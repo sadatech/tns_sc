@@ -36,16 +36,6 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Store Phone Number</label>
-                        <input type="number" class="form-control" value="{{ $str->store_phone }}" name="store_phone" required>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Owner Phone Number</label>
-                        <input type="number" class="form-control" value="{{ $str->owner_phone }}" name="owner_phone" required>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="form-group col-md-12">
                         <label class="control-label">Address</label>
                         <input class="form-control" name="address" id="us3Input-address"/>
@@ -80,34 +70,8 @@
                 </div>
             </div>
             <div class="block-content">
-                <div class="form-group row">
-                    <div class="col-md-6">
-                        <label>Province</label>
-                        <select class="form-control form-control-lg" id="province" name="province" required>
-                            @foreach($province as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label>City</label>
-                        <select class="form-control form-control-lg" id="city" name="city" required>
-                            <option disabled selected>Choose your City</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="block-content">
-                <h5><b>Distributor, Account, Classification, Area</b></h5>
+                <h5><b>Distributor, Account, Area</b></h5>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Classification</label>
-                        <select class="js-select2 custom-select" name="classification" id="classification" required>
-                            @foreach ($classification as $class)
-                            <option value="{{ $class->id }}">{{ $class->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="form-group col-md-6">
                         <label>Distributor</label>
                         <select class="js-select2 custom-select" name="distributor[]" id="distributor" multiple required>
@@ -179,29 +143,28 @@
 <script src="{{ asset('js/locationpicker.jquery.min.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#classification option[value="{{ $str->classification->id }}"]').attr('selected','selected').trigger('change');
         $('#account option[value="{{ $str->account->id }}"]').attr('selected','selected');
         $('#subbarea option[value="{{ $str->subarea->id }}"]').attr('selected','selected');
         $('#type option[value="{{ $str->type }}"]').attr('selected','selected');
-        $('#province option[value="{{ $str->province->id }}"]').attr('selected','selected');
+        // $('#province option[value="{{ $str->province->id }}"]').attr('selected','selected');
         var dist = {{ $dist }};
         $('#distributor').val(dist).trigger('change');
-        $('#province').on('change', e => {
-            var id = $('#province').find(":selected").val()
-            $('#city').empty()
-            $.ajax({
-                type: "GET",
-                url: "{{ route('getCity') }}/?id="+json.province,
-                success: data => {
-                    // console.log(data);
-                    data.forEach(city =>
-                        $('#city').append(`<option value="${city.id}">${city.name}</option>`)
-                    )
+        // $('#province').on('change', e => {
+        //     var id = $('#province').find(":selected").val()
+        //     $('#city').empty()
+        //     $.ajax({
+        //         type: "GET",
+        //         url: "{{ route('getCity') }}/?id="+json.province,
+        //         success: data => {
+        //             // console.log(data);
+        //             data.forEach(city =>
+        //                 $('#city').append(`<option value="${city.id}">${city.name}</option>`)
+        //             )
 
-                    $('#cityInput').val(json.city);
-                }
-            })
-        })
+        //             $('#cityInput').val(json.city);
+        //         }
+        //     })
+        // })
         $.ajax({
             type: "GET", 
             url: "{{ route('getCity') }}/?id={{ $str->province->id }}",

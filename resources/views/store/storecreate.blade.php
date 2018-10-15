@@ -35,16 +35,6 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Store Phone Number</label>
-                        <input type="number" class="form-control" name="store_phone" placeholder="Add new phone number" required>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Owner Phone Number</label>
-                        <input type="number" class="form-control" name="owner_phone" placeholder="Add new owner phone number" required>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="form-group col-md-12">
                         <label class="control-label">Address</label>
                         <input type="text" class="form-control" name="address" id="us3-address"/>
@@ -79,36 +69,8 @@
                 </div>
             </div>
             <div class="block-content">
-                <div class="form-group row">
-                    <div class="col-md-6">
-                        <label>Province</label>
-                        <select class="js-select2 form-control form-control-lg" id="province" name="province" required>
-                            <option value="" disabled selected>Choose your Province</option>
-                            @foreach($province as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label>City</label>
-                        <select class="js-select2 form-control form-control-lg" id="city" name="city" required>
-                            <option value="" disabled selected>Choose your City</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="block-content">
-                <h5><b>Distributor, Account, Classification, Area, and Type</b></h5>
+                <h5><b>Distributor, Account, Area, and Type</b></h5>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Classification</label>
-                        <select class="js-select2 custom-select" name="classification" required>
-                            <option value="" disabled selected>Choose your Classification</option>
-                            @foreach ($classification as $class)
-                            <option value="{{ $class->id }}">{{ $class->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="form-group col-md-6">
                         <label>Distributor</label>
                         <select class="js-select2 custom-select" name="distributor[]" multiple required>

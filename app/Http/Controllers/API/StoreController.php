@@ -21,7 +21,7 @@ class StoreController extends Controller
 			} else {
 				$store = EmployeeStore::where([
 					'id_employee' => $user->id
-				])->with('store.province','store.city','store.account','store.distributor','store.classification','store.subarea')->get(['id_store','alokasi']);
+				])->with('store.province','store.city','store.account','store.distributor','store.subarea')->get(['id_store','alokasi']);
 				if (!$store->isEmpty()) {
 					$storeArr = array();
 					foreach ($store as $key => $value) {
@@ -30,8 +30,6 @@ class StoreController extends Controller
 							'photo' => $value->store->photo,
 							'name1' => $value->store->name1,
 							'name2' => $value->store->name2,
-							'store_phone' => $value->store->store_phone,
-							'owner_phone' => $value->store->owner_phone,
 							'address' => $value->store->address,
 							'latitude' => $value->store->latitude,
 							'longitude' => $value->store->longitude,

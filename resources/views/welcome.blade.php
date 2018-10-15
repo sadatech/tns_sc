@@ -96,23 +96,6 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-6">
-                                <label>Province</label>
-                                <select class="js-select2 form-control form-control-lg" id="province" name="province" required>
-                                    <option value="" disabled selected>Choose your Province</option>
-                                    @foreach($province as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label>City</label>
-                                <select class="js-select2 form-control form-control-lg" id="city" name="city" required>
-                                    <option value="" disabled selected>Choose your City</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-6">
                                 <label>Postal code</label>
                                 <input type="text" class="form-control form-control-lg" name="postal_code" required>
                             </div>

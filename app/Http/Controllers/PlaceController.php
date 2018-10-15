@@ -9,23 +9,20 @@ use DB;
 use Auth;
 use File;
 use Excel;
-use App\City;
-use App\Province;
 use App\Place;
 
 class PlaceController extends Controller
 {
     public function baca()
     {
-        $data['province'] = Province::all();
-        return view('store.place', $data);
+        return view('store.place');
     }
     
-    public function getCity(Request $request) 
-    {
-        $city = City::where('id_province', $request->get('id'))->get();
-        return response()->json($city);
-    }
+    // public function getCity(Request $request) 
+    // {
+    //     $city = City::where('id_province', $request->get('id'))->get();
+    //     return response()->json($city);
+    // }
     
     public function store(Request $request)
     {
@@ -35,8 +32,6 @@ class PlaceController extends Controller
             'code'          => 'required|numeric',
             'address'       => 'required',
             'description'   => 'required',
-            'city'          => 'required|numeric',
-            'province'      => 'required|numeric',
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -53,8 +48,6 @@ class PlaceController extends Controller
                 'latitude'      => $request->input('latitude'),
                 'longitude'     => $request->input('longitude'),
                 'description'   => $request->input('description'),
-                'id_city'       => $request->input('city'),
-                'id_province'   => $request->input('province'),
             ]);
             return redirect()->back()
             ->with([
@@ -67,15 +60,12 @@ class PlaceController extends Controller
 
     public function data()
     {
-        $place = Place::with(['province', 'city'])
-        ->select('places.*');
+        $place = Place::select('places.*');
         return Datatables::of($place)
         ->addColumn('action', function ($place) {
             $data = array(
                 'id'            => $place->id,
                 'name'          => $place->name,
-                'province'      => $place->province->id,
-                'city'          => $place->city->id,
                 'code'          => $place->code,        
                 'address'       => $place->address,
                 'phone'         => $place->phone,    
@@ -95,8 +85,6 @@ class PlaceController extends Controller
         $limit=[
             'name'        => 'required',
             'code'        => 'required',
-            'province'    => 'required',
-            'city'        => 'required',
             'address'     => 'required',
             'latitude'    => 'required',
             'longitude'   => 'required',
@@ -111,8 +99,6 @@ class PlaceController extends Controller
             $place = Place::find($id);
                 $place->name        = $request->input('name');
                 $place->code        = $request->input('code');
-                $place->id_province = $request->input('province');
-                $place->id_city     = $request->input('city');
                 $place->email       = $request->input('email');
                 $place->phone       = $request->input('phone');
                 $place->address     = $request->input('address');
@@ -146,8 +132,6 @@ class PlaceController extends Controller
                     $data['phone']          = $row['phone'];
                     $data['longitude']      = $row['longitude'];
                     $data['latitude']       = $row['latitude'];
-                    $data['id_province']    = $row['province'];
-                    $data['id_city']        = $row['city'];
                     $data['address']        = $row['address'];
                     $data['description']    = $row['description'];
 

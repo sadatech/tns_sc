@@ -25,8 +25,6 @@ class PlaceController extends Controller
 							'id' => $value->id,
 							'code' => $value->code,
 							'name' => $value->name,
-							'city' => $value->city->name,
-							'province' => $value->province->name,
 							'phone' => $value->phone,
 							'email' => $value->email,
 							'latitude' => $value->latitude,
