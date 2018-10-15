@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ChannelTableSeeder::class);
         $this->call(AccountTableSeeder::class);
         $this->call(DistributorTableSeeder::class);
-        $this->call(StoreClassificationTableSeeder::class);
+        // $this->call(StoreClassificationTableSeeder::class);
         $this->call(StoreTableSeeder::class);
         $this->call(PlaceTableSeeder::class);
         $this->call(BrandTableSeeder::class);

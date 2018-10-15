@@ -13,12 +13,9 @@ class CreateStoresTable extends Migration
             $table->text('photo')->nullable();
             $table->string('name1');
             $table->string('name2')->nullable();
-            $table->string('store_phone')->nullable();
-            $table->string('owner_phone')->nullable();
             $table->string('address');
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-            $table->string('type');
             $table->integer('id_account')->unsigned();
             $table->integer('id_subarea')->unsigned();
             $table->string('is_vito');

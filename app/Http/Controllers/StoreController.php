@@ -9,12 +9,9 @@ use Auth;
 use DB;
 use App\Store;
 use App\Account;
-use App\Province;
-use App\City;
 use App\SubArea;
 use App\Distributor;
 use App\StoreDistributor;
-use App\Classification;
 use App\Filters\StoreFilters;
 
 class StoreController extends Controller
@@ -32,22 +29,18 @@ class StoreController extends Controller
 
     public function readStore()
     {
-        $data['province']       = Province::all();
         $data['subarea']        = SubArea::get();
         $data['distributor']    = Distributor::get();
         $data['account']        = Account::get();
-        $data['classification'] = Classification::get();
         return view('store.storecreate', $data);
     }
 
     public function readUpdate($id)
     {
-        $data['province']       = Province::all();
         $data['str'] 		    = Store::where(['id' => $id])->first();
         $data['subarea']        = SubArea::get();
         $data['distributor']    = Distributor::get();
         $data['account']        = Account::get();
-        $data['classification'] = Classification::get();
         $dist                   = StoreDistributor::where(['id_store'=>$id])->get(['id_distributor']);
         $distList = array();
         foreach ($dist as $value) {
@@ -57,11 +50,11 @@ class StoreController extends Controller
         return view('store.storeupdate', $data);
     }
 
-    public function getCity(Request $request) 
-    {
-        $city = City::where('id_province', $request->get('id'))->get();
-        return response()->json($city);
-    }
+    // public function getCity(Request $request) 
+    // {
+    //     $city = City::where('id_province', $request->get('id'))->get();
+    //     return response()->json($city);
+    // }
 
     public function store(Request $request)
     {
@@ -69,17 +62,13 @@ class StoreController extends Controller
         $limit=[
             'photo'          => 'max:10000|mimes:jpeg,jpg,bmp,png',
             'name1'          => 'required',
-            'store_phone'    => 'required',
             'owner_phone'    => 'required',
             'address'        => 'required',
             'latitude'       => 'required',
             'longitude'      => 'required',
             'type'           => 'required',
             'account'        => 'required|numeric',
-            'province'       => 'required|numeric',
-            'city'           => 'required|numeric',
             'distributor'    => 'required',
-            'classification' => 'required|numeric',
             'subarea'        => 'required|numeric',
         ];
         $validator = Validator($data, $limit);
@@ -100,16 +89,11 @@ class StoreController extends Controller
                 'photo'             => $foto,
                 'name1'             => $request->input('name1'),
                 'name2'             => $request->input('name2'),
-                'store_phone'       => $request->input('store_phone'),
-                'owner_phone'       => $request->input('owner_phone'),
                 'address'           => $request->input('address'),
                 'latitude'          => $request->input('latitude'),
                 'longitude'         => $request->input('longitude'),
                 'type'              => $request->input('type'),
                 'id_account'        => $request->input('account'),
-                'id_province'       => $request->input('province'),
-                'id_city'           => $request->input('city'),
-                'id_classification' => $request->input('classification'),
                 'id_subarea'        => $request->input('subarea'),
             ]);
             if ($insert) 
@@ -134,7 +118,7 @@ class StoreController extends Controller
 
     public function data()
     {
-        $store = Store::with(['province', 'city', 'distributor', 'account', 'classification', 'subarea'])
+        $store = Store::with(['province', 'city', 'distributor', 'account', 'subarea'])
         ->select('stores.*');
         return Datatables::of($store)
         ->addColumn('action', function ($store) {
@@ -153,9 +137,6 @@ class StoreController extends Controller
             }
             return rtrim(implode(',', $distList), ',');
         })
-        ->addColumn('classification', function($store) {
-            return $store->classification->name;
-        })
         ->addColumn('subarea', function($store) {
             return $store->subarea->name."(".$store->subarea->area->name.")";
         })->make(true);
@@ -167,16 +148,12 @@ class StoreController extends Controller
         $limit=[
             'photo'          => 'max:10000|mimes:jpeg,jpg,bmp,png',
             'name1'          => 'required',
-            'store_phone'    => 'required',
             'address'        => 'required',
             'latitude'       => 'required',
             'longitude'      => 'required',
             'type'           => 'required',
             'account'        => 'required|numeric',
-            'province'       => 'required',
-            'city'           => 'required',
             'distributor'    => 'required',
-            'classification' => 'required|numeric',
             'subarea'        => 'required|numeric',
         ];
         $validator = Validator($data, $limit);
@@ -209,17 +186,12 @@ class StoreController extends Controller
                 }
                 $store->name1             = $request->input('name1');
                 $store->name2             = $request->input('name2');
-                $store->store_phone       = $request->input('store_phone');
-                $store->owner_phone       = $request->input('owner_phone');
                 $store->address           = $request->input('address');
                 $store->latitude          = $request->input('latitude');
                 $store->longitude         = $request->input('longitude');
                 $store->type              = $request->input('type');
                 $store->id_account        = $request->input('account');
-                $store->id_province       = $request->input('province');
-                $store->id_city           = $request->input('city');
                 // $store->id_distributor    = $request->input('distributor');
-                $store->id_classification = $request->input('classification');
                 $store->id_subarea        = $request->input('subarea');
                 $store->save();
                 return redirect()->route('store')

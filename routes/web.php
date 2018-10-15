@@ -109,13 +109,13 @@ Route::prefix('store')->group(function () {
 	});
 
 	//Classification Pages
-	Route::prefix('classification')->group(function(){
-		Route::get('/', 'ClassificationController@baca')->name('classification')->middleware('auth');
-		Route::get('/data', 'ClassificationController@data')->name('classification.data')->middleware('auth');
-		Route::post('/create', 'ClassificationController@store')->name('classification.add')->middleware('auth');
-		Route::put('/update/{id}', 'ClassificationController@update')->name('classification.update')->middleware('auth');
-		Route::get('/delete/{id}', 'ClassificationController@delete')->name('classification.delete')->middleware('auth');
-	});
+	// Route::prefix('classification')->group(function(){
+	// 	Route::get('/', 'ClassificationController@baca')->name('classification')->middleware('auth');
+	// 	Route::get('/data', 'ClassificationController@data')->name('classification.data')->middleware('auth');
+	// 	Route::post('/create', 'ClassificationController@store')->name('classification.add')->middleware('auth');
+	// 	Route::put('/update/{id}', 'ClassificationController@update')->name('classification.update')->middleware('auth');
+	// 	Route::get('/delete/{id}', 'ClassificationController@delete')->name('classification.delete')->middleware('auth');
+	// });
 
 	//Area Pages
 	Route::prefix('area')->group(function () {

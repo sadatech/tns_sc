@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Province;
-use App\City;
 use App\Company;
 use App\User;
 use DB;
@@ -21,18 +19,16 @@ class DashboardController extends Controller
     //         return view('welcome', $data);
     // }
     
-    public function getCity(Request $request) {
-        $city = City::where('id_province', $request->get('id'))->get();
-        return response()->json($city);
-    }
+    // public function getCity(Request $request) {
+    //     $city = City::where('id_province', $request->get('id'))->get();
+    //     return response()->json($city);
+    // }
     
     public function create_company(Request $request)
     {
         $data=$request->all();
         $limit=[
             'logo'          => 'max:10000|required|mimes:jpeg,jpg,bmp,png',
-            'province'      => 'required|numeric',
-            'city'          => 'required|numeric',
             'username'      => 'required|max:20',
             'name'          => 'required',
             'email'         => 'required|email',
@@ -65,8 +61,6 @@ class DashboardController extends Controller
                 }
             }
             $insert = Company::create([
-                'id_province' => $request->input('province'),
-                'id_city'     => $request->input('city'),
                 'logo'        => $foto,
                 'username'    => $request->input('username'),
                 'name'        => $request->input('name'),

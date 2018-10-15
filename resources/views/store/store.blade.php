@@ -27,14 +27,9 @@
                         <th width="200px">Sub Area</th>
                         <th width="200px">Account</th>
                         <th>Distributor</th>
-                        <th>Classification</th>
-                        <th>City</th>
-                        <th>Province</th>
                         <th>Longitude</th>
                         <th>Latitude</th>
                         <th width="200px">Address</th>
-                        <th width="200px">Store Phone</th>
-                        <th width="200px">Owner Phone</th>
                     </thead>
                 </table>
             </div> 
@@ -123,14 +118,9 @@
             { data: 'subarea', name: 'subarea' },
             { data: 'account', name: 'account' },
             { data: 'distributor', name: 'distributor' },
-            { data: 'classification', name: 'classification' },
-            { data: 'city.name', name: 'city.name' },
-            { data: 'province.name', name: 'province.name' },
             { data: 'longitude', name: 'longitude' },
             { data: 'latitude', name: 'latitude' },
             { data: 'address', name: 'address' },
-            { data: 'store_phone', name: 'store_phone' },
-            { data: 'owner_phone', name: 'owner_phone' },
             ]
         });
     });

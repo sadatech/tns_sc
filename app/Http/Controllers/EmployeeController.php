@@ -54,7 +54,7 @@ class EmployeeController extends Controller
 		$data['store'] 		= Store::get();
 		$position 			= Position::where(['level' => 'level 2'])->first();
 		$data['spv'] 		= Employee::where(['id_position' => $position->id])->get();
-		$data['store_selected'] = json_encode(EmployeeStore::where(['employee_stores.id_employee' => $id])->join('stores','stores.id','employee_stores.id_store')->join('cities','cities.id','stores.id_city')->join('provinces','provinces.id','stores.id_province')->select(DB::raw("concat(stores.id,'|',stores.name1,' - ',cities.name,', ',provinces.name) as stores_item"))->get()->toArray());
+		$data['store_selected'] = json_encode(EmployeeStore::where(['employee_stores.id_employee' => $id])->join('stores','stores.id','employee_stores.id_store')->select(DB::raw("concat(stores.id,'|',stores.name1) as stores_item"))->get()->toArray());
 		if ($data['emp']->isResign) {
 			return redirect()->route('employee');
 		} else {
