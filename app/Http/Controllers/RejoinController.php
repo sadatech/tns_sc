@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
+use App\Rejoin;
+use App\Resign;
+use App\Employee;
+use Auth;
+
+class RejoinController extends Controller
+{
+    public function baca()
+    {
+        return view('employee.rejoin');
+    }
+
+    public function data()
+    {
+        $rejoin = Employee::where([
+            ['isResign', true]
+        ])->with(['position', 'agency']);
+
+        return Datatables::of($rejoin)
+        ->addColumn('position', function($rejoin) {
+            return $rejoin->position->name;
+        })
+        ->addColumn('agency', function($rejoin) {
+            return $rejoin->agency->name;
+        })
+        ->addColumn('action', function ($rejoin) {
+            $resign = Resign::where(['id_employee' => $rejoin->id])->first();
+            $data = array(
+                'id'               => $rejoin->id,
+                'name'          => $rejoin->name,
+                'nik'           => $rejoin->nik,
+                'position'      => $rejoin->position->name,
+                'status'        => $rejoin->status,
+                'agency'        => $rejoin->agency->name,
+                'resign_date'   => $resign->resign_date,
+                'alasan'        => $resign->alasan,
+                'penjelasan'    => $resign->penjelasan
+            );
+            return "<a href='#rejoin' onclick='modalRejoin(".json_encode($data).")' data-toggle='modal' class='btn btn-sm btn-block btn-success btn-square'><i class='si si-logout mr-2'></i>Rejoin</a>";
+        })->make(true);
+    }
+
+    public function store(Request $request)
+    {
+        $check = Employee::where([
+            ['id', $request->input('employee')],
+        ]);
+        if ($check) {
+            $insert = Rejoin::create([
+                'join_date'     => $request->input('join_date'),
+                'alasan'        => $request->input('alasan'),
+                'id_employee'   => $request->input('employee')
+            ]);
+            if ($insert->id) {
+                $update = Employee::find($request->input('employee'));
+                $update->isResign = false;
+                if ($update->save()) {
+                    return redirect()->back()
+                    ->with([
+                        'type'      => 'success',
+                        'title'     => 'Sukses!<br/>',
+                        'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil melakukan rejoin pegawai!'
+                    ]);
+                } else {
+                    return redirect()->back()
+                    ->with([
+                        'type'      => 'danger',
+                        'title'     => 'Gagal!<br/>',
+                        'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil melakukan rejoin pegawai!'
+                    ]);
+                }
+                
+            }
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'      => 'danger',
+                'title'     => 'Gagal!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Kamu tidak diizinkan!'
+            ]);
+        }
+    }
+}
