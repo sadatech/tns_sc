@@ -17,6 +17,7 @@ class CreateDetailInsTable extends Migration
             $table->tinyInteger('is_pf');
             $table->tinyInteger('is_target');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_sellin')->references('id')->on('sell_ins')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');

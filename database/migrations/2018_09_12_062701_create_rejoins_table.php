@@ -14,6 +14,7 @@ class CreateRejoinsTable extends Migration
             $table->dateTime('join_date');
             $table->string('alasan');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
         });

@@ -11,29 +11,29 @@ class CreateImportQueuesTable extends Migration
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::create('import_queues', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('id_employee')->unsigned();
-            $table->date('date');
-            $table->text('file')->nullable();
-            $table->string('type')->nullable();
-            $table->string('status')->nullable();
-            $table->string('log')->nullable();
-            $table->timestamps();
+    // public function up()
+    // {
+    //     Schema::create('import_queues', function (Blueprint $table) {
+    //         $table->increments('id');
+    //         $table->integer('id_employee')->unsigned();
+    //         $table->date('date');
+    //         $table->text('file')->nullable();
+    //         $table->string('type')->nullable();
+    //         $table->string('status')->nullable();
+    //         $table->string('log')->nullable();
+    //         $table->timestamps();
 
-            $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
-        });
-    }
+    //         $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
+    //     });
+    // }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('import_queues');
-    }
+    // /**
+    //  * Reverse the migrations.
+    //  *
+    //  * @return void
+    //  */
+    // public function down()
+    // {
+    //     Schema::dropIfExists('import_queues');
+    // }
 }

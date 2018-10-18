@@ -21,6 +21,7 @@ class CreateDetailOutsTable extends Migration
             $table->integer('price');
             $table->integer('is_pf');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_sellout')->references('id')->on('sell_outs')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');

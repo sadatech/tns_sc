@@ -13,6 +13,7 @@ class CreateResignStoresTable extends Migration
             $table->integer('id_store')->unsigned();
             $table->integer('id_resign')->unsigned();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_store')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_resign')->references('id')->on('resigns')->onUpdate('cascade')->onDelete('cascade');
