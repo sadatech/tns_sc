@@ -13,6 +13,7 @@ class CreateTimezonesTable extends Migration
             $table->string('name');
             $table->string('timezone');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         DB::table('timezones')->insert([

@@ -16,6 +16,7 @@ class CreateStockDetailsTable extends Migration
             $table->integer('qty');
             $table->boolean('isPf');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_stock')->references('id')->on('stocks')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');

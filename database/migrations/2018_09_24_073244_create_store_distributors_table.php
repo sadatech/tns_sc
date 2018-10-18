@@ -13,6 +13,7 @@ class CreateStoreDistributorsTable extends Migration
             $table->integer('id_store')->unsigned();
             $table->integer('id_distributor')->unsigned();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_store')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_distributor')->references('id')->on('distributors')->onUpdate('cascade')->onDelete('cascade');

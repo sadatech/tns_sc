@@ -13,6 +13,7 @@ class CreateAreasTable extends Migration
             $table->string('name');
             $table->integer('id_region')->unsigned();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_region')->references('id')->on('regions')->onUpdate('cascade')->onDelete('cascade');
         });

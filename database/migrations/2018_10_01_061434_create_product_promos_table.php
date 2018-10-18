@@ -16,14 +16,18 @@ class CreateProductPromosTable extends Migration
         Schema::create('product_promos', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_product')->unsigned();
-            $table->integer('id_area')->unsigned()->nullable();
-            $table->enum('type',['TR','MR','ALL']);
+            // $table->integer('id_area')->unsigned()->nullable();
+            // $table->enum('type',['TR','MR','ALL']);
+            $table->string('type'); // Normal, Bundling, Cut Price
+            $table->text('keterangan'); // Keterangan
+            $table->text('photo');
             $table->date('from');
             $table->date('to')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('id_area')->references('id')->on('areas')->onUpdate('cascade')->onDelete('cascade');
+            // $table->foreign('id_area')->references('id')->on('areas')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

@@ -12,8 +12,8 @@ class CreateEmployeeStoresTable extends Migration
             $table->increments('id');
             $table->integer('id_store')->unsigned();
             $table->integer('id_employee')->unsigned();
-            $table->string('alokasi',5);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_store')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');

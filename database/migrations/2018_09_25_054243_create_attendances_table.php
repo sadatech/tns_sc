@@ -19,6 +19,7 @@ class CreateAttendancesTable extends Migration
             $table->enum('keterangan',['Cuti', 'Sakit', 'Off','Check-in']);
             $table->datetime('date');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
         });

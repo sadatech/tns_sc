@@ -18,15 +18,19 @@ class CreateStoresTable extends Migration
             $table->string('longitude')->nullable();
             $table->integer('id_account')->unsigned();
             $table->integer('id_subarea')->unsigned();
+            $table->integer('id_timezone')->unsigned();
+            $table->integer('id_salestier')->unsigned();
             $table->string('is_vito');
             $table->string('store_panel');
-            $table->string('sales_tier');
             $table->string('coverage');
             $table->string('delivery');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_account')->references('id')->on('accounts')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_subarea')->references('id')->on('sub_areas')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_timezone')->references('id')->on('timezones')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_salestier')->references('id')->on('sales_tiers')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

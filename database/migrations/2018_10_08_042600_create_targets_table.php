@@ -13,8 +13,11 @@ class CreateTargetsTable extends Migration
             $table->integer('id_employee')->unsigned();
             $table->integer('id_store')->unsigned();
             $table->date('rilis');
-            $table->enum('type',['Sell In','Sell Out']);
+            // $table->enum('type',['Sell In','Sell Out']);
+            $table->integer('value');
+            $table->integer('value_pf');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_store')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
