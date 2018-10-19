@@ -14,10 +14,9 @@ class DashboardController extends Controller
             return view('dashboard');
     }
     
-    // public function welcome() {
-    //         $data['province'] = Province::all();
-    //         return view('welcome', $data);
-    // }
+    public function welcome() {
+            return view('welcome');
+    }
     
     // public function getCity(Request $request) {
     //     $city = City::where('id_province', $request->get('id'))->get();

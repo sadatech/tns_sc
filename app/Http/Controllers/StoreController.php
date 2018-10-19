@@ -62,11 +62,9 @@ class StoreController extends Controller
         $limit=[
             'photo'          => 'max:10000|mimes:jpeg,jpg,bmp,png',
             'name1'          => 'required',
-            'owner_phone'    => 'required',
             'address'        => 'required',
             'latitude'       => 'required',
             'longitude'      => 'required',
-            'type'           => 'required',
             'account'        => 'required|numeric',
             'distributor'    => 'required',
             'subarea'        => 'required|numeric',
@@ -92,7 +90,6 @@ class StoreController extends Controller
                 'address'           => $request->input('address'),
                 'latitude'          => $request->input('latitude'),
                 'longitude'         => $request->input('longitude'),
-                'type'              => $request->input('type'),
                 'id_account'        => $request->input('account'),
                 'id_subarea'        => $request->input('subarea'),
             ]);
@@ -118,7 +115,7 @@ class StoreController extends Controller
 
     public function data()
     {
-        $store = Store::with(['province', 'city', 'distributor', 'account', 'subarea'])
+        $store = Store::with(['distributor', 'account', 'subarea'])
         ->select('stores.*');
         return Datatables::of($store)
         ->addColumn('action', function ($store) {
@@ -151,7 +148,6 @@ class StoreController extends Controller
             'address'        => 'required',
             'latitude'       => 'required',
             'longitude'      => 'required',
-            'type'           => 'required',
             'account'        => 'required|numeric',
             'distributor'    => 'required',
             'subarea'        => 'required|numeric',

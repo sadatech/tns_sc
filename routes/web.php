@@ -10,9 +10,7 @@
 |
 */
 
-Route::get('/', function () {
-	return view('portal');
-})->name('beranda');
+Route::get('/', 'DashboardController@dashboard')->name('dashboard')->middleware('auth');
 
 
 Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard')->middleware('auth');

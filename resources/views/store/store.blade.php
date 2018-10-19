@@ -23,7 +23,6 @@
                         <th class="text-center" style="width: 150px;">Action</th>
                         <th width="200px">Name</th>
                         <th width="200px">Optional Name</th>
-                        <th width="200px">Type Store</th>
                         <th width="200px">Sub Area</th>
                         <th width="200px">Account</th>
                         <th>Distributor</th>
@@ -114,7 +113,6 @@
             { data: 'action', name: 'action' },
             { data: 'name1', name: 'name1' },
             { data: 'name2', name: 'name2' },
-            { data: 'type', name: 'type' },
             { data: 'subarea', name: 'subarea' },
             { data: 'account', name: 'account' },
             { data: 'distributor', name: 'distributor' },

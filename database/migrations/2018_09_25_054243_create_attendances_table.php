@@ -16,7 +16,7 @@ class CreateAttendancesTable extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_employee')->unsigned();
-            $table->enum('keterangan',['Cuti', 'Sakit', 'Off','Check-in']);
+            $table->string('keterangan');
             $table->datetime('date');
             $table->timestamps();
             $table->softDeletes();

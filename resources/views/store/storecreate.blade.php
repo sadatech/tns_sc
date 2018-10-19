@@ -79,8 +79,6 @@
                             @endforeach
                         </select>
                     </div>
-                </div>
-                <div class="row">
                     <div class="form-group col-md-6">
                         <label>Account</label>
                         <select class="js-select2 custom-select" name="account" required>
@@ -90,6 +88,8 @@
                             @endforeach
                         </select>
                     </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-md-6">
                         <label>Sub Area/ Area</label>
                         <select class="js-select2 form-control" name="subarea" required>
@@ -97,16 +97,6 @@
                             @foreach($subarea as $data)
                                 <option value="{{ $data->id }}">{{ $data->area->name }} - {{ $data->name }}</option>
                             @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Type Store</label>
-                        <select class="form-control" name="type" required>
-                            <option value="" disabled selected>Choose your Type Store</option>
-                            <option value="TR"> TR </option>
-                            <option value="MR"> MR </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">

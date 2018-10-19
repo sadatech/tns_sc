@@ -8,6 +8,7 @@ use Auth;
 use DB;
 use App\Product;
 use App\Category;
+use App\SubCategory;
 use App\Brand;
 
 class CategoryController extends Controller
@@ -87,7 +88,7 @@ class CategoryController extends Controller
     public function delete($id) 
     {
         $category = Category::find($id);
-            $duct = Product::where(['id_category' => $category->id])->count();
+            $duct = SubCategory::where(['id_category' => $category->id])->count();
             if (!$duct < 1) {
                 return redirect()->back()
                 ->with([
