@@ -13,12 +13,13 @@ class CreateHeaderInsTable extends Migration
             $table->integer('id_store')->unsigned();
             $table->integer('id_employee')->unsigned();
             $table->date('date');
-            $table->integer('week');
+            $table->integer('week');    
             $table->timestamps();
 
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_store')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
-         });
+
+        });
     }
 
     public function down()

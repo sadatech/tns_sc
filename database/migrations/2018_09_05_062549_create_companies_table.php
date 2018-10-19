@@ -30,7 +30,7 @@ class CreateCompaniesTable extends Migration
             //3 : One Price
             $table->string('token')->unique();
             $table->timestamps();
-            
+
             $table->foreign('id_province')->references('id')->on('provinces')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_city')->references('id')->on('cities')->onUpdate('cascade')->onDelete('cascade');
         });
