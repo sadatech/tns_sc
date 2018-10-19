@@ -1,7 +1,9 @@
 <?php
+
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+
 class CreateCompaniesTable extends Migration
 {
     public function up()
@@ -28,6 +30,7 @@ class CreateCompaniesTable extends Migration
             //3 : One Price
             $table->string('token')->unique();
             $table->timestamps();
+            
             $table->foreign('id_province')->references('id')->on('provinces')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_city')->references('id')->on('cities')->onUpdate('cascade')->onDelete('cascade');
         });

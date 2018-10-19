@@ -10,7 +10,7 @@ class CreatePlacesTable extends Migration
     {
         Schema::create('places', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('id_province')->unsigned(); 
+            $table->integer('id_province')->unsigned();
             $table->integer('id_city')->unsigned();
             $table->string('code');
             $table->string('name');
