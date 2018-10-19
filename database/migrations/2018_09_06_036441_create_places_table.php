@@ -10,18 +10,20 @@ class CreatePlacesTable extends Migration
     {
         Schema::create('places', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('id_province')->unsigned(); 
+            $table->integer('id_city')->unsigned();
             $table->string('code');
             $table->string('name');
-            $table->integer('id_subarea')->unsigned()->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
-            $table->string('latitude')->nullable();
-            $table->string('longitude')->nullable();
-            $table->string('address')->nullable();
-            $table->string('description')->nullable();
+            $table->string('latitude');
+            $table->string('longitude');
+            $table->string('address');
+            $table->string('description');
             $table->timestamps();
 
-            $table->foreign('id_subarea')->references('id')->on('sub_areas')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_province')->references('id')->on('provinces')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_city')->references('id')->on('cities')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

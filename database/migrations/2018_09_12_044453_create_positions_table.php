@@ -11,15 +11,11 @@ class CreatePositionsTable extends Migration
         Schema::create('positions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->enum('level', ['level 1', 'level 2', 'level 3', 'level 4']);    
             $table->timestamps();
 
         });
-        DB::table('users')->insert([
-            ['name' => 'SPG'],
-            ['name' => 'SPG Pasar'],
-            ['name' => 'MD'],
-            ['name' => 'MD Pasar']
-        ]);
+        DB::table('users')->inser
     }
 
     public function down()
