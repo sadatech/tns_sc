@@ -19,6 +19,9 @@ class CreateBrandsTable extends Migration
             $table->string('keterangan')->nullable();
             $table->timestamps();
         });
+        DB::table('brands')->insert([
+            ['name' => 'SASA']
+        ]);
     }
 
     /**

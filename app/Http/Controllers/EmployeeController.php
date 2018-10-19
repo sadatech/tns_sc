@@ -16,7 +16,6 @@ use App\Store;
 use App\Timezone;
 use App\Employee;
 use App\EmployeeStore;
-use App\EmployeeBrand;
 use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
@@ -40,7 +39,6 @@ class EmployeeController extends Controller
 		$data['store'] 		= Store::get();
 		$position 			= Position::where(['level' => 'level 2'])->first();
 		$data['spv'] 		= Employee::where(['id_position' => $position->id]);
-		$data['brand'] 		= Brand::get();
 		$data['subarea'] 	= SubArea::get();
 		return view('employee.employeecreate', $data);
 	}
@@ -50,7 +48,6 @@ class EmployeeController extends Controller
 		$data['emp'] 		= Employee::where(['id' => $id])->first();
 		$data['position'] 	= Position::get();
 		$data['agency'] 	= Agency::get();
-		$data['brand'] 		= Brand::get();
 		$data['store'] 		= Store::get();
 		$position 			= Position::where(['level' => 'level 2'])->first();
 		$data['spv'] 		= Employee::where(['id_position' => $position->id])->get();
@@ -203,16 +200,6 @@ class EmployeeController extends Controller
 					'id_timezone' 	=> $request->input('timezone'),
 					'id_agency' 	=> $request->input('agency')
 				]);
-				if ($insertData) {
-					$dataBrand = array();
-						foreach ($request->input('brand') as $brand) {
-							$dataBrand[] = array(
-								'id_brand'    			=> $brand,
-								'id_employee'          	=> $insertData->id
-							);
-						}
-						DB::table('employee_brands')->insert($dataBrand);
-				}
 				return redirect()->route('employee')
 				->with([
 					'type' 		=> 'success',
@@ -225,7 +212,7 @@ class EmployeeController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false])->with(['agency', 'brand', 'subarea', 'position', 'employeeStore', 'timezone'])
+		$employee = Employee::where(['isResign' => false])->with(['agency', 'subarea', 'position', 'employeeStore', 'timezone'])
 		->select('employees.*');
 		// dd($employee->get()[0]);
 		return Datatables::of($employee)
@@ -256,14 +243,6 @@ class EmployeeController extends Controller
 		->addColumn('timezone', function($employee) {
 			return $employee->timezone->name;
 		})
-		->addColumn('brand', function($employee) {
-            $dist = EmployeeBrand::where(['id_employee'=>$employee->id])->get();
-            $brandList = array();
-            foreach ($dist as $data) {
-                $brandList[] = $data->brand->name;
-            }
-            return rtrim(implode(',', $brandList), ',');
-        })
 		->addColumn('subarea', function($employee) {
 			if (isset($employee->subarea)) {
 				$subarea = $employee->subarea->name;
@@ -291,7 +270,6 @@ class EmployeeController extends Controller
 			'phone'       			=> 	'required|numeric',
 			'agency'				=> 	'required|numeric',
 			'position'				=> 	'required|numeric',
-			'brand'					=>	'required|numeric'
 		];
 		$validator = Validator($data, $limit);
 		if ($validator->fails()){

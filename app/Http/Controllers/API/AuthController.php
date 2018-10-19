@@ -104,7 +104,7 @@ class AuthController extends Controller
 									'gender' => $user->gender,
 									'education' => $user->education,
 									'birthdate' => $user->birthdate,
-									'level' => $user->position->level,
+									'level' => $user->position,
 									'position' => $user->position->name,
 									'agency' => $user->agency->name,
 									'token' => $token

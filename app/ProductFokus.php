@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductFokus extends Model
 {
     protected $fillable = [
-        'id_product', 'id_area', 'type', 'from', 'to'
+        'id_product', 'id_area', 'from', 'to'
     ];
 
     public function product()

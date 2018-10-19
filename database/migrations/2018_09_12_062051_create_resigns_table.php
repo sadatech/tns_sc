@@ -13,8 +13,8 @@ class CreateResignsTable extends Migration
             $table->integer('id_employee')->unsigned();
             $table->date('resign_date');
             $table->date('effective');
-            $table->text('alasan');
-            $table->text('penjelasan');
+            $table->text('alasan')->nullable();
+            $table->text('penjelasan')->nullable();
             $table->timestamps();
 
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');

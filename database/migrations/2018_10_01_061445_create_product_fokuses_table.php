@@ -12,7 +12,6 @@ class CreateProductFokusesTable extends Migration
             $table->increments('id');
             $table->integer('id_product')->unsigned();
             $table->integer('id_area')->unsigned()->nullable();
-            $table->enum('type',['TR','MR','ALL']);
             $table->string('from');
             $table->string('to')->nullable();
             $table->timestamps();

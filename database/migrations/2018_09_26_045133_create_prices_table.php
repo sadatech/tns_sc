@@ -13,8 +13,6 @@ class CreatePricesTable extends Migration
             $table->integer('id_product')->unsigned();
             $table->string('price');
             $table->date('rilis');
-            $table->enum('type_toko', ['TR', 'MR', 'ALL']);
-            $table->enum('type_price', ['1', '2', '3']);
             //1 : sellin
             //2 : sellout
             //3 : oneprice

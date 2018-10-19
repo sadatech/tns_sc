@@ -153,14 +153,6 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Brand</label>
-                        <select class="js-select form-control form-control-lg" name="brand[]" multiple required>
-                            @foreach($brand as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="form-group col-md-6" id="subarea" >
                         <label>Sub Area / Area</label>
                         <select class="js-select form-control form-control-lg" style="width: 100%" name="subarea" id="subareaInput">

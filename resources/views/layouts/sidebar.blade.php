@@ -55,9 +55,9 @@
                         <a class="{{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><i class="si si-cup"></i><span class="sidebar-mini-hide">Dashboard</span></a>
                     </li>
                     @if(Auth::user()->level == "administrator") 
-                    <li>
+                    <!-- <li>
                         <a class="{{ request()->is('company') ? 'active' : '' }}" href="{{ route('company') }}"><i class="si si-briefcase"></i><span class="sidebar-mini-hide">Company Profile</span></a>
-                    </li>
+                    </li> -->
                     @endif
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Master Data</span></li>
                     {{-- Store --}}
