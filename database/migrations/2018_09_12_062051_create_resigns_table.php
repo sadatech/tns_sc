@@ -16,6 +16,7 @@ class CreateResignsTable extends Migration
             $table->text('alasan')->nullable();
             $table->text('penjelasan')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
         });

@@ -21,6 +21,7 @@ class CreateAttendanceDetailsTable extends Migration
             $table->datetime('checkin');
             $table->datetime('checkout')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_store')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_place')->references('id')->on('places')->onUpdate('cascade')->onDelete('cascade');

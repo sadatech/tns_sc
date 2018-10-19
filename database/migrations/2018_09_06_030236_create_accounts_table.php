@@ -13,6 +13,7 @@ class CreateAccountsTable extends Migration
             $table->integer('id_channel')->unsigned();
             $table->string('name');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_channel')->references('id')->on('channels')->onUpdate('cascade')->onDelete('cascade');
         });

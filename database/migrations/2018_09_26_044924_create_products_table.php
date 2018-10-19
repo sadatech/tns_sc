@@ -16,6 +16,7 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->string('panel')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_subcategory')->references('id')->on('sub_categories')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_brand')->references('id')->on('brands')->onUpdate('cascade')->onDelete('cascade');

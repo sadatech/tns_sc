@@ -12,10 +12,11 @@ class CreateProductFokusesTable extends Migration
             $table->increments('id');
             $table->integer('id_product')->unsigned();
             $table->integer('id_area')->unsigned()->nullable();
-            $table->enum('type',['TR','MR','ALL']);
+            // $table->enum('type',['TR','MR','ALL']);
             $table->string('from');
             $table->string('to')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_area')->references('id')->on('areas')->onUpdate('cascade')->onDelete('cascade');
