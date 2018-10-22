@@ -37,8 +37,6 @@ class EmployeeController extends Controller
 		$data['position'] 	= Position::get();
 		$data['agency'] 	= Agency::get();
 		$data['store'] 		= Store::get();
-		$position 			= Position::where(['level' => 'level 2'])->first();
-		$data['spv'] 		= Employee::where(['id_position' => $position->id]);
 		$data['subarea'] 	= SubArea::get();
 		return view('employee.employeecreate', $data);
 	}
@@ -49,8 +47,6 @@ class EmployeeController extends Controller
 		$data['position'] 	= Position::get();
 		$data['agency'] 	= Agency::get();
 		$data['store'] 		= Store::get();
-		$position 			= Position::where(['level' => 'level 2'])->first();
-		$data['spv'] 		= Employee::where(['id_position' => $position->id])->get();
 		$data['store_selected'] = json_encode(EmployeeStore::where(['employee_stores.id_employee' => $id])->join('stores','stores.id','employee_stores.id_store')->select(DB::raw("concat(stores.id,'|',stores.name1) as stores_item"))->get()->toArray());
 		if ($data['emp']->isResign) {
 			return redirect()->route('employee');

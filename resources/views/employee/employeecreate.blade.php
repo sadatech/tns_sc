@@ -220,21 +220,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-12" id="spv">
-                        @if($spv->count() < 1)
-                        <b class="text-danger">*Kamu tidak memiliki supervisor, harap tambahkan supervisor terlebih dahulu.</b>
-                        @else
-                        <label>Supervisor</label>
-                        <select class="form-control form-control-lg" name="spv">
-                            <option disabled selected>Choose your Status</option>
-                            @foreach($spv->get() as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                        @endif
-                    </div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-alt-success">
