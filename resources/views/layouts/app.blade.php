@@ -30,6 +30,9 @@
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/emoji.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/codebase.min.css') }}">
+
+    @yield('select2-plugins-resource')
+
     @yield('css')
 </head>
 <body>
@@ -139,5 +142,6 @@
     <script src="{{ asset('assets/js/plugins/select2/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
     @yield('script')
+    @stack('additional-js')
 </body>
 </html>
