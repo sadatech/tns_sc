@@ -113,7 +113,7 @@
                 <div class="block-content">
                     <div class="form-group">
                         <label>Code Distributor</label>
-                        <input type="number" class="form-control" name="code" placeholder="Add new code" required>
+                        <input type="text" class="form-control" name="code" placeholder="Add new code" required>
                     </div>
                     <div class="form-group">
                         <label>Name Distributor</label>

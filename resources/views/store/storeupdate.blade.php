@@ -26,8 +26,9 @@
             {!! csrf_field() !!}
             <div class="block-content">
                 <div class="row">
+
                     <div class="form-group col-md-6">
-                        <label>Name</label>
+                        <label>Name</label> {{$str->id_timezone}}
                         <input type="text" class="form-control" value="{{ $str->name1 }}" name="name1" required>
                     </div>
                     <div class="form-group col-md-6">
@@ -80,6 +81,14 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="form-group col-md-6">
+                         <label>Sales</label>
+                        <select class="js-select2 custom-select" name="sales" id="sales" required>
+                            @foreach($sales as $time)
+                                <option value="{{$time->id}}">{{$time->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
@@ -100,12 +109,12 @@
                     </div>
                 </div>
                 <div class="row">
-                <div class="form-group col-md-6">
-                        <label>Type Store</label>
-                        <select class="form-control" id="type" name="type" required>
-                            <option value="" disabled selected>Choose your Type Store</option>
-                            <option value="TR"> TR </option>
-                            <option value="MR"> MR </option>
+              <div class="form-group col-md-6">
+                        <label>Timezones</label>
+                        <select class="js-select2 custom-select" name="timezone" id="timezone" required>
+                            @foreach($timezone as $time)
+                                <option value="{{$time->id}}">{{$time->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -145,36 +154,16 @@
     $(document).ready(function() {
         $('#account option[value="{{ $str->account->id }}"]').attr('selected','selected');
         $('#subbarea option[value="{{ $str->subarea->id }}"]').attr('selected','selected');
-        $('#type option[value="{{ $str->type }}"]').attr('selected','selected');
-        // $('#province option[value="{{ $str->province->id }}"]').attr('selected','selected');
-        var dist = {{ $dist }};
-        $('#distributor').val(dist).trigger('change');
-        // $('#province').on('change', e => {
-        //     var id = $('#province').find(":selected").val()
-        //     $('#city').empty()
-        //     $.ajax({
-        //         type: "GET",
-        //         url: "{{ route('getCity') }}/?id="+json.province,
-        //         success: data => {
-        //             // console.log(data);
-        //             data.forEach(city =>
-        //                 $('#city').append(`<option value="${city.id}">${city.name}</option>`)
-        //             )
+        $('#timezone option[value="{{ $str->id_timezone }}"]').attr('selected','selected');
+        $('#sales option[value="{{ $str->id_salestier }}"]').attr('selected','selected');
 
-        //             $('#cityInput').val(json.city);
-        //         }
-        //     })
-        // })
-        $.ajax({
-            type: "GET", 
-            url: "{{ route('getCity') }}/?id={{ $str->province->id }}",
-            success: data => {
-                data.forEach(city =>
-                    $('#city').append(`<option value="${city.id}">${city.name}</option>`)
-                    )
-                $('#city').val({{ $str->city->id }});
-            }  
-        })
+      
+        var dists = {{ $dist }}
+        $('#distributor').val(dists).trigger('change');
+        $('#account').trigger('change');
+        $('#timezone').trigger('change');
+        $('#subbarea').trigger('change');
+        $('#sales').trigger('change');
     });
 
 
