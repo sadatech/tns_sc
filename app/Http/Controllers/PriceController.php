@@ -25,7 +25,7 @@ class PriceController extends Controller
             return $price->product->name;
         })
         ->addColumn('category', function($price) {
-            return $price->product->category->name;
+            return $price->product->subCategory->name;
         })
         ->addColumn('action', function ($price) {
             $data = array(
@@ -33,8 +33,6 @@ class PriceController extends Controller
                 'product'           => $price->product->id,
                 'rilis'             => $price->rilis,
                 'price'             => $price->price,
-                'type_toko'         => $price->type_toko,
-                'type_price'        => $price->type_price
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('price.delete', $price->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -47,8 +45,6 @@ class PriceController extends Controller
         $limit=[
             'price'         => 'required',
             'product'       => 'required|numeric',
-            'Ttoko'         => 'required',
-            'Tprice'        => 'required',
             'rilis'         => 'required'
         ];
         $validator = Validator($data, $limit);
@@ -60,8 +56,6 @@ class PriceController extends Controller
             Price::create([
                 'price'         => $request->input('price'),
                 'id_product'    => $request->input('product'),
-                'type_toko'     => $request->input('Ttoko'),
-                'type_price'    => $request->input('Tprice'),
                 'rilis'         => $request->input('rilis'),
             ]);
             return redirect()->back()
@@ -78,8 +72,6 @@ class PriceController extends Controller
       $price = Price::find($id);
         $price->price         = $request->get('price');
         $price->rilis         = $request->get('rilis');
-        $price->type_toko     = $request->get('Ttoko');
-        $price->type_price    = $request->get('Tprice');
         $price->id_product    = $request->get('product');
 
         $price->save();
