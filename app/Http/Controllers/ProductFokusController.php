@@ -12,9 +12,7 @@ class ProductFokusController extends Controller
 {
     public function baca()
     {
-    	$data['area']       = Area::get();
-        $data['product']    = Product::get();
-        return view('product.fokus',$data);
+        return view('product.fokus');
     }
 
     public function data()
@@ -39,7 +37,6 @@ class ProductFokusController extends Controller
             $data = array(
                 'id'            => $product->id,
                 'product'     	=> $product->product->id,
-                'type'      	=> $product->type,
                 'area'          => $area,
                 'from'          => $product->from,
                 'to'          	=> $product->to
@@ -53,7 +50,6 @@ class ProductFokusController extends Controller
     {
         $data=$request->all();
         $limit=[
-            'type'          => 'required',
             'product'       => 'required|numeric',
             'from'          => 'required',
             'to'            => 'required'
@@ -65,7 +61,6 @@ class ProductFokusController extends Controller
             ->withInput();
         } else {
             ProductFokus::create([
-                'type'          => $request->input('type'),
                 'id_area'       => $request->input('area'),
                 'id_product'    => $request->input('product'),
                 'from'          => $request->input('from'),
@@ -83,7 +78,6 @@ class ProductFokusController extends Controller
     public function update(Request $request, $id) 
     {
         $product = ProductFokus::find($id);
-            $product->type          = $request->get('type');
             $product->id_product    = $request->get('product');
             $product->id_area       = $request->get('area');
             $product->from          = $request->get('from');
