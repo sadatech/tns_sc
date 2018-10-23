@@ -10,45 +10,35 @@ use Config;
 
 class PlaceController extends Controller
 {
-	public function __construct()
-	{
-		Config::set('auth.providers.users.model', \App\Employee::class);
-	}
-	
 	public function list()
 	{
 		try {
-			if (JWTAuth::getToken() != null) {
-				if (!$user = JWTAuth::parseToken()->authenticate()) {
-					$res['msg'] = "User not found.";
-				} else {
-					$place = Place::where('id',3)->get();
-					if (!$place->isEmpty()) {
-						$placeArr = array();
-						foreach ($place as $key => $value) {
-							$placeArr[$key] = array(
-								'id' => $value->id,
-								'code' => $value->code,
-								'name' => $value->name,
-								'phone' => $value->phone,
-								'email' => $value->email,
-								'latitude' => $value->latitude,
-								'longitude' => $value->longitude,
-								'address' => $value->address,
-								'description' => $value->description,
-							);
-						}
-						$res['success'] = true;
-						$res['place'] = $placeArr;
-					} else {
-						$res['success'] = false;
-						$res['msg'] = "Place not found.";
-					}
-				}
-			}else{
-				$res['success'] = false;
+			Config::set('auth.providers.users.model', \App\Employee::class);
+			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
-				$code = 200;
+			} else {
+				$place = Place::get();
+				if (!$place->isEmpty()) {
+					$placeArr = array();
+					foreach ($place as $key => $value) {
+						$placeArr[$key] = array(
+							'id' => $value->id,
+							'code' => $value->code,
+							'name' => $value->name,
+							'phone' => $value->phone,
+							'email' => $value->email,
+							'latitude' => $value->latitude,
+							'longitude' => $value->longitude,
+							'address' => $value->address,
+							'description' => $value->description,
+						);
+					}
+					$res['success'] = true;
+					$res['place'] = $placeArr;
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Gagal mencari place.";
+				}
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			$res['msg'] = "Token Expired.";

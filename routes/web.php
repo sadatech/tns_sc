@@ -260,6 +260,39 @@ Route::prefix('product')->group(function () {
 	});
 });
 
+/*
+	
+	NEWS
+
+*/
+
+Route::prefix('news')->group(function(){
+		Route::get('/','NewsController@index')->name('news')->middleware('auth');
+		Route::get('/data', 'NewsController@data')->name('news.data')->middleware('auth');
+		Route::get('/create','NewsController@create')->name('tambah.news')->middleware('auth');
+		Route::post('/store','NewsController@store')->name('news.store')->middleware('auth');
+		Route::get('/edit/{id}','NewsController@edit')->name('ubah.news')->middleware('auth');
+		Route::post('/update/{id}','NewsController@update')->name('update.news')->middleware('auth');
+		Route::get('/delete/{id}','NewsController@delete')->name('news.delete')->middleware('auth');
+
+	});
+
+
+/*
+	FAQ
+*/
+
+Route::prefix('faq')->group(function(){
+		Route::get('/','FAQController@index')->name('faq')->middleware('auth');
+		Route::get('/data', 'FAQController@data')->name('faq.data')->middleware('auth');
+		Route::get('/create','FAQController@create')->name('tambah.faq')->middleware('auth');
+		Route::post('/store','FAQController@store')->name('faq.store')->middleware('auth');
+		Route::get('/edit/{id}','FAQController@edit')->name('ubah.faq')->middleware('auth');
+		Route::post('/update/{id}','FAQController@update')->name('update.faq')->middleware('auth');
+		Route::get('/delete/{id}','FAQController@delete')->name('faq.delete')->middleware('auth');
+
+	});
+
 
 /**
 *	Company Pages
