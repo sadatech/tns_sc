@@ -29,7 +29,7 @@ class PlaceController extends Controller
         $data=$request->all();
         $limit=[
             'name'          => 'required',
-            'code'          => 'required|numeric',
+            'code'          => 'required|string',
             'address'       => 'required',
             'description'   => 'required',
         ];

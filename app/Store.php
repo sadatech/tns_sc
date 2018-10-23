@@ -9,8 +9,8 @@ class Store extends Model
 {
     
     protected $fillable = [
-        'photo', 'name1', 'name2', 'type', 'address', 'latitude', 'longitude',
-        'id_account', 'id_subarea', 'store_panel', 'sales_tier', 'coverage', 'delivery'
+            'photo', 'name1', 'name2', 'address', 'latitude', 'longitude',
+        'id_account', 'id_subarea','id_timezone', 'id_salestier', 'store_panel', 'coverage', 'delivery'
     ];
 
     public function distributor()
