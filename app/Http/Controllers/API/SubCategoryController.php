@@ -4,37 +4,42 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Category;
+use App\SubCategory;
 use JWTAuth;
 use Config;
 
-class CategoryController extends Controller
+class SubCategoryController extends Controller
 {
 	public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
 
-	public function list()
+	public function list($id_category = '')
 	{
 		try {
 			$res['success'] = false;
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 			} else {
-				$category = Category::get();
-				if ($category->count() > 0) {
+				if ($id_category != '') {
+					$subCategory = SubCategory::where('id_category',$id_category)->get();
+				}else{
+					$subCategory = SubCategory::get();
+				}
+				if ($subCategory->count() > 0) {
 					$res['success'] = true;
 					$dataArr = array();
-					foreach ($category as $cat) {
+					foreach ($subCategory as $sub) {
 						$dataArr[] = array(
-							'id' => $cat->id,
-							'name' => $cat->name,
+							'id' 			=> $sub->id,
+							'name' 			=> $sub->name,
+							'description' 	=> $sub->description,
 						);
 					}
 					$res['category'] = $dataArr;
 				} else {
-					$res['msg'] = "Gagal mengambil kategori.";
+					$res['msg'] = "Gagal mengambil sub kategori.";
 				}
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {

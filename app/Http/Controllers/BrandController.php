@@ -13,7 +13,7 @@ class BrandController extends Controller
 {
     public function baca()
     {
-        return view('employee.brand');
+        return view('product.brand');
     }
 
     public function store(Request $request)

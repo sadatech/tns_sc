@@ -20,8 +20,6 @@ class StoreTableSeeder extends Seeder
                 'longitude'         => $faker->longitude(-180, 180),
                 'id_account'        => rand(1, 99),
                 'id_subarea'        => rand(1, 99),
-                'id_province'       => 91,
-                'id_city'           => 9101,
                 'photo'             => "default.png",
                 'created_at'        => Carbon::now(),
                 'updated_at'        => Carbon::now()

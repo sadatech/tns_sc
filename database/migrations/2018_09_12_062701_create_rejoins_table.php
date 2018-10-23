@@ -12,7 +12,7 @@ class CreateRejoinsTable extends Migration
             $table->increments('id');
             $table->integer('id_employee')->unsigned();
             $table->dateTime('join_date');
-            $table->string('alasan');
+            $table->string('alasan')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

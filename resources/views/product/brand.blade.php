@@ -122,7 +122,7 @@
     <script type="text/javascript">
         function editModal(id,name,keterangan) {
             $('#editModal').modal('show');
-            $('#editForm').attr('action', "{{ url('/employee/brand/update') }}/"+id);
+            $('#editForm').attr('action', "{{ url('/product/brand/update') }}/"+id);
             $('#nameInput').val(name);
             $('#keteranganInput').val(keterangan);
         }

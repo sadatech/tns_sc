@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 @section('title', 'Login')
 @section('content')
-<div class="bg-image" style="background-image: url('assets/media/photos/photo34@2x.jpg');">
+<div class="bg-image" style="background-image: url('assets/media/photos/sasa-inti20161024100922.jpg');">
     <div class="row mx-0 bg-black-op">
         <div class="hero-static col-md-6 col-xl-8 d-none d-md-flex align-items-md-end">
             <div class="p-30 invisible" data-toggle="appear">
@@ -18,9 +18,9 @@
                 <div class="px-30 py-10">
                     <a class="link-effect font-w700" href="#">
                         <i class="si si-fire"></i>
-                        <span class="font-size-xl text-dual-primary-dark">HRBA</span> <span class="font-size-xl text-primary">online</span>
+                        <span class="font-size-xl text-dual-primary-dark">SASA</span> <span class="font-size-xl text-primary">MTCGTC</span>
                     </a>
-                    <h1 class="h3 font-w700 mt-30 mb-10">Welcome to Your Dashboard</h1>
+                    <h1 class="h3 font-w700 mt-30 mb-10">Welcome.. </h1>
                     <h2 class="h5 font-w400 text-muted mb-0">Please sign in</h2>
                 </div>
                 <form class="js-validation-signin px-30"  method="POST" action="{{ route('login') }}">
