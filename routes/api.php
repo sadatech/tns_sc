@@ -40,6 +40,12 @@ Route::prefix('place')->group(function () {
 Route::prefix('category')->group(function () {
 	Route::get('/list', 'API\CategoryController@list')->name('api.category.list');
 });
+Route::prefix('subcategory')->group(function () {
+	Route::get('/list/{id_category?}', 'API\SubCategoryController@list')->name('api.subcategory.list');
+});
+Route::prefix('brand')->group(function () {
+	Route::get('/list', 'API\BrandController@list')->name('api.brand.list');
+});
 Route::prefix('product')->group(function () {
 	Route::get('/category/{id}/{store}', 'API\ProductController@listByCat')->name('api.product.listCategory');
 });
