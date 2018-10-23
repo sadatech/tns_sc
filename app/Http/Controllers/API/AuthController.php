@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+	public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
+
 	public function company(Request $request)
 	{
 		if ($request->input('token')) {
@@ -83,7 +89,6 @@ class AuthController extends Controller
 					if (Hash::check($request->input('password'), $user->password)) {
 						$credentials = $request->only('nik', 'password');
 						try {
-							Config::set('auth.providers.users.model', \App\Employee::class);
 							if (!$token = JWTAuth::attempt($credentials)) {
 								$res['success'] = false;
 								$res['msg'] = 'Invalid username/password or account not found.';
@@ -139,16 +144,26 @@ class AuthController extends Controller
 	{
 		$credentials = $request->only('nik', 'password');
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
             // verify the credentials and create a token for the user
 			if (! $token = JWTAuth::attempt($credentials)) {
-				return response()->json(['error' => 'invalid_credentials'], 401);
+				return response()->json(['status' => false, 'error' => 'invalid_credentials'], 401);
 			}else{
-				return response()->json(['status' => true, 'token' => $token]);
+				$user = JWTAuth::parseToken()->authenticate();
+				return response()->json(
+					[
+						'status' 	=> true,
+						'name' 		=> $user->name,
+						'email' 	=> $user->email,
+						'photo' 	=> $user->foto_profil,
+						'level' 	=> $user->id_position,
+						'level_name'=> $user->position->name,
+						'token' 	=> $token
+					]
+				);
 			}
 		} catch (JWTException $e) {
             // something went wrong
-			return response()->json(['error' => 'could_not_create_token'], 500);
+			return response()->json(['status' => false, 'error' => 'could_not_create_token'], 500);
 		}
 		// return response()->json($token);
 	}
@@ -156,8 +171,6 @@ class AuthController extends Controller
 	public function getUser()
 	{
 		try {
-
-			Config::set('auth.providers.users.model', \App\Employee::class);
 
 			// if (! $user = JWTAuth::toUser(JWTAuth::getToken())) {
 			if (!$user = JWTAuth::parseToken()->authenticate()) {

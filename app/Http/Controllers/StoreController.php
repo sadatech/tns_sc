@@ -12,6 +12,8 @@ use App\Account;
 use App\SubArea;
 use App\Distributor;
 use App\StoreDistributor;
+use App\Timezone;
+use App\SalesTiers;
 use App\Filters\StoreFilters;
 
 class StoreController extends Controller
@@ -32,21 +34,26 @@ class StoreController extends Controller
         $data['subarea']        = SubArea::get();
         $data['distributor']    = Distributor::get();
         $data['account']        = Account::get();
+        $data['timezone']       = Timezone::get();
+        $data['sales']    = SalesTiers::get();
         return view('store.storecreate', $data);
     }
 
     public function readUpdate($id)
     {
-        $data['str'] 		    = Store::where(['id' => $id])->first();
+        $data['str']           = Store::where(['id' => $id])->first();
         $data['subarea']        = SubArea::get();
+        $data['sales']          = SalesTiers::get();
+        $data['timezone']       = Timezone::get();
         $data['distributor']    = Distributor::get();
         $data['account']        = Account::get();
-        $dist                   = StoreDistributor::where(['id_store'=>$id])->get(['id_distributor']);
+        $dist                   = StoreDistributor::where('id_store',$id)->get(['id_distributor']);
         $distList = array();
         foreach ($dist as $value) {
             $distList[] = $value->id_distributor;
         }
         $data['dist'] = json_encode($distList);
+        // return $data;
         return view('store.storeupdate', $data);
     }
 
@@ -91,6 +98,9 @@ class StoreController extends Controller
                 'latitude'          => $request->input('latitude'),
                 'longitude'         => $request->input('longitude'),
                 'id_account'        => $request->input('account'),
+                'id_salestier'      => $request->input('sales'),
+                'id_timezone'       => $request->input('timezone'),
+                'id_account'        => $request->input('account'),
                 'id_subarea'        => $request->input('subarea'),
             ]);
             if ($insert) 
@@ -121,7 +131,7 @@ class StoreController extends Controller
         ->addColumn('action', function ($store) {
             return "<a href=".route('ubah.store', $store->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
             <button data-url=".route('store.delete', $store->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
-            <a href=".asset('/uploads/documents')."/".$store->photo." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo Store'><i class='si si-picture mr-2'></i>Photo</a>";
+            <a href=".asset('/uploads/logoStore')."/".$store->photo." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo Store'><i class='si si-picture mr-2'></i>Photo</a>";
         })
         ->addColumn('account', function($store) {
             return $store->account->name."(".$store->account->channel->name.")";
@@ -185,7 +195,6 @@ class StoreController extends Controller
                 $store->address           = $request->input('address');
                 $store->latitude          = $request->input('latitude');
                 $store->longitude         = $request->input('longitude');
-                $store->type              = $request->input('type');
                 $store->id_account        = $request->input('account');
                 // $store->id_distributor    = $request->input('distributor');
                 $store->id_subarea        = $request->input('subarea');
