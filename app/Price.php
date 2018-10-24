@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Components\BaseModel;
 
-class Price extends Model
+class Price extends BaseModel
 {
     protected $fillable = [
         'id_product', 'rilis', 'price'

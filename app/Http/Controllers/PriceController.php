@@ -41,28 +41,31 @@ class PriceController extends Controller
 
     public function store(Request $request)
     {
-        $data=$request->all();
         $limit=[
             'price'         => 'required',
-            'product'       => 'required|numeric',
+            'id_product'    => 'required|numeric',
             'rilis'         => 'required'
         ];
-        $validator = Validator($data, $limit);
-        if ($validator->fails()){
-            return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
+        $validator = Validator($request->all(), $limit);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         } else {
-            Price::create([
-                'price'         => $request->input('price'),
-                'id_product'    => $request->input('product'),
-                'rilis'         => $request->input('rilis'),
+            $priceModel = Price::firstOrNew([
+                'id_product' => $request->id_product,
+                'rilis' => $request->rilis,
             ]);
-            return redirect()->back()
-            ->with([
+            $priceModel->price = $request->price;
+
+            $message = '<i class="em em-confetti_ball mr-2"></i>';
+            $message .= !$priceModel->isNewRecord() ? 'Berhasil memperbarui Price Product!' : 'Berhasil menambah Price Product!';
+
+            $priceModel->save();
+
+            return redirect()->back()->with([
                 'type' => 'success',
                 'title' => 'Sukses!<br/>',
-                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Price Product!'
+                'message'=> $message
             ]);
         }
     }
