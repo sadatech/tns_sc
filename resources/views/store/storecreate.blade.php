@@ -79,6 +79,17 @@
                             @endforeach
                         </select>
                     </div>
+                     <div class="form-group col-md-6">
+                        <label>Sales</label>
+                        <select class="form-control form-control-lg" name="sales" required>
+                        <option value="" disabled selected>Choose your Sales</option>
+                            @foreach($sales as $time)
+                                <option value="{{$time->id}}">{{$time->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-md-6">
                         <label>Account</label>
                         <select class="js-select2 custom-select" name="account" required>
@@ -88,14 +99,23 @@
                             @endforeach
                         </select>
                     </div>
-                </div>
-                <div class="row">
                     <div class="form-group col-md-6">
                         <label>Sub Area/ Area</label>
                         <select class="js-select2 form-control" name="subarea" required>
                             <option value="" disabled selected>Choose your Subarea</option>
                             @foreach($subarea as $data)
                                 <option value="{{ $data->id }}">{{ $data->area->name }} - {{ $data->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Timezones</label>
+                        <select class="form-control form-control-lg" name="timezone" required>
+                        <option value="" disabled selected>Choose your Timezone</option>
+                            @foreach($timezone as $time)
+                                <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -136,20 +156,6 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    $('#province').on('change', e => {
-        var id = $('#province').find(":selected").val()
-        $('#city').empty()
-        $.ajax({
-            type: "GET",
-            url: "{{ route('getCity') }}?id="+id,
-            success: data => {
-                // console.log(data);
-                data.forEach(city =>
-                    $('#city').append(`<option value="${city.id}">${city.name}</option>`)
-                )
-            }
-        })
-    })
     var lat     = -6.2241031;
     var long    = 106.9212855;
     if( $('#latitude').val() != '') lat = $('#latitude').val();

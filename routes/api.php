@@ -40,9 +40,24 @@ Route::prefix('place')->group(function () {
 Route::prefix('category')->group(function () {
 	Route::get('/list', 'API\CategoryController@list')->name('api.category.list');
 });
+Route::prefix('subcategory')->group(function () {
+	Route::get('/list/{id_category?}', 'API\SubCategoryController@list')->name('api.subcategory.list');
+});
+Route::prefix('brand')->group(function () {
+	Route::get('/list', 'API\BrandController@list')->name('api.brand.list');
+});
 Route::prefix('product')->group(function () {
 	Route::get('/category/{id}/{store}', 'API\ProductController@listByCat')->name('api.product.listCategory');
 });
 Route::prefix('sales')->group(function () {
 	Route::get('/process/{type}', 'API\SellController@store')->name('api.sales.add');
+});
+
+/**
+ * Employee
+ */
+Route::prefix("employee")->group(function(){
+	Route::post("edit/password", "API\EmployeeController@editPassword")->name("api.employee.edit.password");
+	Route::post("edit/profile", "API\EmployeeController@editProfile")->name("api.employee.edit.profile");
+	Route::post("edit/profile/photo/{type?}", "API\EmployeeController@editProfilePhoto")->name("api.employee.edit.profile.photo");
 });
