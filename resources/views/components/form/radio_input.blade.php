@@ -15,7 +15,7 @@ if (isset($attributes['orientation'])) {
 
 $labelText = $labelText = isset($attributes['labelText']) ? $attributes['labelText'] : ucwords(implode(' ', explode('_', $name))) . (isset($attributes['required']) ? ' <span class="status-decline">*</span>' : '');;
 
-$formAlignment = 'horizontal';
+$formAlignment = 'vertical';
 if (isset($attributes['formAlignment'])) {
 	$formAlignment = $attributes['formAlignment'];
 	unset($attributes['formAlignment']);
