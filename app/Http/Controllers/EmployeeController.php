@@ -93,15 +93,25 @@ class EmployeeController extends Controller
 			} else {
 				$foto_tabungan = "default.png";
 			}
+			if ($request->file('foto_profile'))
+			{
+				$tabungan = $data['foto_profile'];
+				$foto_profile = Str::random().time()."_".rand(1,99999).".".$tabungan->getClientOriginalExtension();
+				$tabungan_path = 'uploads/profile';
+				$tabungan->move($tabungan_path, $foto_profile);
+			} else {
+				$foto_profile = "default.png";
+			}
 
 			if ($request->input('status') == null) {
 				$status = null;
 			} else {
 				$status = $request->input('status');
 			}
-
-			if ($request->input('position') == Position::where(['level' => 'level 1'])->first()->id) {
-				if ($request->input('spv') != null) {
+			$levelPosition = Position::where('id',$request->input('position'))->first()->level;
+			if ($levelPosition == 'level 1') {
+			// if ($request->input('position') == Position::where(['level' => 'level 1'])->first()->id) {
+				if ($request) {
 					$insert = Employee::create([
 						'name' 			=> $request->input('name'),
 						'password' 		=> bcrypt($request->input('password')),
@@ -118,9 +128,9 @@ class EmployeeController extends Controller
 						'joinAt' 		=> Carbon::now(),
 						'foto_ktp' 		=> $foto_ktp,
 						'foto_tabungan' => $foto_tabungan,
+						'foto_profile' => $foto_profile,
 						'id_position' 	=> $request->input('position'),
 						'id_timezone' 	=> $request->input('timezone'),
-                		'id_subarea'	=> $request->input('subarea'),
 						'id_agency' 	=> $request->input('agency')
 					]);
 					if ($insert->id) {
@@ -132,15 +142,10 @@ class EmployeeController extends Controller
 							// 		);
 							// 	}
 							// 	DB::table('employee_brands')->insert($dataBrand);
-						EmployeeSpv::create([
-							'id_user' 		=> $request->input('spv'),
-							'id_employee' 	=> $insert->id
-						]);
 						if ($request->input('status') == 'Stay') {
 							EmployeeStore::create([
 								'id_store' 		=> $request->input('store'),
 								'id_employee' 	=> $insert->id,
-								'alokasi' 		=> 1
 							]);
 							return redirect()->route('employee')
 							->with([
@@ -150,12 +155,10 @@ class EmployeeController extends Controller
 							]);
 						} else if($request->input('status') == 'Mobile') {
 							$dataStore = array();
-							$alokasi = round(1/count($request->input('stores')), 3);
 							foreach ($request->input('stores') as $store) {
 								$dataStore[] = array(
 									'id_employee' 	=> $insert->id,
 									'id_store' 		=> $store,
-									'alokasi' 		=> $alokasi
 								);
 							}
 							DB::table('employee_stores')->insert($dataStore);
@@ -175,7 +178,7 @@ class EmployeeController extends Controller
 						'message'	=> '<i class="em em-thinking_face mr-2"></i>Kamu belum mengisi supervisor!'
 					]);
 				}
-			} else {
+			} elseif ($levelPosition == 'level 2') {
 				$insertData = Employee::create([
 					'name' 			=> $request->input('name'),
 					'password' 		=> bcrypt($request->input('password')),
@@ -194,6 +197,7 @@ class EmployeeController extends Controller
 					'foto_tabungan' => $foto_tabungan,
 					'id_position' 	=> $request->input('position'),
 					'id_timezone' 	=> $request->input('timezone'),
+                	'id_subarea'	=> $request->input('subarea'),
 					'id_agency' 	=> $request->input('agency')
 				]);
 				return redirect()->route('employee')
@@ -289,6 +293,15 @@ class EmployeeController extends Controller
 				$tabungan->move($tabungan_path, $foto_tabungan);
 			} else {
 				$foto_ktp = "Excel Dwi Oktavianto Orang Cabul";
+			}
+			if ($request->file('foto_profile'))
+			{
+				$tabungan = $data['foto_profile'];
+				$foto_profile = Str::random().time()."_".rand(1,99999).".".$tabungan->getClientOriginalExtension();
+				$tabungan_path = 'uploads/profile';
+				$tabungan->move($tabungan_path, $foto_profile);
+			} else {
+				$foto_profile = "default.png";
 			}
 				if($request->file('foto_ktp')){
 					$employee->foto_ktp = $foto_ktp;
