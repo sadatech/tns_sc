@@ -16,15 +16,14 @@ $action = $action ?? '';
           </div>
         </div>
       </div>
-      <form action="{{ $action }}" method="post" id="{{ $type }}Form">
+      {{ Form::open(['url' => $action, 'id' => $type . 'Form']) }}
         @if ($type == 'edit')
         {!! method_field('PUT') !!}
         @endif
-        {!! csrf_field() !!}
         <div class="block-content">
           <div class="form-group">
             <label>Category & Name Product</label>
-            <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="product" required id="{{ $type }}Product">
+            <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_product" required id="{{ $type }}Product">
               <option value="" disabled selected>Choose your Product</option>
               @foreach($product as $data)
               <option value="{{ $data->id }}">{{ $data->subCategory->name }} - {{ $data->name }}</option>
@@ -32,13 +31,11 @@ $action = $action ?? '';
             </select>
           </div>
           <div class="row">
-            <div class="form-group col-md-6">
-              <label>Price</label>
-              <input type="text" class="form-control" name="price" placeholder="Input Price" id="{{ $type }}Price" required>
+            <div class="col-md-6">
+              {{ Form::numberInput('price', old('price'), ['id' => $type.'Price', 'min' => '0']) }}
             </div>
-            <div class="form-group col-md-6">
-              <label>Rilis Date</label>
-              <input class="js-datepicker form-control" type="text" id="{{ $type }}Rilis" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+            <div class="col-md-6">
+              {{ Form::textInput('rilis', old('rilis'), ['labelText' => 'Rilis Date', 'id' => $type.'Rilis', 'class' => 'js-datepicker form-control', 'data-week-start' => '1', 'data-autoclose' => 'true', 'data-today-highlight' => 'true', 'data-date-format' => 'yyyy-mm-dd', 'placeholder' => 'yyyy-mm-dd', 'required' => '']) }}
             </div>
           </div>
         </div>
@@ -48,7 +45,7 @@ $action = $action ?? '';
           </button>
           <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
         </div>
-      </form>
+      {{ Form::close() }}
     </div>
   </div>
 </div>
