@@ -25,14 +25,14 @@ class PasarController extends Controller
     public function readStore()
     {
         $data['subarea']        = SubArea::get();
-        return view('store.pasarCreate', $data);
+        return view('store.pasarcreate', $data);
     }
 
     public function readUpdate($id)
     {
         $data['str']            = Pasar::where(['id' => $id])->first();
         $data['subarea']        = SubArea::get();
-        return view('store.pasarUpdate', $data);
+        return view('store.pasarupdate', $data);
     }
 
     public function data()
