@@ -75,12 +75,12 @@ class DashboardController extends Controller
             if ($insert->id) {
                 $user = User::find(Auth::user()->id);
                 if ($user->save()) {
-                    DB::table('positions')->insert([
-                        ['name' => 'BA', 'level' => 'level 1'],
-                        ['name' => 'SPV', 'level' => 'level 2'],
-                        ['name' => 'Atasannya Supervisor', 'level' => 'level 3'],
-                        ['name' => 'Manager', 'level' => 'level 4'],
-                    ]);
+                    // DB::table('positions')->insert([
+                    //     ['name' => 'BA', 'level' => 'level 1'],
+                    //     ['name' => 'SPV', 'level' => 'level 2'],
+                    //     ['name' => 'Atasannya Supervisor', 'level' => 'level 3'],
+                    //     ['name' => 'Manager', 'level' => 'level 4'],
+                    // ]);
                     return redirect()->route('dashboard');
                 } else {
                     return redirect()->route('welcome');
