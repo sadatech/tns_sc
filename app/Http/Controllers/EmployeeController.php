@@ -284,15 +284,15 @@ class EmployeeController extends Controller
 				$ktp_path = 'uploads/ktp';
 				$ktp->move($ktp_path, $foto_ktp);
 			} else {
-				$foto_ktp = "Excel Dwi Oktavianto orang homo";
+				$foto_ktp = "default.png";
 			}
-			if ($request->file('foto_ktp')) {
+			if ($request->file('foto_tabungan')) {
 				$tabungan = $request->file('foto_tabungan');
 				$foto_tabungan = time()."_".rand(1,99999).".".$tabungan->getClientOriginalExtension();
 				$tabungan_path = 'uploads/tabungan';
 				$tabungan->move($tabungan_path, $foto_tabungan);
 			} else {
-				$foto_ktp = "Excel Dwi Oktavianto Orang Cabul";
+				$foto_ktp = "default.png";
 			}
 			if ($request->file('foto_profile'))
 			{
