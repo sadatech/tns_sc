@@ -83,6 +83,9 @@
                                 <a class="{{ request()->is('store/distributor') ? 'active' : '' }}" href="{{ route('distributor') }}">Distributor</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('store/sales_tiers') ? 'active' : '' }}" href="{{ route('sales_tiers') }}">Sales Tiers</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('store/summary') ? 'active' : '' }}" href="{{ route('store') }}">Store</a>
                             </li>
                             <li>
@@ -143,8 +146,17 @@
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
                         </ul>
-                    </li>
-                    
+                    </li> 
+                    {{-- USERS--}}
+
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2')
+                    <li>
+                        <a class="{{ request()->is('user/index') ? 'active' : '' }}" href="{{ route('user') }}"><i class="si si-user-follow"></i><span class="sidebar-mini-hide">User</span></a>
+                    </li>  
+
+                    @endif
+                    {{-- Utilities --}}
+                      <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Utilities</span></li>
                     <li>
                         <a class="{{ request()->is('news/index') ? 'active' : '' }}" href="{{ route('news') }}"><i class="si si-speech"></i><span class="sidebar-mini-hide">News</span></a>
                     </li>  

@@ -78,6 +78,18 @@ Route::prefix('store')->group(function () {
 		})->name('account.download-template')->middleware('auth');
 	});
 
+	//Sales Tiers
+
+	Route::prefix('sales_tiers')->group(function()
+	{
+		Route::get('/','SalesTiersController@index')->name('sales_tiers')->middleware('auth');
+		Route::get('/data', 'SalesTiersController@data')->name('sales_tiers.data')->middleware('auth');
+		Route::post('/create', 'SalesTiersController@store')->name('sales_tiers.add')->middleware('auth');
+		Route::get('/edit/{id}', 'SalesTiersController@edit')->name('sales_tiers.ubah')->middleware('auth');
+		Route::put('/update/{id}', 'SalesTiersController@update')->name('sales_tiers.update')->middleware('auth');
+		Route::get('/delete/{id}', 'SalesTiersController@delete')->name('sales_tiers.delete')->middleware('auth');
+	});
+
 	//Distributor Pages
 	Route::prefix('distributor')->group(function(){
 		Route::get('/', 'DistributorController@baca')->name('distributor')->middleware('auth');
@@ -261,9 +273,21 @@ Route::prefix('product')->group(function () {
 });
 
 /*
-	
-	NEWS
+	USERS
+*/
 
+	Route::prefix('user')->group(function(){
+		Route::get('/','UserController@index')->name('user')->middleware('auth');
+		Route::post('/create','UserController@store')->name('user.add')->middleware('auth');
+		Route::get('/data','UserController@data')->name('user.data')->middleware('auth');
+		Route::put('/update/{id}','UserController@update')->name('user.update')->middleware('auth');
+
+		Route::get('/delete/{id}','UserController@destroy')->name('user.delete')->middleware('auth');
+	});
+
+
+/*
+	NEWS
 */
 
 Route::prefix('news')->group(function(){
