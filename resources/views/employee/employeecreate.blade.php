@@ -226,6 +226,14 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="form-group col-md-6" id="pasarStay">
+                        <label>Pasar</label>
+                        <select class="js-select form-control" style="width: 100%" data-placeholder="Choose store..." name="store" id="stayInput">
+                            @foreach($pasar as $data)
+                            <option value="{{ $data->id }}">{{ $data->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -289,27 +297,27 @@
     $('#position').on('change', e => {
         var select = $('#position').find(":selected").val()
         var status = $('#status').find(":selected").val()
-        if (select == {{ App\Position::where(['name' => 'MD (Reguler)'])->first()->id }}) {
+        if (select == {{ App\Position::where(['level' => 2])->first()->level }}) {
             $('#status').show();
             $('#subarea').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'SPG (Reguler)'])->first()->id }}) {
+        } else if (select == {{ App\Position::where(['level' => 1])->first()->level }}) {
             $('#status').show();
             $('#subarea').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'SPG (Pasar)'])->first()->id }}) {
+        } else if (select == {{ App\Position::where(['level' => 3])->first()->level }}) {
             $('#status').show();
             $('#subarea').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'MD (Pasar)'])->first()->id }}) {
+        } else if (select == {{ App\Position::where(['level' => 4])->first()->level }}) {
             $('#status').show();
             $('#subarea').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'Demo Coocking'])->first()->id }}) {
+        } else if (select == {{ App\Position::where(['level' => 5])->first()->level }}) {
             $('#status').hide();
             $('#subarea').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['level' => 'level 2'])->first()->id }}) {
+        } else if (select == {{ App\Position::where(['level' => 3])->first()->level }}) {
             $('#subarea').show();
             $('#status').hide();
             $('#storeStay').hide();

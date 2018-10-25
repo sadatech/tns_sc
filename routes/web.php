@@ -150,6 +150,8 @@ Route::prefix('employee')->group(function () {
 	//Employee Pages
 	Route::prefix('summary')->group(function () {
 		Route::get('/', 'EmployeeController@baca')->name('employee')->middleware('auth');
+		Route::get('/pasar', 'Employee\PasarController@baca')->name('employee.pasar')->middleware('auth');
+		Route::get('/dc', 'Employee\DcController@baca')->name('employee.dc')->middleware('auth');
 		Route::get('/create', 'EmployeeController@read')->name('tambah.employee')->middleware('auth');
 		Route::get('/update/{id}', 'EmployeeController@readupdate')->name('ubah.employee')->middleware('auth');
 		Route::get('/data', 'EmployeeController@data')->name('employee.data')->middleware('auth');
@@ -260,6 +262,32 @@ Route::prefix('product')->group(function () {
 	});
 });
 
+// Master Target
+Route::prefix('target')->group(function () {
+	Route::prefix('dc')->group(function () {
+		Route::get('/', 'Target\DcController@baca')->name('target.dc')->middleware('auth');
+		Route::get('/data', 'Target\DcController@data')->name('target.dc.data')->middleware('auth');
+		Route::post('/create', 'Target\DcController@store')->name('target.dc.add')->middleware('auth');
+		Route::put('/update/{id}', 'Target\DcController@update')->name('target.dc.update')->middleware('auth');
+		Route::get('/delete/{id}', 'Target\DcController@delete')->name('target.dc.delete')->middleware('auth');
+	});
+
+	Route::prefix('smd')->group(function () {
+		Route::get('/', 'Target\SmdController@baca')->name('target.smd')->middleware('auth');
+		Route::get('/data', 'Target\SmdController@data')->name('target.smd.data')->middleware('auth');
+		Route::post('/create', 'Target\SmdController@store')->name('target.smd.add')->middleware('auth');
+		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
+		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
+	});
+
+	Route::prefix('spg')->group(function () {
+		Route::get('/', 'Target\SpgController@baca')->name('target.spg')->middleware('auth');
+		Route::get('/data', 'Target\SpgController@data')->name('target.spg.data')->middleware('auth');
+		Route::post('/create', 'Target\SpgController@store')->name('target.spg.add')->middleware('auth');
+		Route::put('/update/{id}', 'Target\SpgController@update')->name('target.spg.update')->middleware('auth');
+		Route::get('/delete/{id}', 'Target\SpgController@delete')->name('target.spg.delete')->middleware('auth');
+	});
+});
 
 /**
 *	Company Pages
@@ -285,7 +313,7 @@ Route::prefix('report')->group(function () {
 			{
 				return response()->download(public_path('assets/SellinImport.xlsx'));
 			})->name('SellIn.download-template')->middleware('auth');
-			});
+		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
 	});	

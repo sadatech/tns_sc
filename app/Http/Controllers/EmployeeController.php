@@ -15,6 +15,7 @@ use App\Brand;
 use App\Store;
 use App\Timezone;
 use App\Employee;
+use App\Pasar;
 use App\EmployeeStore;
 use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
@@ -37,6 +38,7 @@ class EmployeeController extends Controller
 		$data['position'] 	= Position::get();
 		$data['agency'] 	= Agency::get();
 		$data['store'] 		= Store::get();
+		$data['pasar'] 		= Pasar::get();
 		$data['subarea'] 	= SubArea::get();
 		return view('employee.employeecreate', $data);
 	}

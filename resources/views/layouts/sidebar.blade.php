@@ -104,6 +104,12 @@
                                 <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">Employee</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('employee/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">Employee Pasar</a>
+                            </li>
+                            <li>
+                                <a class="{{ request()->is('employee/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('employee/resign') ? 'active' : '' }}" href="{{ route('resign') }}">Resign</a>
                             </li>
                             <li>
@@ -144,6 +150,21 @@
                             </li> -->
                         </ul>
                     </li>
+                    {{-- Target --}}
+                    <li class="{{ request()->is('target/*') ? 'open' : '' }}">
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-target"></i><span class="sidebar-mini-hide">Target(s)</span></a>
+                        <ul>
+                            <li>
+                                <a class="{{ request()->is('target/dc') ? 'active' : '' }}" href="{{ route('target.dc') }}">Demo Cooking</a>
+                            </li>
+                            <li>
+                                <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
+                            </li>
+                            <li>
+                                <a class="{{ request()->is('target/spg') ? 'active' : '' }}" href="{{ route('target.spg') }}">SPG Pasar</a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- SALES --}}
                     <li class="{{ request()->is('report/sales/*') ? 'open' : '' }}">
@@ -159,7 +180,7 @@
                     </li>
                     {{-- Stock In Hand--}}
                     <li>
-                        <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-target"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>
+                        <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>
                     </li>  
                 </ul>
         </div>
