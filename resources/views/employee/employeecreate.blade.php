@@ -96,6 +96,13 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label>Foto Profile</label>
+                        <div class="custom-file">
+                            <input type="file" name="foto_profile" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp" required>
+                            <label class="custom-file-label">Pilih Foto</label>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="block block-themed block-transparent mb-0">
@@ -179,7 +186,7 @@
                             <div style="width: 82%">
                                 <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
                                     @foreach($store as $data)
-                                    <option value="{{ $data->id.'|'.$data->name1.' - '.$data->city->name.', ' .$data->province->name }}">{{ $data->name1." - ".$data->city->name.", ".$data->province->name }}</option>
+                                    <option value="{{ $data->id.'|'.$data->name1}}">{{ $data->name1 }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -215,24 +222,9 @@
                         <label>Store</label>
                         <select class="js-select form-control" style="width: 100%" data-placeholder="Choose store..." name="store" id="stayInput">
                             @foreach($store as $data)
-                            <option value="{{ $data->id }}">{{ $data->name1." - ".$data->city->name.", ".$data->province->name }}</option>
+                            <option value="{{ $data->id }}">{{ $data->name1 }}</option>
                             @endforeach
                         </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-12" id="spv">
-                        @if($spv->count() < 1)
-                        <b class="text-danger">*Kamu tidak memiliki supervisor, harap tambahkan supervisor terlebih dahulu.</b>
-                        @else
-                        <label>Supervisor</label>
-                        <select class="form-control form-control-lg" name="spv">
-                            <option disabled selected>Choose your Status</option>
-                            @foreach($spv->get() as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -280,7 +272,6 @@
         $('#status').hide();
         $('#storeMobile').hide();
         $('#storeStay').hide();
-        $('#spv').hide();
 
         // add Store to Selected Store
         $('#storesAdd').click(function () {
@@ -294,25 +285,39 @@
             }
         });
     });
+
     $('#position').on('change', e => {
         var select = $('#position').find(":selected").val()
         var status = $('#status').find(":selected").val()
-        if (select == {{ App\Position::where(['level' => 'level 1'])->first()->id }}) {
+        if (select == {{ App\Position::where(['name' => 'MD (Reguler)'])->first()->id }}) {
             $('#status').show();
-            $('#spv').show();
             $('#subarea').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['level' => 'level 3'])->first()->id }}) {
+        } else if (select == {{ App\Position::where(['name' => 'SPG (Reguler)'])->first()->id }}) {
+            $('#status').show();
+            $('#subarea').hide();
+            $('#subareaInput').val(null);
+        } else if (select == {{ App\Position::where(['name' => 'SPG (Pasar)'])->first()->id }}) {
+            $('#status').show();
+            $('#subarea').hide();
+            $('#subareaInput').val(null);
+        } else if (select == {{ App\Position::where(['name' => 'MD (Pasar)'])->first()->id }}) {
+            $('#status').show();
+            $('#subarea').hide();
+            $('#subareaInput').val(null);
+        } else if (select == {{ App\Position::where(['name' => 'Demo Coocking'])->first()->id }}) {
+            $('#status').hide();
+            $('#subarea').hide();
+            $('#subareaInput').val(null);
+        } else if (select == {{ App\Position::where(['level' => 'level 2'])->first()->id }}) {
             $('#subarea').show();
             $('#status').hide();
-            $('#spv').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();
             $('#status').val(null);
         } else {
             $('#subarea').hide();
             $('#status').hide();
-            $('#spv').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();
         }
