@@ -96,7 +96,9 @@
           </div>
           <div class="form-group">
             <label>Select File</label>
-            <input type="file" name="file" class="form-control">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
           </div>
         </div>
         <div class="modal-footer">

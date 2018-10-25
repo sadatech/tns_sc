@@ -2,101 +2,86 @@
 @section('title', "Plan Demo Cooking")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Plan Demo Cooking <small>Manage</small></h2>
-  @if($errors->any())
-    <div class="alert alert-danger">
-      <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
-      @foreach ($errors->all() as $error)
-      <div> {{ $error }}</div>
-      @endforeach
-    </div>
-  @endif
-  <div class="block block-themed"> 
-    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
-        <h3 class="block-title">Datatables</h3>
-    </div>
-    <div class="block">        
-      <div class="block-content block-content-full">
-        <div class="block-header p-0 mb-20">
-          <h3 class="block-title">
-                <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                <a href="{{ route('pasar.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
-          </h3>
+    <h2 class="content-heading pt-10">Plan Demo Cooking <small>Manage</small></h2>
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
+            @foreach ($errors->all() as $error)
+            <div> {{ $error }}</div>
+            @endforeach
         </div>
-
-        <table class="table table-striped table-vcenter js-dataTable-full" id="planTable">
-        <thead>
-          <th class="text-center" style="width: 70px;"></th>
-          <th>Employee</th>
-          <th>Date</th>
-          <th>Lokasi</th>
-          <th>Stockist</th>
-          <th class="text-center" style="width: 15%;"> Action</th>
-        </thead>
-        </table>
-      </div>
+    @endif
+    <div class="block block-themed"> 
+        <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+            <h3 class="block-title">Datatables</h3>
+        </div>
+        <div class="block">        
+            <div class="block-content block-content-full">
+                <div class="block-header p-0 mb-20">
+                    <h3 class="block-title">
+                        <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                        <a href="{{ route('pasar.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                    </h3>
+                </div>
+                <table class="table table-striped table-vcenter js-dataTable-full" id="planTable">
+                <thead>
+                    <th class="text-center" style="width: 70px;"></th>
+                    <th>Employee</th>
+                    <th>Date</th>
+                    <th>Lokasi</th>
+                    <th>Stockist</th>
+                    <th class="text-center" style="width: 15%;"> Action</th>
+                </thead>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Account</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <form action="{{ route('account.import') }}" method="post" enctype="multipart/form-data">
-        {!! csrf_field() !!}
-        <div class="block-content">
-          <div class="form-group">
-              <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
-          </div>
-          <h5> Sample Data :</h5>
-          <table class="table table-bordered table-vcenter">
-            <thead>
-              <tr>
-                  <td><b>account</b></td>
-                  <td><b>channel</b></td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
-              </tr>
-              <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="block-content">
-          <div class="form-group">
-          <label>Upload Your Data Account:</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                <label class="custom-file-label">Choose file Excel</label>
-                <code> *Type File Excel</code>
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Plan Demo Cooking</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-          </div>
+            <form action="{{ route('account.import') }}" method="post" enctype="multipart/form-data">
+                {!! csrf_field() !!}
+                <div class="block-content">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Upload Your Data Plan DC:</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                                <label class="custom-file-label">Choose file Excel</label>
+                                <code> *Type File Excel</code>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                        <label>Upload Your Data Plan DC:</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                                <label class="custom-file-label">Choose file Excel</label>
+                                <code> *Type File Excel</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-alt-success">
+                        <i class="fa fa-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Save
-          </button>
-          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 
 @endsection
