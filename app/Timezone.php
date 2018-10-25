@@ -14,4 +14,9 @@ class Timezone extends Model
     {
     	return $this->hasMany('App\Employees', 'id_timezone');
     }
+
+    public function pasars()
+    {
+    	return $this->hasMany('App\Pasar', 'id_timezone');
+    }
 }

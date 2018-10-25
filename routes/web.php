@@ -30,6 +30,17 @@ Route::prefix('store')->group(function () {
 		Route::get('/delete/{id}', 'StoreController@delete')->name('store.delete')->middleware('auth');
 	});
 
+	//Pasar Pages
+	Route::prefix('pasar')->group(function(){
+		Route::get('/', 'PasarController@read')->name('pasar')->middleware('auth');
+		Route::get('/create', 'PasarController@readStore')->name('tambah.pasar')->middleware('auth');
+		Route::get('/update/{id}', 'PasarController@readUpdate')->name('ubah.pasar')->middleware('auth');
+		Route::get('/data', 'PasarController@data')->name('pasar.data')->middleware('auth');
+		Route::post('/create', 'PasarController@store')->name('pasar.add')->middleware('auth');
+		Route::put('/update/{id}', 'PasarController@update')->name('pasar.update')->middleware('auth');
+		Route::get('/delete/{id}', 'PasarController@delete')->name('pasar.delete')->middleware('auth');
+	});
+
 	//Sub Area Pages
 	Route::prefix('subarea')->group(function(){
 		Route::get('/', 'SubareaController@baca')->name('subarea')->middleware('auth');
