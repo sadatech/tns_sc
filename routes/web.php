@@ -39,6 +39,12 @@ Route::prefix('store')->group(function () {
 		Route::post('/create', 'PasarController@store')->name('pasar.add')->middleware('auth');
 		Route::put('/update/{id}', 'PasarController@update')->name('pasar.update')->middleware('auth');
 		Route::get('/delete/{id}', 'PasarController@delete')->name('pasar.delete')->middleware('auth');
+		Route::post('/import', 'PasarController@importXLS')->name('import')->middleware('auth');
+		Route::get('/export', 'PasarController@exportXLS')->name('pasar.export')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/PasarImport.xlsx'));
+		})->name('pasar.download-template')->middleware('auth');
 	});
 
 	//Sub Area Pages

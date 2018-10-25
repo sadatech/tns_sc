@@ -69,17 +69,8 @@
                 </div>
             </div>
             <div class="block-content">
-                <h5><b>SubArea & Timezone</b></h5>
+                <h5><b>SubArea </b></h5>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Timezones</label>
-                        <select class="form-control form-control-lg" name="timezone" required>
-                        <option value="" disabled selected>Choose your Timezone</option>
-                            @foreach($timezone as $time)
-                                <option value="{{$time->id}}">{{$time->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
                     <div class="form-group col-md-6">
                         <label>Sub Area/ Area</label>
                         <select class="js-select2 form-control" name="subarea" required>

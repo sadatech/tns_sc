@@ -71,21 +71,13 @@
                 </div>
             </div>
             <div class="block-content">
-                <h5><b>Subarea & Timezone</b></h5>
+                <h5><b>Subarea</b></h5>
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>Subarea</label>
                         <select class="js-select2 custom-select" name="subarea" id="subarea" required>
                             @foreach ($subarea as $data)
                             <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Timezones</label>
-                        <select class="js-select2 custom-select" name="timezone" id="timezone" required>
-                            @foreach($timezone as $time)
-                                <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -116,7 +108,6 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $('#subbarea option[value="{{ $str->subarea->id }}"]').attr('selected','selected').trigger('change');
-        $('#timezone option[value="{{ $str->id_timezone }}"]').attr('selected','selected').trigger('change');
 
     });
     $('#us3Input').locationpicker({

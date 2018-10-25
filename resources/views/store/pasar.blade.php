@@ -14,8 +14,8 @@
                         <a href="{{ route('tambah.pasar') }}" class="btn btn-primary btn-square" title="Add Data Store"><i class="fa fa-plus mr-2"></i>Add Data</a>
                     </h3>
                     <div class="block-option">
-                        <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                        <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+                        <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                        <a href="{{ route('pasar.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="storetable">
@@ -27,12 +27,88 @@
                         <th>Longitude</th>
                         <th>Latitude</th>
                         <th width="200px">Subarea</th>
-                        <th>Timezone</th>
+                        <th width="200px">Area</th>
+                        <th width="200px">Region</th>
                     </thead>
                 </table>
             </div> 
         </div> 
-    </div>  
+    </div>
+</div>  
+
+<div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary p-10">
+          <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Pasar</h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form id="import-form" method="post" enctype="multipart/form-data" action="{{ url('store/pasar/import') }}">
+        {{ csrf_field() }}
+        <div class="block-content">
+          <div class="form-group">
+            <a href="{{ route('pasar.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <div class="block-content">
+            <h5> Sample Data :</h5>
+            <table class="table table-bordered table-vcenter">
+                <thead>
+                    <tr>
+                        <td><b>Market</b></td>
+                        <td><b>Phone</b></td>
+                        <td><b>Address</b></td>
+                        <td><b>Longitude</b></td>
+                        <td><b>Latitude</b></td>
+                        <td><b>Subarea</b></td>
+                        <td><b>Area</b></td>
+                        <td><b>Region</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Market 1</td>
+                        <td>Phone 1</td>
+                        <td>Address 1</td>
+                        <td>Longitude 1</td>
+                        <td>Latitude 1</td>
+                        <td>Subarea 1</td>
+                        <td>Area 1</td>
+                        <td>Region 1</td>
+                    </tr>
+                    <tr>
+                        <td>Market 2</td>
+                        <td>Without Phone</td>
+                        <td>Address 2</td>
+                        <td>Longitude 2</td>
+                        <td>Latitude 2</td>
+                        <td>Subarea 2</td>
+                        <td>Area 2</td>
+                        <td>Region 2</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+          <div class="form-group">
+            <label>Select File</label>
+            <input type="file" name="file" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Import
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('css')
@@ -110,13 +186,14 @@
             scrollY: "300px",
             columns: [  
             { data: 'action', name: 'action' },
-            { data: 'name', name: 'name' },
-            { data: 'phone', name: 'phone' },
-            { data: 'address', name: 'address' },
-            { data: 'longitude', name: 'longitude' },
-            { data: 'latitude', name: 'latitude' },
+            { data: 'name', name: 'pasars.name' },
+            { data: 'phone', name: 'pasars.phone' },
+            { data: 'address', name: 'pasars.address' },
+            { data: 'longitude', name: 'pasars.longitude' },
+            { data: 'latitude', name: 'pasars.latitude' },
             { data: 'subarea.name', name: 'subarea.name' },
-            { data: 'timezone.name', name: 'timezone.name' },
+            { data: 'subarea.area.name', name: 'subarea.area.name' },
+            { data: 'subarea.area.region.name', name: 'subarea.area.region.name' },
             ]
         });
     });

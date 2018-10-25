@@ -16,12 +16,10 @@ class CreatePasarsTable extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->integer('id_subarea')->unsigned();
-            $table->integer('id_timezone')->unsigned();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('id_subarea')->references('id')->on('sub_areas')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('id_timezone')->references('id')->on('timezones')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
