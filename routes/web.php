@@ -30,6 +30,23 @@ Route::prefix('store')->group(function () {
 		Route::get('/delete/{id}', 'StoreController@delete')->name('store.delete')->middleware('auth');
 	});
 
+	//Pasar Pages
+	Route::prefix('pasar')->group(function(){
+		Route::get('/', 'PasarController@read')->name('pasar')->middleware('auth');
+		Route::get('/create', 'PasarController@readStore')->name('tambah.pasar')->middleware('auth');
+		Route::get('/update/{id}', 'PasarController@readUpdate')->name('ubah.pasar')->middleware('auth');
+		Route::get('/data', 'PasarController@data')->name('pasar.data')->middleware('auth');
+		Route::post('/create', 'PasarController@store')->name('pasar.add')->middleware('auth');
+		Route::put('/update/{id}', 'PasarController@update')->name('pasar.update')->middleware('auth');
+		Route::get('/delete/{id}', 'PasarController@delete')->name('pasar.delete')->middleware('auth');
+		Route::post('/import', 'PasarController@importXLS')->name('import')->middleware('auth');
+		Route::get('/export', 'PasarController@exportXLS')->name('pasar.export')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/PasarImport.xlsx'));
+		})->name('pasar.download-template')->middleware('auth');
+	});
+
 	//Sub Area Pages
 	Route::prefix('subarea')->group(function(){
 		Route::get('/', 'SubareaController@baca')->name('subarea')->middleware('auth');
@@ -258,6 +275,16 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'TargetController@update')->name('target.update')->middleware('auth');
 		Route::get('/delete/{id}', 'TargetController@delete')->name('target.delete')->middleware('auth');
 	});
+});
+
+/**
+*	PlanDc Pages
+*/
+Route::prefix('planDc')->group(function () {
+	Route::get('/', 'PlandcController@read')->name('planDc')->middleware('auth');
+	Route::get('/data', 'PlandcController@data')->name('plan.data')->middleware('auth');
+	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
+	Route::get('/delete/{id}', 'PlandcController@delete')->name('plan.delete')->middleware('auth');
 });
 
 

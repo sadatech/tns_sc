@@ -86,6 +86,9 @@
                                 <a class="{{ request()->is('store/summary') ? 'active' : '' }}" href="{{ route('store') }}">Store</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('store/pasar') ? 'active' : '' }}" href="{{ route('pasar') }}">Pasar</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('store/place') ? 'active' : '' }}" href="{{ route('place') }}">Place</a>
                             </li>
                         </ul>
@@ -110,6 +113,10 @@
                                 <a class="{{ request()->is('employee/rejoin') ? 'active' : '' }}" href="{{ route('rejoin') }}">Rejoin</a>
                             </li>
                         </ul>
+                    </li>
+                    {{-- PlannDc --}}
+                     <li>
+                        <a class="{{ request()->is('planDc') ? 'active' : '' }}" href="{{ route('planDc') }}"><i class="fa fa-pied-piper"></i><span class="sidebar-mini-hide">Plan Dc</span></a>
                     </li>
                     {{-- Product --}}
                     <li class="{{ request()->is('product/*') ? 'open' : '' }}">
