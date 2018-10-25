@@ -277,6 +277,15 @@ Route::prefix('product')->group(function () {
 	});
 });
 
+/**
+*	PlanDc Pages
+*/
+Route::prefix('planDc')->group(function () {
+	Route::get('/', 'PlandcController@read')->name('planDc')->middleware('auth');
+	Route::get('/data', 'PlandcController@data')->name('plan.data')->middleware('auth');
+	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
+});
+
 
 /**
 *	Company Pages
