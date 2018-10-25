@@ -47,8 +47,8 @@ Route::prefix('brand')->group(function () {
 	Route::get('/list', 'API\BrandController@list')->name('api.brand.list');
 });
 Route::prefix('product')->group(function () {
-	Route::get('/category/{id}/{store}', 'API\ProductController@listByCat')->name('api.product.listCategory');
+	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 });
 Route::prefix('sales')->group(function () {
-	Route::get('/process/{type}', 'API\SellController@store')->name('api.sales.add');
+	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
 });
