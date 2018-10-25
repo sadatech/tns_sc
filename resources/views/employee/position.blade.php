@@ -93,6 +93,18 @@
             columns: [
             { data: 'name', name: 'name' },
             { data: 'action', name: 'action' },
+            ],
+             'columnDefs': [
+            {
+                "targets": 0, // your case first column
+                "className": "text-center",
+                "width": "60%"
+            },
+            {
+                "targets": 1, // your case first column
+                "className": "text-center",
+                "width": "30%"
+            },
             ]
         });
     });
