@@ -3,19 +3,25 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Filters\QueryFilters;
+use DB;
 
 class Product extends Model
 {
+    use SoftDeletes;
+    
     protected $fillable = [
-        'name', 'deskripsi', 'id_subcategory', 'id_brand', 'panel'
+        'name', 'deskripsi', 'id_brand', 'id_category'
     ];
 
-    public function subCategory()
-	{
-		return $this->belongsTo('App\SubCategory', 'id_subcategory');
+    protected $dates =['deleted_at'];
+
+    public function subcategory()
+    {
+        return $this->belongsTo('App\SubCategory', 'id_subcategory');
     }
-    
+
     public function brand()
     {
         return $this->belongsTo('App\Brand', 'id_brand');
@@ -40,8 +46,23 @@ class Product extends Model
     {
         return $this->hasMany('App\ProductPromo', 'id_product');
     }
+
+    public function promoProduct()
+    {
+        return $this->hasMany('App\PromoProduct', 'id_product');
+    }
+
     public function scopeFilter($query, QueryFilters $filters)
     {
         return $filters->apply($query);
+    }
+
+    public function getPrice($date, $type_price){
+        $data = $this->prices->where('rilis', '<=', $date)
+                            ->where('type_price', $type_price)
+                            ->sortByDesc('rilis')
+                            ->first();
+
+        return ($data) ? $data->price : 0;
     }
 }
