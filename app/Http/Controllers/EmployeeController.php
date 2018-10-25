@@ -23,9 +23,9 @@ use App\Filters\EmployeeFilters;
 class EmployeeController extends Controller
 {
 	public function getDataWithFilters(EmployeeFilters $filters){
-        $data = Employee::filter($filters)->get();
-        return $data;
-    }
+		$data = Employee::filter($filters)->get();
+		return $data;
+	}
 
 	public function baca()
 	{
@@ -104,84 +104,13 @@ class EmployeeController extends Controller
 			} else {
 				$foto_profile = "default.png";
 			}
-
 			if ($request->input('status') == null) {
 				$status = null;
 			} else {
 				$status = $request->input('status');
 			}
-			$levelPosition = Position::where('id',$request->input('position'))->first()->level;
-			if ($levelPosition == 'level 1') {
-			// if ($request->input('position') == Position::where(['level' => 'level 1'])->first()->id) {
-				if ($request) {
-					$insert = Employee::create([
-						'name' 			=> $request->input('name'),
-						'password' 		=> bcrypt($request->input('password')),
-						'nik' 			=> $request->input('nik'),
-						'ktp' 			=> $request->input('ktp'),
-						'phone' 		=> $request->input('phone'),
-						'email' 		=> $request->input('email'),
-						'rekening' 		=> $request->input('rekening'),
-						'bank' 			=> $request->input('bank'),
-						'education' 	=> $request->input('education'),
-						'birthdate' 	=> $request->input('birthdate'),
-						'gender' 		=> $request->input('gender'),
-						'status' 		=> $status,
-						'joinAt' 		=> Carbon::now(),
-						'foto_ktp' 		=> $foto_ktp,
-						'foto_tabungan' => $foto_tabungan,
-						'foto_profile' => $foto_profile,
-						'id_position' 	=> $request->input('position'),
-						'id_timezone' 	=> $request->input('timezone'),
-						'id_agency' 	=> $request->input('agency')
-					]);
-					if ($insert->id) {
-							// $dataBrand = array();
-							// 	foreach ($request->input('brand') as $brand) {
-							// 		$dataBrand[] = array(
-							// 			'id_brand'    			=> $brand,
-							// 			'id_employee'          	=> $insert->id
-							// 		);
-							// 	}
-							// 	DB::table('employee_brands')->insert($dataBrand);
-						if ($request->input('status') == 'Stay') {
-							EmployeeStore::create([
-								'id_store' 		=> $request->input('store'),
-								'id_employee' 	=> $insert->id,
-							]);
-							return redirect()->route('employee')
-							->with([
-								'type' 		=> 'success',
-								'title' 	=> 'Sukses!<br/>',
-								'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
-							]);
-						} else if($request->input('status') == 'Mobile') {
-							$dataStore = array();
-							foreach ($request->input('stores') as $store) {
-								$dataStore[] = array(
-									'id_employee' 	=> $insert->id,
-									'id_store' 		=> $store,
-								);
-							}
-							DB::table('employee_stores')->insert($dataStore);
-							return redirect()->route('employee')
-							->with([
-								'type' 		=> 'success',
-								'title' 	=> 'Sukses!<br/>',
-								'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
-							]);
-						}
-					}
-				} else {
-					return redirect()->route('employee')
-					->with([
-						'type' 		=> 'danger',
-						'title' 	=> 'Terjadi Kesalahan!<br/>',
-						'message'	=> '<i class="em em-thinking_face mr-2"></i>Kamu belum mengisi supervisor!'
-					]);
-				}
-			} elseif ($levelPosition == 'level 2') {
-				$insertData = Employee::create([
+			if (Position::where('level', $request->input('position'))->count() > 0) {
+				$insert = Employee::create([
 					'name' 			=> $request->input('name'),
 					'password' 		=> bcrypt($request->input('password')),
 					'nik' 			=> $request->input('nik'),
@@ -197,16 +126,69 @@ class EmployeeController extends Controller
 					'joinAt' 		=> Carbon::now(),
 					'foto_ktp' 		=> $foto_ktp,
 					'foto_tabungan' => $foto_tabungan,
+					'foto_profile' => $foto_profile,
 					'id_position' 	=> $request->input('position'),
 					'id_timezone' 	=> $request->input('timezone'),
-                	'id_subarea'	=> $request->input('subarea'),
 					'id_agency' 	=> $request->input('agency')
 				]);
+				if ($insert->id) {
+							// $dataBrand = array();
+							// 	foreach ($request->input('brand') as $brand) {
+							// 		$dataBrand[] = array(
+							// 			'id_brand'    			=> $brand,
+							// 			'id_employee'          	=> $insert->id
+							// 		);
+							// 	}
+							// 	DB::table('employee_brands')->insert($dataBrand);
+					if ($request->input('status') == 'Stay') {
+						EmployeeStore::create([
+							'id_store' 		=> $request->input('store'),
+							'id_employee' 	=> $insert->id,
+						]);
+						return redirect()->route('employee')
+						->with([
+							'type' 		=> 'success',
+							'title' 	=> 'Sukses!<br/>',
+							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
+						]);
+					} else if($request->input('status') == 'Mobile') {
+						$dataStore = array();
+						foreach ($request->input('stores') as $store) {
+							$dataStore[] = array(
+								'id_employee' 	=> $insert->id,
+								'id_store' 		=> $store,
+							);
+						}
+						DB::table('employee_stores')->insert($dataStore);
+						return redirect()->route('employee')
+						->with([
+							'type' 		=> 'success',
+							'title' 	=> 'Sukses!<br/>',
+							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
+						]);
+					} else if (!empty($request->input('pasar'))) {
+						$dataPasar = array();
+						foreach ($request->input('pasar') as $pasar) {
+							$dataPasar[] = array(
+								'id_employee' 	=> $insert->id,
+								'id_pasar' 		=> $pasar,
+							);
+						}
+						DB::table('employee_pasar')->insert($dataPasar);
+						return redirect()->route('employee')
+						->with([
+							'type' 		=> 'success',
+							'title' 	=> 'Sukses!<br/>',
+							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
+						]);
+					}
+				}
+			} else {
 				return redirect()->route('employee')
 				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
+					'type' 		=> 'danger',
+					'title' 	=> 'Terjadi Kesalahan!<br/>',
+					'message'	=> '<i class="em em-thinking_face mr-2"></i>Position tidak tersedia!'
 				]);
 			}
 		}
@@ -214,16 +196,16 @@ class EmployeeController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false])->with(['agency', 'subarea', 'position', 'employeeStore', 'timezone'])
+		$employee = Employee::where(['isResign' => false])->with(['agency', 'position', 'employeeStore', 'timezone'])
 		->select('employees.*');
 		// dd($employee->get()[0]);
 		return Datatables::of($employee)
 		->addColumn('action', function ($employee) {
 			// if ($employee->isResign == false) {
-				return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-				<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
-				<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
-				<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
+			return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+			<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+			<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
+			<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
 			// } else {
 			// 	return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square disabled' title='Update'><i class='si si-pencil'></i></a>
 			// 	<a href=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square mr-6 js-swal-delete' title='Delete'><i class='si si-trash'></i></a>
@@ -244,14 +226,6 @@ class EmployeeController extends Controller
 		})
 		->addColumn('timezone', function($employee) {
 			return $employee->timezone->name;
-		})
-		->addColumn('subarea', function($employee) {
-			if (isset($employee->subarea)) {
-				$subarea = $employee->subarea->name;
-			} else {
-				$subarea = "Without Area";
-			}
-			return $subarea;
 		})
 		->addColumn('agency', function($employee) {
 			return $employee->agency->name;
@@ -305,12 +279,12 @@ class EmployeeController extends Controller
 			} else {
 				$foto_profile = "default.png";
 			}
-				if($request->file('foto_ktp')){
-					$employee->foto_ktp = $foto_ktp;
-				}
-				if($request->file('foto_tabungan')){
-					$employee->foto_tabungan = $foto_tabungan;
-				}
+			if($request->file('foto_ktp')){
+				$employee->foto_ktp = $foto_ktp;
+			}
+			if($request->file('foto_tabungan')){
+				$employee->foto_tabungan = $foto_tabungan;
+			}
 				// if ($request->input('brand')) {
     //                 foreach ($request->input('brand') as $brand) {
     //                     EmployeeBrand::where('id_employee', $id)->delete();
@@ -321,47 +295,47 @@ class EmployeeController extends Controller
     //                 }
     //                 DB::table('employee_brands')->insert($dataStore);
     //             }
-				if ($request->input('status') == 'Stay') {
-					$employee->status = $request->input('status');
-				}
-				if ($request->input('status') == 'Mobile') {
-					$employee->status = $request->input('status');
-				}
-				if ($request->input('position') == Position::where(['level' => 'level 3'])->first()->id) {
-					$employee->id_subarea = $request->input('subarea');
-				}
-				$employee->name 		= $request->input('name');
-				$employee->nik 			= $request->input('nik');
-				$employee->ktp 			= $request->input('ktp');
-				$employee->phone 		= $request->input('phone');
-				$employee->email 		= $request->input('email');
-				$employee->rekening 	= $request->input('rekening');
-				$employee->bank 		= $request->input('bank');
-				$employee->gender 		= $request->input('gender');
-				$employee->education 	= $request->input('education');
-				$employee->birthdate 	= $request->input('birthdate');
-				$employee->id_position 	= $request->input('position');
-				$employee->id_agency 	= $request->input('agency');
+			if ($request->input('status') == 'Stay') {
+				$employee->status = $request->input('status');
+			}
+			if ($request->input('status') == 'Mobile') {
+				$employee->status = $request->input('status');
+			}
+			if ($request->input('position') == Position::where(['level' => 'level 3'])->first()->id) {
+				$employee->id_subarea = $request->input('subarea');
+			}
+			$employee->name 		= $request->input('name');
+			$employee->nik 			= $request->input('nik');
+			$employee->ktp 			= $request->input('ktp');
+			$employee->phone 		= $request->input('phone');
+			$employee->email 		= $request->input('email');
+			$employee->rekening 	= $request->input('rekening');
+			$employee->bank 		= $request->input('bank');
+			$employee->gender 		= $request->input('gender');
+			$employee->education 	= $request->input('education');
+			$employee->birthdate 	= $request->input('birthdate');
+			$employee->id_position 	= $request->input('position');
+			$employee->id_agency 	= $request->input('agency');
 				// $employee->id_brand 	= $request->input('brand');
-				$employee->save();
-				return redirect()->route('employee')
-				->with([
-					'type'    => 'success',
-					'title'   => 'Sukses!<br/>',
-					'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+			$employee->save();
+			return redirect()->route('employee')
+			->with([
+				'type'    => 'success',
+				'title'   => 'Sukses!<br/>',
+				'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
+			]);
 		}
 	}
 
 	public function delete($id)
 	{
 		$employee = Employee::find($id);
-			$employee->delete();
-			return redirect()->back()
-			->with([
-				'type'    => 'success',
-				'title'   => 'Sukses!<br/>',
-				'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-			]);
+		$employee->delete();
+		return redirect()->back()
+		->with([
+			'type'    => 'success',
+			'title'   => 'Sukses!<br/>',
+			'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+		]);
 	}
 }
