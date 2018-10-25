@@ -126,7 +126,7 @@ class PasarController extends Controller
                     'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Pasar!'
                 ]);
             } else {
-                return redirect()->back()
+                return redirect()->route('pasar')
                 ->with([
                     'type'   => 'danger',
                     'title'  => 'Gagal!<br/>',
