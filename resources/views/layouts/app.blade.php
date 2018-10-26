@@ -35,6 +35,8 @@
     @yield('select2-plugins-resource')
 
     @yield('css')
+
+    @stack('additional-css')
 </head>
 <body>
 
