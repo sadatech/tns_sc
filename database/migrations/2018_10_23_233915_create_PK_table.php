@@ -13,8 +13,15 @@ class CreatePKTable extends Migration
      */
     public function up()
     {
-        Schema::create('ProductKnowledges', function (Blueprint $table) {
+        Schema::create('product_knowledges', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('admin',150);
+            $table->string('sender',150);
+            $table->string('subject',150);
+            $table->string('type',150);
+            $table->text('filePDF');
+            $table->unsignedInteger('target');
+            $table->foreign('target')->references('id')->on('positions');
             $table->timestamps();
         });
     }
@@ -26,6 +33,6 @@ class CreatePKTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ProductKnowledges');
+        Schema::dropIfExists('product_knowledges');
     }
 }

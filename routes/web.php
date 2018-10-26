@@ -327,6 +327,21 @@ Route::prefix('news')->group(function(){
 
 	});
 
+/*
+	PRODUCT KNOWLEDGES
+*/
+
+	Route::prefix('pk')->group(function(){
+		Route::get('/','PKController@index')->name('pk')->middleware('auth');
+		Route::get('/data', 'PKController@data')->name('pk.data')->middleware('auth');
+		Route::get('/create','PKController@create')->name('tambah.pk')->middleware('auth');
+		Route::post('/store','PKController@store')->name('pk.store')->middleware('auth');
+		Route::get('/edit/{id}','PKController@edit')->name('ubah.pk')->middleware('auth');
+		Route::post('/update/{id}','PKController@update')->name('update.pk')->middleware('auth');
+		Route::get('/delete/{id}','PKController@delete')->name('pk.delete')->middleware('auth');
+
+	});
+
 
 /*
 	FAQ
