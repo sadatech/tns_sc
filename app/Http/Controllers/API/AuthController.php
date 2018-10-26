@@ -43,6 +43,7 @@ class AuthController extends Controller
 					if (Hash::check($request->input('password'), $user->password)) {
 						$credentials = $request->only('nik', 'password');
 						try {
+							Config::set('auth.providers.users.model', \App\Employee::class);
 							if (!$token = JWTAuth::attempt($credentials)) {
 								$res['success'] = false;
 								$res['msg'] = 'Invalid username/password or account not found.';
@@ -98,11 +99,11 @@ class AuthController extends Controller
 	{
 		$credentials = $request->only('nik', 'password');
 		try {
+			Config::set('auth.providers.users.model', \App\Employee::class);
             // verify the credentials and create a token for the user
 			if (! $token = JWTAuth::attempt($credentials)) {
-				return response()->json(['status' => false, 'error' => 'invalid_credentials'], 401);
+				return response()->json(['error' => 'invalid_credentials'], 401);
 			}else{
-				// $user = JWTAuth::parseToken()->authenticate();
 				$user =  Auth::user();
 				return response()->json(
 					[
@@ -118,7 +119,7 @@ class AuthController extends Controller
 			}
 		} catch (JWTException $e) {
             // something went wrong
-			return response()->json(['status' => false, 'error' => 'could_not_create_token'], 500);
+			return response()->json(['error' => 'could_not_create_token'], 500);
 		}
 		// return response()->json($token);
 	}
