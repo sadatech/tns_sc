@@ -36,6 +36,10 @@ class CreatePromoDetailsTable extends Migration
      */
     public function down()
     {
+        Schema::table('promo_details', function (Blueprint $table) {
+            $table->dropForeign(['id_promo']);
+            $table->dropForeign(['id_product']);            
+        });
         Schema::dropIfExists('promo_details');
     }
 }

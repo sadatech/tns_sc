@@ -38,6 +38,11 @@ class CreatePromosTable extends Migration
      */
     public function down()
     {
+        Schema::table('promos', function (Blueprint $table) {
+            $table->dropForeign(['id_employee']);
+            $table->dropForeign(['id_store']);
+            $table->dropForeign(['id_brand']);
+        });
         Schema::dropIfExists('promos');
     }
 }

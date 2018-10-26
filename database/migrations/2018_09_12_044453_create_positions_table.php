@@ -11,19 +11,10 @@ class CreatePositionsTable extends Migration
         Schema::create('positions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->tinyInteger('level');
+            $table->string('level');
             $table->timestamps();
             $table->softDeletes();
         });
-
-        DB::table('positions')->insert([
-            ['name' => 'SPG Reguler','level'=>1],
-            ['name' => 'MD Reguler','level'=>2],
-            ['name' => 'SPG Pasar','level'=>3],
-            ['name' => 'MD Pasar','level'=>4],
-            ['name' => 'Demo Cooking','level'=>5],
-            ['name' => 'TL','level'=>6],
-        ]);
     }
 
     public function down()
