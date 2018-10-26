@@ -109,6 +109,42 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Is Vito</label>
+                        <select class="js-select2 custom-select" name="is_vito" id="is_vito" required>
+                            <option value="" disabled selected>Choose Vito / Non Vito</option>
+                            <option value="Vito">VITO</option>
+                            <option value="Non Vito">NON VITO</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Delivery</label>
+                        <select class="js-select2 form-control" name="delivery" id="delivery" required>
+                            <option value="" disabled selected>Choose Delivery</option>
+                                <option value="Direct">Direct</option>
+                                <option value="DC">DC</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Store Panel</label>
+                        <select class="js-select2 custom-select" name="store_panel" id="store_panel" required>
+                            <option value="" disabled selected>Choose Store Panel</option>
+                            <option value="YES">YES</option>
+                            <option value="NO">NO</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Coverage</label>
+                        <select class="js-select2 form-control" name="coverage" id="coverage" required>
+                            <option value="" disabled selected>Choose Coverage</option>
+                                <option value="Direct">Direct</option>
+                                <option value="In Direct">In Direct</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
               <div class="form-group col-md-6">
                         <label>Timezones</label>
                         <select class="js-select2 custom-select" name="timezone" id="timezone" required>
@@ -156,6 +192,10 @@
         $('#subbarea option[value="{{ $str->subarea->id }}"]').attr('selected','selected');
         $('#timezone option[value="{{ $str->id_timezone }}"]').attr('selected','selected');
         $('#sales option[value="{{ $str->id_salestier }}"]').attr('selected','selected');
+        $('#is_vito option[value="{{ $str->is_vito }}"]').attr('selected','selected');
+        $('#coverage option[value="{{ $str->coverage }}"]').attr('selected','selected');
+        $('#store_panel option[value="{{ $str->store_panel }}"]').attr('selected','selected');
+        $('#delivery option[value="{{ $str->delivery }}"]').attr('selected','selected');
 
       
         var dists = {{ $dist }}
@@ -164,6 +204,10 @@
         $('#timezone').trigger('change');
         $('#subbarea').trigger('change');
         $('#sales').trigger('change');
+        $('#is_vito').trigger('change');
+        $('#coverage').trigger('change');
+        $('#store_panel').trigger('change');
+        $('#delivery').trigger('change');
     });
 
 

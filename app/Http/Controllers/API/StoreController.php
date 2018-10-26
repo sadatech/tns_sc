@@ -10,11 +10,11 @@ use Config;
 
 class StoreController extends Controller
 {
-	public function __construct()
+  public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
-	
+  
 	public function list()
 	{
 		try {
