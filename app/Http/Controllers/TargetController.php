@@ -14,7 +14,7 @@ class TargetController extends Controller
 {
     public function baca()
     {
-    	$data['employee']       = Employee::get();
+    	$data['employee'] = Employee::get();
         $data['store']    = Store::get();
         return view('product.target',$data);
     }
@@ -28,8 +28,9 @@ class TargetController extends Controller
             $data = array(
                 'id'            => $product->id,
                 'employee'     	=> $product->employee->id,
-                'store'      	=> $product->store->id,
-                'type'      	=> $product->type,
+                'store'         => $product->store->id,
+                'value'         => $product->value,
+                'value_pf'      => $product->value_pf,
                 'rilis'         => $product->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
@@ -41,10 +42,11 @@ class TargetController extends Controller
     {
         $data=$request->all();
         $limit=[
-            'type'          => 'required',
             'employee'      => 'required|numeric',
             'store'         => 'required|numeric',
-            'rilis'         => 'required'
+            'rilis'         => 'required',
+            'value'         => 'required|numeric',
+            'value_pf'      => 'required|numeric'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -52,13 +54,7 @@ class TargetController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
-            Target::create([
-                'type'          => $request->input('type'),
-                'id_employee'   => $request->input('employee'),
-                'id_product'    => $request->input('product'),
-                'id_store'      => $request->input('store'),
-                'rilis'         => $request->input('rilis'),
-            ]);
+            Target::create($data);
             return redirect()->back()
             ->with([
                 'type' => 'success',
@@ -71,17 +67,13 @@ class TargetController extends Controller
     public function update(Request $request, $id) 
     {
         $product = Target::find($id);
-            $product->type          = $request->get('type');
-            $product->id_store    = $request->get('store');
-            $product->id_employee       = $request->get('employee');
-            $product->rilis          = $request->get('rilis');
-            $product->save();
-            return redirect()->back()
-            ->with([
-              'type'    => 'success',
-              'title'   => 'Sukses!<br/>',
-              'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!'
-          ]);
+        $product->fill($request->all());
+        $product->save();
+        return redirect()->back()->with([
+          'type'    => 'success',
+          'title'   => 'Sukses!<br/>',
+          'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!'
+      ]);
     }
 
     public function delete($id)

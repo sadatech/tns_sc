@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Yajra\Datatables\Datatables;
-use Auth;
-use App\Category;
-use App\SubCategory;
-use App\Product;
-use App\Price;
 use App\Brand;
-use App\ProductPromo;
-use App\ProductFokus;
+use App\Category;
 use App\Filters\ProductFilters;
+use App\Price;
+use App\Product;
+use App\ProductFokus;
+use App\ProductPromo;
+use App\ProductUnit;
+use App\SubCategory;
+use Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Yajra\Datatables\Datatables;
 
 class ProductController extends Controller
 {
@@ -23,14 +25,12 @@ class ProductController extends Controller
 
    public function baca()
    {
-       $data['brand'] = Brand::get();
-       $data['subcategory'] = SubCategory::get();
-       return view('product.product', $data);
+       return view('product.product');
    }
 
    public function data()
     {
-        $product = Product::where('id_brand','1')->with('subcategory')->with('brand');
+        $product = Product::where('id_brand','1')->with('subcategory')->with('brand')->with('stockType')->with('sku_units');
         return Datatables::of($product)
         ->addColumn('brand', function($product) {
             return $product->brand->name;
@@ -38,14 +38,19 @@ class ProductController extends Controller
         ->addColumn('subcategory', function($product) {
             return $product->subcategory->name;
         })
+        ->addColumn('stockType', function($product) {
+            return $product->stockType->name;
+        })
         ->addColumn('action', function ($product) {
             $data = array(
                 'id'            => $product->id,
-                // 'brand'         => $product->brand->id,
                 'subcategory'   => $product->subcategory->id,
                 'name'          => $product->name,
+                'code'          => $product->code,
+                'stock_type_id' => $product->stock_type_id,
                 'deskrispi'     => $product->deskripsi,
-                'panel'         => $product->panel
+                'panel'         => $product->panel,
+                'sku_units'     => $product->sku_units->pluck('sku_unit_id')
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('product.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -54,47 +59,56 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $data=$request->all();
-        $limit=[
-            'name'          => 'required',
-            // 'deskripsi'     => 'required',
-            'panel'         => 'required',
-            'subcategory'   => 'required|numeric',
-            // 'brand'         => 'required|numeric'
-        ];
-        $validator = Validator($data, $limit);
-        if ($validator->fails()){
-            return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
-        } else {
-            Product::create([
-                'name'              => $request->input('name'),
-                'deskripsi'         => $request->input('deskripsi'),
-                'id_subcategory'    => $request->input('subcategory'),
-                'id_brand'          => '1',
-                'panel'             => $request->input('panel'),
-            ]);
-            return redirect()->back()
-            ->with([
-                'type' => 'success',
-                'title' => 'Sukses!<br/>',
-                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Product!'
-            ]);
+        $data = $request->all();
+
+        if (($validator = Product::validate($data))->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
+
+        DB::transaction(function () use($data) {
+            $product = Product::create($data);
+            foreach ($data['sku_units'] as $sku_id) {
+                ProductUnit::create([
+                    'product_id' => $product->id,
+                    'sku_unit_id' => $sku_id
+                ]);
+            }
+        });
+
+        return redirect()->back()->with([
+            'type' => 'success',
+            'title' => 'Sukses!<br/>',
+            'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Product!'
+        ]);
     }
 
     public function update(Request $request, $id) 
     {
-      $product = Product::find($id);
-        $product->name          = $request->get('name');
-        $product->deskripsi     = $request->get('deskripsi');
-        $product->id_subcategory= $request->get('subcategory');
-        $product->id_brand      = '1';
-        $product->panel         = $request->get('panel');
-        $product->save();
-        return redirect()->back()
-        ->with([
+        $product = Product::findOrFail($id);
+        $data = $request->all();
+
+        if (($validator = Product::validate($data))->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        DB::transaction(function () use($product, $data) {
+            $product->fill($data)->save();
+
+            $oldSkuUnits = $product->sku_units->pluck('sku_unit_id');
+            $deletedSkuUnits = $oldSkuUnits->diff($data['sku_units']);
+            foreach ($deletedSkuUnits as $deleted_id) {
+                ProductUnit::where(['product_id' => $product->id, 'sku_unit_id' => $deleted_id])->delete(); 
+            }
+
+            foreach ($data['sku_units'] as $sku_id) {
+                ProductUnit::updateOrCreate([
+                    'product_id' => $product->id,
+                    'sku_unit_id' => $sku_id
+                ]);
+            }
+        });
+
+        return redirect()->back()->with([
             'type'    => 'success',
             'title'   => 'Sukses!<br/>',
             'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product!'

@@ -33,8 +33,6 @@
           <th class="text-center">Category</th>
           <th class="text-center">Price</th>
           <th class="text-center">Date Rilis</th>
-          <th class="text-center">Type Toko</th>
-          <th class="text-center">Type Price</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -43,136 +41,12 @@
   </div>
 </div>
 
-<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Price Product</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <form action="{{ route('price.add') }}" method="post">
-        {!! csrf_field() !!}
-        <div class="block-content">
-          <div class="form-group">
-            <label>Category & Name Product</label>
-            <select class="js-select2 form-control" style="width: 100%" name="product" required>
-            <option value="" disabled selected>Choose your Product</option>
-              @foreach($product as $data)
-                <option value="{{ $data->id }}">{{ $data->category->name }} - {{ $data->name }}</option>
-              @endforeach
-            </select>
-          </div>
-          <div class="row">
-            <div class="form-group col-md-6">
-              <label>Price</label>
-              <input type="text" class="form-control" name="price" placeholder="Input Price" required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>Rilis Date</label>
-              <input class="js-datepicker form-control" type="date" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
-            </div>
-          </div>
-          <div class="row">
-            <div class="form-group col-md-6">
-            <label>Type Store</label>
-              <select class="form-control form-control-lg" name="Ttoko" required>
-                <option value="" disabled selected>Choose your Type Store</option>
-                <option value="TR">TR</option>
-                <option value="MR">MR</option>
-                <option value="ALL">ALL</option>
-              </select>
-            </div>
-            <div class="form-group col-md-6">
-            <label>Type Price</label>
-              <select class="form-control form-control-lg" name="Tprice" required>
-                <option value="" disabled selected>Choose your Type Price</option>
-                <option value="1">Sell In</option>
-                <option value="2">Sell Out</option>
-                <option value="3">One Price</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Save
-          </button>
-          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+{{-- MODAL ADD PRICE --}}
+@include('product._form_price', ['id' => 'tambahModal', 'action' => route('price.add')])
 
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-edit"></i> Update Price Product</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <form id="editForm" method="post">
-        {!! method_field('PUT') !!}
-        {!! csrf_field() !!}
-        <div class="block-content">
-          <div class="form-group">
-            <label>Category & Name Product</label>
-            <select class="js-edit form-control" id="productInput" style="width: 100%" name="product">
-              @foreach($product as $data)
-                <option value="{{ $data->id }}">{{ $data->category->name }} - {{ $data->name }}</option>
-              @endforeach
-            </select>
-          </div>
-          <div class="row">
-            <div class="form-group col-md-6">
-              <label>Price</label>
-              <input type="text" class="form-control" name="price" id="priceInput">
-            </div>
-            <div class="form-group col-md-6">
-              <label>Rilis Date</label>
-              <input class="js-datepicker form-control" type="date" id="rilisInput" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
-            </div>
-          </div>
-          <div class="row">
-            <div class="form-group col-md-6">
-            <label>Type Store</label>
-              <select class="form-control form-control-lg" name="Ttoko" id="toko" required>
-                <option value="TR">TR</option>
-                <option value="MR">MR</option>
-              </select>
-            </div>
-            <div class="form-group col-md-6">
-            <label>Type Price</label>
-              <select class="form-control form-control-lg" name="Tprice" id="priceSelect" required>
-                <option value="1">Sell In</option>
-                <option value="2">Sell Out</option>
-                <option value="3">One Price</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-alt-success">
-              <i class="fa fa-save"></i> Save
-            </button>
-            <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+{{-- MODAL UPDATE PRICE --}}
+@include('product._form_price', ['id' => 'editModal', 'type' => 'edit'])
+
 @endsection
 
 @section('css')
@@ -194,16 +68,6 @@
 $('#currency').on('change', function() {
     window.location.href = $(this).val();
 });
-  function editModal(json) {
-    $('#editModal').modal('show');
-    $('#editForm').attr('action', "{{ url('/product/price/update') }}/"+json.id);
-    $('#productInput').val(json.product).trigger('change');
-    $('#priceInput').val(json.price);
-    $('#toko').val(json.type_toko);
-    $('#priceSelect').val(json.type_price);
-    $('#rilisInput').val(json.rilis);
-    // console.log(json);
-  }
   @if(session('type'))
   $(document).ready(function() {
     $.notify({
@@ -261,17 +125,9 @@ $('#currency').on('change', function() {
       { data: 'category', name: 'category' },
       { data: 'price', name: 'price' },
       { data: 'rilis', name: 'rilis' },
-      { data: 'type_toko', name: 'type_toko' },
-      { data: 'type_price', name: 'type_price' },
       { data: 'action', name: 'action' },
       ]
     });
-  });
-  $(".js-select2").select2({ 
-    dropdownParent: $("#tambahModal")
-  });
-  $(".js-edit").select2({ 
-    dropdownParent: $("#editModal")
   });
 </script>
 @endsection

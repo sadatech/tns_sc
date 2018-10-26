@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Product Target")
+@section('title', "Demo Cooking Target")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Product Target<small class="ml-2">Demo Cooking</small></h2>
+  <h2 class="content-heading pt-10"> Target<small class="ml-2">Demo Cooking</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -30,8 +30,9 @@
           <thead>
             <th class="text-center" style="width: 70px;"></th>
             <th>Employee Name</th>
-            <th>Pasar</th>
-            <th>Type</th>
+            <th>Sub Area</th>
+            <th>Value</th>
+            <th>Value PF</th>
             <th>Release Month</th>
             <th class="text-center" style="width: 15%;"> Action</th>
           </thead>
@@ -68,9 +69,9 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label>Pasar</label>
-              <select class= "js-edit form-control" id="PasarInput" style="width: 100%"  name="pasar" >
-                @foreach($pasar as $data)
+              <label>Sub Area</label>
+              <select class= "js-edit form-control" id="SubAreaInput" style="width: 100%"  name="subarea" >
+                @foreach($subarea as $data)
                 <option value="{{ $data->id }}">{{ $data->name }}</option>
                 @endforeach
               </select>
@@ -105,7 +106,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Product Fokus</h3>
+          <h3 class="block-title"><i class="fa fa-plus"></i> Add Target</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -113,7 +114,7 @@
           </div>
         </div>
       </div>
-      <form action="{{ route('target.add') }}" method="post">
+      <form action="{{ route('target.dc.add') }}" method="post">
         {!! csrf_field() !!}
         <div class="block-content">
           <div class="form-group">
@@ -127,10 +128,10 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label>Pasar</label>
-              <select class="js-select2 form-control" style="width: 100%" name="pasar">
-                <option disabled selected>Choose your Pasar</option>
-                @foreach($pasar as $data)
+              <label>Sub Area</label>
+              <select class="js-select2 form-control" style="width: 100%" name="subarea">
+                <option disabled selected>Choose your Sub Area</option>
+                @foreach($subarea as $data)
                 <option value="{{ $data->id }}">{{ $data->name }}</option>
                 @endforeach
               </select>
@@ -179,9 +180,9 @@
 <script type="text/javascript">
   function editModal(json) {
     $('#editModal').modal('show');
-    $('#editForm').attr('action', "{{ url('/product/target/update') }}/"+json.id);
+    $('#editForm').attr('action', "{{ url('/target/dc/update') }}/"+json.id);
     $('#EmployeeInput').val(json.employee).trigger('change');
-    $('#PasarInput').val(json.pasar).trigger('change');
+    $('#SubAreaInput').val(json.subarea).trigger('change');
     $('#rilisInput').val(json.rilis);
     $('#valueInput').val(json.value);
     $('#valuepfInput').val(json.valuepf);
@@ -208,7 +209,6 @@
         $(function() {
           $('#promoTable').DataTable({
             processing: true,
-            serverSide: true,
             drawCallback: function(){
               $('.js-swal-delete').on('click', function(){
                 var url = $(this).data("url");
@@ -236,12 +236,13 @@
                 });
               });
             },
-            ajax: '{!! route('target.data') !!}',
+            ajax: '{!! route('target.dc.data') !!}',
             columns: [
             { data: 'id', name: 'id' },
             { data: 'employee.name', name: 'employee.name'},
-            { data: 'pasar.name', name: 'pasar.name' },
-            { data: 'type', name: 'type' },
+            { data: 'subarea', name: 'subarea', seachable: true },
+            { data: 'value', name: 'value' },
+            { data: 'value_pf', name: 'value_pf' },
             { data: 'rilis', name: 'rilis' },
             { data: 'action', name: 'action' },
             ]

@@ -141,6 +141,9 @@
                                 <a class="{{ request()->is('product/sub-category') ? 'active' : '' }}" href="{{ route('sub-category') }}">Sub Category</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('product/sku-unit') ? 'active' : '' }}" href="{{ route('sku-unit') }}">SKU Unit</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
                             <li>

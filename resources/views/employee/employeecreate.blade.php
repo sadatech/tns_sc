@@ -162,7 +162,7 @@
                 <div class="row">
                     <div class="form-group col-md-6" id="subarea" >
                         <label>Sub Area / Area</label>
-                        <select class="js-select form-control form-control-lg" style="width: 100%" name="subarea" id="subareaInput">
+                        <select class="js-select2 form-control form-control-lg" style="width: 100%" name="subarea[]" id="subareaInput">
                             <option disabled selected>Choose your Subarea</option>
                             @foreach($subarea as $data)
                             <option value="{{ $data->id }}">{{ $data->name }}</option>
@@ -366,7 +366,6 @@
         } else if (select == {{ App\Position::where(['level' => 5])->first()->level }}) {
             $('#subarea').show();
             $('#status').hide();
-            $('#subarea').show();
             $('#storeStay').hide();
             $('#storeMobile').hide();
             $('#pasarMobile').hide();
