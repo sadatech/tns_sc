@@ -218,6 +218,44 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group col-md-6" id="pasarMobile">
+                        <label class="col-md-12" style="padding: 0">Pasar</label>
+                        <div class="input-group mb-3 col-md-12" style="padding: 0">
+                            <div style="width: 82%">
+                                <select id="pasar" class="js-select2 form-control" style="width: 100%" data-placeholder="Pilih pasar...">
+                                    @foreach($pasar as $data)
+                                    <option value="{{ $data->id.'|'.$data->name}}">{{ $data->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="input-group-append" style="width: 18%">
+                                <button id="pasarAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
+                            </div>
+                        </div>
+                        <!-- Block’s content.. -->
+                        <div class="block block-themed block-rounded">
+                            <div class="block-header bg-gd-lake" style="padding: 5px">
+                                <h3 class="block-title">Pasar Terpilih</h3>
+                                <span id="selectedStoreDefault" style="color: #ffeb5e;padding-top: 5px;">Tolong tambahkan pasar.</span>
+                                <div class="block-options">
+                                    <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Cari Pasar..">
+                                </div>
+                            </div>
+                            <div class="block-content" style="padding: 0; width: 100%;">
+                                <table id="selectedPasarTable" class="table table-striped table-vcenter" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" style="width: 50px;">#</th>
+                                            <th>Pasar</th>
+                                            <th class="text-center" style="width: 100px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="selectedPasarTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group col-md-6" id="storeStay">
                         <label>Store</label>
                         <select class="js-select form-control" style="width: 100%" data-placeholder="Choose store..." name="store" id="stayInput">
@@ -241,6 +279,7 @@
 @section('script')
 <script type="text/javascript">
     var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
+    var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;
     $(".js-select2").select2({
         tags: true
     });
@@ -272,6 +311,7 @@
         $('#status').hide();
         $('#storeMobile').hide();
         $('#storeStay').hide();
+        $('#pasarMobile').hide();
 
         // add Store to Selected Store
         $('#storesAdd').click(function () {
@@ -284,38 +324,60 @@
                 notif('Warning',': Please the select Store first','warning');
             }
         });
+        $('#pasarAdd').click(function () {
+            var pasar = $('#pasar').val();
+            if (pasar != null) {
+                $('#pasar').val('');
+                $('#select2-pasar-container').html('');
+                addItemPasar(pasar);
+            }else{                
+                notif('Warning',': Please the select Pasar first','warning');
+            }
+        });
     });
 
     $('#position').on('change', e => {
         var select = $('#position').find(":selected").val()
         var status = $('#status').find(":selected").val()
-        if (select == {{ App\Position::where(['name' => 'MD (Reguler)'])->first()->id }}) {
+        if (select == {{ App\Position::where(['level' => 2])->first()->level }}) {
             $('#status').show();
             $('#subarea').hide();
+            $('#pasarMobile').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'SPG (Reguler)'])->first()->id }}) {
+            $('#status').val(null);
+        } else if (select == {{ App\Position::where(['level' => 1])->first()->level }}) {
             $('#status').show();
             $('#subarea').hide();
+            $('#pasarMobile').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'SPG (Pasar)'])->first()->id }}) {
-            $('#status').show();
-            $('#subarea').hide();
-            $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'MD (Pasar)'])->first()->id }}) {
-            $('#status').show();
-            $('#subarea').hide();
-            $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['name' => 'Demo Coocking'])->first()->id }}) {
+            $('#status').val(null);
+        } else if (select == {{ App\Position::where(['level' => 3])->first()->level }}) {
+            $('#pasarMobile').show();
             $('#status').hide();
             $('#subarea').hide();
             $('#subareaInput').val(null);
-        } else if (select == {{ App\Position::where(['level' => 'level 2'])->first()->id }}) {
+            $('#status').val(null);
+        } else if (select == {{ App\Position::where(['level' => 4])->first()->level }}) {
+            $('#pasarMobile').show();
+            $('#status').hide();
+            $('#subarea').hide();
+            $('#subareaInput').val(null);
+            $('#status').val(null);
+        } else if (select == {{ App\Position::where(['level' => 5])->first()->level }}) {
             $('#subarea').show();
+            $('#status').hide();
+            $('#subarea').show();
+            $('#storeStay').hide();
+            $('#storeMobile').hide();
+            $('#pasarMobile').hide();
+            $('#status').val(null);
+        } else if (select == {{ App\Position::where(['level' => 6])->first()->level }}) {
             $('#status').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();
             $('#status').val(null);
         } else {
+            $('#pasarMobile').hide();
             $('#subarea').hide();
             $('#status').hide();
             $('#storeStay').hide();
@@ -365,6 +427,38 @@
             notif('Warning',msg,'warning');
         }
     }
+    function addItemPasar(pasar, get = '') {
+        var pasarSplit = pasar.split("|");
+        var a = selectedPasarId.indexOf(''+pasarSplit[0]);
+
+        if (get != 'get') {
+            selectedPasar.push(pasar);
+            selectedPasarId.push(pasarSplit[0]);
+            selectedPasarName.push(pasarSplit[1]);
+        }
+
+        if (a < 0 || get == 'get') {
+            tableIndex++;
+            $('#selectedPasarTable').removeAttr('style');
+            $('#selectedPasarDefault').css('display','none');
+            $('#selectedPasarTableBody').append("<tr>"+
+                "<th class='text-center' scope='row'>"+ tableIndex +"</th>"+
+                "<td><span>"+ pasarSplit[1] +"</span>"+
+                "<input type='hidden' name='pasar[]' value='"+ pasarSplit[0] +
+                "'></td>"+
+                "<td class='text-center'>"+
+                "<div class='btn-group'>"+
+                "<button type='button' class='btn btn-sm btn-secondary js-tooltip-enabled' data-toggle='tooltip' title=' data-original-title='Delete' onclick='deleteItemPasar("+ pasarSplit[0] +")'>"+
+                "<i class='fa fa-times'></i>"+
+                "</button>"+
+                "</div>"+
+                "</td>"+
+                "</tr>");
+        }else{
+            var msg = " : Data Already Exist! data: "+pasarSplit[1];
+            notif('Warning',msg,'warning');
+        }
+    }
     function deleteItem(id) {
         var a = selectedStoresId.indexOf(''+id);
         if (a >= 0) {
@@ -376,6 +470,24 @@
             tableIndex = 0;
             $('#selectedStoreTableBody').html('');
             $.each(selectedStores, function( index, value ) {
+                console.log(value)
+                addItem(value,'get');
+            });
+        }else{
+            console.log("Index Item Not Found!");
+        }
+    }
+    function deleteItemPasar(id) {
+        var a = selectedPasarId.indexOf(''+id);
+        if (a >= 0) {
+            console.log(selectedPasar)
+            selectedPasar.splice(a, 1);
+            selectedPasarId.splice(a, 1);
+            selectedPasarName.splice(a, 1);
+            console.log(selectedPasar)
+            tableIndex = 0;
+            $('#selectedPasarTableBody').html('');
+            $.each(selectedPasar, function( index, value ) {
                 console.log(value)
                 addItem(value,'get');
             });

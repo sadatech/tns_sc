@@ -13,18 +13,13 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     use Authenticatable;
     
     protected $fillable = [
-        'name', 'nik', 'id_position', 'ktp', 'phone', 'email', 'rekening', 'bank', 'status', 'joinAt', 'id_agency', 'id_subarea', 'gender', 'education', 'birthdate', 'foto_ktp', 'foto_tabungan', 'isResign', 'password', 'id_timezone'
+        'name', 'nik', 'id_position', 'ktp', 'phone', 'email', 'rekening', 'bank', 'status', 'joinAt', 'id_agency', 'gender', 'education', 'birthdate', 'foto_ktp', 'foto_tabungan', 'isResign', 'password', 'id_timezone'
     ];
 
     protected $hidden = [
         'password'
     ];
-
-    public function subarea()
-    {
-        return $this->belongsTo('App\SubArea', 'id_subarea');
-    }
-
+    
     public function resigns()
     {
         return $this->hasMany('App\Resign', 'id_employee');
@@ -53,6 +48,11 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     public function employeeStore()
     {
         return $this->hasMany('App\EmployeeStore', 'id_employee');
+    }
+
+    public function employeePasar()
+    {
+        return $this->hasMany('App\EmployeePasar', 'id_employee');
     }
 
     public function position()
