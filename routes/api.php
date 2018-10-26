@@ -53,6 +53,9 @@ Route::prefix('sales')->group(function () {
 	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
 });
 
+Route::prefix('dataprice')->group(function () {
+	Route::post('/add', 'API\DataPriceController@store')->name('api.dataprice.add');
+});
 
 /**
  * Employee
