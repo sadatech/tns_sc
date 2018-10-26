@@ -17,7 +17,12 @@ class SubArea extends Model
 
     public function stores()
     {
-    	return $this->hasMany('App\Store', 'id_subarea');
+        return $this->hasMany('App\Store', 'id_subarea');
+    }
+
+    public function employeeSubArea()
+    {
+        return $this->hasMany('App\employeeSubArea', 'id_subarea');
     }
 
     public function pasars()
