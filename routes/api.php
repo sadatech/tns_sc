@@ -52,6 +52,9 @@ Route::prefix('product')->group(function () {
 Route::prefix('sales')->group(function () {
 	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
 });
+Route::prefix('competitor')->group(function () {
+	Route::post('/promo', 'API\CompetitorController@promo')->name('api.competitor.promo');
+});
 
 
 /**

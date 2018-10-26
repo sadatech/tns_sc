@@ -4,10 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductPromo extends Model
+class PromoDetail extends Model
 {
     protected $fillable = [
-        'id_product', 'id_area', 'from', 'to'
+        'id_promo', 'id_product', 'type', 'description', 'start_date', 'end_date'
     ];
 
     public function product()
@@ -15,8 +15,8 @@ class ProductPromo extends Model
         return $this->belongsTo('App\Product', 'id_product');
     }
 
-    public function area()
+    public function promo()
     {
-        return $this->belongsTo('App\Area', 'id_area');
+        return $this->belongsTo('App\Promo', 'id_promo');
     }
 }

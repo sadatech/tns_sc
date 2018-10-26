@@ -110,7 +110,7 @@ class AuthController extends Controller
 						'name' 		=> $user->name,
 						'email' 	=> $user->email,
 						'photo' 	=> $user->foto_profil,
-						'level' 	=> $user->id_position,
+						'level' 	=> $user->position->level,
 						'level_name'=> $user->position->name,
 						'token' 	=> $token
 					]
@@ -126,7 +126,6 @@ class AuthController extends Controller
 	public function getUser()
 	{
 		try {
-
 			// if (! $user = JWTAuth::toUser(JWTAuth::getToken())) {
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				return response()->json(['user_not_found'], 404);
