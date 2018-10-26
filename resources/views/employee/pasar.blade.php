@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Employee")
+@section('title', "Employee Pasar")
 @section('content')
 <div class="content">
-    <h2 class="content-heading pt-10">Employee <small>Manage</small></h2>
+    <h2 class="content-heading pt-10">Employee Pasar <small>Manage</small></h2>
     <div class="block block-themed"> 
         <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
             <h3 class="block-title">Datatables</h3>
@@ -25,7 +25,7 @@
                         <th width="200px">NIK</th>
                         <th width="200px">Name</th>
                         <th width="200px">No. KTP</th>
-                        <th width="200px">Store</th>
+                        <th width="200px">Pasar</th>
                         <th width="200px">Phone</th>
                         <th width="200px">Email</th>
                         <th width="200px">No. Rekening</th>
@@ -36,7 +36,7 @@
                         <th width="120px">Gender</th>
                         <th width="60px">Education</th>
                         <th width="200px">Birth Date</th>
-                        <th width="200px">Name Position</th>
+                        <th width="200px">Position</th>
                     </thead>
                 </table>
             </div>
@@ -111,14 +111,14 @@
                     });
                 });
             },
-            ajax: '{!! route('employee.data') !!}',
+            ajax: '{!! route('employee.data.pasar') !!}',
             serverSide: true,
             columns: [
             { data: 'action', name: 'action' },
             { data: 'nik', name: 'nik' },
             { data: 'name', name: 'name' },
             { data: 'ktp', name: 'ktp' },
-            { data: 'employeeStore', name: 'employeeStore' },
+            { data: 'employeePasar', name: 'employeePasar' },
             { data: 'phone', name: 'phone' },
             { data: 'email', name: 'email' },
             { data: 'rekening', name: 'rekening' },

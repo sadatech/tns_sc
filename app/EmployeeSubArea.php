@@ -4,10 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmployeeStore extends Model
+class EmployeeSubArea extends Model
 {
     protected $fillable = [
-        'id_employee', 'id_store'
+        'id_employee', 'id_subarea'
     ];
 
     public function employee()
@@ -17,7 +17,6 @@ class EmployeeStore extends Model
     
     public function store()
     {
-		return $this->belongsTo('App\Store', 'id_store');
+		return $this->belongsTo('App\SubArea', 'id_subarea');
     }
-
 }
