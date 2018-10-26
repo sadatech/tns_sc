@@ -95,6 +95,18 @@ Route::prefix('store')->group(function () {
 		})->name('account.download-template')->middleware('auth');
 	});
 
+	//Sales Tiers
+
+	Route::prefix('sales_tiers')->group(function()
+	{
+		Route::get('/','SalesTiersController@index')->name('sales_tiers')->middleware('auth');
+		Route::get('/data', 'SalesTiersController@data')->name('sales_tiers.data')->middleware('auth');
+		Route::post('/create', 'SalesTiersController@store')->name('sales_tiers.add')->middleware('auth');
+		Route::get('/edit/{id}', 'SalesTiersController@edit')->name('sales_tiers.ubah')->middleware('auth');
+		Route::put('/update/{id}', 'SalesTiersController@update')->name('sales_tiers.update')->middleware('auth');
+		Route::get('/delete/{id}', 'SalesTiersController@delete')->name('sales_tiers.delete')->middleware('auth');
+	});
+
 	//Distributor Pages
 	Route::prefix('distributor')->group(function(){
 		Route::get('/', 'DistributorController@baca')->name('distributor')->middleware('auth');
@@ -286,6 +298,50 @@ Route::prefix('planDc')->group(function () {
 	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
 	Route::get('/delete/{id}', 'PlandcController@delete')->name('plan.delete')->middleware('auth');
 });
+/*
+	USERS
+*/
+
+	Route::prefix('user')->group(function(){
+		Route::get('/','UserController@index')->name('user')->middleware('auth');
+		Route::post('/create','UserController@store')->name('user.add')->middleware('auth');
+		Route::get('/data','UserController@data')->name('user.data')->middleware('auth');
+		Route::put('/update/{id}','UserController@update')->name('user.update')->middleware('auth');
+
+		Route::get('/delete/{id}','UserController@destroy')->name('user.delete')->middleware('auth');
+	});
+
+
+/*
+	NEWS
+*/
+
+Route::prefix('news')->group(function(){
+		Route::get('/','NewsController@index')->name('news')->middleware('auth');
+		Route::get('/data', 'NewsController@data')->name('news.data')->middleware('auth');
+		Route::get('/create','NewsController@create')->name('tambah.news')->middleware('auth');
+		Route::post('/store','NewsController@store')->name('news.store')->middleware('auth');
+		Route::get('/edit/{id}','NewsController@edit')->name('ubah.news')->middleware('auth');
+		Route::post('/update/{id}','NewsController@update')->name('update.news')->middleware('auth');
+		Route::get('/delete/{id}','NewsController@delete')->name('news.delete')->middleware('auth');
+
+	});
+
+
+/*
+	FAQ
+*/
+
+Route::prefix('faq')->group(function(){
+		Route::get('/','FAQController@index')->name('faq')->middleware('auth');
+		Route::get('/data', 'FAQController@data')->name('faq.data')->middleware('auth');
+		Route::get('/create','FAQController@create')->name('tambah.faq')->middleware('auth');
+		Route::post('/store','FAQController@store')->name('faq.store')->middleware('auth');
+		Route::get('/edit/{id}','FAQController@edit')->name('ubah.faq')->middleware('auth');
+		Route::post('/update/{id}','FAQController@update')->name('update.faq')->middleware('auth');
+		Route::get('/delete/{id}','FAQController@delete')->name('faq.delete')->middleware('auth');
+
+	});
 
 
 /**
