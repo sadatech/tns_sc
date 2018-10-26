@@ -161,7 +161,7 @@
                         <a class="{{ request()->is('news/index') ? 'active' : '' }}" href="{{ route('news') }}"><i class="si si-speech"></i><span class="sidebar-mini-hide">News</span></a>
                     </li>  
                     <li>
-                        <a class="{{ request()->is('faq/index') ? 'active' : '' }}" href="{{ route('faq') }}"><i class="si si-notebook"></i><span class="sidebar-mini-hide">Product Knowledge</span></a>
+                        <a class="{{ request()->is('pk/index') ? 'active' : '' }}" href="{{ route('pk') }}"><i class="si si-notebook"></i><span class="sidebar-mini-hide">Product Knowledge</span></a>
                     </li>  
                     <li>
                         <a class="{{ request()->is('faq/index') ? 'active' : '' }}" href="{{ route('faq') }}"><i class="si si-bubbles"></i><span class="sidebar-mini-hide">FAQ</span></a>

@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Yajra\Datatables\Datatables;
+use Auth;
+use Illuminate\Support\Str;
+use App\ProductKnowledge;
+use App\Position;
+use DB;
 class PKController extends Controller
 {
     /**
@@ -13,7 +18,7 @@ class PKController extends Controller
      */
     public function index()
     {
-        //
+        return view('productknowledge.PK');
     }
 
     /**
@@ -23,7 +28,8 @@ class PKController extends Controller
      */
     public function create()
     {
-        //
+        $data['positions'] = Position::get();
+        return view('productknowledge.PKCreate',$data);
     }
 
     /**
@@ -34,7 +40,37 @@ class PKController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       
+        $data=$request->all();
+        $limit=[
+            'filePDF'          => 'required|mimes:pdf|max:10000',
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+        } else {
+                 ProductKnowledge::create([
+                'filePDF'           => $request->input('filePDF'),
+                'admin'             => $request->input('admin'),
+                'sender'            => $request->input('sender'),
+                'subject'           => $request->input('subject'),
+                'type'              => $request->input('type'),
+                'target'            => $request->input('target'),
+            ]); 
+                return redirect()->route('pk')
+                ->with([
+                    'type'      => 'success',
+                    'title'     => 'Sukses!<br/>',
+                    'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Product Knowledges!'
+                ]); 
+        } return redirect()->route('pk')
+                ->with([
+                    'type'      => 'danger',
+                    'title'     => 'Gagal!<br/>',
+                    'message'   => '<i class="em em-warning mr-2"></i>Gagal menambah Product!'
+                ]);
     }
 
     /**
