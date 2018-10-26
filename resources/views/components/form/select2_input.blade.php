@@ -1,3 +1,11 @@
+@push('additional-css')
+<style type="text/css">
+	.select2-container--default {
+		width: 100%!important;
+	}
+</style>
+@endpush
+
 @php
 if (!is_array($attributes)) $attributes = [];
 
@@ -78,12 +86,12 @@ foreach ($configAttributes as $attribute => $attributeValue) {
 	@endif
 </div>
 
-@push('vendor-css')
+@section('select2-plugin-resource')
 <link href="{{asset('assets/vendor/select2/select2.min.css')}}" rel="stylesheet" media="all">
-@endpush
-
-@push('vendor-js')
 <script type="text/javascript" src="{{ asset('assets/vendor/select2/select2.min.js')}}"></script>
+@endsection
+
+@push('additional-js')
 <script type="text/javascript">
 	var select2Options_{{$name}} = {
 			placeholder: 'Select...',
