@@ -8,7 +8,7 @@ use Yajra\Datatables\Datatables;
 use App\Target;
 use App\Employee;
 use App\Brand;
-use App\Pasar;
+use App\SubArea;
 use Auth;
 
 class DcController extends Controller
@@ -16,7 +16,7 @@ class DcController extends Controller
     public function baca()
     {
         $data['employee']   = Employee::get();
-        $data['pasar']      = Pasar::get();
+        $data['subarea']    = SubArea::get();
         return view('target.dc',$data);
     }
 
@@ -29,7 +29,7 @@ class DcController extends Controller
             $data = array(
                 'id'            => $product->id,
                 'employee'      => $product->employee->id,
-                'pasar'         => $product->pasar->id,
+                'subarea'       => $product->pasar->id,
                 'value'         => $product->value,
                 'valuepf'       => $product->valuepf,
                 'rilis'         => $product->rilis
@@ -45,7 +45,7 @@ class DcController extends Controller
         $limit=[
             'type'          => 'required',
             'employee'      => 'required|numeric',
-            'pasar'         => 'required|numeric',
+            'subarea'       => 'required|numeric',
             'rilis'         => 'required'
         ];
         $validator = Validator($data, $limit);
