@@ -95,6 +95,18 @@ Route::prefix('store')->group(function () {
 		})->name('account.download-template')->middleware('auth');
 	});
 
+	//Sales Tiers
+
+	Route::prefix('sales_tiers')->group(function()
+	{
+		Route::get('/','SalesTiersController@index')->name('sales_tiers')->middleware('auth');
+		Route::get('/data', 'SalesTiersController@data')->name('sales_tiers.data')->middleware('auth');
+		Route::post('/create', 'SalesTiersController@store')->name('sales_tiers.add')->middleware('auth');
+		Route::get('/edit/{id}', 'SalesTiersController@edit')->name('sales_tiers.ubah')->middleware('auth');
+		Route::put('/update/{id}', 'SalesTiersController@update')->name('sales_tiers.update')->middleware('auth');
+		Route::get('/delete/{id}', 'SalesTiersController@delete')->name('sales_tiers.delete')->middleware('auth');
+	});
+
 	//Distributor Pages
 	Route::prefix('distributor')->group(function(){
 		Route::get('/', 'DistributorController@baca')->name('distributor')->middleware('auth');
@@ -166,13 +178,22 @@ Route::prefix('employee')->group(function () {
 
 	//Employee Pages
 	Route::prefix('summary')->group(function () {
+		// View
 		Route::get('/', 'EmployeeController@baca')->name('employee')->middleware('auth');
+		Route::get('/pasar', 'Employee\PasarController@baca')->name('employee.pasar')->middleware('auth');
+		Route::get('/dc', 'Employee\DcController@baca')->name('employee.dc')->middleware('auth');
+
+		// Crud
 		Route::get('/create', 'EmployeeController@read')->name('tambah.employee')->middleware('auth');
 		Route::get('/update/{id}', 'EmployeeController@readupdate')->name('ubah.employee')->middleware('auth');
-		Route::get('/data', 'EmployeeController@data')->name('employee.data')->middleware('auth');
 		Route::post('/create', 'EmployeeController@store')->name('employee.add')->middleware('auth');
 		Route::put('/update/{id}', 'EmployeeController@update')->name('employee.update')->middleware('auth');
 		Route::get('/delete/{id}', 'EmployeeController@delete')->name('employee.delete')->middleware('auth');
+
+		// Datatable
+		Route::get('/data', 'EmployeeController@data')->name('employee.data')->middleware('auth');
+		Route::get('/data/pasar', 'Employee\PasarController@data')->name('employee.data.pasar')->middleware('auth');
+		Route::get('/data/dc', 'Employee\DcController@data')->name('employee.data.dc')->middleware('auth');
 	});
 
 	//Resign Pages
@@ -277,6 +298,33 @@ Route::prefix('product')->group(function () {
 	});
 });
 
+// Master Target
+Route::prefix('target')->group(function () {
+	Route::prefix('dc')->group(function () {
+		Route::get('/', 'Target\DcController@baca')->name('target.dc')->middleware('auth');
+		Route::get('/data', 'Target\DcController@data')->name('target.dc.data')->middleware('auth');
+		Route::post('/create', 'Target\DcController@store')->name('target.dc.add')->middleware('auth');
+		Route::put('/update/{id}', 'Target\DcController@update')->name('target.dc.update')->middleware('auth');
+		Route::get('/delete/{id}', 'Target\DcController@delete')->name('target.dc.delete')->middleware('auth');
+	});
+
+	Route::prefix('smd')->group(function () {
+		Route::get('/', 'Target\SmdController@baca')->name('target.smd')->middleware('auth');
+		Route::get('/data', 'Target\SmdController@data')->name('target.smd.data')->middleware('auth');
+		Route::post('/create', 'Target\SmdController@store')->name('target.smd.add')->middleware('auth');
+		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
+		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
+	});
+
+	Route::prefix('spg')->group(function () {
+		Route::get('/', 'Target\SpgController@baca')->name('target.spg')->middleware('auth');
+		Route::get('/data', 'Target\SpgController@data')->name('target.spg.data')->middleware('auth');
+		Route::post('/create', 'Target\SpgController@store')->name('target.spg.add')->middleware('auth');
+		Route::put('/update/{id}', 'Target\SpgController@update')->name('target.spg.update')->middleware('auth');
+		Route::get('/delete/{id}', 'Target\SpgController@delete')->name('target.spg.delete')->middleware('auth');
+	});
+});
+
 /**
 *	PlanDc Pages
 */
@@ -285,6 +333,64 @@ Route::prefix('planDc')->group(function () {
 	Route::get('/data', 'PlandcController@data')->name('plan.data')->middleware('auth');
 	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
 	Route::get('/delete/{id}', 'PlandcController@delete')->name('plan.delete')->middleware('auth');
+});
+/*
+	USERS
+*/
+
+	Route::prefix('user')->group(function(){
+		Route::get('/','UserController@index')->name('user')->middleware('auth');
+		Route::post('/create','UserController@store')->name('user.add')->middleware('auth');
+		Route::get('/data','UserController@data')->name('user.data')->middleware('auth');
+		Route::put('/update/{id}','UserController@update')->name('user.update')->middleware('auth');
+
+		Route::get('/delete/{id}','UserController@destroy')->name('user.delete')->middleware('auth');
+	});
+
+
+/*
+	NEWS
+*/
+
+Route::prefix('news')->group(function(){
+		Route::get('/','NewsController@index')->name('news')->middleware('auth');
+		Route::get('/data', 'NewsController@data')->name('news.data')->middleware('auth');
+		Route::get('/create','NewsController@create')->name('tambah.news')->middleware('auth');
+		Route::post('/store','NewsController@store')->name('news.store')->middleware('auth');
+		Route::get('/edit/{id}','NewsController@edit')->name('ubah.news')->middleware('auth');
+		Route::post('/update/{id}','NewsController@update')->name('update.news')->middleware('auth');
+		Route::get('/delete/{id}','NewsController@delete')->name('news.delete')->middleware('auth');
+
+	});
+
+/*
+	PRODUCT KNOWLEDGES
+*/
+
+	Route::prefix('pk')->group(function(){
+		Route::get('/','PKController@index')->name('pk')->middleware('auth');
+		Route::get('/data', 'PKController@data')->name('pk.data')->middleware('auth');
+		Route::get('/create','PKController@create')->name('tambah.pk')->middleware('auth');
+		Route::post('/store','PKController@store')->name('pk.store')->middleware('auth');
+		Route::get('/edit/{id}','PKController@edit')->name('ubah.pk')->middleware('auth');
+		Route::post('/update/{id}','PKController@update')->name('update.pk')->middleware('auth');
+		Route::get('/delete/{id}','PKController@delete')->name('pk.delete')->middleware('auth');
+
+	});
+
+
+/*
+	FAQ
+*/
+
+Route::prefix('faq')->group(function(){
+		Route::get('/','FAQController@index')->name('faq')->middleware('auth');
+		Route::get('/data', 'FAQController@data')->name('faq.data')->middleware('auth');
+		Route::get('/create','FAQController@create')->name('tambah.faq')->middleware('auth');
+		Route::post('/store','FAQController@store')->name('faq.store')->middleware('auth');
+		Route::get('/edit/{id}','FAQController@edit')->name('ubah.faq')->middleware('auth');
+		Route::post('/update/{id}','FAQController@update')->name('update.faq')->middleware('auth');
+		Route::get('/delete/{id}','FAQController@delete')->name('faq.delete')->middleware('auth');
 });
 
 
@@ -312,7 +418,7 @@ Route::prefix('report')->group(function () {
 			{
 				return response()->download(public_path('assets/SellinImport.xlsx'));
 			})->name('SellIn.download-template')->middleware('auth');
-			});
+		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
 	});	
