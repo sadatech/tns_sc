@@ -20,7 +20,7 @@
                 <div class="block-header p-0 mb-20">
                     <h3 class="block-title">
                         <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                        <a href="{{ route('pasar.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                        <a href="{{ route('plan.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </h3>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full" id="planTable">
@@ -29,7 +29,7 @@
                     <th>Employee</th>
                     <th>Date</th>
                     <th>Lokasi</th>
-                    <th>Stockist</th>
+                    <th>Stocklist</th>
                     <th class="text-center" style="width: 15%;"> Action</th>
                 </thead>
                 </table>
@@ -51,59 +51,64 @@
                     </div>
                 </div>
             </div>
-            <form action="{{ route('account.import') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ route('plan.import') }}" method="post" enctype="multipart/form-data">
                 {!! csrf_field() !!}
                 <div class="block-content">
-                    <div class="form-group col-md-12" id="storeMobile">
-                        <label class="col-md-12" style="padding: 0">Employee</label>
-                        <div class="input-group mb-3 col-md-12" style="padding: 0">
-                            <div style="width: 82%">
-                                <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
-                                   
-                                </select>
-                            </div>
-                            <div class="input-group-append" style="width: 18%">
-                                <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
-                            </div>
-                        </div>
-                        <!-- Block’s content.. -->
-                        <div class="block block-themed block-rounded">
-                            <div class="block-header bg-gd-lake" style="padding: 5px">
-                                <h3 class="block-title">Selected Employee DC</h3>
-                                <span id="selectedStoreDefault" style="color: #ffeb5e;padding-top: 5px;">Please Add Employee</span>
-                                <div class="block-options">
-                                    <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Search for Employee..">
-                                </div>
-                            </div>
-                            <div class="block-content" style="padding: 0; width: 100%;">
-                                <table id="selectedStoreTable" class="table table-striped table-vcenter" style="display: none;">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center" style="width: 50px;">#</th>
-                                            <th>Employee</th>
-                                            <th class="text-center" style="width: 100px;">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="selectedStoreTableBody">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <a href="{{ route('plan.download-template') }}" class="btn btn-sm btn-info" title="Sample Data" style="float: right;">Download Import Format</a>
                     </div>
                         <div class="form-group col-md-12">
-                        <label>Upload Your Data Plan DC:</label>
+                            <label class="col-md-12" style="padding: 0">Employee</label>
+                            <div class="input-group mb-3 col-md-12" style="padding: 0">
+                                <div style="width: 82%">
+                                    <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
+                                        @foreach($employee as $data)
+                                            <option value="{{ $data->id.'|'.$data->name}}">{{$data->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="input-group-append" style="width: 18%">
+                                    <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
+                                </div>
+                            </div>
+                            <!-- Block’s content.. -->
+                            <div class="block block-themed block-rounded">
+                                <div class="block-header bg-gd-lake" style="padding: 5px">
+                                    <h3 class="block-title">Selected Employee DC</h3>
+                                    <span id="selectedStoreDefault" style="color: #ffeb5e;padding-top: 5px;">Please Add Employee</span>
+                                    <div class="block-options">
+                                        <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Search for Employee..">
+                                    </div>
+                                </div>
+                                <div class="block-content" style="padding: 0; width: 100%;">
+                                    <table id="selectedStoreTable" class="table table-striped table-vcenter" style="display: none;">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" style="width: 50px;">#</th>
+                                                <th>Employee</th>
+                                                <th class="text-center" style="width: 100px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="selectedStoreTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label>Upload Your Data Plan DC:</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
                                 <label class="custom-file-label">Choose file Excel</label>
                                 <code> *Type File Excel</code>
                             </div>
                         </div>
-                    </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-alt-success">
+                                <i class="fa fa-save"></i> Save
+                            </button>
+                            <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                        </div>
                 </div>
             </form>
         </div>
@@ -152,7 +157,6 @@
   $(function() {
     $('#planTable').DataTable({
       processing: true,
-      serverSide: true,
       drawCallback: function(){
         $('.js-swal-delete').on('click', function(){
           var url = $(this).data("url");
@@ -184,7 +188,7 @@
       scrollY: "300px",
       columns: [
       { data: 'id', name: 'plan_dcs.id' },
-      { data: 'employee.name', name: 'employee.name' },
+      { data: 'planEmployee', name: 'planEmployee' },
       { data: 'date', name: 'plan_dcs.date'},
       { data: 'lokasi', name: 'plan_dcs.lokasi'},
       { data: 'stocklist', name: 'plan_dcs.stocklist'},

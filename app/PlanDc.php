@@ -12,6 +12,6 @@ class PlanDc extends Model
 
     public function planEmployee()
     {
-        return $this->hasMany('App\PlanEmployee', 'id_plandc');
+        return $this->belongsTo('App\PlanEmployee', 'id_plandc');
     }
 }

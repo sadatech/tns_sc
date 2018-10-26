@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pasar extends Model
 {
     protected $fillable = [
-        'name', 'phone', 'address', 'latitude', 'longitude', 'id_subarea'
+        'name', 'address', 'latitude', 'longitude', 'id_subarea'
     ];
 
     public function subarea()

@@ -14,9 +14,10 @@ class PlanEmployee extends Model
     {
 		return $this->belongsTo('App\Employee', 'id_employee');
     }
-    
+
     public function planDc()
     {
 		return $this->belongsTo('App\PlanDc', 'id_plandc');
     }
 }
+  
