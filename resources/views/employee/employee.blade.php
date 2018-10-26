@@ -33,7 +33,6 @@
                         <th width="60px">Status</th>
                         <th width="150px">Join Date</th>
                         <th width="200px">Agency</th>
-                        <th width="200px">Area</th>
                         <th width="120px">Gender</th>
                         <th width="60px">Education</th>
                         <th width="200px">Birth Date</th>
@@ -127,7 +126,6 @@
             { data: 'status', name: 'status' },
             { data: 'joinAt', name: 'joinAt' },
             { data: 'agency', name: 'agency' },
-            { data: 'subarea', name: 'subarea' },
             { data: 'gender', name: 'gender' },
             { data: 'education', name: 'education' },
             { data: 'birthdate', name: 'birthdate' },

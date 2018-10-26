@@ -96,6 +96,10 @@ class StoreController extends Controller
                 'name2'             => $request->input('name2'),
                 'address'           => $request->input('address'),
                 'latitude'          => $request->input('latitude'),
+                'coverage'          => $request->input('coverage'),
+                'store_panel'       => $request->input('store_panel'),
+                'is_vito'           => $request->input('is_vito'),
+                'delivery'          => $request->input('delivery'),
                 'longitude'         => $request->input('longitude'),
                 'id_account'        => $request->input('account'),
                 'id_salestier'      => $request->input('sales'),
@@ -198,6 +202,10 @@ class StoreController extends Controller
                 $store->id_account        = $request->input('account');
                 // $store->id_distributor    = $request->input('distributor');
                 $store->id_subarea        = $request->input('subarea');
+                $store->is_vito           = $request->input('is_vito');
+                $store->coverage           = $request->input('coverage');
+                $store->delivery           = $request->input('delivery');
+                $store->store_panel           = $request->input('store_panel');
                 $store->save();
                 return redirect()->route('store')
                 ->with([
