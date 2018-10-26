@@ -16,7 +16,7 @@ use App\Brand;
 use App\Store;
 use App\Timezone;
 use App\Employee;
-use App\EmployeeStore;
+use App\EmployeePasar;
 use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
@@ -34,10 +34,19 @@ class PasarController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false])->with(['agency', 'subarea', 'position', 'employeeStore', 'timezone'])
+		$employee = Employee::where(['isResign' => false])
+		->whereIn('id_position', [3,4])
+		->with(['agency', 'position', 'employeePasar', 'timezone'])
 		->select('employees.*');
-		// dd($employee->get()[0]);
 		return Datatables::of($employee)
+		->addColumn('employeePasar', function($employee) {
+			$pasar = EmployeePasar::where(['id_employee' => $employee->id])->get();
+			$pasarList = array();
+			foreach ($pasar as $data) {
+				$pasarList[] = $data->pasar->name;
+			}
+			return rtrim(implode(', ', $pasarList), ',');
+		})
 		->addColumn('action', function ($employee) {
 			// if ($employee->isResign == false) {
 				return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
@@ -51,27 +60,11 @@ class PasarController extends Controller
 			// 	<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
 			// }
 		})
-		->addColumn('employeeStore', function($employee) {
-			$store = EmployeeStore::where(['id_employee' => $employee->id])->get();
-			$storeList = array();
-			foreach ($store as $data) {
-				$storeList[] = $data->store->name1;
-			}
-			return rtrim(implode(',', $storeList), ',');
-		})
 		->addColumn('position', function($employee) {
 			return $employee->position->name;
 		})
 		->addColumn('timezone', function($employee) {
 			return $employee->timezone->name;
-		})
-		->addColumn('subarea', function($employee) {
-			if (isset($employee->subarea)) {
-				$subarea = $employee->subarea->name;
-			} else {
-				$subarea = "Without Area";
-			}
-			return $subarea;
 		})
 		->addColumn('agency', function($employee) {
 			return $employee->agency->name;

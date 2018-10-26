@@ -20,7 +20,7 @@ class CreateEmployeePasarsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('id_pasar')->references('id')->on('pasar')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_pasar')->references('id')->on('pasars')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
         });
     }

@@ -174,7 +174,7 @@ class EmployeeController extends Controller
 								'id_pasar' 		=> $pasar,
 							);
 						}
-						DB::table('employee_pasar')->insert($dataPasar);
+						DB::table('employee_pasars')->insert($dataPasar);
 						return redirect()->route('employee')
 						->with([
 							'type' 		=> 'success',
@@ -196,7 +196,9 @@ class EmployeeController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false])->with(['agency', 'position', 'employeeStore', 'timezone'])
+		$employee = Employee::where(['isResign' => false])
+		->whereIn('id_position', [1,2,6])
+		->with(['agency', 'position', 'employeeStore', 'timezone'])
 		->select('employees.*');
 		// dd($employee->get()[0]);
 		return Datatables::of($employee)

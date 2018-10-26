@@ -166,15 +166,22 @@ Route::prefix('employee')->group(function () {
 
 	//Employee Pages
 	Route::prefix('summary')->group(function () {
+		// View
 		Route::get('/', 'EmployeeController@baca')->name('employee')->middleware('auth');
 		Route::get('/pasar', 'Employee\PasarController@baca')->name('employee.pasar')->middleware('auth');
 		Route::get('/dc', 'Employee\DcController@baca')->name('employee.dc')->middleware('auth');
+
+		// Crud
 		Route::get('/create', 'EmployeeController@read')->name('tambah.employee')->middleware('auth');
 		Route::get('/update/{id}', 'EmployeeController@readupdate')->name('ubah.employee')->middleware('auth');
-		Route::get('/data', 'EmployeeController@data')->name('employee.data')->middleware('auth');
 		Route::post('/create', 'EmployeeController@store')->name('employee.add')->middleware('auth');
 		Route::put('/update/{id}', 'EmployeeController@update')->name('employee.update')->middleware('auth');
 		Route::get('/delete/{id}', 'EmployeeController@delete')->name('employee.delete')->middleware('auth');
+
+		// Datatable
+		Route::get('/data', 'EmployeeController@data')->name('employee.data')->middleware('auth');
+		Route::get('/data/pasar', 'Employee\PasarController@data')->name('employee.data.pasar')->middleware('auth');
+		Route::get('/data/dc', 'Employee\DcController@data')->name('employee.data.dc')->middleware('auth');
 	});
 
 	//Resign Pages
