@@ -18,7 +18,7 @@ class PlandcController extends Controller
 {
     public function read()
     {
-        $data['employee']    = Employee::where('id_position', 5 )->get();
+        $data['employee']       = Employee::where('id_position', 5 )->get();
         return view('plandc.plandc', $data);
     }
 
@@ -29,7 +29,10 @@ class PlandcController extends Controller
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
             $data = array(
-                'id'            => $plan->id
+                'id'            => $plan->id,
+                'date'          => $plan->date,
+                'stocklist'     => $plan->stocklist,
+                'lokasi'        => $plan->lokasi
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square'><i class='si si-pencil'></i></button>
             <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
@@ -134,6 +137,45 @@ class PlandcController extends Controller
         })->download();
     }
 
+    public function update(Request $request, $id) 
+    {
+        $data=$request->all();
+        $limit=[
+            'date'           => 'required',
+            'lokasi'         => 'required',
+            'stocklist'      => 'required',
+            'employee'       => 'required'
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+        } else {
+            $store = Plandc::find($id);
+                if ($request->input('employee')) {
+                    foreach ($request->input('employee') as $emp) {
+                        PlanEmployee::where('id_plandc', $id)->delete();
+                        $dataEmp[] = array(
+                            'id_employee'       => $emp,
+                            'id_plandc'         => $id,
+                        );
+                    }
+                    DB::table('plan_employees')->insert($dataEmp);
+                }
+                $store->date             = $request->input('date');
+                $store->lokasi           = $request->input('lokasi');
+                $store->stocklist        = $request->input('stocklist');
+                $store->save();
+                return redirect()->back()
+                ->with([
+                    'type'    => 'success',
+                    'title'   => 'Sukses!<br/>',
+                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
+                ]);
+        }
+    }
+
     public function delete($id)
     {
         $plan = PlanDc::find($id);
@@ -145,4 +187,5 @@ class PlandcController extends Controller
                 'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
             ]);
     }
+    
 }
