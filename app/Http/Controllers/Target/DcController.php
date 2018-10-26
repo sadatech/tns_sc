@@ -25,17 +25,20 @@ class DcController extends Controller
         $target = TargetDc::with(['subArea','employee'])
         ->select('target_dcs.*');
         return Datatables::of($target)
+        ->addColumn('subarea', function($target) {
+            return $target->subArea->name;
+        })
         ->addColumn('action', function ($target) {
             $data = array(
                 'id'            => $target->id,
                 'employee'      => $target->employee->id,
                 'subarea'       => $target->subArea->id,
                 'value'         => $target->value,
-                'valuepf'       => $target->valuepf,
+                'valuepf'       => $target->value_pf,
                 'rilis'         => $target->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('target.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            <button data-url=".route('target.dc.delete', $target->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })->make(true);
     }
 
@@ -60,7 +63,7 @@ class DcController extends Controller
                 'id_subarea'      => $request->input('subarea'),
                 'rilis'         => $request->input('rilis'),
                 'value'         => $request->input('value'),
-                'valuepf'       => $request->input('valuepf'),
+                'value_pf'       => $request->input('valuepf'),
             ]);
             return redirect()->back()
             ->with([
@@ -74,16 +77,16 @@ class DcController extends Controller
     public function update(Request $request, $id) 
     {
         $target = TargetDc::find($id);
-        $target->id_pasar      = $request->get('pasar');
+        $target->id_subarea    = $request->get('subarea');
         $target->id_employee   = $request->get('employee');
         $target->rilis         = $request->get('rilis');
         $target->value         = $request->get('value');
-        $target->valuepf       = $request->get('valuepf');
+        $target->value_pf      = $request->get('valuepf');
         if ($target->save()) {
             return redirect()->back()->with([
                 'type'    => 'success',
                 'title'   => 'Sukses!<br/>',
-                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!'
+                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah target!'
             ]);
         } else {
             return redirect()->route('employee')

@@ -31,7 +31,7 @@ class SmdController extends Controller
                 'employee'      => $target->employee->id,
                 'pasar'         => $target->pasar->id,
                 'value'         => $target->value,
-                'valuepf'       => $target->valuepf,
+                'valuepf'       => $target->value_pf,
                 'rilis'         => $target->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
@@ -44,10 +44,10 @@ class SmdController extends Controller
         $data=$request->all();
         $limit=[
             'employee'      => 'required|numeric',
-            'pasar'       => 'required|numeric',
+            'pasar'         => 'required|numeric',
             'rilis'         => 'required',
             'value'         => 'required',
-            'valuepf'       => 'required'
+            'valuepf'      => 'required'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -60,7 +60,7 @@ class SmdController extends Controller
                 'id_pasar'      => $request->input('pasar'),
                 'rilis'         => $request->input('rilis'),
                 'value'         => $request->input('value'),
-                'valuepf'       => $request->input('valuepf'),
+                'value_pf'      => $request->input('valuepf'),
             ]);
             return redirect()->back()
             ->with([
@@ -78,7 +78,7 @@ class SmdController extends Controller
         $target->id_employee   = $request->get('employee');
         $target->rilis         = $request->get('rilis');
         $target->value         = $request->get('value');
-        $target->valuepf       = $request->get('valuepf');
+        $target->value_pf      = $request->get('valuepf');
         if ($target->save()) {
             return redirect()->back()->with([
                 'type'    => 'success',

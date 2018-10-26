@@ -31,7 +31,8 @@
             <th class="text-center" style="width: 70px;"></th>
             <th>Employee Name</th>
             <th>Sub Area</th>
-            <th>Type</th>
+            <th>Value</th>
+            <th>Value PF</th>
             <th>Release Month</th>
             <th class="text-center" style="width: 15%;"> Action</th>
           </thead>
@@ -179,7 +180,7 @@
 <script type="text/javascript">
   function editModal(json) {
     $('#editModal').modal('show');
-    $('#editForm').attr('action', "{{ url('/product/target/update') }}/"+json.id);
+    $('#editForm').attr('action', "{{ url('/target/dc/update') }}/"+json.id);
     $('#EmployeeInput').val(json.employee).trigger('change');
     $('#SubAreaInput').val(json.subarea).trigger('change');
     $('#rilisInput').val(json.rilis);
@@ -208,7 +209,6 @@
         $(function() {
           $('#promoTable').DataTable({
             processing: true,
-            serverSide: true,
             drawCallback: function(){
               $('.js-swal-delete').on('click', function(){
                 var url = $(this).data("url");
@@ -240,8 +240,9 @@
             columns: [
             { data: 'id', name: 'id' },
             { data: 'employee.name', name: 'employee.name'},
-            { data: 'subArea.name', name: 'subArea.name' },
-            { data: 'type', name: 'type' },
+            { data: 'subarea', name: 'subarea', seachable: true },
+            { data: 'rilis', name: 'rilis' },
+            { data: 'rilis', name: 'rilis' },
             { data: 'rilis', name: 'rilis' },
             { data: 'action', name: 'action' },
             ]

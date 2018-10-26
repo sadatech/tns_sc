@@ -31,7 +31,7 @@ class SpgController extends Controller
                 'employee'      => $target->employee->id,
                 'pasar'         => $target->pasar->id,
                 'value'         => $target->value,
-                'valuepf'       => $target->valuepf,
+                'valuepf'      => $target->value_pf,
                 'rilis'         => $target->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
@@ -44,10 +44,10 @@ class SpgController extends Controller
         $data=$request->all();
         $limit=[
             'employee'      => 'required|numeric',
-            'pasar'       => 'required|numeric',
+            'pasar'         => 'required|numeric',
             'rilis'         => 'required',
             'value'         => 'required',
-            'valuepf'       => 'required'
+            'valuepf'      => 'required'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -78,7 +78,7 @@ class SpgController extends Controller
         $target->id_employee   = $request->get('employee');
         $target->rilis         = $request->get('rilis');
         $target->value         = $request->get('value');
-        $target->valuepf       = $request->get('valuepf');
+        $target->value_pf      = $request->get('valuepf');
         if ($target->save()) {
             return redirect()->back()->with([
                 'type'    => 'success',

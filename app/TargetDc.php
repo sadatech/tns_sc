@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class TargetDc extends Model
 {
     protected $fillable = [
-        'id_employee', 'id_subarea', 'rilis', 'value', 'valuepf'
+        'id_employee', 'id_subarea', 'rilis', 'value', 'value_pf'
     ];
 
     public function employee()
