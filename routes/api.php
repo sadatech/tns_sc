@@ -40,17 +40,14 @@ Route::prefix('place')->group(function () {
 Route::prefix('category')->group(function () {
 	Route::get('/list', 'API\CategoryController@list')->name('api.category.list');
 });
-Route::prefix('subcategory')->group(function () {
-	Route::get('/list/{id_category?}', 'API\SubCategoryController@list')->name('api.subcategory.list');
-});
-Route::prefix('brand')->group(function () {
-	Route::get('/list', 'API\BrandController@list')->name('api.brand.list');
-});
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 });
 Route::prefix('sales')->group(function () {
 	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
+});
+Route::prefix('competitor')->group(function () {
+	Route::post('/promo', 'API\CompetitorController@promo')->name('api.competitor.promo');
 });
 
 Route::prefix('dataprice')->group(function () {

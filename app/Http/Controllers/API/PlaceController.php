@@ -10,11 +10,11 @@ use Config;
 
 class PlaceController extends Controller
 {
-	public function __construct()
+  public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
-	
+  
 	public function list()
 	{
 		try {
@@ -23,7 +23,7 @@ class PlaceController extends Controller
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					$place = Place::where('id',3)->get();
+					$place = Place::get();
 					if (!$place->isEmpty()) {
 						$placeArr = array();
 						foreach ($place as $key => $value) {
@@ -44,6 +44,11 @@ class PlaceController extends Controller
 					} else {
 						$res['msg'] = "Place not found.";
 					}
+					$res['success'] = true;
+					$res['place'] = $placeArr;
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Gagal mencari place.";
 				}
 			}else{
 				$res['msg'] = "User not found.";

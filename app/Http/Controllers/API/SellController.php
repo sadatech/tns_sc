@@ -31,6 +31,10 @@ class SellController extends Controller
 	public function store(Request $request, $type)
 	{
 		$data = json_decode($request->getContent());
+		if (empty($data->store) || empty($data->product)) {
+			$res['msg']	= "Please select Store and Product.";
+			$res['code']= 200;
+		}else
 		try {
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg']	= "User not found.";
@@ -207,6 +211,7 @@ class SellController extends Controller
 						'id_sellin'		=> $sellin->id,
 						'id_product'	=> $product->id,
 						'qty'			=> $product->qty,
+						'id_measure'	=> $product->id_measure,
 					);
 				}
 				$insert_in = DB::table('detail_ins')->insert($detailin);
@@ -225,6 +230,7 @@ class SellController extends Controller
 					'id_sellin'		=> $checkSellIn->id,
 					'id_product'	=> $product->id,
 					'qty'			=> $product->qty,
+					'id_measure'	=> $product->id_measure,
 				);
 			}
 			$insert_in = DB::table('detail_ins')->insert($detailin);
@@ -259,6 +265,7 @@ class SellController extends Controller
 						'id_sellout'	=> $sellout->id,
 						'id_product'	=> $product->id,
 						'qty'			=> $product->qty,
+						'id_measure'	=> $product->id_measure,
 					);
 				}
 				$insert_in = DB::table('detail_out')->insert($detailout);
@@ -279,6 +286,7 @@ class SellController extends Controller
 					'id_sellout'	=> $checkSellOut->id,
 					'id_product'	=> $product->id,
 					'qty'			=> $product->qty,
+					'id_measure'	=> $product->id_measure,
 				);
 			}
 			$insert_out = DB::table('detail_outs')->insert($detailout);
