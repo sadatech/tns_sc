@@ -16,7 +16,7 @@ class PositionController extends Controller
 
 	public function data()
 	{
-		$position = Position::orderBy('level', 'ASC');
+		$position = Position::get();
 		return Datatables::of($position)
 		->addColumn('action', function ($position) {
 			return '<button onclick="editModal('.$position->id.',&#39;'.$position->name.'&#39;)" class="btn btn-sm btn-primary btn-square"><i class="si si-pencil"></i></button>';

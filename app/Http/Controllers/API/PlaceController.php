@@ -10,14 +10,15 @@ use Config;
 
 class PlaceController extends Controller
 {
-	public function __construct()
+  public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
-	
+  
 	public function list()
 	{
 		try {
+			$res['success'] = false;
 			if (JWTAuth::getToken() != null) {
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
@@ -41,14 +42,16 @@ class PlaceController extends Controller
 						$res['success'] = true;
 						$res['place'] = $placeArr;
 					} else {
-						$res['success'] = false;
 						$res['msg'] = "Place not found.";
 					}
+					$res['success'] = true;
+					$res['place'] = $placeArr;
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Gagal mencari place.";
 				}
 			}else{
-				$res['success'] = false;
 				$res['msg'] = "User not found.";
-				$code = 200;
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			$res['msg'] = "Token Expired.";

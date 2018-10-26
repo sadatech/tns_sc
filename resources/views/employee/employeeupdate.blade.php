@@ -213,21 +213,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-12" id="spv">
-                        @if($spv->count() < 1)
-                        <b class="text-danger">*Kamu tidak memiliki supervisor, harap tambahkan supervisor terlebih dahulu.</b>
-                        @else
-                        <label>Supervisor</label>
-                        <select class="form-control form-control-lg" name="status" required>
-                            <option disabled selected>Choose your Status</option>
-                            @foreach($spv as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                        @endif
-                    </div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-alt-success">
@@ -276,15 +261,15 @@
                 $('#storeMobile').hide();
                 $('#storeStay').show();
             }
-            if (select == {{ App\Position::where(['level' => 'level 1'])->first()->id }}) {
-                $('#status').show();
-                $('#spv').show();
-            } else {
-                $('#status').hide();
-                $('#spv').hide();
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-            }   
+            // if (select == {{ App\Position::where(['level' => 'level 1'])->first()->id }}) {
+            //     $('#status').show();
+            //     $('#spv').show();
+            // } else {
+            //     $('#status').hide();
+            //     $('#spv').hide();
+            //     $('#storeStay').hide();
+            //     $('#storeMobile').hide();
+            // }   
         }
 
         // add Store to Selected Store
