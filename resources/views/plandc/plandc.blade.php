@@ -38,6 +38,91 @@
     </div>
 </div>
 
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="fa fa-edit"></i> Update Plan DemoCooking</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <form id="editForm" method="post">
+                {!! method_field('PUT') !!}
+                {!! csrf_field() !!}
+                <div class="block-content">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-md-12" style="padding: 0">Employee</label>
+                            <div class="input-group mb-3 col-md-12" style="padding: 0">
+                                <div style="width: 82%">
+                                    <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
+                                        <option disabled selected>Choose your Employee</option>
+                                        @foreach($employee as $data)
+                                        <option value="{{ $data->id.'|'.$data->name }}">{{ $data->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="input-group-append" style="width: 18%">
+                                    <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
+                                </div>
+                            </div>
+                            <!-- Block’s content.. -->
+                            <div class="block block-themed block-rounded">
+                                <div class="block-header bg-gd-lake" style="padding: 5px">
+                                    <h3 class="block-title">Selected Employee</h3>
+                                    <div class="block-options">
+                                        <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Search for Store..">
+                                    </div>
+                                </div>
+                                <div class="block-content" style="padding: 0; width: 100%;">
+                                    <table id="selectedStoreTable" class="table table-striped table-vcenter" style="display: none;">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" style="width: 50px;">#</th>
+                                                <th>Store</th>
+                                                <th class="text-center" style="width: 100px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="selectedStoreTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Date</label>
+                            <input class="js-datepicker form-control" type="text" name="date" id="dateInput" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Stocklist</label>
+                            <input type="text" class="form-control" name="stocklist" id="stocklistInput" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label>Lokasi</label>
+                            <textarea class="form-control" name="lokasi" id="lokasiInput" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-alt-success">
+                            <i class="fa fa-save"></i> Save
+                        </button>
+                        <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
         <div class="modal-content">
@@ -118,6 +203,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
 [data-notify="container"] {
@@ -127,14 +213,18 @@
 @endsection
 
 @section('script')
+<script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+<script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
   function editModal(json) {
     $('#editModal').modal('show');
-    $('#editForm').attr('action', "{{ url('/store/account/update') }}/"+json.id);
-    $('#nameInput').val(json.name);
-    $('#channelInput').val(json.channel).trigger('change');
+    $('#editForm').attr('action', "{{ url('/planDc/update') }}/"+json.id);
+    $('#dateInput').val(json.date);
+    $('#stocklistInput').val(json.stocklist);
+    $('#lokasiInput').val(json.lokasi);
+    console.log(json);
   }
   @if(session('type'))
   $(document).ready(function() {
