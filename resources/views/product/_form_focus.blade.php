@@ -24,7 +24,7 @@ $type = $type ?? '';
         <div class="block-content">
           <div class="form-group">
             <label>Product</label>
-            <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Product" name="product" required>
+            <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Product" name="id_product" required>
               <option value="" disabled selected>Choose your Product</option>
               @foreach(App\Product::get() as $data)
               <option value="{{ $data->id }}">{{ $data->name }} </option>
@@ -34,7 +34,7 @@ $type = $type ?? '';
           <div class="row">
             <div class="form-group col-md-12">
               <label>Area</label>
-              <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Area" name="area">
+              <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Area" name="id_area">
                 <option disabled selected>Choose your Area</option>
                 @foreach(App\Area::get() as $data)
                 <option value="{{ $data->id }}">{{ $data->name }}</option>
@@ -43,11 +43,11 @@ $type = $type ?? '';
             </div>
             <div class="form-group col-md-6">
               <label>Month From</label>
-              <input class="js-datepicker form-control" data-date-format="mm" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from" data-month-highlight="true" required>
             </div>
             <div class="form-group col-md-6">
               <label>Month Until</label>
-              <input class="js-datepicker form-control" type="text" id="{{$type}}DateTo" data-date-format="mm" name="to" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Month Until" id="{{$type}}DateTo" name="to" data-month-highlight="true" required>
             </div>
           </div>
           <div class="modal-footer">
@@ -64,14 +64,8 @@ $type = $type ?? '';
 
 @push('additional-js')
 <script type="text/javascript">
-  $("#{{$type}}DateFrom").datepicker( {
-    format: "mm",
-    viewMode: "months",
-    autoclose: true,
-    minViewMode: "months"
-  });
-  $("#{{$type}}DateTo").datepicker( {
-    format: "mm",
+  $(".js-datepicker").datepicker( {
+    format: "mm/yyyy",
     viewMode: "months",
     autoclose: true,
     minViewMode: "months"
