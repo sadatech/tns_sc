@@ -234,6 +234,15 @@ Route::prefix('product')->group(function () {
 		Route::get('/delete/{id}', 'SubCategoryController@delete')->name('sub-category.delete')->middleware('auth');
 	});
 
+	//SKU Unit Pages
+	Route::prefix('sku-unit')->group(function () {
+		Route::get('/', 'SkuUnitController@baca')->name('sku-unit')->middleware('auth');
+		Route::get('/data', 'SkuUnitController@data')->name('sku-unit.data')->middleware('auth');
+		Route::post('/create', 'SkuUnitController@store')->name('sku-unit.add')->middleware('auth');
+		Route::put('/update/{id}', 'SkuUnitController@update')->name('sku-unit.update')->middleware('auth');
+		Route::get('/delete/{id}', 'SkuUnitController@delete')->name('sku-unit.delete')->middleware('auth');
+	});
+
 	//Product Summary Pages
 	Route::prefix('summary')->group(function () {
 		Route::get('/', 'ProductController@baca')->name('product')->middleware('auth');
