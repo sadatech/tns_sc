@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
-use App\Company;
 use App\Employee;
 use App\EmployeeStore;
 use JWTFactory;
 use JWTAuth;
 use Config;
+use Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,52 +18,6 @@ class AuthController extends Controller
 	public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
-	}
-
-	public function company(Request $request)
-	{
-		if ($request->input('token')) {
-			$limit=['token' => 'max:40|required'];
-			$validator = Validator($request->all(), $limit);
-			if ($validator->fails()){
-				$res['success'] = false;
-				$res['msg'] = $validator->messages();
-				$code = 200;
-			} else {
-				$check = Company::where('token', $request->input('token'))->first(['id', 'username','logo','name','introduce','email','phone']);
-				if ($check) {
-					$res['success'] = true;
-					$res['msg'] = 'Valid QRcode.';
-					$res['company'] = $check;
-					$code = 200;
-				} else {
-					$res['success'] = false;
-					$res['msg'] = 'Invalid QRcode.';
-					$code = 200;
-				}
-			}
-		} else if($request->input('username')) {
-			$limit=['username' => 'max:20|required|alpha_dash'];
-			$validator = Validator($request->all(), $limit);
-			if ($validator->fails()){
-				$res['success'] = false;
-				$res['msg'] = $validator->messages();
-				$code = 200;
-			} else {
-				$check = Company::where('username', $request->input('username'))->first(['id', 'username','logo','name','introduce','email','phone']);
-				if ($check) {
-					$res['success'] = true;
-					$res['msg'] = 'Valid company code.';
-					$res['company'] = $check;
-					$code = 200;
-				} else {
-					$res['success'] = false;
-					$res['msg'] = 'Invalid company code.';
-					$code = 200;
-				}
-			}
-		}
-		return response()->json($res, $code);
 	}
 
 	public function user(Request $request)
@@ -89,6 +43,7 @@ class AuthController extends Controller
 					if (Hash::check($request->input('password'), $user->password)) {
 						$credentials = $request->only('nik', 'password');
 						try {
+							Config::set('auth.providers.users.model', \App\Employee::class);
 							if (!$token = JWTAuth::attempt($credentials)) {
 								$res['success'] = false;
 								$res['msg'] = 'Invalid username/password or account not found.';
@@ -144,11 +99,12 @@ class AuthController extends Controller
 	{
 		$credentials = $request->only('nik', 'password');
 		try {
+			Config::set('auth.providers.users.model', \App\Employee::class);
             // verify the credentials and create a token for the user
 			if (! $token = JWTAuth::attempt($credentials)) {
-				return response()->json(['status' => false, 'error' => 'invalid_credentials'], 401);
+				return response()->json(['error' => 'invalid_credentials'], 401);
 			}else{
-				$user = JWTAuth::parseToken()->authenticate();
+				$user =  Auth::user();
 				return response()->json(
 					[
 						'status' 	=> true,
@@ -163,7 +119,7 @@ class AuthController extends Controller
 			}
 		} catch (JWTException $e) {
             // something went wrong
-			return response()->json(['status' => false, 'error' => 'could_not_create_token'], 500);
+			return response()->json(['error' => 'could_not_create_token'], 500);
 		}
 		// return response()->json($token);
 	}
@@ -171,6 +127,8 @@ class AuthController extends Controller
 	public function getUser()
 	{
 		try {
+
+			Config::set('auth.providers.users.model', \App\Employee::class);
 
 			// if (! $user = JWTAuth::toUser(JWTAuth::getToken())) {
 			if (!$user = JWTAuth::parseToken()->authenticate()) {

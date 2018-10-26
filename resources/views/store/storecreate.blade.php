@@ -111,6 +111,42 @@
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
+                        <label>Is Vito</label>
+                        <select class="js-select2 custom-select" name="is_vito" required>
+                            <option value="" disabled selected>Choose Vito / Non Vito</option>
+                            <option value="Vito">VITO</option>
+                            <option value="Non Vito">NON VITO</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Delivery</label>
+                        <select class="js-select2 form-control" name="delivery" required>
+                            <option value="" disabled selected>Choose Delivery</option>
+                                <option value="Direct">Direct</option>
+                                <option value="DC">DC</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Store Panel</label>
+                        <select class="js-select2 custom-select" name="store_panel" required>
+                            <option value="" disabled selected>Choose Store Panel</option>
+                            <option value="YES">YES</option>
+                            <option value="NO">NO</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Coverage</label>
+                        <select class="js-select2 form-control" name="coverage" required>
+                            <option value="" disabled selected>Choose Coverage</option>
+                                <option value="Direct">Direct</option>
+                                <option value="In Direct">In Direct</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
                         <label>Timezones</label>
                         <select class="form-control form-control-lg" name="timezone" required>
                         <option value="" disabled selected>Choose your Timezone</option>

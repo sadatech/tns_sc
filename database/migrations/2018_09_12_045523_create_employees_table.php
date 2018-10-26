@@ -13,7 +13,6 @@ class CreateEmployeesTable extends Migration
             $table->integer('id_position')->unsigned();
             $table->integer('id_agency')->unsigned();
             $table->integer('id_timezone')->unsigned()->nullable();
-            $table->integer('id_subarea')->unsigned()->nullable();
             $table->string('name');
             $table->string('nik')->nullable();
             $table->string('ktp')->unique()->nullable();
@@ -33,7 +32,6 @@ class CreateEmployeesTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('id_subarea')->references('id')->on('sub_areas')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_position')->references('id')->on('positions')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_agency')->references('id')->on('agencies')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_timezone')->references('id')->on('timezones')->onUpdate('cascade')->onDelete('cascade');

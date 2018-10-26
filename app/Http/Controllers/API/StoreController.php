@@ -10,19 +10,18 @@ use Config;
 
 class StoreController extends Controller
 {
-	public function __construct()
+  public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
-	
+  
 	public function list()
 	{
 		try {
+			$res['success'] = false;
 			if (JWTAuth::getToken() != null) {
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
-					$res['success'] = false;
 					$res['msg'] = "User not found.";
-					$code = 200;
 				} else {
 					$store = EmployeeStore::where([
 						'id_employee' => $user->id
@@ -44,17 +43,12 @@ class StoreController extends Controller
 						}
 						$res['success'] = true;
 						$res['store'] = $storeArr;
-						$code = 200;
 					} else {
-						$res['success'] = false;
 						$res['msg'] = "Store not found.";
-						$code = 200;
 					}
 				}
 			}else{
-				$res['success'] = false;
 				$res['msg'] = "User not found.";
-				$code = 200;
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			$res['msg'] = "Token Expired.";
@@ -68,6 +62,6 @@ class StoreController extends Controller
 			$res['msg'] = "Token Absent.";
 			$code = $e->getStatusCode();
 		}
-		return response()->json($res, $code);
+		return response()->json($res, 200);
 	}
 }
