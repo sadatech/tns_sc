@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDataPriceTable extends Migration
+class CreateAvailabilityTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateDataPriceTable extends Migration
      */
     public function up()
     {
-        Schema::create('data_price', function (Blueprint $table) {
+        Schema::create('availability', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('id_store');
             $table->unsignedInteger('id_employee');
@@ -24,14 +24,14 @@ class CreateDataPriceTable extends Migration
             $table->foreign('id_employee')->references('id')->on('employees');
         });
 
-        Schema::create('detail_data_price', function (Blueprint $table) {
+        Schema::create('detail_availability', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('id_data_price');
+            $table->unsignedInteger('id_availability');
             $table->unsignedInteger('id_product');
-            $table->double('price',8,2);
+            $table->unsignedSmallInteger('available')->default(0);
             $table->timestamps();
 
-            $table->foreign('id_data_price')->references('id')->on('data_price');
+            $table->foreign('id_availability')->references('id')->on('availability');
             $table->foreign('id_product')->references('id')->on('products');
         });
     }
@@ -43,16 +43,16 @@ class CreateDataPriceTable extends Migration
      */
     public function down()
     {
-        Schema::table('detail_data_price', function (Blueprint $table) {
-            $table->dropForeign(['id_data_price']);
+        Schema::table('detail_availability', function (Blueprint $table) {
+            $table->dropForeign(['id_availability']);
             $table->dropForeign(['id_product']);
         });
-        Schema::dropIfExists('detail_data_price');
+        Schema::dropIfExists('detail_availability');
 
-        Schema::table('data_price', function (Blueprint $table) {
+        Schema::table('availability', function (Blueprint $table) {
             $table->dropForeign(['id_store']);
             $table->dropForeign(['id_employee']);
         });
-        Schema::dropIfExists('data_price');
+        Schema::dropIfExists('availability');
     }
 }
