@@ -31,7 +31,9 @@
           <th style="width: 70px;"></th>
           <th>Brand</th>
           <th>Sub Category</th>
+          <th>Code</th>
           <th>SKU</th>
+          <th>Stock Type</th>
           <th>Panel</th>
           <th style="width: 15%;"> Action</th>
         </thead>
@@ -41,68 +43,10 @@
   </div>
 </div>
 
-<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout" role="document">
-        <div class="modal-content">
-            <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="fa fa-plus"></i> Add Product</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="si si-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <form action="{{ route('product.add') }}" method="post">
-                {!! csrf_field() !!}
-                <div class="block-content">
-                    <!-- <div class="form-group">
-                      <label>Brand Product</label>
-                      <select class="js-select2 form-control" style="width: 100%" name="brand">
-                      <option disabled selected>Choose your Brand</option>
-                        @foreach($brand as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                        @endforeach
-                      </select>
-                    </div> -->
-                    <div class="form-group">
-                      <label>Sub Category Product</label>
-                      <select class="js-select2 form-control" style="width: 100%" name="subcategory">
-                      <option disabled selected>Choose your Sub Category</option>
-                        @foreach($subcategory as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                        @endforeach
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>SKU Product</label>
-                      <input type="text" class="form-control" name="name" placeholder="Add new product" required>
-                    </div>
-                    <!-- <div class="form-group">
-                        <label>Deskripsi</label>
-                        <textarea class="form-control" name="deskripsi"></textarea>
-                    </div>
- -->                    <div class="form-group">
-                      <label>Panel</label>
-                      <select class="js-select2 form-control" style="width: 100%" name="panel">
-                      <option disabled selected>Choose your Panel</option>
-                            <option value="yes"> Yes </option>
-                            <option value="no"> No </option>
-                      </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{{-- ADD PRODUCT MODAL --}}
+@include('product._form_product', ['action' => route('product.add'), 'id' => 'tambahModal'])
 
+@include('product._form_product', ['id' => 'editModal', 'type' => 'edit'])
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout" role="document">
         <div class="modal-content">
@@ -120,25 +64,7 @@
                 {!! method_field('PUT') !!}
                 {!! csrf_field() !!}
                 <div class="block-content">
-                    <!-- <div class="row">
-                        <div class="form-group col-md-12">
-                            <label>Brand Product</label>
-                            <select class="js-edit form-control" id="brandinput" style="width: 100%" name="brand" >
-                                @foreach($brand as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div> -->
                     <div class="row">
-                        <div class="form-group col-md-12">
-                            <label>Sub Category Product</label>
-                            <select class="js-edit form-control" id="subcategoryinput" style="width: 100%" name="subcategory" >
-                                @foreach($subcategory as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name}}</option>
-                                @endforeach
-                            </select>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
@@ -186,16 +112,6 @@
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
-    function editModal(json) {
-        $('#editModal').modal('show');
-        $('#editForm').attr('action', "{{ url('/product/summary/update') }}/"+json.id);
-        $('#nameInput').val(json.name);
-        $('#deskripsiInput').val(json.deskrispi);
-        // $('#brandinput').val(json.brand).trigger('change');
-        $('#subcategoryinput').val(json.subcategory).trigger('change');
-        $('#panelinput').val(json.panel).trigger('change');
-        // console.log(json);
-    }
     @if(session('type'))
     $(document).ready(function() {
         $.notify({
@@ -251,17 +167,13 @@
             { data: 'id', name: 'id' },
             { data: 'brand', name: 'brand' },
             { data: 'subcategory', name: 'subcategory' },
+            { data: 'code', name: 'code' },
             { data: 'name', name: 'name' },
+            { data: 'stockType', name: 'stockType' },
             { data: 'panel', name: 'panel' },
             { data: 'action', name: 'action' },
             ]
         });
-    });
-    $(".js-select2").select2({ 
-      dropdownParent: $("#tambahModal")
-    });
-    $(".js-edit").select2({ 
-      dropdownParent: $("#editModal")
     });
 </script>
 @endsection

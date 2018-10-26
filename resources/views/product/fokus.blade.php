@@ -31,7 +31,6 @@
           <th class="text-center" style="width: 70px;"></th>
           <th>Product</th>
           <th>Area</th>
-          <th>Type</th>
           <th>Date From</th>
           <th>Date Until</th>
           <th class="text-center" style="width: 15%;"> Action</th>
@@ -42,134 +41,12 @@
   </div>
 </div>
 
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-        <div class="modal-content">
-            <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="fa fa-edit"></i> Update Product Fokus</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="si si-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <form id="editForm" method="post">
-              {!! method_field('PUT') !!}
-              {!! csrf_field() !!}
-              <div class="block-content">
-                <div class="form-group">
-                  <label>Product</label>
-                  <select class="js-edit form-control" style="width: 100%" id="productInput" name="product" >
-                    @foreach($product as $data)
-                      <option value="{{ $data->id }}">{{ $data->name }} </option>
-                    @endforeach
-                  </select>
-                </div>
-                <div class="row">
-                  <div class="form-group col-md-6">
-                      <label>Area</label>
-                      <select class= "js-edit form-control" id="areaInput" style="width: 100%"  name="area" >
-                      <option disabled selected>Choose your Area</option>
-                        @foreach($area as $data)
-                          <option value="{{ $data->id }}">{{ $data->name }} </option>
-                        @endforeach
-                      </select>
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label>Type Product Fokus</label>
-                    <select class="form-control form-control" name="type" id="typeInput">
-                      <option disabled selected>Choose your Type</option>
-                      <option value="TR">TR</option>
-                      <option value="MR">MR</option>
-                      <option value="ALL">ALL</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-6">
-                      <label>Date From</label>
-                      <input class="js-datepicker form-control" type="date" id="fromInput" name="from" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
-                  </div>
-                  <div class="form-group col-md-6">
-                      <label>Date Until</label>
-                      <input class="js-datepicker form-control" type="date" id="toInput" name="to" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </form>
-        </div>
-    </div>
-</div>
+{{-- MODAL EDIT FOCUS --}}
+@include('product._form_focus', ['id' => 'editModal', 'type' => 'edit'])
 
-<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Product Fokus</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <form action="{{ route('fokus.add') }}" method="post">
-        {!! csrf_field() !!}
-        <div class="block-content">
-          <div class="form-group">
-            <label>Product</label>
-            <select class="js-select2 form-control" style="width: 100%" name="product" required>
-            <option value="" disabled selected>Choose your Product</option>
-              @foreach($product as $data)
-                <option value="{{ $data->id }}">{{ $data->name }} </option>
-              @endforeach
-            </select>
-          </div>
-          <div class="row">
-            <div class="form-group col-md-6">
-                <label>Area</label>
-                <select class="js-select2 form-control" style="width: 100%" name="area">
-                  <option disabled selected>Choose your Area</option>
-                  @foreach($area as $data)
-                    <option value="{{ $data->id }}">{{ $data->name }}</option>
-                  @endforeach
-                </select>
-            </div>
-            <div class="form-group col-md-6">
-              <label>Type Product Fokus</label>
-              <select class="form-control form-control" name="type" required>
-                <option value="" disabled selected>Choose your Type</option>
-                <option value="TR">TR</option>
-                <option value="MR">MR</option>
-                <option value="ALL">ALL</option>
-              </select>
-            </div>
-            <div class="form-group col-md-6">
-                <label>Month From</label>
-                <input class="js-datepicker form-control" data-date-format="mm" type="text" placeholder="Month From" id="date" name="from" data-month-highlight="true" required>
-            </div>
-            <div class="form-group col-md-6">
-                <label>Month Until</label>
-                <input class="js-datepicker form-control" type="text" id="date1" data-date-format="mm" name="to" data-month-highlight="true" required>
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Save
-          </button>
-          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+{{-- MODAL ADD FOCUS --}}
+@include('product._form_focus', ['id' => 'tambahModal', 'action' => route('fokus.add')])
+
 @endsection
 
 @section('css')
@@ -189,29 +66,6 @@
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script type="text/javascript">
-      $("#date").datepicker( {
-        format: "mm",
-        viewMode: "months",
-        autoclose: true,
-        minViewMode: "months"
-      });
-      $("#date1").datepicker( {
-        format: "mm",
-        viewMode: "months",
-        autoclose: true,
-        minViewMode: "months"
-      });
-
-      function editModal(json) {
-          $('#editModal').modal('show');
-          $('#editForm').attr('action', "{{ url('/product/fokus/update') }}/"+json.id);
-          $('#productInput').val(json.product).trigger('change');
-          $('#areaInput').val(json.area).trigger('change');
-          $('#typeInput').val(json.type);
-          $('#fromInput').val(json.from);
-          $('#toInput').val(json.to);
-          console.log(json);
-      }
       @if(session('type'))
       $(document).ready(function() {
           $.notify({
@@ -266,18 +120,11 @@
 	              { data: 'id', name: 'id' },
                 { data: 'product.name', name: 'product.name'},
 	              { data: 'area', name: 'area' },
-	              { data: 'type', name: 'type' },
                 { data: 'from', name: 'from' },
                 { data: 'to', name: 'to' },
 	              { data: 'action', name: 'action' },
               ]
           });
       });
-      $(".js-select2").select2({ 
-      dropdownParent: $("#tambahModal")
-    });
-    $(".js-edit").select2({ 
-      dropdownParent: $("#editModal")
-    });
   </script>
 @endsection

@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Target extends Model
 {
-    protected $fillable = [
-        'id_employee', 'id_pasar', 'rilis', 'value', 'valuepf'
-    ];
+    protected $fillable = ['id_employee', 'id_store', 'rilis', 'value', 'value_pf'];
 
     public function targetDetail()
     {
@@ -20,8 +18,8 @@ class Target extends Model
         return $this->belongsTo('App\Employee', 'id_employee');
     }
 
-    public function pasar()
+    public function store()
     {
-        return $this->belongsTo('App\Pasar', 'id_pasar');
+        return $this->belongsTo('App\Store', 'id_store');
     }
 }

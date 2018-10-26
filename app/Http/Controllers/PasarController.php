@@ -68,7 +68,6 @@ class PasarController extends Controller
             if ($check < 1) {
                 Pasar::create([
                     'name'              => $request->input('name'),
-                    'phone'             => $request->input('phone'),
                     'address'           => $request->input('address'),
                     'latitude'          => $request->input('latitude'),
                     'longitude'         => $request->input('longitude'),
@@ -113,7 +112,6 @@ class PasarController extends Controller
             if ($check < 1) {
                 $dataPasar = Pasar::find($id);
                 $dataPasar->name              = $request->input('name');
-                $dataPasar->phone             = $request->input('phone');
                 $dataPasar->address           = $request->input('address');
                 $dataPasar->latitude          = $request->input('latitude');
                 $dataPasar->longitude         = $request->input('longitude');
@@ -178,7 +176,6 @@ class PasarController extends Controller
 
                          Pasar::create([
                             'name'              => $row->pasar,
-                            'phone'             => (isset($row->phone) ? $row->phone : "-"),
                             'id_subarea'        => $id_subarea,
                             'longitude'         => $row->longitude,
                             'latitude'          => $row->latitude,
@@ -268,7 +265,6 @@ class PasarController extends Controller
         foreach ($pasar as $val) {
             $data[] = array(
                 'Pasar'             => $val->name,
-                'Phone'             => (isset($val->phone) ? $val->phone : "-"),
                 'Address'           => $val->address,
                 'Longitude'         => $val->lobgitude,
                 'Latitude'          => $val->latitude,
