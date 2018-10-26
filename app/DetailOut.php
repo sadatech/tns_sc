@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DetailOut extends Model
 {
     protected $fillable = [
-		'id_sellout', 'id_store', 'date', 'week'
+		'id_sellout', 'id_store', 'id_measure', 'qty'
 	];
 
 	public function sellout()
@@ -19,5 +19,10 @@ class DetailOut extends Model
 	{
 		return $this->belongsTo('App\Store', 'id_store');
 	}
+
+	public function measure()
+    {
+        return $this->belongsTo('App\MeasurementUnit', 'id_measure');
+    }
 
 }
