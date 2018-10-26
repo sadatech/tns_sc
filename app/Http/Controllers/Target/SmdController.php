@@ -35,7 +35,7 @@ class SmdController extends Controller
                 'rilis'         => $target->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('target.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            <button data-url=".route('target.smd.delete', $target->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })->make(true);
     }
 
@@ -83,7 +83,7 @@ class SmdController extends Controller
             return redirect()->back()->with([
                 'type'    => 'success',
                 'title'   => 'Sukses!<br/>',
-                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!'
+                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah target!'
             ]);
         } else {
             return redirect()->route('employee')

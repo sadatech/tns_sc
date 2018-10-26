@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Product Target")
+@section('title', "Demo Cooking Target")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Product Target<small class="ml-2">Demo Cooking</small></h2>
+  <h2 class="content-heading pt-10"> Target<small class="ml-2">Demo Cooking</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -241,8 +241,8 @@
             { data: 'id', name: 'id' },
             { data: 'employee.name', name: 'employee.name'},
             { data: 'subarea', name: 'subarea', seachable: true },
-            { data: 'rilis', name: 'rilis' },
-            { data: 'rilis', name: 'rilis' },
+            { data: 'value', name: 'value' },
+            { data: 'value_pf', name: 'value_pf' },
             { data: 'rilis', name: 'rilis' },
             { data: 'action', name: 'action' },
             ]
