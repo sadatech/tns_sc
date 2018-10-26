@@ -10,34 +10,38 @@ use Config;
 
 class CategoryController extends Controller
 {
+  public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
+  
 	public function list()
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
-			if (!$user = JWTAuth::parseToken()->authenticate()) {
-				$res['msg'] = "User not found.";
-			} else {
-				$category = Category::get();
-				if (!empty($category)) {
-					$res['success'] = true;
-					$dataArr = array();
-					foreach ($category as $cat) {
-						if ($cat->brand == null) {
-							$brand = "Without Brand";
-						} else {
-							$brand = $cat->brand->name;
-						}
-						$dataArr[] = array(
-							'id' => $cat->id,
-							'brand' => $brand,
-							'name' => $cat->name,
-						);
-					}
-					$res['category'] = $dataArr;
+			$res['success'] = false;
+			if (JWTAuth::getToken() != null) {
+				if (!$user = JWTAuth::parseToken()->authenticate()) {
+					$res['msg'] = "User not found.";
 				} else {
-					$res['success'] = false;
-					$res['msg'] = "Gagal mengambil category.";
+					$category = Category::get();
+					if ($category->count() > 0) {
+						$res['success'] = true;
+						$dataArr = array();
+						foreach ($category as $cat) {
+							$dataArr[] = array(
+								'id' => $cat->id,
+								'name' => $cat->name,
+							);
+						}
+						$res['category'] = $dataArr;
+					} else {
+						$res['msg'] = "Gagal mengambil kategori.";
+					}
 				}
+			}else{
+				$res['success'] = false;
+				$res['msg'] = "User not found.";
+				$code = 200;
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			$res['msg'] = "Token Expired.";
