@@ -13,6 +13,9 @@ class BrandTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('brands')->insert([
+            ['name' => 'SASA']
+        ]);
     	$faker = Faker::create();
     	foreach(range(0,99) as $i){
     		DB::table('brands')->insert([

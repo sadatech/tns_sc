@@ -20,9 +20,6 @@ class CreateBrandsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-        DB::table('brands')->insert([
-            ['name' => 'SASA']
-        ]);
     }
 
     /**

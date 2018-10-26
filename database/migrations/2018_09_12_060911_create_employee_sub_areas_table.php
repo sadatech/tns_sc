@@ -20,7 +20,7 @@ class CreateEmployeeSubAreasTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('id_subarea')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_subarea')->references('id')->on('sub_areas')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
         });
     }

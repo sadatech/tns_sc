@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pasar extends Model
 {
     protected $fillable = [
-        'name', 'phone', 'address', 'latitude', 'longitude', 'id_subarea'
+        'name', 'address', 'latitude', 'longitude', 'id_subarea'
     ];
 
     public function subarea()
@@ -23,6 +23,11 @@ class Pasar extends Model
     public function EmployeePasar()
     {
         return $this->hasMany('App\EmployeePasar', 'id_pasar');
+    }
+
+    public function targetGtc()
+    {
+        return $this->hasMany('App\TargetGtc', 'id_pasar');
     }
 
 }

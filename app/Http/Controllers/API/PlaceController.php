@@ -23,7 +23,7 @@ class PlaceController extends Controller
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					$place = Place::where('id',3)->get();
+					$place = Place::get();
 					if (!$place->isEmpty()) {
 						$placeArr = array();
 						foreach ($place as $key => $value) {

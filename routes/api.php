@@ -46,7 +46,17 @@ Route::prefix('product')->group(function () {
 Route::prefix('sales')->group(function () {
 	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
 });
+Route::prefix('competitor')->group(function () {
+	Route::post('/promo', 'API\CompetitorController@promo')->name('api.competitor.promo');
+});
 
+Route::prefix('dataprice')->group(function () {
+	Route::post('/add', 'API\DataPriceController@store')->name('api.dataprice.add');
+});
+
+Route::prefix('availability')->group(function () {
+	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
+});
 
 /**
  * Employee

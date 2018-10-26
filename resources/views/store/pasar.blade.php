@@ -22,7 +22,6 @@
                     <thead>
                         <th class="text-center" style="width: 150px;">Action</th>
                         <th width="200px">Name</th>
-                        <th width="200px">Phone</th>
                         <th width="200px">Address</th>
                         <th>Longitude</th>
                         <th>Latitude</th>
@@ -40,7 +39,7 @@
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
+        <div class="block-header bg-gd-sun p-10">
           <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Pasar</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -61,7 +60,6 @@
                 <thead>
                     <tr>
                         <td><b>Market</b></td>
-                        <td><b>Phone</b></td>
                         <td><b>Address</b></td>
                         <td><b>Longitude</b></td>
                         <td><b>Latitude</b></td>
@@ -73,7 +71,6 @@
                 <tbody>
                     <tr>
                         <td>Market 1</td>
-                        <td>Phone 1</td>
                         <td>Address 1</td>
                         <td>Longitude 1</td>
                         <td>Latitude 1</td>
@@ -83,7 +80,6 @@
                     </tr>
                     <tr>
                         <td>Market 2</td>
-                        <td>Without Phone</td>
                         <td>Address 2</td>
                         <td>Longitude 2</td>
                         <td>Latitude 2</td>
@@ -94,12 +90,14 @@
                 </tbody>
             </table>
           </div>
-          <div class="form-group">
-            <label>Select File</label>
+          <div class="form-group col-md-12">
+            <label>Upload Your Data Plan DC:</label>
+            <div class="custom-file">
                 <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
                 <label class="custom-file-label">Choose file Excel</label>
                 <code> *Type File Excel</code>
-          </div>
+            </div>
+           </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-alt-success">
@@ -189,7 +187,6 @@
             columns: [  
             { data: 'action', name: 'action' },
             { data: 'name', name: 'pasars.name' },
-            { data: 'phone', name: 'pasars.phone' },
             { data: 'address', name: 'pasars.address' },
             { data: 'longitude', name: 'pasars.longitude' },
             { data: 'latitude', name: 'pasars.latitude' },
