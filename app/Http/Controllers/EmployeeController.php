@@ -181,6 +181,21 @@ class EmployeeController extends Controller
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
 						]);
+					} else if (!empty($request->input('subarea'))) {
+						$dataSubArea = array();
+						foreach ($request->input('subarea') as $subarea) {
+							$dataSubArea[] = array(
+								'id_employee' 	=> $insert->id,
+								'id_subarea' 	=> $subarea,
+							);
+						}
+						DB::table('employee_subareas')->insert($dataSubArea);
+						return redirect()->route('employee')
+						->with([
+							'type' 		=> 'success',
+							'title' 	=> 'Sukses!<br/>',
+							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
+						]);
 					}
 				}
 			} else {
