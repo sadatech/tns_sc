@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DetailIn extends Model
 {
     protected $fillable = [
-        'id_sellin', 'id_product', 'qty', 'price', 'isPf'
+        'id_sellin', 'id_product', 'qty'
     ];
 
     public function sellin()
