@@ -189,7 +189,7 @@ class EmployeeController extends Controller
 								'id_subarea' 	=> $subarea,
 							);
 						}
-						DB::table('employee_subareas')->insert($dataSubArea);
+						DB::table('employee_sub_areas')->insert($dataSubArea);
 						return redirect()->route('employee')
 						->with([
 							'type' 		=> 'success',
