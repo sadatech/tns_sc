@@ -331,8 +331,14 @@ Route::prefix('target')->group(function () {
 Route::prefix('planDc')->group(function () {
 	Route::get('/', 'PlandcController@read')->name('planDc')->middleware('auth');
 	Route::get('/data', 'PlandcController@data')->name('plan.data')->middleware('auth');
+	Route::post('/import','PlandcController@import')->name('plan.import')->middleware('auth');
 	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
 	Route::get('/delete/{id}', 'PlandcController@delete')->name('plan.delete')->middleware('auth');
+	Route::get('/export', 'PlandcController@exportXLS')->name('plan.export')->middleware('auth');
+	Route::get('/download-template', function()
+	{
+		return response()->download(public_path('assets/PlanDcImport.xlsx'));
+	})->name('plan.download-template')->middleware('auth');
 });
 /*
 	USERS

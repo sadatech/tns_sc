@@ -20,7 +20,7 @@
                 <div class="block-header p-0 mb-20">
                     <h3 class="block-title">
                         <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                        <a href="{{ route('pasar.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                        <a href="{{ route('plan.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </h3>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full" id="planTable">
@@ -29,7 +29,7 @@
                     <th>Employee</th>
                     <th>Date</th>
                     <th>Lokasi</th>
-                    <th>Stockist</th>
+                    <th>Stocklist</th>
                     <th class="text-center" style="width: 15%;"> Action</th>
                 </thead>
                 </table>
@@ -51,11 +51,51 @@
                     </div>
                 </div>
             </div>
-            <form action="{{ route('account.import') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ route('plan.import') }}" method="post" enctype="multipart/form-data">
                 {!! csrf_field() !!}
                 <div class="block-content">
-                    <div class="row">
-                        <div class="form-group col-md-6">
+                    <div class="form-group">
+                        <a href="{{ route('plan.download-template') }}" class="btn btn-sm btn-info" title="Sample Data" style="float: right;">Download Import Format</a>
+                    </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-md-12" style="padding: 0">Employee</label>
+                            <div class="input-group mb-3 col-md-12" style="padding: 0">
+                                <div style="width: 82%">
+                                    <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
+                                        @foreach($employee as $data)
+                                            <option value="{{ $data->id.'|'.$data->name}}">{{$data->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="input-group-append" style="width: 18%">
+                                    <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
+                                </div>
+                            </div>
+                            <!-- Block’s content.. -->
+                            <div class="block block-themed block-rounded">
+                                <div class="block-header bg-gd-lake" style="padding: 5px">
+                                    <h3 class="block-title">Selected Employee DC</h3>
+                                    <span id="selectedStoreDefault" style="color: #ffeb5e;padding-top: 5px;">Please Add Employee</span>
+                                    <div class="block-options">
+                                        <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Search for Employee..">
+                                    </div>
+                                </div>
+                                <div class="block-content" style="padding: 0; width: 100%;">
+                                    <table id="selectedStoreTable" class="table table-striped table-vcenter" style="display: none;">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" style="width: 50px;">#</th>
+                                                <th>Employee</th>
+                                                <th class="text-center" style="width: 100px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="selectedStoreTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
                             <label>Upload Your Data Plan DC:</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
@@ -63,21 +103,12 @@
                                 <code> *Type File Excel</code>
                             </div>
                         </div>
-                        <div class="form-group col-md-6">
-                        <label>Upload Your Data Plan DC:</label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                                <label class="custom-file-label">Choose file Excel</label>
-                                <code> *Type File Excel</code>
-                            </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-alt-success">
+                                <i class="fa fa-save"></i> Save
+                            </button>
+                            <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
                         </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -126,7 +157,6 @@
   $(function() {
     $('#planTable').DataTable({
       processing: true,
-      serverSide: true,
       drawCallback: function(){
         $('.js-swal-delete').on('click', function(){
           var url = $(this).data("url");
@@ -158,7 +188,7 @@
       scrollY: "300px",
       columns: [
       { data: 'id', name: 'plan_dcs.id' },
-      { data: 'employee.name', name: 'employee.name' },
+      { data: 'planEmployee', name: 'planEmployee' },
       { data: 'date', name: 'plan_dcs.date'},
       { data: 'lokasi', name: 'plan_dcs.lokasi'},
       { data: 'stocklist', name: 'plan_dcs.stocklist'},
@@ -166,11 +196,113 @@
       ]
     });
   });
+  
+  var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
   $(".js-select2").select2({ 
-    dropdownParent: $("#tambahModal")
+    tags: true,
+    dropdownParent: $("#importModal")
   });
   $(".js-edit").select2({ 
+    tags: true,
     dropdownParent: $("#editModal")
   });
+    $('#storesAdd').click(function () {
+        var stores = $('#stores').val();
+        if (stores != null) {
+            $('#stores').val('');
+            $('#select2-stores-container').html('');
+            addItem(stores);
+        } else {               
+            text('Warning',': Please the select Employee first','warning');
+        }
+    });
+  function addItem(stores, get = '') {
+        var storeSplit = stores.split("|");
+        var a = selectedStoresId.indexOf(''+storeSplit[0]);
+
+        if (get != 'get') {
+            selectedStores.push(stores);
+            selectedStoresId.push(storeSplit[0]);
+            selectedStoresName.push(storeSplit[1]);
+        }
+
+        if (a < 0 || get == 'get') {
+            tableIndex++;
+            $('#selectedStoreTable').removeAttr('style');
+            $('#selectedStoreDefault').css('display','none');
+            $('#selectedStoreTableBody').append("<tr>"+
+                "<th class='text-center' scope='row'>"+ tableIndex +"</th>"+
+                "<td><span>"+ storeSplit[1] +"</span>"+
+                "<input type='hidden' name='employee[]' value='"+ storeSplit[0] +
+                "'></td>"+
+                "<td class='text-center'>"+
+                "<div class='btn-group'>"+
+                "<button type='button' class='btn btn-sm btn-secondary js-tooltip-enabled' data-toggle='tooltip' title=' data-original-title='Delete' onclick='deleteItem("+ storeSplit[0] +")'>"+
+                "<i class='fa fa-times'></i>"+
+                "</button>"+
+                "</div>"+
+                "</td>"+
+                "</tr>");
+        }else{
+            var msg = " : Data Already Exist! data: "+storeSplit[1];
+            notif('Warning',msg,'warning');
+        }
+    }
+    function deleteItem(id) {
+        var a = selectedStoresId.indexOf(''+id);
+        if (a >= 0) {
+            console.log(selectedStores)
+            selectedStores.splice(a, 1);
+            selectedStoresId.splice(a, 1);
+            selectedStoresName.splice(a, 1);
+            console.log(selectedStores)
+            tableIndex = 0;
+            $('#selectedStoreTableBody').html('');
+            $.each(selectedStores, function( index, value ) {
+                console.log(value)
+                addItem(value,'get');
+            });
+        }else{
+            console.log("Index Item Not Found!");
+        }
+    }
+    function searchFunction() {
+        var input, filter, table, tr, a, i;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("selectedStoreTableBody");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            console.log(a)
+            a = tr[i].getElementsByTagName("span")[0];
+            if(a != null){
+                a= a.innerHTML;
+                if (a.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+    function notif(title = 'default title<br/>', message = '<i class="em em-confetti_ball mr-2"></i>default message', type = 'success') {
+        $.notify(
+        {
+            title: '<strong>'+title+'</strong>',
+            message: message
+        }, 
+        {
+            type: type,
+            animate: {
+                enter: 'animated zoomInDown',
+                exit: 'animated zoomOutUp'
+            },
+            placement: {
+                from: 'top',
+                align: 'center'
+            }
+        }
+        );
+    }
 </script>
 @endsection
