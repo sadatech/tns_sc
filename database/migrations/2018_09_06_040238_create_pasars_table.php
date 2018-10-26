@@ -11,7 +11,6 @@ class CreatePasarsTable extends Migration
         Schema::create('pasars', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('phone')->nullable();
             $table->text('address');
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();

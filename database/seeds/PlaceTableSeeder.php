@@ -16,12 +16,10 @@ class PlaceTableSeeder extends Seeder
     	$faker = Faker::create();
     	foreach(range(0,99) as $i){
     		DB::table('places')->insert([
-    			'id_province' => 91,
-    			'id_city' => 9101,
     			'name' => $faker->name,
     			'code' => $faker->bothify('TR?#?#??##'),
-    			'email' => $faker->email,
     			'phone' => '0857'.rand(0000000,99999999),
+                'email' => $faker->email,
     			'latitude' => $faker->latitude(-90, 90),
     			'longitude' => $faker->longitude(-90, 90),
     			'address' => $faker->address,
