@@ -30,7 +30,7 @@
           <thead>
             <th class="text-center" style="width: 70px;"></th>
             <th>Employee Name</th>
-            <th>Pasar</th>
+            <th>Sub Area</th>
             <th>Type</th>
             <th>Release Month</th>
             <th class="text-center" style="width: 15%;"> Action</th>
@@ -68,9 +68,9 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label>Pasar</label>
-              <select class= "js-edit form-control" id="PasarInput" style="width: 100%"  name="pasar" >
-                @foreach($pasar as $data)
+              <label>Sub Area</label>
+              <select class= "js-edit form-control" id="SubAreaInput" style="width: 100%"  name="subarea" >
+                @foreach($subarea as $data)
                 <option value="{{ $data->id }}">{{ $data->name }}</option>
                 @endforeach
               </select>
@@ -127,10 +127,10 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label>Pasar</label>
-              <select class="js-select2 form-control" style="width: 100%" name="pasar">
-                <option disabled selected>Choose your Pasar</option>
-                @foreach($pasar as $data)
+              <label>Sub Area</label>
+              <select class="js-select2 form-control" style="width: 100%" name="subarea">
+                <option disabled selected>Choose your Sub Area</option>
+                @foreach($subarea as $data)
                 <option value="{{ $data->id }}">{{ $data->name }}</option>
                 @endforeach
               </select>
@@ -181,7 +181,7 @@
     $('#editModal').modal('show');
     $('#editForm').attr('action', "{{ url('/product/target/update') }}/"+json.id);
     $('#EmployeeInput').val(json.employee).trigger('change');
-    $('#PasarInput').val(json.pasar).trigger('change');
+    $('#SubAreaInput').val(json.subarea).trigger('change');
     $('#rilisInput').val(json.rilis);
     $('#valueInput').val(json.value);
     $('#valuepfInput').val(json.valuepf);
@@ -240,7 +240,7 @@
             columns: [
             { data: 'id', name: 'id' },
             { data: 'employee.name', name: 'employee.name'},
-            { data: 'pasar.name', name: 'pasar.name' },
+            { data: 'subarea.name', name: 'subarea.name' },
             { data: 'type', name: 'type' },
             { data: 'rilis', name: 'rilis' },
             { data: 'action', name: 'action' },
