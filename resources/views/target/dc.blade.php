@@ -113,7 +113,7 @@
           </div>
         </div>
       </div>
-      <form action="{{ route('target.add') }}" method="post">
+      <form action="{{ route('target.dc.add') }}" method="post">
         {!! csrf_field() !!}
         <div class="block-content">
           <div class="form-group">
@@ -236,11 +236,11 @@
                 });
               });
             },
-            ajax: '{!! route('target.data') !!}',
+            ajax: '{!! route('target.dc.data') !!}',
             columns: [
             { data: 'id', name: 'id' },
             { data: 'employee.name', name: 'employee.name'},
-            { data: 'subarea.name', name: 'subarea.name' },
+            { data: 'subArea.name', name: 'subArea.name' },
             { data: 'type', name: 'type' },
             { data: 'rilis', name: 'rilis' },
             { data: 'action', name: 'action' },

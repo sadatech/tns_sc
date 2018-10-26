@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Target;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
-use App\Target;
+use App\TargetGtc;
 use App\Employee;
 use App\Brand;
 use App\Pasar;
@@ -15,24 +15,24 @@ class SpgController extends Controller
 {
     public function baca()
     {
-        $data['employee']   = Employee::get();
+        $data['employee']   = Employee::where('id_position', 3)->get();
         $data['pasar']      = Pasar::get();
-        return view('target.dc',$data);
+        return view('target.spg',$data);
     }
 
     public function data()
     {
-        $product = Target::with(['pasar','employee'])
+        $target = TargetGtc::with(['pasar','employee'])
         ->select('targets.*');
-        return Datatables::of($product)
-        ->addColumn('action', function ($product) {
+        return Datatables::of($target)
+        ->addColumn('action', function ($target) {
             $data = array(
-                'id'            => $product->id,
-                'employee'      => $product->employee->id,
-                'pasar'         => $product->pasar->id,
-                'value'         => $product->value,
-                'valuepf'       => $product->valuepf,
-                'rilis'         => $product->rilis
+                'id'            => $target->id,
+                'employee'      => $target->employee->id,
+                'pasar'         => $target->pasar->id,
+                'value'         => $target->value,
+                'valuepf'       => $target->valuepf,
+                'rilis'         => $target->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('target.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -43,10 +43,11 @@ class SpgController extends Controller
     {
         $data=$request->all();
         $limit=[
-            'type'          => 'required',
             'employee'      => 'required|numeric',
-            'pasar'         => 'required|numeric',
-            'rilis'         => 'required'
+            'pasar'       => 'required|numeric',
+            'rilis'         => 'required',
+            'value'         => 'required',
+            'valuepf'       => 'required'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -54,49 +55,63 @@ class SpgController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
-            Target::create([
+            TargetGtc::create([
                 'id_employee'   => $request->input('employee'),
-                'id_product'    => $request->input('product'),
                 'id_pasar'      => $request->input('pasar'),
                 'rilis'         => $request->input('rilis'),
-                'value'         => $request->input('rilis'),
+                'value'         => $request->input('value'),
                 'valuepf'       => $request->input('valuepf'),
             ]);
             return redirect()->back()
             ->with([
                 'type' => 'success',
                 'title' => 'Sukses!<br/>',
-                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!'
+                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk target!'
             ]);
         }
     }
 
     public function update(Request $request, $id) 
     {
-        $product = Target::find($id);
-        $product->id_pasar      = $request->get('pasar');
-        $product->id_employee   = $request->get('employee');
-        $product->rilis         = $request->get('rilis');
-        $product->value         = $request->get('value');
-        $product->valuepf       = $request->get('valuepf');
-        $product->save();
-        return redirect()->back()
-        ->with([
-          'type'    => 'success',
-          'title'   => 'Sukses!<br/>',
-          'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!'
-      ]);
+        $target = TargetGtc::find($id);
+        $target->id_pasar      = $request->get('pasar');
+        $target->id_employee   = $request->get('employee');
+        $target->rilis         = $request->get('rilis');
+        $target->value         = $request->get('value');
+        $target->valuepf       = $request->get('valuepf');
+        if ($target->save()) {
+            return redirect()->back()->with([
+                'type'    => 'success',
+                'title'   => 'Sukses!<br/>',
+                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!'
+            ]);
+        } else {
+            return redirect()->route('employee')
+            ->with([
+                'type'      => 'danger',
+                'title'     => 'Terjadi Kesalahan!<br/>',
+                'message'   => '<i class="em em-thinking_face mr-2"></i>Gagal mengupdate data!'
+            ]);
+        }
     }
 
     public function delete($id)
     {
-        $product = Target::find($id);
-        $product->delete();
-        return redirect()->back()
-        ->with([
-            'type'      => 'success',
-            'title'     => 'Sukses!<br/>',
-            'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-        ]);
+        $product = TargetGtc::find($id);
+        if ($product->delete()) {
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+            ]);
+        } else {
+            return redirect()->route('employee')
+            ->with([
+                'type'      => 'danger',
+                'title'     => 'Terjadi Kesalahan!<br/>',
+                'message'   => '<i class="em em-thinking_face mr-2"></i>Gagal menghapus data!'
+            ]);
+        }
     }
 }

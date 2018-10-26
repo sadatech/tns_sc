@@ -30,7 +30,7 @@
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Employee Name</th>
-          <th>Store</th>
+          <th>Pasar</th>
           <th>Type</th>
           <th>Release Month</th>
           <th class="text-center" style="width: 15%;"> Action</th>
@@ -68,10 +68,10 @@
                 </div>
                 <div class="row">
                   <div class="form-group col-md-6">
-                      <label>Store</label>
-                      <select class= "js-edit form-control" id="StoreInput" style="width: 100%"  name="store" >
-                        @foreach($store as $data)
-                          <option value="{{ $data->id }}">{{ $data->name1 }}</option>
+                      <label>Pasar</label>
+                      <select class= "js-edit form-control" id="PasarInput" style="width: 100%"  name="pasar" >
+                        @foreach($pasar as $data)
+                          <option value="{{ $data->id }}">{{ $data->name }}</option>
                         @endforeach
                       </select>
                   </div>
@@ -127,11 +127,11 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-                <label>Store</label>
-                <select class="js-select2 form-control" style="width: 100%" name="store">
-                  <option disabled selected>Choose your Store</option>
-                  @foreach($store as $data)
-                    <option value="{{ $data->id }}">{{ $data->name1 }}</option>
+                <label>Pasar</label>
+                <select class="js-select2 form-control" style="width: 100%" name="pasar">
+                  <option disabled selected>Choose your Pasar</option>
+                  @foreach($pasar as $data)
+                    <option value="{{ $data->id }}">{{ $data->name }}</option>
                   @endforeach
                 </select>
             </div>
@@ -181,7 +181,7 @@
           $('#editModal').modal('show');
           $('#editForm').attr('action', "{{ url('/product/target/update') }}/"+json.id);
           $('#EmployeeInput').val(json.employee).trigger('change');
-          $('#StoreInput').val(json.store).trigger('change');
+          $('#PasarInput').val(json.pasar).trigger('change');
           $('#typeInput').val(json.type);
           $('#rilisInput').val(json.rilis);
           // console.log(json);
@@ -239,7 +239,7 @@
               columns: [
 	              { data: 'id', name: 'id' },
                 { data: 'employee.name', name: 'employee.name'},
-	              { data: 'store.name1', name: 'store.name1' },
+	              { data: 'pasar.name', name: 'pasar.name' },
 	              { data: 'type', name: 'type' },
                 { data: 'rilis', name: 'rilis' },
 	              { data: 'action', name: 'action' },
