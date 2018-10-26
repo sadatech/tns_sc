@@ -26,6 +26,10 @@
                         <th width="200px">Sub Area</th>
                         <th width="200px">Account</th>
                         <th>Distributor</th>
+                        <th>Store Panel</th>
+                        <th>Coverage</th>
+                        <th>Is Vito</th>
+                        <th>Delivery</th>
                         <th>Longitude</th>
                         <th>Latitude</th>
                         <th width="200px">Address</th>
@@ -116,6 +120,10 @@
             { data: 'subarea', name: 'subarea' },
             { data: 'account', name: 'account' },
             { data: 'distributor', name: 'distributor' },
+            { data: 'store_panel', name: 'store_panel' },
+            { data: 'coverage', name: 'coverage' },
+            { data: 'is_vito', name: 'is_vito' },
+            { data: 'delivery', name: 'delivery' },
             { data: 'longitude', name: 'longitude' },
             { data: 'latitude', name: 'latitude' },
             { data: 'address', name: 'address' },
