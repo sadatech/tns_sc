@@ -73,6 +73,12 @@
                     </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-alt-success">
+                    <i class="fa fa-save"></i> Save
+                </button>
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
         </form>
     </div>
 </div>
