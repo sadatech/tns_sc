@@ -9,7 +9,7 @@ class ChannelTableSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        foreach(range(0,99) as $i){
+        foreach(range(1,10) as $i){
             DB::table('channels')->insert([
                 'name'          => $faker->firstName,
                 'created_at'    => Carbon::now(),

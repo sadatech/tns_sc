@@ -26,12 +26,17 @@ class RegionTableSeeder extends Seeder
         //     ]);
         
         $faker = Faker::create();
-        foreach(range(1,10) as $i){
+        foreach(range(1,4) as $i){
             DB::table('regions')->insert([
                 'name'          => $faker->state,
                 'created_at'    => Carbon::now(),
                 'updated_at'    => Carbon::now()
             ]);
         }
+
+        // DB::table('regions')->insert(['name' => 'Jabodetabek']);
+        // DB::table('regions')->insert(['name' => 'Jawa']);
+        // DB::table('regions')->insert(['name' => 'Sumatera']);
+        // DB::table('regions')->insert(['name' => 'Indonesia Timur']);
     }
 }

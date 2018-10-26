@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFaqTable extends Migration
+class RemovePhoneFromPasar extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class CreateFaqTable extends Migration
      */
     public function up()
     {
-        Schema::create('faqs', function (Blueprint $table) {
-            $table->increments('id');
-            $table->text('question');
-            $table->text('answer');
-            $table->timestamps();
+        Schema::table('pasars', function (Blueprint $table) {
+            //
+            $table->dropColumn('phone');
         });
     }
 
@@ -28,6 +26,9 @@ class CreateFaqTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('faqs');
+        Schema::table('pasars', function (Blueprint $table) {
+            //
+            $table->string('phone')->nullable();
+        });
     }
 }
