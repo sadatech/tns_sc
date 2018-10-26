@@ -16,6 +16,7 @@ use App\SubArea;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\Datatables\Datatables;
 use Box\Spout\Writer\Style\Color;
+use App\Filters\SubAreaFilters;
 
 class SubareaController extends Controller
 {
@@ -40,6 +41,11 @@ class SubareaController extends Controller
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square'><i class='si si-pencil'></i></button>
             <button data-url=".route('subarea.delete', $subarea->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
         })->make(true);
+    }
+
+    public function getDataWithFilters(SubAreaFilters $filters){
+        $data = SubArea::filter($filters)->get();
+        return $data;
     }
 
     public function store(Request $request)

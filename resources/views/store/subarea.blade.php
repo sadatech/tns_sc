@@ -30,8 +30,8 @@
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th class="text-center">Name</th>
-          <th class="text-center">Region</th>
           <th class="text-center">Area</th>
+          <th class="text-center">Region</th>          
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -306,8 +306,8 @@
       columns: [
       { data: 'id', name: 'sub_areas.id' },
       { data: 'name', name: 'sub_areas.name' },
-      { data: 'area.region.name', name: 'area.regions.name', "searchable": true },
       { data: 'area.name', name: 'area.name' },
+      { data: 'area.region.name', name: 'area.regions.name', "searchable": true },      
       { data: 'action', name: 'action' },
       ]
     });

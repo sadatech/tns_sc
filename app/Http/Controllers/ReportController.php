@@ -19,7 +19,100 @@ class ReportController extends Controller
 		return view('report.sellin');
 	}
 
-	public function sellInData(){
+    public function sellInData(Request $request){
+
+        $data = DetailIn::where('deleted_at', null);
+
+        return Datatables::of($data)
+        ->addColumn('week', function($item) {
+            return $item->sellin->week;
+        })        
+        ->addColumn('distributor_code', function($item) {
+            return $item->sellin->store->getDistributorCode();
+        })
+        ->addColumn('distributor_name', function($item) {
+            return $item->sellin->store->getDistributorName();
+        })
+        ->addColumn('region', function($item) {
+            return $item->sellin->store->subarea->area->region->name;
+        })
+        ->addColumn('area', function($item) {
+            return $item->sellin->store->subarea->area->name;
+        })
+        ->addColumn('sub_area', function($item) {
+            return $item->sellin->store->subarea->name;
+        })
+        ->addColumn('account', function($item) {
+            return $item->sellin->store->account->name;
+        })
+        ->addColumn('channel', function($item) {
+            return $item->sellin->store->account->channel->name;
+        })
+        ->addColumn('store_name_1', function($item) {
+            return $item->sellin->store->name1;
+        })
+        ->addColumn('store_name_2', function($item) {
+            return $item->sellin->store->name2;
+        })
+        ->addColumn('nik', function($item) {
+            return $item->sellin->employee->nik;
+        })
+        ->addColumn('employee_name', function($item) {
+            return $item->sellin->employee->name;
+        })
+        ->addColumn('date', function($item) {
+            return $item->sellin->date;
+        })
+        ->addColumn('product_name', function($item) {
+            return $item->product->name;
+        })
+        ->addColumn('category', function($item) {
+            // return $item->product->category->name;
+        })
+        ->addColumn('unit_price', function($item) {
+            // return $item->product->getPrice(
+            //                             $item->sellin->date,
+            //                             $item->sellin->store->type,
+            //                             ($item->company->typePrice == 2) ? 3 : 1
+            //                            );
+        })
+        ->addColumn('value', function($item) {
+            // return  $item->product->getPrice(
+                    //                     $item->sellin->date,
+                    //                     $item->sellin->store->type,
+                    //                     ($item->company->typePrice == 2) ? 3 : 1
+                    //                    )
+                    // *
+                    // $item->isTarget()['target'];
+        })
+        ->addColumn('value_pf', function($item) {
+            // return  $item->product->getPrice(
+            //                             $item->sellin->date,
+            //                             $item->sellin->store->type,
+            //                             ($item->company->typePrice == 2) ? 3 : 1
+            //                            )
+            //         *
+            //         $item->isTarget()['target_pf']
+            //         *
+            //         $item->isPf();
+        })
+        ->addColumn('spv_name', function($item) {
+            // return $item->sellin->employee->getSpvName();
+        })
+        ->addColumn('action', function ($item) {
+            $data = array(
+                'id'            => $item->id,
+                'qty'           => $item->qty
+            );
+
+            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
+            <button data-url=".route('sellin.delete', $item->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+            ";
+        })->make(true);
+
+    }
+
+	public function sellInDataOld(){
 
 		$str =  "
                 SELECT d.id, h.week, reg.name as region, ar.name as area, sar.name as sub_area, acc.name as account, cha.name as channel, str.name1 as store_name_1, str.name2 as store_name_2, emp.nik, emp.name as employee_name, h.date, pro.name as product_name, cat.name as category, d.qty as quantity, d.price as unit_price, (d.qty * d.price) as value, (d.qty * d.price * d.is_pf) as value_pf, spv.name as spv_name, str.id as storeId

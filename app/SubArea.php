@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class SubArea extends Model
 {
@@ -28,5 +29,10 @@ class SubArea extends Model
     public function employee()
     {
         return $this->hasMany('App\Employee', 'id_subarea');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }

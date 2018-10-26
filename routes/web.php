@@ -303,7 +303,7 @@ Route::prefix('report')->group(function () {
 	Route::prefix('sales')->group(function () {
 		Route::prefix('sellin')->group(function () {
 			Route::get('/', 'ReportController@sellInIndex')->name('sellin')->middleware('auth');
-			Route::get('/data', 'ReportController@sellInData')->name('sellin.data')->middleware('auth');
+			Route::post('/data', 'ReportController@sellInData')->name('sellin.data')->middleware('auth');
 			Route::post('/edit/{id}', 'ReportController@sellInUpdate')->name('sellin.edit')->middleware('auth');
 			Route::get('/delete/{id}', 'ReportController@sellInDelete')->name('sellin.delete')->middleware('auth');
 			Route::post('/add', 'ReportController@sellInAdd')->name('sellin.add')->middleware('auth');
@@ -342,6 +342,7 @@ Route::prefix('utility')->group(function () {
 Route::prefix('select2')->group(function () {
 	Route::post('/region-select2', 'RegionController@getDataWithFilters')->name('region-select2');
 	Route::post('/area-select2', 'AreaController@getDataWithFilters')->name('area-select2');
+	Route::post('/sub-area-select2', 'SubareaController@getDataWithFilters')->name('sub-area-select2');
 	Route::post('/employee-select2', 'EmployeeController@getDataWithFilters')->name('employee-select2');
 	Route::post('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
