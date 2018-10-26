@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Store")
+@section('title', "FAQ")
 @section('content')
 <div class="content">
-    <h2 class="content-heading pt-10">Store <small>Manage</small></h2>
+    <h2 class="content-heading pt-10">FAQ <small>Manage</small></h2>
     <div class="block block-themed"> 
         <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
             <h3 class="block-title">Datatables</h3>
@@ -11,28 +11,16 @@
             <div class="block-content block-content-full">
                 <div class="block-header p-0 mb-20">
                     <h3 class="block-title">
-                        <a href="{{ route('tambah.store') }}" class="btn btn-primary btn-square" title="Add Data Store"><i class="fa fa-plus mr-2"></i>Add Data</a>
+                        <a href="{{ route('tambah.faq') }}" class="btn btn-primary btn-square" title="Add Data Store"><i class="fa fa-plus mr-2"></i>Add Data</a>
                     </h3>
-                    <div class="block-option">
-                        <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                        <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
-                    </div>
                 </div>
-                <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="storetable">
+                <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="faqtable">
                     <thead>
                         <th class="text-center" style="width: 150px;">Action</th>
-                        <th width="200px">Name</th>
-                        <th width="200px">Optional Name</th>
-                        <th width="200px">Sub Area</th>
-                        <th width="200px">Account</th>
-                        <th>Distributor</th>
-                        <th>Store Panel</th>
-                        <th>Coverage</th>
-                        <th>Is Vito</th>
-                        <th>Delivery</th>
-                        <th>Longitude</th>
-                        <th>Latitude</th>
-                        <th width="200px">Address</th>
+                        <th width="200px">Question</th>
+                        <th width="200px">Answer</th>
+                        <th width="200px">Create</th>
+                        <th width="200px">Update</th>
                     </thead>
                 </table>
             </div> 
@@ -77,13 +65,10 @@
     });
     @endif
     $(function() {
-        $('#storetable').DataTable({
+        $('#faqtable').DataTable({
             processing: true,
             scrollX: true,
             drawCallback: function(){ 
-                $('.popup-image').magnificPopup({
-                    type: 'image',
-                });
                 $('.js-swal-delete').on('click', function(){
                     var url = $(this).data("url");
                     swal({
@@ -110,23 +95,15 @@
                     });
                 });
             },
-            ajax: '{!! route('store.data') !!}',
+            ajax: '{!! route('faq.data') !!}',
             serverSide: true,
             scrollY: "300px",
             columns: [  
             { data: 'action', name: 'action' },
-            { data: 'name1', name: 'name1' },
-            { data: 'name2', name: 'name2' },
-            { data: 'subarea', name: 'subarea' },
-            { data: 'account', name: 'account' },
-            { data: 'distributor', name: 'distributor' },
-            { data: 'store_panel', name: 'store_panel' },
-            { data: 'coverage', name: 'coverage' },
-            { data: 'is_vito', name: 'is_vito' },
-            { data: 'delivery', name: 'delivery' },
-            { data: 'longitude', name: 'longitude' },
-            { data: 'latitude', name: 'latitude' },
-            { data: 'address', name: 'address' },
+            { data: 'question', name: 'question' },
+            { data: 'answer', name: 'answer' },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'updated_at', name: 'updated_at' },
             ]
         });
     });
