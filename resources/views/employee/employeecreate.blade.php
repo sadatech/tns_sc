@@ -162,7 +162,7 @@
                 <div class="row">
                     <div class="form-group col-md-6" id="subarea" >
                         <label>Sub Area / Area</label>
-                        <select class="js-select form-control form-control-lg" style="width: 100%" name="subarea" id="subareaInput">
+                        <select class="js-select2 form-control form-control-lg" style="width: 100%" name="subarea[]" id="subareaInput">
                             <option disabled selected>Choose your Subarea</option>
                             @foreach($subarea as $data)
                             <option value="{{ $data->id }}">{{ $data->name }}</option>
@@ -339,49 +339,57 @@
     $('#position').on('change', e => {
         var select = $('#position').find(":selected").val()
         var status = $('#status').find(":selected").val()
-        if (select == {{ App\Position::where(['level' => 2])->first()->level }}) {
+        console.log(select);
+        if (select == "{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}") {
             $('#status').show();
             $('#subarea').hide();
             $('#pasarMobile').hide();
             $('#subareaInput').val(null);
             $('#status').val(null);
-        } else if (select == {{ App\Position::where(['level' => 1])->first()->level }}) {
+        } else if (select == "{{ App\Position::where(['level' => 'spgmtc'])->first()->id }}") {
             $('#status').show();
             $('#subarea').hide();
             $('#pasarMobile').hide();
             $('#subareaInput').val(null);
             $('#status').val(null);
-        } else if (select == {{ App\Position::where(['level' => 3])->first()->level }}) {
+        } else if (select == "{{ App\Position::where(['level' => 'spggtc'])->first()->id }}") {
             $('#pasarMobile').show();
             $('#status').hide();
             $('#subarea').hide();
             $('#subareaInput').val(null);
             $('#status').val(null);
-        } else if (select == {{ App\Position::where(['level' => 4])->first()->level }}) {
+            $('#storeStay').hide();
+            $('#storeMobile').hide();
+        } else if (select == "{{ App\Position::where(['level' => 'mdgtc'])->first()->id }}") {
             $('#pasarMobile').show();
             $('#status').hide();
             $('#subarea').hide();
             $('#subareaInput').val(null);
             $('#status').val(null);
-        } else if (select == {{ App\Position::where(['level' => 5])->first()->level }}) {
+            $('#storeStay').hide();
+            $('#storeMobile').hide();
+        } else if (select == "{{ App\Position::where(['level' => 'dc'])->first()->id }}") {
             $('#subarea').show();
             $('#status').hide();
-            $('#subarea').show();
             $('#storeStay').hide();
             $('#storeMobile').hide();
             $('#pasarMobile').hide();
             $('#status').val(null);
-        } else if (select == {{ App\Position::where(['level' => 6])->first()->level }}) {
+        } else if (select == "{{ App\Position::where(['level' => 'tlmtc'])->first()->id }}") {
             $('#status').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();
             $('#status').val(null);
         } else {
-            $('#pasarMobile').hide();
-            $('#subarea').hide();
             $('#status').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();
+            $('#status').val(null);
+            // $('#pasarMobile').hide();
+            // $('#subarea').hide();
+            // $('#status').hide();
+            // $('#storeStay').hide();
+            // $('#storeMobile').hide();
         }
     })
     $('#status').on('change', e => {

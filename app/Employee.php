@@ -60,6 +60,11 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
         return $this->hasMany('App\EmployeePasar', 'id_employee');
     }
 
+    public function employeeSubArea()
+    {
+        return $this->hasMany('App\EmployeeSubArea', 'id_employee');
+    }
+
     public function position()
     {
         return $this->belongsTo('App\Position', 'id_position');

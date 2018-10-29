@@ -16,7 +16,7 @@ use App\Brand;
 use App\Store;
 use App\Timezone;
 use App\Employee;
-use App\EmployeeStore;
+use App\EmployeeSubArea;
 use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
@@ -34,7 +34,8 @@ class DcController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false])->with(['agency', 'subarea', 'position', 'employeeStore', 'timezone'])
+		$employee = Employee::where(['isResign' => false, 'id_position' => 5])
+		->with(['agency', 'position', 'employeeSubArea', 'timezone'])
 		->select('employees.*');
 		// dd($employee->get()[0]);
 		return Datatables::of($employee)
@@ -51,27 +52,19 @@ class DcController extends Controller
 			// 	<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
 			// }
 		})
-		->addColumn('employeeStore', function($employee) {
-			$store = EmployeeStore::where(['id_employee' => $employee->id])->get();
-			$storeList = array();
-			foreach ($store as $data) {
-				$storeList[] = $data->store->name1;
+		->addColumn('employeeSubArea', function($employee) {
+			$subarea = EmployeeSubArea::where(['id_employee' => $employee->id])->get();
+			$subareaList = array();
+			foreach ($subarea as $data) {
+				$subareaList[] = $data->subarea->name;
 			}
-			return rtrim(implode(',', $storeList), ',');
+			return rtrim(implode(',', $subareaList), ',');
 		})
 		->addColumn('position', function($employee) {
 			return $employee->position->name;
 		})
 		->addColumn('timezone', function($employee) {
 			return $employee->timezone->name;
-		})
-		->addColumn('subarea', function($employee) {
-			if (isset($employee->subarea)) {
-				$subarea = $employee->subarea->name;
-			} else {
-				$subarea = "Without Area";
-			}
-			return $subarea;
 		})
 		->addColumn('agency', function($employee) {
 			return $employee->agency->name;
