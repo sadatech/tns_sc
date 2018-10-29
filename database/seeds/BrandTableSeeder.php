@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class BrandTableSeeder extends Seeder
 {
@@ -16,14 +15,5 @@ class BrandTableSeeder extends Seeder
         DB::table('brands')->insert([
             ['name' => 'SASA']
         ]);
-    	$faker = Faker::create();
-    	foreach(range(0,99) as $i){
-    		DB::table('brands')->insert([
-    			'name' => $faker->firstName,
-    			'keterangan' => $faker->sentence(rand(6,10), true),
-    			'created_at' => Carbon::now(),
-    			'updated_at' => Carbon::now()
-    		]);
-    	}
     }
 }
