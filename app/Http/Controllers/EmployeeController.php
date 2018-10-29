@@ -65,7 +65,7 @@ class EmployeeController extends Controller
 			'foto_tabungan' => 'max:10000|mimes:jpeg,jpg,bmp,png',
 			'name' 			=> 'required',
 			'password' 		=> 'required',
-			'position' 		=> 'required|numeric',
+			'position' 		=> 'required',
 			'agency' 		=> 'required|numeric',
 			'email' 		=> 'email|required',
 			'phone' 		=> 'required|numeric|unique:employees',
@@ -109,7 +109,7 @@ class EmployeeController extends Controller
 			} else {
 				$status = $request->input('status');
 			}
-			if (Position::where('level', $request->input('position'))->count() > 0) {
+			if (Position::where('id', $request->input('position'))->count() > 0) {
 				$insert = Employee::create([
 					'name' 			=> $request->input('name'),
 					'password' 		=> bcrypt($request->input('password')),
@@ -262,7 +262,7 @@ class EmployeeController extends Controller
 			'ktp'        			=> 	'required|numeric',
 			'phone'       			=> 	'required|numeric',
 			'agency'				=> 	'required|numeric',
-			'position'				=> 	'required|numeric',
+			'position'				=> 	'required',
 		];
 		$validator = Validator($data, $limit);
 		if ($validator->fails()){
@@ -318,7 +318,7 @@ class EmployeeController extends Controller
 			if ($request->input('status') == 'Mobile') {
 				$employee->status = $request->input('status');
 			}
-			if ($request->input('position') == Position::where(['level' => 'level 3'])->first()->id) {
+			if ($request->input('position') == Position::where(['level' => 'tlmtc'])->first()->id) {
 				$employee->id_subarea = $request->input('subarea');
 			}
 			$employee->name 		= $request->input('name');
