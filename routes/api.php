@@ -58,6 +58,11 @@ Route::prefix('availability')->group(function () {
 	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
 });
 
+// Outlet
+Route::prefix('outlet')->group(function () {
+	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
+});
+
 /**
  * Employee
  */
