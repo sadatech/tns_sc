@@ -12,7 +12,8 @@
         "predis/predis": "^1.1",
         "rap2hpoutre/fast-excel": "^0.9.0",
         "tymon/jwt-auth": "dev-develop",
-        "yajra/laravel-datatables-oracle": "~8.0"
+        "yajra/laravel-datatables-oracle": "~8.0",
+        "laravelcollective/html": "^5.4.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
