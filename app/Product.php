@@ -2,20 +2,47 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Components\traits\ValidationHelper;
 use App\Filters\QueryFilters;
 use DB;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class Product extends Model
 {
     use SoftDeletes;
+    use ValidationHelper;
     
-    protected $fillable = [
-        'name', 'deskripsi', 'id_brand', 'id_category'
-    ];
+    protected $guarded = ['sku_units'];
 
     protected $dates =['deleted_at'];
+
+    public static function boot(){
+        self::creating(function($model){
+            $model->id_brand = Brand::defaultBrand()->id;
+        });
+    }
+
+    public static function rule()
+    {
+        return [
+            'id_subcategory' => 'required|integer',
+            'name' => 'required|string',
+            'code' => 'required|string',
+            'panel' => 'required|string',
+            'stock_type_id' => 'required|integer',
+            'sku_units' => 'required'
+        ];
+    }
+
+    public static function getPanelOptions()
+    {
+        return [
+            'yes' => 'Yes',
+            'no' => 'No'
+        ];
+    }
 
     public function subcategory()
     {
@@ -25,6 +52,16 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo('App\Brand', 'id_brand');
+    }
+
+    public function stockType()
+    {
+        return $this->belongsTo(ProductStockType::class);
+    }
+
+    public function sku_units()
+    {
+        return $this->hasMany(ProductUnit::class);
     }
     
     public function prices()
