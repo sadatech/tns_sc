@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Outlet;
+use App\EmployeePasar;
 use JWTAuth;
 use Config;
+use DB;
 
 class OutletController extends Controller
 {
@@ -19,7 +21,7 @@ class OutletController extends Controller
 				$code = $e->getStatusCode();
 			} else {
 				$data = json_decode($request->getContent());
-				if (empty($data->pasar) || empty($data->name) || empty($data->phone)) {
+				if (empty($data->pasar) || empty($data->outlet)) {
 					$res['success'] = false;
 					$res['msg'] = "Data cannot be empty.";
 					$code = 200;
