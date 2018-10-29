@@ -299,11 +299,9 @@
   var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
   var selectedEmployees = [], selectedEmployeesId = [], selectedEmployeesName = [], tabIndex = 0;
   $(".js-select2").select2({ 
-    tags: true,
     dropdownParent: $("#importModal")
   });
   $(".js-edit").select2({ 
-    tags: true,
     dropdownParent: $("#editModal")
   });
   
@@ -428,7 +426,7 @@
                 "'></td>"+
                 "<td class='text-center'>"+
                 "<div class='btn-group'>"+
-                "<button type='button' class='btn btn-sm btn-secondary js-tooltip-enabled' data-toggle='tooltip' title=' data-original-title='Delete' onclick='deleteItem("+ employeeSplit[0] +")'>"+
+                "<button type='button' class='btn btn-sm btn-secondary js-tooltip-enabled' data-toggle='tooltip' title=' data-original-title='Delete' onclick='deleteItem2("+ employeeSplit[0] +")'>"+
                 "<i class='fa fa-times'></i>"+
                 "</button>"+
                 "</div>"+
@@ -437,6 +435,22 @@
         }else{
             console.log("Data Already Exist! data: "+employeeSplit[1]);
             notif('Warning',': Please the select Store first','warning');
+        }
+    }
+
+    function deleteItem2(id) {
+        var a = selectedEmployeesId.indexOf(''+id);
+        if (a >= 0) {
+            selectedEmployees.splice(a, 1);
+            selectedEmployeesId.splice(a, 1);
+            selectedEmployeesName.splice(a, 1);
+            tableIndex = 0;
+            $('#selectedEmployeeTableBody').html('');
+            $.each(selectedEmployees, function( index, value ) {
+              addItem2(value,'get2');
+          });
+        }else{
+            console.log("Index Item Not Found!");
         }
     }
 </script>

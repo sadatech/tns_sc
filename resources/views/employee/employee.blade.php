@@ -16,7 +16,6 @@
                     </h3>
                     <div class="block-option">
                         <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
-                        <button class="btn btn-danger btn-square float-right" type="submit"><i class="si si-trash mr-2"></i>Delete Data</button>
                     </div>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover" id="employeetable">

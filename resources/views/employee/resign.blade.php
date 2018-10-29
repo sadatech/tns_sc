@@ -17,14 +17,7 @@
         </div>
         <div class="block-content block-content-full">
             <div class="block-header p-0 mb-20">
-                <h3 class="block-title">
-                    <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                </h3>
-                <div class="block-options">
-                    <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
-                </div>
             </div>
-
             <table class="table table-striped table-vcenter js-dataTable-full" id="resigntable">
                 <thead class="text-center">
                     <th></th>
@@ -34,9 +27,6 @@
                     <th width="200px">No. KTP</th>
                     <th>Phone</th>
                     <th>Email</th>
-                    <th width="200px">No. Rekening</th>
-                    <th width="200px">Bank</th>
-                    <th>Status</th>
                     <th width="200px">Join Date</th>
                     <th>Agency</th>
                     <th>Gender</th>
@@ -53,7 +43,7 @@
     <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
+                <div class="block-header bg-gd-sun p-10">
                     <h3 class="block-title"><i class="fa fa-edit"></i> Rejoin Confirmation</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -177,7 +167,6 @@
     $(function() {
         $('#resigntable').DataTable({
             processing: true,
-            serverSide: true,
             scrollX: true,
             scrollY: "300px",
             ajax: '{!! route('resign.data') !!}',
@@ -189,9 +178,6 @@
             { data: 'ktp', name: 'ktp' },
             { data: 'phone', name: 'phone' },
             { data: 'email', name: 'email' },
-            { data: 'rekening', name: 'rekening' },
-            { data: 'bank', name: 'bank' },
-            { data: 'status', name: 'status' },
             { data: 'joinAt', name: 'joinAt' },
             { data: 'agency', name: 'agency' },
             { data: 'gender', name: 'gender' },

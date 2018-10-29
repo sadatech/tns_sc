@@ -209,6 +209,7 @@ Route::prefix('employee')->group(function () {
 		Route::get('/', 'RejoinController@baca')->name('rejoin')->middleware('auth');
 		Route::get('/data', 'RejoinController@data')->name('rejoin.data')->middleware('auth');
 		Route::post('/create', 'RejoinController@store')->name('rejoin.add')->middleware('auth');
+		Route::get('/export', 'RejoinController@export')->name('rejoin.export')->middleware('auth');
 	});
 });
 
