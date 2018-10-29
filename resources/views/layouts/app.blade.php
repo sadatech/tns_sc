@@ -30,7 +30,13 @@
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/emoji.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/codebase.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/js/plugins/summernote/summernote-bs4.css') }}">
+
+    @yield('select2-plugins-resource')
+
     @yield('css')
+
+    @stack('additional-css')
 </head>
 <body>
 
@@ -138,6 +144,8 @@
     <script src="{{ asset('assets/js/plugins/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/select2/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/summernote/summernote-bs4.min.js') }}"></script>
     @yield('script')
+    @stack('additional-js')
 </body>
 </html>

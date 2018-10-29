@@ -15,12 +15,6 @@ class CreateTimezonesTable extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-
-        DB::table('timezones')->insert([
-            ['name' => 'WIB', 'timezone' => 'Asia/Jakarta'],
-            ['name' => 'WITA', 'timezone' => 'Asia/Makassar'],
-            ['name' => 'WIT', 'timezone' => 'Asia/Jayapura'],
-        ]);
     }
 
     public function down()
