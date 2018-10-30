@@ -134,14 +134,6 @@ class EmployeeController extends Controller
 					'id_agency' 	=> $request->input('agency')
 				]);
 				if ($insert->id) {
-							// $dataBrand = array();
-							// 	foreach ($request->input('brand') as $brand) {
-							// 		$dataBrand[] = array(
-							// 			'id_brand'    			=> $brand,
-							// 			'id_employee'          	=> $insert->id
-							// 		);
-							// 	}
-							// 	DB::table('employee_brands')->insert($dataBrand);
 					if ($request->input('status') == 'Stay') {
 						EmployeeStore::create([
 							'id_store' 		=> $request->input('store'),
@@ -177,7 +169,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_pasars')->insert($dataPasar);
-						return redirect()->route('employee')
+						return redirect()->route('employee.pasar')
 						->with([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
@@ -192,7 +184,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_sub_areas')->insert($dataSubArea);
-						return redirect()->route('employee')
+						return redirect()->route('employee.pasar')
 						->with([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
