@@ -26,7 +26,7 @@
                     <img class="img-avatar img-avatar32" src="{{ asset('assets/media/avatars/avatar15.jpg') }}" alt="">
                 </div>
                 <div class="sidebar-mini-hidden-b text-center">
-                    <a class="img-link" href="be_pages_generic_profile.html">
+                    <a class="img-link" href="">
                         <img class="img-avatar" src="{{ asset('assets/media/avatars/avatar15.jpg') }}" alt="">
                     </a>
                     <ul class="list-inline mt-10">
@@ -110,16 +110,16 @@
                                 <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">Employee</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('employee/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">Employee Pasar</a>
+                                <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">MD & SPG</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('employee/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
+                                <a class="{{ request()->is('employee/summary/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
                             </li>
                             <li>
                                 <a class="{{ request()->is('employee/resign') ? 'active' : '' }}" href="{{ route('resign') }}">Resign</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('employee/rejoin') ? 'active' : '' }}" href="{{ route('rejoin') }}">Rejoin</a>
+                                <a class="{{ request()->is('employee/rejoin') ? 'active' : '' }}" href="{{ route('rejoin') }}">Turn Over</a>
                             </li>
                         </ul>
                     </li>

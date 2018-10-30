@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
-use Auth;
 use DB;
+use Auth;
+use File;
+use Excel;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
@@ -17,7 +19,6 @@ use App\Timezone;
 use App\Employee;
 use App\Pasar;
 use App\EmployeeStore;
-use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
 class EmployeeController extends Controller
@@ -69,12 +70,13 @@ class EmployeeController extends Controller
 			'agency' 		=> 'required|numeric',
 			'email' 		=> 'email|required',
 			'phone' 		=> 'required|numeric|unique:employees',
-			'nik' 			=> 'required',
+			'nik' 			=> 'required|unique:employees',
 			'ktp' 			=> 'required|numeric|unique:employees',
 			'gender' 		=> 'required',
 			'education' 	=> 'required',
 			'birthdate' 	=> 'required|date',
 			'timezone'		=> 'required',
+			'joinAt'		=> 'required'
 		];
 		$validator = Validator($data, $limit);
 		if ($validator->fails()){
@@ -123,7 +125,7 @@ class EmployeeController extends Controller
 					'birthdate' 	=> $request->input('birthdate'),
 					'gender' 		=> $request->input('gender'),
 					'status' 		=> $status,
-					'joinAt' 		=> Carbon::now(),
+					'joinAt' 		=> $request->input('joinAt'),
 					'foto_ktp' 		=> $foto_ktp,
 					'foto_tabungan' => $foto_tabungan,
 					'foto_profile' => $foto_profile,
@@ -354,5 +356,51 @@ class EmployeeController extends Controller
 			'title'   => 'Sukses!<br/>',
 			'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
 		]);
+	}
+
+	public function export()
+    {
+        $emp = Employee::where('isResign', false)
+		->orderBy('created_at', 'DESC')
+		->get();
+		$dataBrand = array();
+        foreach ($emp as $val) {
+			$store = EmployeeStore::where(
+				'id_employee', $val->id
+				)->get();
+			$storeList = array();
+			foreach($store as $dataStore) {
+				if(isset($dataStore->id_store)) {
+					$storeList[] = $dataStore->store->name1;
+				} else {
+					$storeList[] = "-";
+				}
+			}
+        	$data[] = array(
+        	    'NIK'          	=> $val->nik,
+        	    'Name'          => $val->name,
+        	    'KTP'         	=> $val->ktp,
+        	    'Phone'         => $val->phone,
+				'Email'     	=> $val->email,
+				'Timezone'		=> $val->timezone->name,
+        	    'Rekening'      => (isset($val->rekening) ? $val->rekening : "-"),
+        	    'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
+				'Join Date'		=> $val->joinAt,
+				'Agency'		=> $val->agency->name,
+				'SubArea'		=> (isset($val->subarea->name) ? $val->subarea->name : "-"),
+				'Gender'		=> $val->education,
+				'Birthdate'		=> $val->birthdate,
+				'Position'		=> $val->position->name,
+				'Status'		=> (isset($val->status) ? $val->status : "-"),
+				'Store'			=> rtrim(implode(',', $storeList), ',') ? rtrim(implode(',', $storeList), ',') : "-"
+        	);
+		}
+        $filename = "employee_".Carbon::now().".xlsx";
+        return Excel::create($filename, function($excel) use ($data) {
+            $excel->sheet('Employee', function($sheet) use ($data)
+            {
+                $sheet->fromArray($data);
+            });
+        })->download();
 	}
 }

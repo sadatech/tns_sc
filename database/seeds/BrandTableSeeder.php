@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class BrandTableSeeder extends Seeder
 {

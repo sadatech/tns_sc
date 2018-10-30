@@ -194,6 +194,9 @@ Route::prefix('employee')->group(function () {
 		Route::get('/data', 'EmployeeController@data')->name('employee.data')->middleware('auth');
 		Route::get('/data/pasar', 'Employee\PasarController@data')->name('employee.data.pasar')->middleware('auth');
 		Route::get('/data/dc', 'Employee\DcController@data')->name('employee.data.dc')->middleware('auth');
+
+		//Export Import
+		Route::get('/export', 'EmployeeController@export')->name('employee.export')->middleware('auth');
 	});
 
 	//Resign Pages
@@ -209,6 +212,7 @@ Route::prefix('employee')->group(function () {
 		Route::get('/', 'RejoinController@baca')->name('rejoin')->middleware('auth');
 		Route::get('/data', 'RejoinController@data')->name('rejoin.data')->middleware('auth');
 		Route::post('/create', 'RejoinController@store')->name('rejoin.add')->middleware('auth');
+		Route::get('/export', 'RejoinController@export')->name('rejoin.export')->middleware('auth');
 	});
 });
 

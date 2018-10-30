@@ -22,31 +22,31 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>NIK</label>
-                        <input type="text" class="form-control" name="nik" placeholder="Add new employee" required>
+                        <input type="text" class="form-control" name="nik" value="{{ old('nik') }}" placeholder="Add new nik" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Name</label>
-                        <input type="text" class="form-control" name="name" placeholder="Add new employee" required>
+                        <input type="text" class="form-control" name="name" value="{{ old('name') }}" placeholder="Add new employee" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>No. KTP</label>
-                        <input type="text" id="numKtp" onblur="checkLength(this)" class="form-control" name="ktp" placeholder="Add new employee"  minlength="16" maxlength="16" required>
+                        <input type="text" id="numKtp" onblur="checkLength(this)" value="{{ old('ktp') }}" class="form-control" name="ktp" placeholder="Add new KTP"  minlength="16" maxlength="16" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Phone</label>
-                        <input type="text" id="numPhone" class="form-control" name="phone" placeholder="Add new employee" required>
+                        <input type="text" id="numPhone" class="form-control" name="phone" value="{{ old('phone') }}" placeholder="Add new phone" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>Email</label>
-                        <input type="email" class="form-control" name="email" placeholder="Add new employee" required>
+                        <input type="email" class="form-control" name="email" value="{{ ('email') }}" placeholder="Add new email" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Password</label>
-                        <input type="password" class="form-control" name="password" placeholder="Add new password" required>
+                        <input type="password" class="form-control" name="password" value="{{ old('password') }}" placeholder="Add new password" required>
                     </div>
                 </div>
                 <div class="row">
@@ -54,34 +54,47 @@
                         <label>Gender</label>
                         <select class="form-control form-control-lg" name="gender" required>
                             <option value="" disabled selected>Choose your Gender</option>
-                            <option value="Laki-laki">Laki - Laki</option>
-                            <option value="Perempuan">Perempuan</option>
+                            <option value="Laki-laki" @if (old('gender') == "Laki-laki") {{ 'selected' }} @endif>Male</option>
+                            <option value="Perempuan" @if (old('gender') == "Perempuan") {{ 'selected' }} @endif>Female</option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Education</label>
                         <select class="form-control form-control-lg" name="education" required>
                             <option value="" disabled selected>Choose your Education</option>
-                            <option value="SD">SD</option>
-                            <option value="SMP">SMP</option>
-                            <option value="SLTA">SLTA</option>
-                            <option value="D1">D1</option>
-                            <option value="D2">D2</option>
-                            <option value="D3">D3</option>
-                            <option value="S1/D4">S1/D4</option>
-                            <option value="S2">S2</option>
+                            <option value="SD" @if (old('education') == "SD") {{ 'selected' }} @endif>SD</option>
+                            <option value="SMP" @if (old('education') == "SMP") {{ 'selected' }} @endif>SMP</option>
+                            <option value="SLTA" @if (old('education') == "SLTA") {{ 'selected' }} @endif>SLTA</option>
+                            <option value="D1" @if (old('education') == "D1") {{ 'selected' }} @endif>D1</option>
+                            <option value="D2" @if (old('education') == "D2") {{ 'selected' }} @endif>D2</option>
+                            <option value="D3" @if (old('education') == "D3") {{ 'selected' }} @endif>D3</option>
+                            <option value="S1/D4" @if (old('education') == "S1/D4") {{ 'selected' }} @endif>S1/D4</option>
+                            <option value="S2" @if (old('education') == "S2") {{ 'selected' }} @endif>S2</option>
                         </select>
                     </diV>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>Tanggal Lahir</label>
-                        <input class="js-datepicker form-control" type="date" name="birthdate" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                        <input class="js-datepicker form-control" value="{{ old('birthdate') }}" type="text" name="birthdate" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label>Join Date</label>
+                        <input class="js-datepicker form-control" type="text" value="{{ old('joinAt') }}" name="joinAt" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-md-6">
                         <label>Foto KTP</label>
                         <div class="custom-file">
                             <input type="file" name="foto_ktp" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp" required>
+                            <label class="custom-file-label">Pilih Foto</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Foto Profile</label>
+                        <div class="custom-file">
+                            <input type="file" name="foto_profile" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp" required>
                             <label class="custom-file-label">Pilih Foto</label>
                         </div>
                     </div>
@@ -95,13 +108,6 @@
                                 <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Foto Profile</label>
-                        <div class="custom-file">
-                            <input type="file" name="foto_profile" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp" required>
-                            <label class="custom-file-label">Pilih Foto</label>
-                        </div>
                     </div>
                 </div>
             </div>
