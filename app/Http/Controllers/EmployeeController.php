@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
-use Auth;
 use DB;
+use Auth;
+use File;
+use Excel;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
@@ -17,7 +19,6 @@ use App\Timezone;
 use App\Employee;
 use App\Pasar;
 use App\EmployeeStore;
-use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
 class EmployeeController extends Controller
@@ -364,21 +365,9 @@ class EmployeeController extends Controller
 		->get();
 		$dataBrand = array();
         foreach ($emp as $val) {
-			$spv = EmployeeSpv::where(
-				'id_employee', $val->id
-				)->get();
 			$store = EmployeeStore::where(
 				'id_employee', $val->id
 				)->get();
-			$spvList = array();
-			foreach ($spv as $dataSPV) {
-				if(isset($dataSPV->id_user))
-				{
-					$spvList[] = $dataSPV->id_user;
-				} else {
-					$spvList[] = "-";
-				}
-			}
 			$storeList = array();
 			foreach($store as $dataStore) {
 				if(isset($dataStore->id_store)) {
@@ -403,8 +392,7 @@ class EmployeeController extends Controller
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
 				'Status'		=> (isset($val->status) ? $val->status : "-"),
-				'Store'			=> rtrim(implode(',', $storeList), ',') ? rtrim(implode(',', $storeList), ',') : "-",
-				'SPV'			=> rtrim(implode(',', $spvList), ',') ? rtrim(implode(',', $spvList), ',') : "-"
+				'Store'			=> rtrim(implode(',', $storeList), ',') ? rtrim(implode(',', $storeList), ',') : "-"
         	);
 		}
         $filename = "employee_".Carbon::now().".xlsx";
