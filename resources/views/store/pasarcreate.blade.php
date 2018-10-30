@@ -30,7 +30,7 @@
                         <input type="text" class="form-control" name="name" placeholder="Add new name" required>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Sub Area/ Area</label>
+                        <label>Area / Sub-area</label>
                         <select class="js-select2 form-control" name="subarea" required>
                             <option value="" disabled selected>Choose your Subarea</option>
                             @foreach($subarea as $data)
