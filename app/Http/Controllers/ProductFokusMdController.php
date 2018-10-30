@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Area;
 use App\Product;
-use App\ProductFokus;
+use App\ProductFokusMd;
 use Auth;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Yajra\Datatables\Datatables;
-class ProductFokusController extends Controller
+
+class ProductFokusMdController extends Controller
 {
     private $alert = [
         'type' => 'success',
@@ -18,13 +20,13 @@ class ProductFokusController extends Controller
 
     public function baca()
     {
-        return view('product.fokus');
+        return view('product.fokusMD');
     }
 
     public function data()
     {
-        $product = ProductFokus::with(['product','area'])
-        ->select('product_fokuses.*');
+        $product = ProductFokusMd::with(['product','area'])
+        ->select('product_fokus_mds.*');
         return Datatables::of($product)
         ->addColumn('area', function($product) {
 			if (isset($product->area)) {
@@ -48,7 +50,7 @@ class ProductFokusController extends Controller
                 'to'          	=> $product->to
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('fokus.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            <button data-url=".route('fokusMD.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })->make(true);
     }
 
@@ -56,7 +58,7 @@ class ProductFokusController extends Controller
     {
         $data = $request->all();
 
-        if (($validator = ProductFokus::validate($data))->fails()) {
+        if (($validator = ProductFokusMd::validate($data))->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -65,13 +67,13 @@ class ProductFokusController extends Controller
         $to = explode('/', $data['to']);
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data)) {
+        if (ProductFokusMd::hasActivePF($data)) {
             $this->alert['type'] = 'warning';
             $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus MD sudah ada!';
         } else {
-            ProductFokus::create($data);
-            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
+            ProductFokusMd::create($data);
+            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus MD!';
         }
 
         return redirect()->back()->with($this->alert);
@@ -80,7 +82,7 @@ class ProductFokusController extends Controller
     public function update(Request $request, $id) 
     {
         $data = $request->all();
-        $product = ProductFokus::findOrFail($id);
+        $product = ProductFokusMd::findOrFail($id);
 
         if (($validator = $product->validate($data))->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -91,13 +93,13 @@ class ProductFokusController extends Controller
         $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data, $product->id)) {
+        if (ProductFokusMd::hasActivePF($data, $product->id)) {
             $this->alert['type'] = 'warning';
             $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus MD sudah ada!';
         } else {
             $product->fill($data)->save();
-            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!';
+            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus MD!';
         }
 
         return redirect()->back()->with($this->alert);
@@ -105,7 +107,7 @@ class ProductFokusController extends Controller
 
     public function delete($id)
     {
-        $product = ProductFokus::find($id);
+        $product = ProductFokusMd::find($id);
             $product->delete();
             return redirect()->back()
             ->with([

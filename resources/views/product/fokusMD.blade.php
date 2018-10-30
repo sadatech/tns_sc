@@ -114,7 +114,7 @@
                     });
                   });
               },
-              ajax: '{!! route('fokus.data') !!}',
+              ajax: '{!! route('fokusMD.data') !!}',
               scrollY: "300px",
               columns: [
 	            { data: 'id', name: 'id' },
