@@ -184,7 +184,7 @@ class PasarController extends Controller
                                 'longitude'         => (isset($row->longitude)? $row->longitude : "-"),
                                 'latitude'          => (isset($row->latitude) ? $row->latitude : "-"),
                                 'address'           => $row->address
-                            ]);
+                            ])->id;
                         } else {
                             return false;
                         }
