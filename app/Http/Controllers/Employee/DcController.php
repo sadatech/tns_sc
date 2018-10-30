@@ -104,4 +104,151 @@ class DcController extends Controller
             });
         })->download();
 	}
+
+	public function import(Request $request)
+    {
+        $id_company = Auth::user()->id_company;
+        $this->validate($request, [
+            'file' =>   'required'
+        ]);
+
+        $transaction = DB::transaction(function () use ($request, $id_company) {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+            if($request->hasFile('file')){
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($id_company)
+                {
+                    foreach($results as $row)
+                    {
+                        echo "$row<hr>";
+
+						$dataAgency['agency_name']   = $row->agency;
+						$id_agency = $this->findAgenc($dataAgency);
+						
+                        $insert = Employee::create([
+							'foto_ktp' 			=> "default.png",
+							'foto_tabungan'		=> "default.png",
+							'foto_profile' 		=> "default.png",
+                            'name'             	=> $row->name,
+							'nik'              	=> $row->nik,
+							'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
+							'phone'				=> (isset($row->phone) ? $row->phone : "-"),
+							'email'				=> (isset($row->email) ? $row->email : "-"),
+							'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
+							'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
+							'birthdate'			=> Carbon::now(),
+							'id_agency'			=> $id_agency,
+							'id_position'       => 5,
+						]);
+						if ($insert) {
+                            $dataSub = array();
+                            $listSub = explode(",", $row->subarea);
+                            foreach ($listSub as $sub) {
+                                $dataSub[] = array(
+                                    'id_subarea'    	=> $this->findSub($sub),
+                                    'id_employee'       => $insert->id
+                                );
+                            }
+							DB::table('employee_sub_areas')->insert($dataSub);
+                        }
+                    }
+                },false);
+            }
+            return 'success';
+        });
+
+        if ($transaction == 'success') {
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
+            ]);
+        }else{
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+            ]);
+        }
+	}
+
+	public function findAgen($data)
+    {
+        $dataAgency = Agency::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['agency_name']))."'")->get();
+        if ($dataAgency != null) {
+            $agency = Agency::create([
+              'name'        => $data['agency_name']
+          ]);
+            $id_agency = $agency->id;
+        } else {
+            $id_agency = $dataAgency->first()->id;
+        }
+        return $id_agency;
+    }
+
+	
+	public function findSub($data)
+    {
+        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
+        if ($dataSub->count() < 1 ) {
+
+            $dataSub['area_name']  = $data['area_name'];
+            $dataSub['region_name']  = $data['region_name'];
+            $id_area = $this->findArea($dataSub);
+            $subarea = Subarea::create([
+              'name'        => $data['subarea_name'],
+              'id_area'     => $id_area
+          ]);
+            $id_subarea = $subarea->id;
+        }else{
+            $id_subarea = $dataSub->first()->id;
+        }
+        return $id_subarea;
+    }
+
+
+    public function findArea($data)
+    {
+        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
+        if ($dataArea->count() == 0) {
+            
+            $dataRegion['region_name']  = $data['region_name'];
+            $id_region = $this->findRegion($dataRegion);
+
+            $area = Area::create([
+              'name'        => $data['area_name'],
+              'id_region'   => $id_region,
+            ]);
+            $id_area = $area->id;
+        }else{
+            $id_area = $dataArea->first()->id;
+        }
+      return $id_area;
+    }
+
+    public function findRegion($data)
+    {
+        $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
+        if ($dataRegion->count() == 0) {
+            
+            $region = Region::create([
+              'name'        => $data['region_name'],
+            ]);
+            $id_region = $region->id;
+        }else{
+            $id_region = $dataRegion->first()->id;
+        }
+      return $id_region;
+	}
+	
 }
