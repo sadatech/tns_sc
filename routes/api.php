@@ -66,6 +66,7 @@ Route::prefix('pasar')->group(function () {
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
+	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
 });
 
 /**
