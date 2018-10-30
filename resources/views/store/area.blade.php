@@ -52,23 +52,19 @@
         {!! method_field('PUT') !!}
         {!! csrf_field() !!}
         <div class="block-content">
-          <div class="row">
-            <div class="form-group col-md-12">
-              <label>Area Name</label>
-              <input type="text" class="form-control" name="name" id="nameInput" required>
-            </div>
+          <div class="form-group">
+            <label>Area Name</label>
+            <input type="text" class="form-control" name="name" id="nameInput" required>
           </div>
-          <div class="row">
-            <div class="col-md-12 col-sm-12" style="padding: 0">
-              <label class="col-md-12 col-sm-12" style="padding: 0">Region</label>
-              <div class="input-group mb-3 col-sm-12 col-md-12" style="padding: 0">
-                <div class="col-md-8 col-sm-12" style="padding: 0">
-                  <select class="form-control" style="width: 100%" name="region" id="regionInput" required>
-                  </select>
-                </div>
-                <div class="input-group-append col-md-4 col-sm-12" style="padding: 0">
-                  <a href="{{ route('region') }}" target="_blank" class="btn btn-primary btn-square" style="width: 100%;"><i class="fa fa-plus mr-2"></i>Add Region</a>
-                </div>
+          <div class="col-md-12 col-sm-12" style="padding: 0">
+            <label class="col-md-12 col-sm-12" style="padding: 0">Region</label>
+            <div class="input-group mb-3 col-sm-12 col-md-12" style="padding: 0">
+              <div class="col-md-8 col-sm-12" style="padding: 0">
+                <select class="form-control" style="width: 100%" name="region" id="regionInput" required>
+                </select>
+              </div>
+              <div class="input-group-append col-md-4 col-sm-12" style="padding: 0">
+                <a href="{{ route('region') }}" target="_blank" class="btn btn-primary btn-square" style="width: 100%;"><i class="fa fa-plus mr-2"></i>Add Region</a>
               </div>
             </div>
           </div>
