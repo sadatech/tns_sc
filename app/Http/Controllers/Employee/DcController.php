@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
-use Auth;
 use DB;
+use Auth;
+use File;
+use Excel;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
@@ -17,7 +18,6 @@ use App\Store;
 use App\Timezone;
 use App\Employee;
 use App\EmployeeSubArea;
-use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
 class DcController extends Controller
@@ -69,5 +69,39 @@ class DcController extends Controller
 		->addColumn('agency', function($employee) {
 			return $employee->agency->name;
 		})->make(true);
+	}
+
+	public function export()
+    {
+        $emp = Employee::where([
+		'isResign' => false, 
+		'id_position' => 5
+		])->orderBy('created_at', 'DESC')
+		->get();
+		foreach ($emp as $val) {
+        	$data[] = array(
+        	    'NIK'          	=> $val->nik,
+        	    'Name'          => $val->name,
+        	    'KTP'         	=> $val->ktp,
+        	    'Phone'         => $val->phone,
+				'Email'     	=> $val->email,
+				'Timezone'		=> $val->timezone->name,
+        	    'Rekening'      => (isset($val->rekening) ? $val->rekening : "-"),
+        	    'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
+				'Join Date'		=> $val->joinAt,
+				'Agency'		=> $val->agency->name,
+				'SubArea'		=> (isset($val->subarea->name) ? $val->subarea->name : "-"),
+				'Gender'		=> $val->education,
+				'Birthdate'		=> $val->birthdate,
+				'Position'		=> $val->position->name
+			);
+		}
+        $filename = "employeeDemoCooking_".Carbon::now().".xlsx";
+        return Excel::create($filename, function($excel) use ($data) {
+            $excel->sheet('Employee', function($sheet) use ($data)
+            {
+                $sheet->fromArray($data);
+            });
+        })->download();
 	}
 }
