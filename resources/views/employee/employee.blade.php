@@ -15,7 +15,7 @@
                         <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
                     </h3>
                     <div class="block-option">
-                        <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+                        <a href="{{ route('employee.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover" id="employeetable">

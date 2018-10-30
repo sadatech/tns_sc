@@ -80,7 +80,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label>Join Date</label>
-                        <input class="js-datepicker form-control" type="text" name="joinAt" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                        <input class="js-datepicker form-control" type="text" value="{{ old('joinAt') }}" name="joinAt" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
                     </div>
                 </div>
                 <div class="row">
