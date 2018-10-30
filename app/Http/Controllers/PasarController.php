@@ -164,7 +164,7 @@ class PasarController extends Controller
                 $file = $request->file('file')->getRealPath();
                 $ext = '';
                 
-                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
                     foreach($results as $row)
                     {
@@ -174,13 +174,20 @@ class PasarController extends Controller
                         $dataSub['region_name']    = $row->region;
                         $id_subarea = $this->findSub($dataSub);
 
-                         Pasar::create([
-                            'name'              => $row->pasar,
-                            'id_subarea'        => $id_subarea,
-                            'longitude'         => (isset($row->longitude)? $row->longitude : "-"),
-                            'latitude'          => (isset($row->latitude) ? $row->latitude : "-"),
-                            'address'           => $row->address
-                        ]);
+                        $data1 = SubArea::where(['id' => $id_subarea])->first();
+                        $check = Pasar::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->pasar))."'")
+                        ->where(['id_subarea' => $data1->id])->count();
+                        if ($check < 1) {
+                            Pasar::create([
+                                'name'              => $row->pasar,
+                                'id_subarea'        => $id_subarea,
+                                'longitude'         => (isset($row->longitude)? $row->longitude : "-"),
+                                'latitude'          => (isset($row->latitude) ? $row->latitude : "-"),
+                                'address'           => $row->address
+                            ])->id;
+                        } else {
+                            return false;
+                        }
                     }
                 },false);
             }
@@ -206,64 +213,57 @@ class PasarController extends Controller
 
     public function findSub($data)
     {
-        $dataSub = SubArea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
-        if ($dataSub->count() < 1) {
+        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
+        if ($dataSub->count() < 1 ) {
+
             $dataSub['area_name']  = $data['area_name'];
             $dataSub['region_name']  = $data['region_name'];
             $id_area = $this->findArea($dataSub);
-            if ($id_area) {
-                $subarea = SubArea::create([
-                    'name'        => $data['subarea_name'],
-                    'id_area'     => $id_area
-                ]);
-                $id_subarea = $subarea->id;
-                if ($id_subarea) {
-                    return $id_subarea;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } else {
-            return $dataSub->first()->id;;
+            $subarea = Subarea::create([
+              'name'        => $data['subarea_name'],
+              'id_area'     => $id_area
+          ]);
+            $id_subarea = $subarea->id;
+        }else{
+            $id_subarea = $dataSub->first()->id;
         }
+        return $id_subarea;
     }
 
+
     public function findArea($data)
-    {  
-        $dataRegion['region_name']  = $data['region_name'];
-        $id_region = $this->findRegion($dataRegion);
-        $data1 = Region::where(['id' => $id_region])->first();
-        $dataArea = Area::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['area_name']))."'")
-        ->where(['id_region' => $data1->id]);
-        if ($dataArea->count() < 1) {
+    {
+        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
+        if ($dataArea->count() == 0) {
+            
+            $dataRegion['region_name']  = $data['region_name'];
+            $id_region = $this->findRegion($dataRegion);
+
             $area = Area::create([
               'name'        => $data['area_name'],
               'id_region'   => $id_region,
-          ]);
+            ]);
             $id_area = $area->id;
-        } else {
-            return false;
+        }else{
+            $id_area = $dataArea->first()->id;
         }
-        return $id_area;
+      return $id_area;
     }
 
     public function findRegion($data)
     {
-        $dataRegion = Region::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['region_name']))."'");
+        $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
         if ($dataRegion->count() == 0) {
-
+            
             $region = Region::create([
               'name'        => $data['region_name'],
-          ]);
+            ]);
             $id_region = $region->id;
         }else{
             $id_region = $dataRegion->first()->id;
         }
-        return $id_region;
+      return $id_region;
     }
-
     public function exportXLS()
     {
         $pasar = Pasar::orderBy('created_at', 'DESC')->get();
