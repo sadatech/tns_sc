@@ -264,6 +264,7 @@ class PasarController extends Controller
         }
       return $id_region;
     }
+    
     public function exportXLS()
     {
         $pasar = Pasar::orderBy('created_at', 'DESC')->get();
