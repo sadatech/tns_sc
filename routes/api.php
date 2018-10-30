@@ -58,9 +58,15 @@ Route::prefix('availability')->group(function () {
 	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
 });
 
+// Pasar
+Route::prefix('pasar')->group(function () {
+	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');
+});
+
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
+	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
 });
 
 /**
