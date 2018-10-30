@@ -202,11 +202,11 @@ class SubareaController extends Controller
  
         $subarea = SubArea::orderBy('created_at', 'DESC')->get();
         $filename = "subareas_".Carbon::now().".xlsx";
-        (new FastExcel($subarea))->setHeaderStyle(true, 16, Color::YELLOW, false, Color::BLUE)->download($filename, function ($subarea) {
+        (new FastExcel($subarea))->download($filename, function ($subarea) {
             return [
-                'Name' => $subarea->name,
-                'Region' => $subarea->area->region->name,
-                'Area' => $subarea->area->name
+                'Sub Area'  => $subarea->name,
+                'Area'      => $subarea->area->name,
+                'Region'    => $subarea->area->region->name
             ];
         });
     }

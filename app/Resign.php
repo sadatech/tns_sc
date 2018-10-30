@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Resign extends Model
 {
 	protected $fillable = [
-		'id_store', 'resign_date', 'effective', 'alasan', 'penjelasan'
+		'id_store', 'resign_date', 'effective', 'alasan', 'penjelasan', 'id_employee'
 	];
 
 	public function resignStore()

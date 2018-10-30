@@ -209,6 +209,7 @@ Route::prefix('employee')->group(function () {
 		Route::get('/', 'RejoinController@baca')->name('rejoin')->middleware('auth');
 		Route::get('/data', 'RejoinController@data')->name('rejoin.data')->middleware('auth');
 		Route::post('/create', 'RejoinController@store')->name('rejoin.add')->middleware('auth');
+		Route::get('/export', 'RejoinController@export')->name('rejoin.export')->middleware('auth');
 	});
 });
 
@@ -241,6 +242,15 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'SubCategoryController@store')->name('sub-category.add')->middleware('auth');
 		Route::put('/update/{id}', 'SubCategoryController@update')->name('sub-category.update')->middleware('auth');
 		Route::get('/delete/{id}', 'SubCategoryController@delete')->name('sub-category.delete')->middleware('auth');
+	});
+
+	//SKU Unit Pages
+	Route::prefix('sku-unit')->group(function () {
+		Route::get('/', 'SkuUnitController@baca')->name('sku-unit')->middleware('auth');
+		Route::get('/data', 'SkuUnitController@data')->name('sku-unit.data')->middleware('auth');
+		Route::post('/create', 'SkuUnitController@store')->name('sku-unit.add')->middleware('auth');
+		Route::put('/update/{id}', 'SkuUnitController@update')->name('sku-unit.update')->middleware('auth');
+		Route::get('/delete/{id}', 'SkuUnitController@delete')->name('sku-unit.delete')->middleware('auth');
 	});
 
 	//Product Summary Pages

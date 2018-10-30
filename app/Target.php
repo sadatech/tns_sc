@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Target extends Model
 {
-    protected $fillable = [
-        'id_employee', 'id_store', 'rilis', 'value', 'valuepf'
-    ];
+    protected $fillable = ['id_employee', 'id_store', 'rilis', 'value', 'value_pf'];
 
     public function targetDetail()
     {
