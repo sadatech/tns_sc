@@ -2,7 +2,7 @@
 @section('title', "Employee MD & SPG")
 @section('content')
 <div class="content">
-    <h2 class="content-heading pt-10">Employee MD & SPG <small>Manage</small></h2>
+    <h2 class="content-heading pt-10">MD & SPG <small>Manage</small></h2>
     <div class="block block-themed"> 
         <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
             <h3 class="block-title">Datatables</h3>
