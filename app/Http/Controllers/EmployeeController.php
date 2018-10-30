@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
-use Auth;
 use DB;
+use Auth;
+use File;
+use Excel;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
@@ -17,7 +19,6 @@ use App\Timezone;
 use App\Employee;
 use App\Pasar;
 use App\EmployeeStore;
-use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
 class EmployeeController extends Controller
@@ -304,15 +305,15 @@ class EmployeeController extends Controller
 				$employee->foto_tabungan = $foto_tabungan;
 			}
 				// if ($request->input('brand')) {
-    //                 foreach ($request->input('brand') as $brand) {
-    //                     EmployeeBrand::where('id_employee', $id)->delete();
-    //                     $dataStore[] = array(
-    //                         'id_brand'    			=> $brand,
-    //                         'id_employee'          	=> $id,
-    //                     );
-    //                 }
-    //                 DB::table('employee_brands')->insert($dataStore);
-    //             }
+                    // foreach ($request->input('brand') as $brand) {
+                        // EmployeeBrand::where('id_employee', $id)->delete();
+                        // $dataStore[] = array(
+                            // 'id_brand'    			=> $brand,
+                            // 'id_employee'          	=> $id,
+                        // );
+                    // }
+                    // DB::table('employee_brands')->insert($dataStore);
+                // }
 			if ($request->input('status') == 'Stay') {
 				$employee->status = $request->input('status');
 			}
@@ -359,26 +360,15 @@ class EmployeeController extends Controller
 
 	public function export()
     {
-        $emp = Employee::where('isResign', false)
+        $emp = Employee::where(['isResign' => false])
+		->whereIn('id_position', [1,2,6])
 		->orderBy('created_at', 'DESC')
 		->get();
 		$dataBrand = array();
         foreach ($emp as $val) {
-			$spv = EmployeeSpv::where(
-				'id_employee', $val->id
-				)->get();
 			$store = EmployeeStore::where(
 				'id_employee', $val->id
 				)->get();
-			$spvList = array();
-			foreach ($spv as $dataSPV) {
-				if(isset($dataSPV->id_user))
-				{
-					$spvList[] = $dataSPV->id_user;
-				} else {
-					$spvList[] = "-";
-				}
-			}
 			$storeList = array();
 			foreach($store as $dataStore) {
 				if(isset($dataStore->id_store)) {
@@ -398,13 +388,11 @@ class EmployeeController extends Controller
         	    'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
 				'Join Date'		=> $val->joinAt,
 				'Agency'		=> $val->agency->name,
-				'SubArea'		=> (isset($val->subarea->name) ? $val->subarea->name : "-"),
 				'Gender'		=> $val->education,
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
 				'Status'		=> (isset($val->status) ? $val->status : "-"),
-				'Store'			=> rtrim(implode(',', $storeList), ',') ? rtrim(implode(',', $storeList), ',') : "-",
-				'SPV'			=> rtrim(implode(',', $spvList), ',') ? rtrim(implode(',', $spvList), ',') : "-"
+				'Store'			=> rtrim(implode(',', $storeList), ',') ? rtrim(implode(',', $storeList), ',') : "-"
         	);
 		}
         $filename = "employee_".Carbon::now().".xlsx";

@@ -111,7 +111,7 @@
             locationNameInput:$('#us3-address')
         },
         enableAutocomplete:true,
-        markerIcon:"https://www.fratekindoapp.com/public/img/Map-Marker-PNG-File-70x70.png"
+        markerIcon: "{{ asset('img/Map-Marker-PNG-File-70x70.png') }}"
     });
     $('#us3').locationpicker('autosize');
     $(".js-select2").select2();

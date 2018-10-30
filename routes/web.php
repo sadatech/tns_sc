@@ -197,6 +197,8 @@ Route::prefix('employee')->group(function () {
 
 		//Export Import
 		Route::get('/export', 'EmployeeController@export')->name('employee.export')->middleware('auth');
+		Route::get('/dc/export', 'Employee\DcController@export')->name('employeedc.export')->middleware('auth');
+		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
 	});
 
 	//Resign Pages

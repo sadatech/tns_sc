@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
-use Auth;
 use DB;
+use Auth;
+use File;
+use Excel;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
@@ -17,7 +18,6 @@ use App\Store;
 use App\Timezone;
 use App\Employee;
 use App\EmployeePasar;
-use App\EmployeeSpv;
 use App\Filters\EmployeeFilters;
 
 class PasarController extends Controller
@@ -69,5 +69,50 @@ class PasarController extends Controller
 		->addColumn('agency', function($employee) {
 			return $employee->agency->name;
 		})->make(true);
+	}
+
+	public function export()
+    {
+        $emp = Employee::where(['isResign' => false])
+		->whereIn('id_position', [3,4])
+		->orderBy('created_at', 'DESC')
+		->get();
+		$dataBrand = array();
+        foreach ($emp as $val) {
+			$pasar = EmployeePasar::where(
+				'id_employee', $val->id
+				)->get();
+			$pasarList = array();
+			foreach($pasar as $dataPasar) {
+				if(isset($dataPasar->id_pasar)) {
+					$pasarList[] = $dataPasar->pasar->name;
+				} else {
+					$pasarList[] = "-";
+				}
+			}
+        	$data[] = array(
+        	    'NIK'          	=> $val->nik,
+        	    'Name'          => $val->name,
+        	    'KTP'         	=> $val->ktp,
+        	    'Phone'         => $val->phone,
+				'Email'     	=> $val->email,
+				'Timezone'		=> $val->timezone->name,
+        	    'Rekening'      => (isset($val->rekening) ? $val->rekening : "-"),
+        	    'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
+				'Join Date'		=> $val->joinAt,
+				'Agency'		=> $val->agency->name,
+				'Gender'		=> $val->education,
+				'Birthdate'		=> $val->birthdate,
+				'Position'		=> $val->position->name,
+				'Pasar'			=> rtrim(implode(',', $pasarList), ',') ? rtrim(implode(',', $pasarList), ',') : "-"
+        	);
+		}
+        $filename = "employeePasar_".Carbon::now().".xlsx";
+        return Excel::create($filename, function($excel) use ($data) {
+            $excel->sheet('EmployeePasar', function($sheet) use ($data)
+            {
+                $sheet->fromArray($data);
+            });
+        })->download();
 	}
 }
