@@ -19,10 +19,10 @@
             <div class="block-content block-content-full">
                 <div class="block-header p-0 mb-20">
                     <h3 class="block-title">
-                        <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                    
                     </h3>
                     <div class="block-options">
-                        <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+                        <a href="{{ route('rejoin.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
 

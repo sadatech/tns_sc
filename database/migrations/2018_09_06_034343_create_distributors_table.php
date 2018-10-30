@@ -14,7 +14,6 @@ class CreateDistributorsTable extends Migration
             $table->string('code');
             $table->timestamps();
             $table->softDeletes();
-
         });
     }
 
