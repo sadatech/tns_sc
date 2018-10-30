@@ -305,15 +305,15 @@ class EmployeeController extends Controller
 				$employee->foto_tabungan = $foto_tabungan;
 			}
 				// if ($request->input('brand')) {
-    //                 foreach ($request->input('brand') as $brand) {
-    //                     EmployeeBrand::where('id_employee', $id)->delete();
-    //                     $dataStore[] = array(
-    //                         'id_brand'    			=> $brand,
-    //                         'id_employee'          	=> $id,
-    //                     );
-    //                 }
-    //                 DB::table('employee_brands')->insert($dataStore);
-    //             }
+                    // foreach ($request->input('brand') as $brand) {
+                        // EmployeeBrand::where('id_employee', $id)->delete();
+                        // $dataStore[] = array(
+                            // 'id_brand'    			=> $brand,
+                            // 'id_employee'          	=> $id,
+                        // );
+                    // }
+                    // DB::table('employee_brands')->insert($dataStore);
+                // }
 			if ($request->input('status') == 'Stay') {
 				$employee->status = $request->input('status');
 			}
@@ -360,7 +360,8 @@ class EmployeeController extends Controller
 
 	public function export()
     {
-        $emp = Employee::where('isResign', false)
+        $emp = Employee::where(['isResign' => false])
+		->whereIn('id_position', [1,2,6])
 		->orderBy('created_at', 'DESC')
 		->get();
 		$dataBrand = array();
@@ -387,7 +388,6 @@ class EmployeeController extends Controller
         	    'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
 				'Join Date'		=> $val->joinAt,
 				'Agency'		=> $val->agency->name,
-				'SubArea'		=> (isset($val->subarea->name) ? $val->subarea->name : "-"),
 				'Gender'		=> $val->education,
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
