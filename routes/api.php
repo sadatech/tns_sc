@@ -69,6 +69,7 @@ Route::prefix('outlet')->group(function () {
 	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
 	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');
 	Route::post('/checkout', 'API\OutletController@checkout')->name('api.outlet.checkout');
+	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
 });
 
 /**
