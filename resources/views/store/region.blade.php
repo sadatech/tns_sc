@@ -26,8 +26,8 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="regiontable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th class="text-center">Name</th>
-          <th class="text-center" style="width: 15%;"> Action</th>
+          <th>Region</th>
+          <th style="width: 15%;"> Action</th>
         </thead>
         </table>
       </div>

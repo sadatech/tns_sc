@@ -19,4 +19,9 @@ class EmployeePasar extends Model
     {
 		return $this->belongsTo('App\Pasar', 'id_pasar');
     }
+
+    public function outlet()
+    {
+        return $this->hasMany('App\Outlet', 'id_employee_pasar');
+    }
 }
