@@ -18,6 +18,7 @@ class CreateOutletsTable extends Migration
             $table->integer('id_employee_pasar')->unsigned();
             $table->string('name');
             $table->string('phone');
+            $table->boolean('active');
             $table->timestamps();
 
             $table->foreign('id_employee_pasar')->references('id')->on('employee_pasars')->onUpdate('cascade')->onDelete('cascade');

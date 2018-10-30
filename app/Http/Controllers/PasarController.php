@@ -41,8 +41,8 @@ class PasarController extends Controller
         ->select('pasars.*');
         return Datatables::of($store)
         ->addColumn('action', function ($store) {
-            return "<a href=".route('ubah.pasar', $store->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-            <button data-url=".route('pasar.delete', $store->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            return "<div align='center'><a href=".route('ubah.pasar', $store->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+            <button data-url=".route('pasar.delete', $store->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button></div>";
         })->make(true);
     }
 
@@ -184,7 +184,7 @@ class PasarController extends Controller
                                 'longitude'         => (isset($row->longitude)? $row->longitude : "-"),
                                 'latitude'          => (isset($row->latitude) ? $row->latitude : "-"),
                                 'address'           => $row->address
-                            ]);
+                            ])->id;
                         } else {
                             return false;
                         }
