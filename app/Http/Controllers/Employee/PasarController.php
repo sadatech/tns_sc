@@ -9,6 +9,7 @@ use DB;
 use Auth;
 use File;
 use Excel;
+use App\Outlet;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
@@ -48,9 +49,30 @@ class PasarController extends Controller
 			return rtrim(implode(', ', $pasarList), ',');
 		})
 		->addColumn('action', function ($employee) {
+			$eP 		= EmployeePasar::where(['id_employee' => $employee->id])->first();
+			$employeeS 	= EmployeePasar::where(['id_employee' => $employee->id])->get();
+			$eOut 		= Outlet::where(['id_employee_pasar' => $eP->id])->get();
+	
+			$pasar = array();
+			foreach ($employeeS as $data) 
+			{
+				$pasar[] = $data->pasar->name;
+			}
+			
+			$outlet = array();
+			foreach ($eOut as $data) 
+			{
+				$outlet[] = $data->name;
+			}
+			$data = array(
+                'id'        	=> $employee->id,
+				'pasar'    		=> rtrim(implode(', ', $pasar), ','),
+				'outlet'    	=> rtrim(implode(', ', $outlet), ','),
+			);
 			// if ($employee->isResign == false) {
 				return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
 				<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+				<button onclick='viewModal(".json_encode($data).")' class='btn btn-sm btn-warning btn-square' title='View Store'><i class='si si-picture mr-2'></i> OUTLET</button>
 				<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
 				<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
 			// } else {

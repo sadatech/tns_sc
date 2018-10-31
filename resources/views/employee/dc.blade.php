@@ -55,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ url('store/subarea/import') }}">
+            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeedc.import') }}">
                 {{ csrf_field() }}
                 <div class="block-content">
                     <div class="form-group">
