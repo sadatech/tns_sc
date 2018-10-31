@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Employee;
 
+use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
@@ -137,4 +138,83 @@ class PasarController extends Controller
             });
         })->download();
 	}
+
+	public function import(Request $request)
+    {
+        $id_company = Auth::user()->id_company;
+        // $this->validate($request, [
+        //     'file' =>   'required|mimeTypes:'.
+        //                 'application/vnd.ms-office,'.
+        //                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'.
+        //                 'application/vnd.ms-excel'
+        // ]);
+
+        $transaction = DB::transaction(function () use ($request, $id_company) {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+            if($request->hasFile('file')){
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($id_company)
+                {
+                    foreach($results as $row)
+                    {
+                        echo "$row<hr>";
+
+                        $dataAgency['agency_name']   = $row->agency;
+                        $id_agency = $this->findAgen($dataAgency);
+						
+                        $insert = Employee::create([
+                            'photo'             => "default.png",
+                            'name1'             => $row->name,
+                            'name2'             => (isset($row->optionalname) ? $row->optionalname : "-"),
+                            'type'              => $row->type,
+                            'id_subarea'        => $id_subarea,
+                            'id_account'        => $id_account,
+                            'id_classification' => $id_classification,
+                            'longitude'         => $row->longitude,
+                            'latitude'          => $row->latitude,
+                            'address'           => $row->address,
+                            'store_phone'       => (isset($row->store_phone) ? $row->store_phone : "-"),
+                            'owner_phone'       => (isset($row->owner_phone) ? $row->owner_phone : "-")
+                        ]);
+                        if ($insert) {
+                            $dataStore = array();
+                            $listDist = explode(",", $row->distributor);
+                            foreach ($listDist as $dist) {
+                                $dataStore[] = array(
+                                    'id_distributor'    => $this->findDistributor($dist),
+                                    'id_store'          => $insert->id,
+                                );
+                            }
+                            DB::table('store_distributors')->insert($dataStore);
+                        }
+                    }
+                },false);
+            }
+            return 'success';
+        });
+
+        if ($transaction == 'success') {
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
+            ]);
+        }else{
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+            ]);
+        }
+    }
 }
