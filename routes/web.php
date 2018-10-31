@@ -338,7 +338,7 @@ Route::prefix('news')->group(function(){
 		Route::post('/store','PKController@store')->name('pk.store')->middleware('auth');
 		Route::get('/edit/{id}','PKController@edit')->name('ubah.pk')->middleware('auth');
 		Route::post('/update/{id}','PKController@update')->name('update.pk')->middleware('auth');
-		Route::get('/delete/{id}','PKController@delete')->name('pk.delete')->middleware('auth');
+		Route::get('/delete/{id}','PKController@destroy')->name('pk.delete')->middleware('auth');
 
 	});
 

@@ -13,6 +13,10 @@ class Store extends Model
         'id_account', 'id_subarea','id_timezone', 'id_salestier', 'is_vito' ,'store_panel', 'coverage', 'delivery'
     ];
 
+    public function sales()
+    {
+        return $this->hasOne('App\SalesTiers', 'id');
+    }
     public function distributor()
     {
         return $this->belongsTo('App\StoreDistributor', 'id_store');

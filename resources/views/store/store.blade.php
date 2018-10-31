@@ -20,12 +20,13 @@
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="storetable">
                     <thead>
-                        <th class="text-center" style="width: 150px;">Action</th>
+                        <th class="text-center" style="width: 60px;">Action</th>
                         <th width="200px">Name</th>
                         <th width="200px">Optional Name</th>
                         <th width="200px">Sub Area</th>
                         <th width="200px">Account</th>
                         <th>Distributor</th>
+                        <th width="200px">Sales Tiers</th>
                         <th>Store Panel</th>
                         <th>Coverage</th>
                         <th>Is Vito</th>
@@ -120,6 +121,7 @@
             { data: 'subarea', name: 'subarea' },
             { data: 'account', name: 'account' },
             { data: 'distributor', name: 'distributor' },
+            { data: 'sales', name: 'sales' },
             { data: 'store_panel', name: 'store_panel' },
             { data: 'coverage', name: 'coverage' },
             { data: 'is_vito', name: 'is_vito' },

@@ -67,7 +67,7 @@ class StoreController extends Controller
     {
         $data=$request->all();
         $limit=[
-            'photo'          => 'max:10000|mimes:jpeg,jpg,bmp,png',
+           
             'name1'          => 'required',
             'address'        => 'required',
             'latitude'       => 'required',
@@ -82,16 +82,8 @@ class StoreController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
-            if($request->file('photo')) {
-                $logo = $data['photo'];
-                $foto = Str::random().time()."_".rand(1,99999).".".$logo->getClientOriginalExtension();
-                $Path = 'uploads/logoStore';
-                $logo->move($Path, $foto);
-            } else {
-                $foto = "default.png";
-            }
             $insert = Store::create([
-                'photo'             => $foto,
+               
                 'name1'             => $request->input('name1'),
                 'name2'             => $request->input('name2'),
                 'address'           => $request->input('address'),
@@ -129,16 +121,18 @@ class StoreController extends Controller
 
     public function data()
     {
-        $store = Store::with(['distributor', 'account', 'subarea'])
+        $store = Store::with(['distributor', 'account', 'subarea', 'sales'])
         ->select('stores.*');
         return Datatables::of($store)
         ->addColumn('action', function ($store) {
             return "<a href=".route('ubah.store', $store->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-            <button data-url=".route('store.delete', $store->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
-            <a href=".asset('/uploads/logoStore')."/".$store->photo." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo Store'><i class='si si-picture mr-2'></i>Photo</a>";
+            <button data-url=".route('store.delete', $store->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })
         ->addColumn('account', function($store) {
             return $store->account->name."(".$store->account->channel->name.")";
+        })
+        ->addColumn('sales', function($store) {
+            return $store->sales->name."(".$store->sales->name.")";
         })
         ->addColumn('distributor', function($store) {
             $dist = StoreDistributor::where(['id_store'=>$store->id])->get();
@@ -157,7 +151,7 @@ class StoreController extends Controller
     {
         $data=$request->all();
         $limit=[
-            'photo'          => 'max:10000|mimes:jpeg,jpg,bmp,png',
+         
             'name1'          => 'required',
             'address'        => 'required',
             'latitude'       => 'required',
@@ -173,17 +167,6 @@ class StoreController extends Controller
             ->withInput();
         } else {
             $store = Store::find($id);
-            if ($request->file('photo')) {
-                $photo = $request->file('photo');
-                $foto_str = Str::random().time()."_".rand(1,99999).".".$photo->getClientOriginalExtension();
-                $str_path = 'uploads/logoStore';
-                $photo->move($str_path, $foto_str);
-            } else {
-                $foto_str = "Change Photo Store Failed";
-            }
-                if($request->file('photo')){
-                    $store->photo = $foto_str;
-                }
                 if ($request->input('distributor')) {
                     foreach ($request->input('distributor') as $distributor) {
                         StoreDistributor::where('id_store', $id)->delete();
