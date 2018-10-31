@@ -17,6 +17,7 @@ use App\Brand;
 use App\Store;
 use App\Timezone;
 use App\Employee;
+use App\EmployeePasar;
 use App\Pasar;
 use App\EmployeeStore;
 use App\Filters\EmployeeFilters;
@@ -50,7 +51,10 @@ class EmployeeController extends Controller
 		$data['position'] 	= Position::get();
 		$data['agency'] 	= Agency::get();
 		$data['store'] 		= Store::get();
+		$data['pasar'] 		= Pasar::get();
+		$data['subarea'] 	= SubArea::get();
 		$data['store_selected'] = json_encode(EmployeeStore::where(['employee_stores.id_employee' => $id])->join('stores','stores.id','employee_stores.id_store')->select(DB::raw("concat(stores.id,'|',stores.name1) as stores_item"))->get()->toArray());
+		$data['pasar_selected'] = json_encode(EmployeePasar::where(['employee_pasars.id_employee' => $id])->join('pasars','pasars.id','employee_pasars.id_pasar')->select(DB::raw("concat(pasars.id,'|',pasars.name) as pasars_item"))->get()->toArray());
 		if ($data['emp']->isResign) {
 			return redirect()->route('employee');
 		} else {
@@ -296,16 +300,6 @@ class EmployeeController extends Controller
 			if($request->file('foto_tabungan')){
 				$employee->foto_tabungan = $foto_tabungan;
 			}
-				// if ($request->input('brand')) {
-                    // foreach ($request->input('brand') as $brand) {
-                        // EmployeeBrand::where('id_employee', $id)->delete();
-                        // $dataStore[] = array(
-                            // 'id_brand'    			=> $brand,
-                            // 'id_employee'          	=> $id,
-                        // );
-                    // }
-                    // DB::table('employee_brands')->insert($dataStore);
-                // }
 			if ($request->input('status') == 'Stay') {
 				$employee->status = $request->input('status');
 			}
@@ -314,6 +308,9 @@ class EmployeeController extends Controller
 			}
 			if ($request->input('position') == Position::where(['level' => 'tlmtc'])->first()->id) {
 				$employee->id_subarea = $request->input('subarea');
+			}
+			if ($request->input('password')) {
+				$employee->password = bcrypt($request->input('name'));
 			}
 			$employee->name 		= $request->input('name');
 			$employee->nik 			= $request->input('nik');
