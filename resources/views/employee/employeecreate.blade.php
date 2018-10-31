@@ -12,7 +12,7 @@
     @endif
     <div class="block block-fx-shadow">
         <div class="block block-themed block-transparent mb-0">
-            <div class="block-header bg-primary p-10">
+            <div class="block-header bg-gd-sun p-10">
                 <h3 class="block-title"><i class="fa fa-user mr-2"></i>Employee Profile</h3>
             </div>
         </div>
@@ -42,7 +42,7 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>Email</label>
-                        <input type="email" class="form-control" name="email" value="{{ ('email') }}" placeholder="Add new email" required>
+                        <input type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="Add new email" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Password</label>
@@ -104,15 +104,15 @@
                         <label>Timezones</label>
                         <select class="form-control form-control-lg" name="timezone" required>
                         <option value="" disabled selected>Choose your Timezone</option>
-                            @foreach($timezone as $time)
-                                <option value="{{$time->id}}">{{$time->name}}</option>
+                            @foreach($timezone as $option)
+                                <option value="{{ $option->id }}" {{ (collect(old('timezone'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
             </div>
             <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
+                <div class="block-header bg-gd-sun p-10">
                     <h3 class="block-title"><i class="fa fa-user mr-2"></i>Bank Account</h3>
                 </div>
             </div>
@@ -120,11 +120,11 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>Nomor Rekening</label>
-                        <input type="text" id="txtboxToFilter" class="form-control" name="rekening" placeholder="Add new employee">
+                        <input type="text" id="txtboxToFilter" class="form-control" value="{{ old('rekening')}}" name="rekening" placeholder="Add rekening">
                     </div>
                     <div class="form-group col-md-6">
                         <label>Name Bank</label>
-                        <input type="text" class="form-control" name="bank" placeholder="Add new employee">
+                        <input type="text" class="form-control" name="bank" value="{{ old('bank') }}" placeholder="Add bank">
                     </div>
                 </div>
                 <div class="row">
@@ -140,7 +140,7 @@
                 </div>
             </div>
             <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
+                <div class="block-header bg-gd-sun p-10">
                     <h3 class="block-title"><i class="fa fa-user mr-2"></i>Employee Positioning</h3>
                 </div>
             </div>
@@ -150,8 +150,8 @@
                         <label>Position</label>
                         <select class="form-control form-control-lg" name="position" id="position" required>
                             <option value="" disabled selected>Choose your Position</option>
-                            @foreach($position as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
+                            @foreach($position as $option)
+                                <option value="{{ $option->id }}" {{ (collect(old('position'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -159,8 +159,8 @@
                         <label>Agency</label>
                         <select class="js-select form-control form-control-lg" style="width: 100%" name="agency" required>
                             <option value="" disabled selected>Choose your Agency</option>
-                            @foreach($agency as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
+                            @foreach($agency as $option)
+                                <option value="{{ $option->id }}" {{ (collect(old('agency'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -170,8 +170,8 @@
                         <label>Sub Area / Area</label>
                         <select class="js-select2 form-control form-control-lg" style="width: 100%" name="subarea[]" id="subareaInput">
                             <option disabled selected>Choose your Subarea</option>
-                            @foreach($subarea as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
+                            @foreach($subarea as $option)
+                            <option value="{{ $option->id }}" {{ (collect(old('subarea'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -282,7 +282,14 @@
     </div>
 </div>
 @endsection
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
+@endsection
+
 @section('script')
+<script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+<script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script type="text/javascript">
     var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
     var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;

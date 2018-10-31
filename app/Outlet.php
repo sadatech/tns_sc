@@ -14,4 +14,9 @@ class Outlet extends Model
     {
         return $this->belongsTo('App\EmployeePasar', 'id_employee_pasar');
     }
+    
+    public function attendanceOutlet()
+    {
+        return $this->hasMany('App\AttendanceOutlet', 'id_outlet');
+    }
 }
