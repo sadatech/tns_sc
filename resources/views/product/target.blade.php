@@ -44,62 +44,32 @@
 
 {{-- MODAL EDIT TARGET --}}
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-        <div class="modal-content">
-            <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="fa fa-edit"></i> Update Product Target</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="si si-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <form id="editForm" method="post">
-              {!! method_field('PUT') !!}
-              {!! csrf_field() !!}
-              <div class="block-content">
-                <div class="form-group">
-                  <label>Employee</label>
-                  <select class="js-edit form-control" style="width: 100%" id="EmployeeInput" name="employee" >
-                    @foreach($employee as $data)
-                      <option value="{{ $data->id }}">{{ $data->name }} </option>
-                    @endforeach
-                  </select>
-                </div>
-                <div class="row">
-                  <div class="form-group col-md-6">
-                      <label>Store</label>
-                      <select class= "js-edit form-control" id="StoreInput" style="width: 100%"  name="store" >
-                        @foreach($store as $data)
-                          <option value="{{ $data->id }}">{{ $data->name1 }}</option>
-                        @endforeach
-                      </select>
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label>Type</label>
-                    <select class="form-control form-control" name="type" id="typeInput">
-                      <option value="" disabled selected>Choose your Type</option>
-                      <option value="Sell In">Sell In</option>
-                      <option value="Sell Out">Sell Out</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-6">
-                      <label>Release Date</label>
-                      <input class="js-datepicker form-control" type="date" id="rilisInput" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
-              </div>
-            </form>
+  <div class="modal-dialog modal-dialog-popout" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary p-10">
+          <h3 class="block-title"><i class="fa fa-edit"></i> Edit Product Target</h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
         </div>
+      </div>
+      {{ Form::open(['url' => '#', 'id' => 'editModalForm']) }}
+        {!! method_field('PUT') !!}
+        <div class="block-content">
+          {{ Form::numberInput('quantity', old('quantity'), ['required' => '', 'id' => 'editQuantity', 'min' => 1]) }}
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-alt-success">
+              <i class="fa fa-save"></i> Save
+            </button>
+            <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      {{ Form::close() }}
     </div>
+  </div>
 </div>
 
 {{-- MODAL ADD TARGET --}}
@@ -123,6 +93,13 @@
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script type="text/javascript">
+    function editModal(json) {
+      $('#editModal').modal('show');
+      $('#editModalForm').attr('action', "{{ url('/product/target/update') }}/"+json.id);
+      $('#editQuantity').val(json.quantity)
+      console.log(json);
+    }
+
       @if(session('type'))
       $(document).ready(function() {
           $.notify({

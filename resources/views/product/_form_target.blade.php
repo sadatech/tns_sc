@@ -22,7 +22,7 @@ $action = $action ?? '';
         @if ($type != 'edit')
           <div class="block-content" style="display: none" id="downloadSampleContainer">
             <div class="form-group">
-              <a href="#" target="_blank" class="btn btn-sm btn-info pull-right" id="downloadSampleBtn">Download Import Format</a>
+              <a href="#" class="btn btn-sm btn-info pull-right" id="downloadSampleBtn">Download Import Format</a>
             </div>
           </div>
         @endif
@@ -64,7 +64,7 @@ $action = $action ?? '';
       $('#{{$type}}Employee').val(json.employee).trigger('change');
       $('#{{$type}}Store').val(json.store).trigger('change');
       $('#{{$type}}type').val(json.type);
-      $('#{{$type}}rilis').val(json.rilis);
+      $('#{{$type}}Rilis').val(json.rilis);
       console.log(json);
     }
   @else
@@ -84,7 +84,6 @@ $action = $action ?? '';
   $('#downloadSampleBtn').click(function(e){
     e.preventDefault();
     window.open("{{ url('product/target/sample-form/download') }}" + '/' + $('#Employee').val());
-    // document.location = ; 
   })
 
   $(".{{$type}}-js-select2").select2({ 

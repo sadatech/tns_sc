@@ -29,8 +29,9 @@ class TargetController extends Controller
         ->addColumn('action', function ($product) {
             $data = array(
                 'id'            => $product->id,
-                'employee'     	=> $product->employee->name,
+                'employee'     	=> $product->employee->id,
                 'store'         => $product->store->name1,
+                'quantity'      => $product->quantity,
                 'rilis'         => $product->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
@@ -61,11 +62,12 @@ class TargetController extends Controller
                 
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
                     foreach($results as $row) {
-                        Target::create([
+                        Target::updateOrCreate([
                             'rilis' => $request->rilis,
                             'id_employee' => $request->id_employee,
                             'id_store' => $row->id_store,
                             'id_product' => \App\Product::where('name', $row->product_name)->first()->id,
+                        ], [
                             'quantity' => $row->quantity,
                         ]);
                     }
@@ -112,7 +114,7 @@ class TargetController extends Controller
 
     public function update(Request $request, $id) 
     {
-        $product = Target::find($id);
+        $product = Target::findOrFail($id);
         $product->fill($request->all());
         $product->save();
         return redirect()->back()->with([
