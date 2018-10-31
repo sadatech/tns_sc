@@ -41,8 +41,8 @@ class PasarController extends Controller
         ->select('pasars.*');
         return Datatables::of($store)
         ->addColumn('action', function ($store) {
-            return "<a href=".route('ubah.pasar', $store->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-            <button data-url=".route('pasar.delete', $store->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            return "<div align='center'><a href=".route('ubah.pasar', $store->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+            <button data-url=".route('pasar.delete', $store->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button></div>";
         })->make(true);
     }
 
@@ -68,7 +68,6 @@ class PasarController extends Controller
             if ($check < 1) {
                 Pasar::create([
                     'name'              => $request->input('name'),
-                    'phone'             => $request->input('phone'),
                     'address'           => $request->input('address'),
                     'latitude'          => $request->input('latitude'),
                     'longitude'         => $request->input('longitude'),
@@ -113,7 +112,6 @@ class PasarController extends Controller
             if ($check < 1) {
                 $dataPasar = Pasar::find($id);
                 $dataPasar->name              = $request->input('name');
-                $dataPasar->phone             = $request->input('phone');
                 $dataPasar->address           = $request->input('address');
                 $dataPasar->latitude          = $request->input('latitude');
                 $dataPasar->longitude         = $request->input('longitude');
@@ -166,7 +164,7 @@ class PasarController extends Controller
                 $file = $request->file('file')->getRealPath();
                 $ext = '';
                 
-                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
                     foreach($results as $row)
                     {
@@ -176,14 +174,20 @@ class PasarController extends Controller
                         $dataSub['region_name']    = $row->region;
                         $id_subarea = $this->findSub($dataSub);
 
-                         Pasar::create([
-                            'name'              => $row->pasar,
-                            'phone'             => (isset($row->phone) ? $row->phone : "-"),
-                            'id_subarea'        => $id_subarea,
-                            'longitude'         => $row->longitude,
-                            'latitude'          => $row->latitude,
-                            'address'           => $row->address
-                        ]);
+                        $data1 = SubArea::where(['id' => $id_subarea])->first();
+                        $check = Pasar::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->pasar))."'")
+                        ->where(['id_subarea' => $data1->id])->count();
+                        if ($check < 1) {
+                            Pasar::create([
+                                'name'              => $row->pasar,
+                                'id_subarea'        => $id_subarea,
+                                'longitude'         => (isset($row->longitude)? $row->longitude : "-"),
+                                'latitude'          => (isset($row->latitude) ? $row->latitude : "-"),
+                                'address'           => $row->address
+                            ])->id;
+                        } else {
+                            return false;
+                        }
                     }
                 },false);
             }
@@ -209,9 +213,8 @@ class PasarController extends Controller
 
     public function findSub($data)
     {
-      
-        $dataSub = Subarea::where('name','like','%'.trim($data['subarea_name']).'%')->get();
-        if ($dataSub != null) {
+        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
+        if ($dataSub->count() < 1 ) {
 
             $dataSub['area_name']  = $data['area_name'];
             $dataSub['region_name']  = $data['region_name'];
@@ -227,40 +230,41 @@ class PasarController extends Controller
         return $id_subarea;
     }
 
+
     public function findArea($data)
     {
         $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
         if ($dataArea->count() == 0) {
-
+            
             $dataRegion['region_name']  = $data['region_name'];
             $id_region = $this->findRegion($dataRegion);
 
             $area = Area::create([
               'name'        => $data['area_name'],
               'id_region'   => $id_region,
-          ]);
+            ]);
             $id_area = $area->id;
         }else{
             $id_area = $dataArea->first()->id;
         }
-        return $id_area;
+      return $id_area;
     }
 
     public function findRegion($data)
     {
         $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
         if ($dataRegion->count() == 0) {
-
+            
             $region = Region::create([
               'name'        => $data['region_name'],
-          ]);
+            ]);
             $id_region = $region->id;
         }else{
             $id_region = $dataRegion->first()->id;
         }
-        return $id_region;
+      return $id_region;
     }
-
+    
     public function exportXLS()
     {
         $pasar = Pasar::orderBy('created_at', 'DESC')->get();
@@ -268,9 +272,8 @@ class PasarController extends Controller
         foreach ($pasar as $val) {
             $data[] = array(
                 'Pasar'             => $val->name,
-                'Phone'             => (isset($val->phone) ? $val->phone : "-"),
                 'Address'           => $val->address,
-                'Longitude'         => $val->lobgitude,
+                'Longitude'         => $val->longitude,
                 'Latitude'          => $val->latitude,
                 'Subarea'           => $val->subarea->name,
                 'Area'              => $val->subarea->area->name,

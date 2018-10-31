@@ -14,7 +14,6 @@ class CreatePositionsTable extends Migration
             $table->string('level');
             $table->timestamps();
             $table->softDeletes();
-
         });
     }
 

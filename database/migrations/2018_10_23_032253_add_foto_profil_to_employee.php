@@ -26,7 +26,7 @@ class AddFotoProfilToEmployee extends Migration
     public function down()
     {
         Schema::table("employees", function(Blueprint $table){
-            //
+            $table->dropColumn('foto_profil');
         });
     }
 }

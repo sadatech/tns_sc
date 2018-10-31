@@ -46,7 +46,31 @@ Route::prefix('product')->group(function () {
 Route::prefix('sales')->group(function () {
 	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
 });
+Route::prefix('competitor')->group(function () {
+	Route::post('/promo', 'API\CompetitorController@promo')->name('api.competitor.promo');
+});
 
+Route::prefix('dataprice')->group(function () {
+	Route::post('/add', 'API\DataPriceController@store')->name('api.dataprice.add');
+});
+
+Route::prefix('availability')->group(function () {
+	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
+});
+
+// Pasar
+Route::prefix('pasar')->group(function () {
+	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');
+});
+
+// Outlet
+Route::prefix('outlet')->group(function () {
+	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
+	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
+	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');
+	Route::post('/checkout', 'API\OutletController@checkout')->name('api.outlet.checkout');
+	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
+});
 
 /**
  * Employee

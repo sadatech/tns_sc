@@ -30,8 +30,13 @@
                         <input type="text" class="form-control" name="name" placeholder="Add new name" required>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Phone</label>
-                        <input type="text" class="form-control" id="NumPhone" name="phone" placeholder="Add new phone">
+                        <label>Sub-area / Area</label>
+                        <select class="js-select2 form-control" name="subarea" required>
+                            <option value="" disabled selected>Choose your Subarea</option>
+                            @foreach($subarea as $data)
+                                <option value="{{ $data->id }}">{{ $data->name }} - {{ $data->area->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="row">
@@ -57,36 +62,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Latitude</label>
-                        <input type="text" class="form-control" readonly="readonly" id="latitude" name="latitude" required/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Longitude</label>
-                        <input type="text" class="form-control" readonly="readonly" id="longitude" name="longitude" required/>
-                    </div>
-                </div>
+                <input type="hidden" id="latitude" name="latitude" required/>
+                <input type="hidden" id="longitude" name="longitude" required/>
             </div>
-            <div class="block-content">
-                <h5><b>SubArea </b></h5>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Sub Area/ Area</label>
-                        <select class="js-select2 form-control" name="subarea" required>
-                            <option value="" disabled selected>Choose your Subarea</option>
-                            @foreach($subarea as $data)
-                                <option value="{{ $data->id }}">{{ $data->area->name }} - {{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-alt-success">
+                    <i class="fa fa-save"></i> Save
+                </button>
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
             </div>
         </form>
     </div>
@@ -128,21 +111,9 @@
             locationNameInput:$('#us3-address')
         },
         enableAutocomplete:true,
-        markerIcon:"https://www.fratekindoapp.com/public/img/Map-Marker-PNG-File-70x70.png"
+        markerIcon: "{{ asset('img/Map-Marker-PNG-File-70x70.png') }}"
     });
     $('#us3').locationpicker('autosize');
-    $("#NumPhone").keydown(function (e) 
-    {
-        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
-            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
-            (e.keyCode >= 35 && e.keyCode <= 40)) 
-            {
-                return;
-            }
-        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-            e.preventDefault();
-        }
-    });
     $(".js-select2").select2();
 </script>
 @endsection

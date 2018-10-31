@@ -32,8 +32,12 @@
                         <input type="text" class="form-control" value="{{ $str->name }}" name="name" required>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Phone</label>
-                        <input type="text" class="form-control" value="{{ $str->phone }}" name="phone">
+                        <label>Sub-area / Area</label>
+                        <select class="js-select2 custom-select" name="subarea" id="subarea" required>
+                            @foreach($subarea as $data)
+                                <option value="{{ $data->id }}" {{$data->id==$str->id_subarea ? 'selected' : ''}}>{{ $data->name }} - {{ $data->area->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="row">
@@ -59,29 +63,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Latitude</label>
-                        <input type="text" class="form-control" readonly="readonly" id="latitudeInput" name="latitude" required/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Longitude</label>
-                        <input type="text" class="form-control" readonly="readonly" id="longitudeInput" name="longitude" required/>
-                    </div>
-                </div>
-            </div>
-            <div class="block-content">
-                <h5><b>Subarea</b></h5>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Subarea</label>
-                        <select class="js-select2 custom-select" name="subarea" id="subarea" required>
-                            @foreach ($subarea as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+                <input type="hidden" id="latitudeInput" name="latitude" required/>
+                <input type="hidden" id="longitudeInput" name="longitude" required/>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-alt-success">

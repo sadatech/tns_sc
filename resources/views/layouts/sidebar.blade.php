@@ -26,7 +26,7 @@
                     <img class="img-avatar img-avatar32" src="{{ asset('assets/media/avatars/avatar15.jpg') }}" alt="">
                 </div>
                 <div class="sidebar-mini-hidden-b text-center">
-                    <a class="img-link" href="be_pages_generic_profile.html">
+                    <a class="img-link" href="">
                         <img class="img-avatar" src="{{ asset('assets/media/avatars/avatar15.jpg') }}" alt="">
                     </a>
                     <ul class="list-inline mt-10">
@@ -110,10 +110,16 @@
                                 <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">Employee</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">MD & SPG</a>
+                            </li>
+                            <li>
+                                <a class="{{ request()->is('employee/summary/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('employee/resign') ? 'active' : '' }}" href="{{ route('resign') }}">Resign</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('employee/rejoin') ? 'active' : '' }}" href="{{ route('rejoin') }}">Rejoin</a>
+                                <a class="{{ request()->is('employee/rejoin') ? 'active' : '' }}" href="{{ route('rejoin') }}">Turn Over</a>
                             </li>
                         </ul>
                     </li>
@@ -135,6 +141,9 @@
                                 <a class="{{ request()->is('product/sub-category') ? 'active' : '' }}" href="{{ route('sub-category') }}">Sub Category</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('product/sku-unit') ? 'active' : '' }}" href="{{ route('sku-unit') }}">SKU Unit</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
                             <li>
@@ -147,12 +156,32 @@
                                 <a class="{{ request()->is('product/fokus') ? 'active' : '' }}" href="{{ route('fokus') }}">Fokus</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('product/target') ? 'active' : '' }}" href="{{ route('target') }}">Target</a>
                             </li>
                             <!-- <li>
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
                         </ul>
+                    </li>
+                    {{-- Target --}}
+                    <li class="{{ request()->is('target/*') ? 'open' : '' }}">
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-target"></i><span class="sidebar-mini-hide">Target(s)</span></a>
+                        <ul>
+                            <li>
+                                <a class="{{ request()->is('target/dc') ? 'active' : '' }}" href="{{ route('target.dc') }}">Demo Cooking</a>
+                            </li>
+                            <li>
+                                <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
+                            </li>
+                            <li>
+                                <a class="{{ request()->is('target/spg') ? 'active' : '' }}" href="{{ route('target.spg') }}">SPG Pasar</a>
+                            </li>
+                        </ul>
+                    </li>
+
                     </li> 
                     {{-- USERS--}}
 
@@ -173,6 +202,7 @@
                     <li>
                         <a class="{{ request()->is('faq/index') ? 'active' : '' }}" href="{{ route('faq') }}"><i class="si si-bubbles"></i><span class="sidebar-mini-hide">FAQ</span></a>
                     </li>  
+
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- SALES --}}
                     <li class="{{ request()->is('report/sales/*') ? 'open' : '' }}">
@@ -188,7 +218,7 @@
                     </li>
                     {{-- Stock In Hand--}}
                     <li>
-                        <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-target"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>
+                        <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>
                     </li>  
                 </ul>
         </div>
