@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
         $this->call(RegionTableSeeder::class);
         $this->call(AreaTableSeeder::class);
         $this->call(SubAreaTableSeeder::class);
+
+        $this->call(PositionTableSeeder::class);
         
         $this->call(ChannelTableSeeder::class);
         $this->call(AccountTableSeeder::class);
