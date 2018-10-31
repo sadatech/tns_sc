@@ -2,11 +2,13 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Components\traits\DropDownHelper;
 use App\Filters\QueryFilters;
+use Illuminate\Database\Eloquent\Model;
 
 class Store extends Model
 {
+    use DropDownHelper;
     
     protected $fillable = [
             'photo', 'name1', 'name2', 'address', 'latitude', 'longitude',
