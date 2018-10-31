@@ -4,7 +4,7 @@ $action = $action ?? '';
 @endphp
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1" role="dialog" aria-labelledby="{{ $id }}" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+  <div class="modal-dialog modal-dialog-popout" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-primary p-10">
@@ -16,45 +16,33 @@ $action = $action ?? '';
           </div>
         </div>
       </div>
-      <form action="{{ $action }}" method="post" id="{{$id}}Form">
+      <form action="{{ $action }}" method="post" id="{{$id}}Form" enctype="multipart/form-data">
         {!! csrf_field() !!}
-        <div class="block-content">
-          <div class="form-group">
-            <label>Employee</label>
-            <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_employee" id="{{$type}}Employee">
-              <option value="" disabled selected>Choose your employee</option>
-              @foreach($employee as $data)
-              <option value="{{ $data->id }}">{{ $data->name }} </option>
-              @endforeach
-            </select>
+
+        @if ($type != 'edit')
+          <div class="block-content" style="display: none" id="downloadSampleContainer">
+            <div class="form-group">
+              <a href="#" target="_blank" class="btn btn-sm btn-info pull-right" id="downloadSampleBtn">Download Import Format</a>
+            </div>
           </div>
-          <div class="row">
-            <div class="form-group col-md-6">
-              <label>Store</label>
+        @endif
+        <div class="block-content">
+            {{ Form::select2Input('id_employee', old('id_employee'), App\Employee::toDropDownData(), ['required' => '', 'labelText' => 'Employee', 'id' => $type . 'Employee']) }}
+              {{-- <label>Store</label>
               <select class="{{ $type }}-js-select2 form-control" style="width: 100%" name="id_store" id="{{$type}}Store">
                 <option disabled selected>Choose your Store</option>
                 @foreach($store as $data)
                 <option value="{{ $data->id }}">{{ $data->name1 }}</option>
                 @endforeach
-              </select>
-            </div>
-            <div class="form-group col-md-6">
+              </select> --}}
+            <div class="form-group">
               <label>Release</label>
               <input class="js-datepicker form-control" type="text" name="rilis" id="{{$type}}Rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
-            </div>
+            </div>  
+          <div class="form-group">
+            <label>Select File (Format .xlsx, .xls)</label>
+            <input type="file" name="file" class="form-control">
           </div>
-
-          <div class="row">
-            <div class="form-group col-md-6">
-              <label>Value</label>
-              <input type="number" name="value" id="{{$type}}Value" class="form-control" required="">
-            </div>
-            <div class="form-group col-md-6">
-              <label>Value PF</label>
-              <input type="number" name="value_pf" id="{{$type}}ValuePf" class="form-control" required="">
-            </div>
-          </div>
-
           <div class="modal-footer">
             <button type="submit" class="btn btn-alt-success">
               <i class="fa fa-save"></i> Save
@@ -79,7 +67,25 @@ $action = $action ?? '';
       $('#{{$type}}rilis').val(json.rilis);
       console.log(json);
     }
+  @else
+    function showDownloadBtn() {
+      if($('#Employee').val() != ''){
+        $('#downloadSampleContainer').show('slow');
+      } else {
+        $('#downloadSampleContainer').hide('slow');
+      }
+    }
+
+    $('#Employee').change(function(){
+      showDownloadBtn();
+    })
   @endif
+
+  $('#downloadSampleBtn').click(function(e){
+    e.preventDefault();
+    window.open("{{ url('product/target/sample-form/download') }}" + '/' + $('#Employee').val());
+    // document.location = ; 
+  })
 
   $(".{{$type}}-js-select2").select2({ 
     dropdownParent: $("#{{$id}}")

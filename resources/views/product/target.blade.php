@@ -31,8 +31,9 @@
           <th class="text-center" style="width: 70px;"></th>
           <th>Employee Name</th>
           <th>Store</th>
-          <th>Type</th>
           <th>Release Month</th>
+          <th>Product</th>
+          <th>Quantity</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -176,9 +177,9 @@
 	              { data: 'id', name: 'id' },
                 { data: 'employee.name', name: 'employee.name'},
 	              { data: 'store.name1', name: 'store.name1' },
-                { data: 'value', name: 'value' },
-	              { data: 'value_pf', name: 'value_pf' },
                 { data: 'rilis', name: 'rilis' },
+                { data: 'product.name', name: 'product.name' },
+                { data: 'quantity', name: 'quantity' },
 	              { data: 'action', name: 'action' },
               ]
           });
