@@ -30,11 +30,11 @@
                         <input type="text" class="form-control" name="name" placeholder="Add new name" required>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Sub Area/ Area</label>
+                        <label>Sub-area / Area</label>
                         <select class="js-select2 form-control" name="subarea" required>
                             <option value="" disabled selected>Choose your Subarea</option>
                             @foreach($subarea as $data)
-                                <option value="{{ $data->id }}">{{ $data->area->name }} - {{ $data->name }}</option>
+                                <option value="{{ $data->id }}">{{ $data->name }} - {{ $data->area->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -62,16 +62,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Latitude</label>
-                        <input type="text" class="form-control" readonly="readonly" id="latitude" name="latitude" required/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Longitude</label>
-                        <input type="text" class="form-control" readonly="readonly" id="longitude" name="longitude" required/>
-                    </div>
-                </div>
+                <input type="hidden" id="latitude" name="latitude" required/>
+                <input type="hidden" id="longitude" name="longitude" required/>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-alt-success">
@@ -119,7 +111,7 @@
             locationNameInput:$('#us3-address')
         },
         enableAutocomplete:true,
-        markerIcon:"https://www.fratekindoapp.com/public/img/Map-Marker-PNG-File-70x70.png"
+        markerIcon: "{{ asset('img/Map-Marker-PNG-File-70x70.png') }}"
     });
     $('#us3').locationpicker('autosize');
     $(".js-select2").select2();
