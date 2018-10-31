@@ -91,7 +91,7 @@
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label>Rejoin Submission Date</label>
-                            <input class="js-datepicker form-control" type="date" name="join_date" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                            <input class="js-datepicker form-control" type="text" name="join_date" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
                         </div>
                     </div>
                     <div class="row">

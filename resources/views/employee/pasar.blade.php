@@ -56,14 +56,12 @@
                 <input type="hidden" name="employee" id="employeeID">
                 <div class="block-content">
                     <table class="table table-bordered">
-                        <tr>
-                            <td width="100"><b>Pasar</b></td>
-                            <td id="reasonName" colspan="4">Example</td>
-                        </tr>
-                        <tr>
-                            <td><b>Outlet</b></td>
-                            <td id="reasonNIK" colspan="4">Example</td>
-                        </tr>
+                        <thead>
+                            <th>Pasar</th>
+                            <th>Outlet</th>
+                        </thead>
+                        <tbody id="outletRow">
+                        </tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
@@ -90,8 +88,7 @@
     function viewModal(json) {
         $('#viewModal').modal('show');
         $('#employeeID').val(json.id);
-        $('#reasonName').html(json.pasar);
-        $('#reasonNIK').html(json.outlet);
+        $('#outletRow').html(json.pasar);
     }
     @if(session('type'))
     $(document).ready(function() {

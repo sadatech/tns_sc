@@ -44,7 +44,7 @@
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-gd-sun p-10">
-                    <h3 class="block-title"><i class="fa fa-edit"></i> Rejoin Confirmation</h3>
+                    <h3 class="block-title"><i class="fa fa-edit"></i> Resign Confirmation</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
                             <i class="si si-close"></i>
@@ -80,13 +80,22 @@
                         </tr>
                     </table>
                     <div class="row">
-                        <div class="form-group col-md-6">
+                        {{-- <div class="form-group col-md-6">
                             <label>Resign Submission Date</label>
                             <input class="js-datepicker form-control" type="date" name="submission" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
                         </div>
                         <div class="form-group col-md-6">
                             <label>Effective Resign Date</label>
                             <input class="js-datepicker form-control" type="date" name="effective" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                        </div> --}}
+                        <div class="form-group col-md-6">
+                            <label>Resign Submission Date</label>
+                            <input class="js-datepicker form-control" type="text" name="submission" id="submission" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required onchange="dateCompare()">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Effective Resign Date</label>
+                            <input class="js-datepicker form-control" type="text" name="effective" id="effective" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required onchange="dateCompare()">
+                            <small id="alert" style="color:red;display:none;">Note: Effective date must equal or greater than submission.</small>
                         </div>
                     </div>
                     <div class="row">
@@ -105,12 +114,12 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label>Optional Information</label>
-                            <textarea class="form-control" name="optional" id="reasonInput" required></textarea>
+                            <textarea class="form-control" name="optional" id="reasonInput"{{--  required --}}></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
+                    <button type="submit" class="btn btn-alt-success" id="btnSubmit">
                         <i class="fa fa-save"></i> Save
                     </button>
                     <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
@@ -119,6 +128,29 @@
         </div>
     </div>
 </div>
+
+{{-- <div class="modal fade" id="alertDateCompare" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="fa fa-edit"></i> Notification</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="block-content">
+                Effective date must be greater than submission date. Please select another date.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div> --}}
 @endsection
 
 @section('css')
@@ -186,5 +218,25 @@
             ]
         });
     });
+    $(document).ready(function(){
+        $("#btnSubmit").hide();
+    });
+
+    function dateCompare(){
+        var submission = $("#submission").val();
+        var effective = $("#effective").val();
+        if(submission != '' && effective != ''){
+            if(new Date(submission) > new Date(effective))
+            {
+                $('#alert').show();
+                $("#btnSubmit").hide();
+            }else{
+                $('#alert').hide();
+                $("#btnSubmit").show();
+            }
+        }else{
+            $("#btnSubmit").hide();
+        }
+    }
 </script>
 @endsection
