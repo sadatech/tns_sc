@@ -199,6 +199,11 @@ Route::prefix('employee')->group(function () {
 		Route::get('/export', 'EmployeeController@export')->name('employee.export')->middleware('auth');
 		Route::get('/dc/export', 'Employee\DcController@export')->name('employeedc.export')->middleware('auth');
 		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
+		Route::post('/dc/import','Employee\DcController@import')->name('employeedc.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
+		})->name('employeeDc.download-template')->middleware('auth');
 	});
 
 	//Resign Pages
@@ -301,6 +306,15 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'ProductFokusController@store')->name('fokus.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
+	});
+
+	//Fokus MD Pages
+	Route::prefix('fokusMD')->group(function () {
+		Route::get('/', 'ProductFokusMdController@baca')->name('fokusMD')->middleware('auth');
+		Route::get('/data', 'ProductFokusMdController@data')->name('fokusMD.data')->middleware('auth');
+		Route::post('/create', 'ProductFokusMdController@store')->name('fokusMD.add')->middleware('auth');
+		Route::put('/update/{id}', 'ProductFokusMdController@update')->name('fokusMD.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductFokusMdController@delete')->name('fokusMD.delete')->middleware('auth');
 	});
 
 	//Target Pages

@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Outlet;
 use App\EmployeePasar;
+use App\AttendanceOutlet;
+use App\Attendance;
+use Carbon\Carbon;
 use JWTAuth;
 use Config;
 use DB;
@@ -213,6 +216,56 @@ class OutletController extends Controller
 						$res['msg'] = "Sudah melakukan checkout untuk hari ini.";
 						$code = 200;
 					}
+				}
+			}
+		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			$res['msg'] = "Token Expired.";
+			$code = $e->getStatusCode();
+
+		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			$res['msg'] = "Token Invalid.";
+			$code = $e->getStatusCode();
+
+		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+			$res['msg'] = "Token Absent.";
+			$code = $e->getStatusCode();
+		}
+		return response()->json($res, $code);
+	}
+
+	public function status()
+	{
+		try {
+			Config::set('auth.providers.users.model', \App\Employee::class);
+			if (!$user = JWTAuth::parseToken()->authenticate()) {
+				$res['msg'] = "User not found.";
+			} else {
+				$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->first();
+				if (isset($attId->id)) {
+					$attendance = AttendanceOutlet::where(['id_attendance' => $attId->id])->first();
+					if (!empty($attendance)) {
+						if ($attendance->checkout == null) {
+							$res['success'] = true;
+							$res['msg'] = "Kamu belum checkout di outlet sebelumnya.";
+							$res['id'] = (isset($attendance->id_outlet) ? $attendance->id_outlet : null);
+							$res['name'] = (isset($attendance->outlet->name) ? $attendance->outlet->name : null);
+							$res['time'] = $attendance->checkin;
+							$code = 200;
+						} else {
+							$res['success'] = false;
+							$res['msg'] = "Sudah melakukan checkout.";
+							$code = 200;
+						}
+					} else {
+						$res['success'] = false;
+						$res['msg'] = "Belum melakukan check-in.";
+						$code = 200;
+					}
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Belum melakukan check-in.";
+					$code = 200;
+
 				}
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {

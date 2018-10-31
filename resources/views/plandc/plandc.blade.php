@@ -29,7 +29,7 @@
                     <th>Employee</th>
                     <th>Date</th>
                     <th>Lokasi</th>
-                    <th>Stocklist</th>
+                    <th>Stockist</th>
                     <th class="text-center" style="width: 15%;"> Action</th>
                 </thead>
                 </table>
@@ -102,7 +102,7 @@
                             <input class="js-datepicker form-control" type="text" name="date" id="dateInput" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Stocklist</label>
+                            <label>Stockist</label>
                             <input type="text" class="form-control" name="stocklist" id="stocklistInput" required>
                         </div>
                     </div>
