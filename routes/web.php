@@ -194,6 +194,16 @@ Route::prefix('employee')->group(function () {
 		Route::get('/data', 'EmployeeController@data')->name('employee.data')->middleware('auth');
 		Route::get('/data/pasar', 'Employee\PasarController@data')->name('employee.data.pasar')->middleware('auth');
 		Route::get('/data/dc', 'Employee\DcController@data')->name('employee.data.dc')->middleware('auth');
+
+		//Export Import
+		Route::get('/export', 'EmployeeController@export')->name('employee.export')->middleware('auth');
+		Route::get('/dc/export', 'Employee\DcController@export')->name('employeedc.export')->middleware('auth');
+		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
+		Route::post('/dc/import','Employee\DcController@import')->name('employeedc.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
+		})->name('employeeDc.download-template')->middleware('auth');
 	});
 
 	//Resign Pages
@@ -209,6 +219,7 @@ Route::prefix('employee')->group(function () {
 		Route::get('/', 'RejoinController@baca')->name('rejoin')->middleware('auth');
 		Route::get('/data', 'RejoinController@data')->name('rejoin.data')->middleware('auth');
 		Route::post('/create', 'RejoinController@store')->name('rejoin.add')->middleware('auth');
+		Route::get('/export', 'RejoinController@export')->name('rejoin.export')->middleware('auth');
 	});
 });
 
@@ -295,6 +306,15 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'ProductFokusController@store')->name('fokus.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
+	});
+
+	//Fokus MD Pages
+	Route::prefix('fokusMD')->group(function () {
+		Route::get('/', 'ProductFokusMdController@baca')->name('fokusMD')->middleware('auth');
+		Route::get('/data', 'ProductFokusMdController@data')->name('fokusMD.data')->middleware('auth');
+		Route::post('/create', 'ProductFokusMdController@store')->name('fokusMD.add')->middleware('auth');
+		Route::put('/update/{id}', 'ProductFokusMdController@update')->name('fokusMD.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductFokusMdController@delete')->name('fokusMD.delete')->middleware('auth');
 	});
 
 	//Target Pages

@@ -29,10 +29,17 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="subtable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
+<<<<<<< HEAD
           <th class="text-center">Name</th>
           <th class="text-center">Area</th>
           <th class="text-center">Region</th>          
           <th class="text-center" style="width: 15%;"> Action</th>
+=======
+          <th>Sub Area</th>
+          <th>Area</th>
+          <th>Region</th>
+          <th style="width: 15%;"> Action</th>
+>>>>>>> 015594ae6d3b2d0b8a2be669e815645ea1a52ae9
         </thead>
         </table>
       </div>
@@ -57,23 +64,19 @@
         {!! method_field('PUT') !!}
         {!! csrf_field() !!}
         <div class="block-content">
-          <div class="row">
-            <div class="form-group col-md-12">
-              <label>Sub Area Name</label>
-              <input type="text" class="form-control" name="name" id="nameInput" required>
-            </div>
+          <div class="form-group">
+            <label>Sub Area Name</label>
+            <input type="text" class="form-control" name="name" id="nameInput" required>
           </div>
-          <div class="row">
-            <div class="col-md-12 col-sm-12" style="padding: 0">
-              <label class="col-md-12 col-sm-12" style="padding: 0">Area</label>
-              <div class="input-group mb-3 col-sm-12 col-md-12" style="padding: 0">
-                <div class="col-md-8 col-sm-12" style="padding: 0">
-                  <select class="form-control" style="width: 100%" name="area" id="areaInput" required>
-                  </select>
-                </div>
-                <div class="input-group-append col-md-4 col-sm-12" style="padding: 0">
-                  <a href="{{ route('area') }}" target="_blank" class="btn btn-primary btn-square" style="width: 100%;"><i class="fa fa-plus mr-2"></i>Add Area</a>
-                </div>
+          <div class="col-md-12 col-sm-12" style="padding: 0">
+            <label class="col-md-12 col-sm-12" style="padding: 0">Area</label>
+            <div class="input-group mb-3 col-sm-12 col-md-12" style="padding: 0">
+              <div class="col-md-8 col-sm-12" style="padding: 0">
+                <select class="form-control" style="width: 100%" name="area" id="areaInput" required>
+                </select>
+              </div>
+              <div class="input-group-append col-md-4 col-sm-12" style="padding: 0">
+                <a href="{{ route('area') }}" target="_blank" class="btn btn-primary btn-square" style="width: 100%;"><i class="fa fa-plus mr-2"></i>Add Area</a>
               </div>
             </div>
           </div>
@@ -307,7 +310,7 @@
       { data: 'id', name: 'sub_areas.id' },
       { data: 'name', name: 'sub_areas.name' },
       { data: 'area.name', name: 'area.name' },
-      { data: 'area.region.name', name: 'area.regions.name', "searchable": true },      
+      { data: 'area.region.name', name: 'area.regions.name', "searchable": true },
       { data: 'action', name: 'action' },
       ]
     });

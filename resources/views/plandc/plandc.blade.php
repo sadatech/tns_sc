@@ -29,7 +29,7 @@
                     <th>Employee</th>
                     <th>Date</th>
                     <th>Lokasi</th>
-                    <th>Stocklist</th>
+                    <th>Stockist</th>
                     <th class="text-center" style="width: 15%;"> Action</th>
                 </thead>
                 </table>
@@ -37,6 +37,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
@@ -60,35 +61,35 @@
                             <label class="col-md-12" style="padding: 0">Employee</label>
                             <div class="input-group mb-3 col-md-12" style="padding: 0">
                                 <div style="width: 82%">
-                                    <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
-                                        <option disabled selected>Choose your Employee</option>
+                                    <select id="employees" class="js-edit form-control" style="width: 100%" data-placeholder="Choose Employee...">
                                         @foreach($employee as $data)
                                         <option value="{{ $data->id.'|'.$data->name }}">{{ $data->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="input-group-append" style="width: 18%">
-                                    <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
+                                    <button id="employeesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
                                 </div>
                             </div>
                             <!-- Block’s content.. -->
                             <div class="block block-themed block-rounded">
                                 <div class="block-header bg-gd-lake" style="padding: 5px">
                                     <h3 class="block-title">Selected Employee</h3>
+                                    <span id="selectedEmployeeDefault" style="color: #ffeb5e;padding-top: 5px;">Please Add Employee</span>
                                     <div class="block-options">
-                                        <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Search for Store..">
+                                        <input type="text" id="myEmployee" class="form-control" placeholder="Search for Employee..">
                                     </div>
                                 </div>
                                 <div class="block-content" style="padding: 0; width: 100%;">
-                                    <table id="selectedStoreTable" class="table table-striped table-vcenter" style="display: none;">
+                                    <table id="selectedEmployeeTable" class="table table-striped table-vcenter" style="display: none;">
                                         <thead>
                                             <tr>
                                                 <th class="text-center" style="width: 50px;">#</th>
-                                                <th>Store</th>
+                                                <th>Employee</th>
                                                 <th class="text-center" style="width: 100px;">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="selectedStoreTableBody">
+                                        <tbody id="selectedEmployeeTableBody">
                                         </tbody>
                                     </table>
                                 </div>
@@ -101,7 +102,7 @@
                             <input class="js-datepicker form-control" type="text" name="date" id="dateInput" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Stocklist</label>
+                            <label>Stockist</label>
                             <input type="text" class="form-control" name="stocklist" id="stocklistInput" required>
                         </div>
                     </div>
@@ -122,6 +123,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
@@ -146,7 +148,7 @@
                             <label class="col-md-12" style="padding: 0">Employee</label>
                             <div class="input-group mb-3 col-md-12" style="padding: 0">
                                 <div style="width: 82%">
-                                    <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
+                                    <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose Employee...">
                                         @foreach($employee as $data)
                                             <option value="{{ $data->id.'|'.$data->name}}">{{$data->name}}</option>
                                         @endforeach
@@ -225,6 +227,13 @@
     $('#stocklistInput').val(json.stocklist);
     $('#lokasiInput').val(json.lokasi);
     console.log(json);
+     $('#employeesAdd').click(function () {
+            var employees = $('#employees').val();
+            if (employees != null) {
+                clearStores();
+                addItem2(employees);
+            }
+        });
   }
   @if(session('type'))
   $(document).ready(function() {
@@ -288,25 +297,23 @@
   });
   
   var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
+  var selectedEmployees = [], selectedEmployeesId = [], selectedEmployeesName = [], tabIndex = 0;
   $(".js-select2").select2({ 
-    tags: true,
     dropdownParent: $("#importModal")
   });
   $(".js-edit").select2({ 
-    tags: true,
     dropdownParent: $("#editModal")
   });
+  
     $('#storesAdd').click(function () {
         var stores = $('#stores').val();
         if (stores != null) {
             $('#stores').val('');
             $('#select2-stores-container').html('');
             addItem(stores);
-        } else {               
-            text('Warning',': Please the select Employee first','warning');
         }
     });
-  function addItem(stores, get = '') {
+    function addItem(stores, get = '') {
         var storeSplit = stores.split("|");
         var a = selectedStoresId.indexOf(''+storeSplit[0]);
 
@@ -393,6 +400,58 @@
             }
         }
         );
+    }
+
+    function clearStores() {
+        $('#employees').val('');
+        $('#select2-employees-container').html('<span class="select2-selection__placeholder">Choose your Employee</span>');
+    }
+    function addItem2(employees, get2 = '') {
+        var employeeSplit = employees.split("|");
+        var a = selectedEmployeesId.indexOf(''+employeeSplit[0]);
+        
+        if (get2 != 'get2') {
+            selectedEmployees.push(employees);
+            selectedEmployeesId.push(employeeSplit[0]);
+            selectedEmployeesName.push(employeeSplit[1]);
+        }
+
+        if (a < 0 || get2 == 'get2') {
+            tabIndex++;
+            $('#selectedEmployeeTable').removeAttr('style');
+            $('#selectedEmployeeTableBody').append("<tr>"+
+                "<th class='text-center' scope='row'>"+ tabIndex +"</th>"+
+                "<td><span>"+ employeeSplit[1] +"</span>"+
+                "<input type='hidden' name='employee[]' value='"+ employeeSplit[0] +
+                "'></td>"+
+                "<td class='text-center'>"+
+                "<div class='btn-group'>"+
+                "<button type='button' class='btn btn-sm btn-secondary js-tooltip-enabled' data-toggle='tooltip' title=' data-original-title='Delete' onclick='deleteItem2("+ employeeSplit[0] +")'>"+
+                "<i class='fa fa-times'></i>"+
+                "</button>"+
+                "</div>"+
+                "</td>"+
+                "</tr>");
+        }else{
+            console.log("Data Already Exist! data: "+employeeSplit[1]);
+            notif('Warning',': Please the select Store first','warning');
+        }
+    }
+
+    function deleteItem2(id) {
+        var a = selectedEmployeesId.indexOf(''+id);
+        if (a >= 0) {
+            selectedEmployees.splice(a, 1);
+            selectedEmployeesId.splice(a, 1);
+            selectedEmployeesName.splice(a, 1);
+            tableIndex = 0;
+            $('#selectedEmployeeTableBody').html('');
+            $.each(selectedEmployees, function( index, value ) {
+              addItem2(value,'get2');
+          });
+        }else{
+            console.log("Index Item Not Found!");
+        }
     }
 </script>
 @endsection

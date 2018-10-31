@@ -28,6 +28,11 @@ class PlandcController extends Controller
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
+            $data1['store_selected'] = json_encode(PlanEmployee::where(['plan_employees.id_plandc' => $plan->id])
+            ->join('employees','employees.id','plan_employees.id_employee')
+            ->select(DB::raw("concat(employees.id,'|',employees.name) as stores_item"))
+            ->get()
+            ->toArray());
             $data = array(
                 'id'            => $plan->id,
                 'date'          => $plan->date,
@@ -72,19 +77,31 @@ class PlandcController extends Controller
                 {
                     foreach($results as $row)
                     {
+                       
+                        // $check = PlanEmployee::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($row->lokasi))."'")
+                        // ->where(['id_' => $data1->id])->count();
+                     
                         $insert = PlanDc::create([
                             'date'              => Carbon::now(),
                             'lokasi'            => $row->lokasi,
-                            'stocklist'         => $row->stocklist
+                            'stocklist'          => $row->stocklist
                         ]);
-                        if ($insert) 
+                        if (!empty($insert)) 
                             {
                                 $dataStore = array();
                                 foreach ($request->input('employee') as $distributor) {
-                                    $dataStore[] = array(
-                                        'id_employee'    => $distributor,
-                                        'id_plandc'      => $insert->id,
-                                    );
+                                    // $data1 = Employee::where(['id' => $distributor])->first();
+                                    // $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($row->lokasi))."'");
+                                    // $check = PlanEmployee::where(['id_employee' => $data1->id]);
+                                    // if(!empty($data1) && $data2->count() < 1 && $chec   k->count() < 1 ) {
+                                        $dataStore[] = array(
+                                            'id_employee'    => $distributor,
+                                            'id_plandc'      => $insert->id,
+                                        );
+                                    // } else {
+                                    //     break;
+                                    //     return false;
+                                    // }
                                 }
                                 DB::table('plan_employees')->insert($dataStore); 
                             }
