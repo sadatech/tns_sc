@@ -216,6 +216,10 @@ class OutletController extends Controller
 						$res['msg'] = "Sudah melakukan checkout untuk hari ini.";
 						$code = 200;
 					}
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Kamu belum melakukan check-in.";
+					$code = 200;
 				}
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
