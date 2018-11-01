@@ -13,7 +13,6 @@ use Carbon\Carbon;
 use App\Position;
 use App\Agency;
 use App\SubArea;
-use App\Brand;
 use App\Store;
 use App\Timezone;
 use App\Employee;
@@ -216,9 +215,33 @@ class EmployeeController extends Controller
 		// dd($employee->get()[0]);
 		return Datatables::of($employee)
 		->addColumn('action', function ($employee) {
+			$employeeS = EmployeeStore::where(['id_employee' => $employee->id])->get();
+			if ($employee->status = "Stay" && (!empty($employeeS->store)) && (!empty($employeeS->coverage)) && (!empty($employeeS->is_vito)) && (!empty($employeeS->address))) {
+				$store = $employeeS->store->id;
+				$coverage = $employeeS->store->id;
+				$is_vito = $employeeS->store->id;
+				$address = $employeeS->store->id;
+			} else {
+				$store = array();
+				$coverage = array();
+				foreach ($employeeS as $data) {
+				$store[] = $data->store->name1;
+				$coverage[] = $data->store->coverage;
+				$is_vito[] = $data->store->is_vito;
+				$address[] = $data->store->address;
+				}
+			}
+			$data = array(
+                'id'        	=> $employee->id,
+				'store'    		=> rtrim(implode(', ', $store), ','),
+				'coverage'		=> rtrim(implode(', ', $coverage), ','),
+				'is_vito'		=> rtrim(implode(', ', $is_vito), ','),
+				'address'		=> rtrim(implode(', ', $address), ','),
+			);
 			// if ($employee->isResign == false) {
 			return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
 			<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+			<button onclick='viewModal(".json_encode($data).")' class='btn btn-sm btn-warning btn-square' title='View Store'><i class='si si-picture mr-2'></i> STORE</button>
 			<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
 			<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
 			// } else {
