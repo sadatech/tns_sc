@@ -28,6 +28,8 @@ Route::prefix('store')->group(function () {
 		Route::post('/create', 'StoreController@store')->name('store.add')->middleware('auth');
 		Route::put('/update/{id}', 'StoreController@update')->name('store.update')->middleware('auth');
 		Route::get('/delete/{id}', 'StoreController@delete')->name('store.delete')->middleware('auth');
+		Route::get('/exportXLS', 'StoreController@exportXLS')->name('store.exportXLS')->middleware('auth');
+		Route::post('/importXLS', 'StoreController@importXLS')->name('store.importXLS')->middleware('auth');
 	});
 
 	//Pasar Pages

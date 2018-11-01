@@ -43,6 +43,14 @@ class NewsController extends Controller
         $news = new News;
         $news->sender = $request->input('sender');
         $news->subject = $request->input('subject');
+        if ($request->input('content') == null) {
+               return redirect()->route('news')
+                ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Harap isi Content!'
+                ]);
+        }
         $news->content = $request->input('content');
         $news->created_at = Carbon::now('Asia/Jakarta');
         $news->updated_at = Carbon::now('Asia/Jakarta');

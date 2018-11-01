@@ -1,12 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
 use Auth;
+use App\Area;
 use DB;
+use Carbon\Carbon;
+use Rap2hpoutre\FastExcel\FastExcel;
+use Box\Spout\Writer\Style\Color;
+use File;
+use Excel;
 use App\Store;
 use App\Account;
 use App\SubArea;
@@ -138,7 +144,7 @@ class StoreController extends Controller
             $dist = StoreDistributor::where(['id_store'=>$store->id])->get();
             $distList = array();
             foreach ($dist as $data) {
-                $distList[] = $data->distributor->name;
+                array_push($distList,$data->distributor->name);
             }
             return rtrim(implode(',', $distList), ',');
         })
@@ -146,8 +152,136 @@ class StoreController extends Controller
             return $store->subarea->name."(".$store->subarea->area->name.")";
         })->make(true);
     }
+    public function exportXLS()
+    {
+ 
+        $store = Store::orderBy('created_at', 'DESC')->get();
+        $filename = "Store_".Carbon::now().".xlsx";
+        (new FastExcel($store))->download($filename, function ($store) {
+            return [
+                'Name'  => $store->name1,
+                'Optional Name'      => $store->name2,
+                'Address'    => $store->address,
+                'Latitude'    => $store->latitude,
+                'Longitude'    => $store->longitude,
+                'Account'    => $store->account->name,
+                'Sub Area'    => $store->subarea->area->name,
+                'Timezone'    => $store->timezone->name,
+                'Sales Tiers'    => $store->sales->name,
+                'VITO'    => $store->is_vito,
+                'Store Panel'    => $store->store_panel,
+                'Coverage'    => $store->coverage,
+                'Delivery'    => $store->delivery,
+            ];
+        });
+    }
+     public function importXLS(Request $request)
+    {
 
-    public function update(Request $request, $id) 
+        $this->validate($request, [
+            'file' => 'required'
+        ]);
+
+        $transaction = DB::transaction(function () use ($request) {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+            if($request->hasFile('file')){
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
+                    {
+                        // return var_dump($results);
+                        // exit();
+                        foreach($results as $row)
+                        {
+                           echo "$row<hr>";
+                            // CEK ISSET CUSTOMER
+                            $dataArea['area_name']      = $row->area;
+                            $dataArea['sub_area']    = $row->sub_area;
+                            $id_area = $this->findArea($dataArea);
+
+
+                         $insert = Store::create([
+                            'name1' => $row->name1,
+                            'name2' => $row->name2,
+                            'address' => $row->address,
+                            'latitude' => $row->latitude,
+                            'longitude' => $row->longitude,
+                            'id_account' => $row->id_account,
+                            'id_subarea' => $row->sub_area,
+                            'id_timezone' => $row->id_timezone,
+                            'id_salestier' => $row->id_salestier,
+                            'is_vito' => $row->is_vito,
+                            'store_panel' => $row->store_panel,
+                            'coverage' => $row->coverage,
+                            'delivery' => $row->delivery,
+                         ]);
+
+                        }
+                    },false);
+            }
+            return 'success';
+        });
+
+        if ($transaction == 'success') {
+            return redirect()->back()
+                ->with([
+                    'type'      => 'success',
+                    'title'     => 'Sukses!<br/>',
+                    'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
+                ]);
+        }else{
+            return redirect()->back()
+                ->with([
+                    'type'    => 'danger',
+                    'title'   => 'Gagal!<br/>',
+                    'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+                ]);
+        }
+    }
+ 
+    public function findArea($data)
+    {
+        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
+        if ($dataArea->count() == 0) {
+            
+            $dataSubArea['sub_area']  = $data['sub_area'];
+            $id_subarea = $this->finSubArea($dataSubArea);
+
+            $area = Area::create([
+              'name'        => $data['area_name'],
+              'id_subarea'   => $id_subarea,
+            ]);
+            $id_area = $area->id;
+        }else{
+            $id_area = $dataArea->first()->id;
+        }
+      return $id_area;
+    }
+
+    public function finSubArea($data)
+    {
+        $dataSubArea = SubArea::where('name','like','%'.trim($data['sub_area']).'%');
+        if ($dataSubArea->count() == 0) {
+            
+            $subarea = SubArea::create([
+              'name'        => $data['sub_area'],
+            ]);
+            $id_subarea = $subarea->id;
+        }else{
+            $id_subarea = $dataSubArea->first()->id;
+        }
+      return $id_subarea;
+    }
+
+
+   public function update(Request $request, $id) 
     {
         $data=$request->all();
         $limit=[

@@ -51,7 +51,7 @@ class PKController extends Controller
                 $files->move($file_path, $filename);
                 $pk->filePDF = $filename;
         }
-        if ( $pk->subject = $request->input('subject')==NULL) {
+        if ($request->input('subject') == NULL) {
              return redirect()->route('pk')
                 ->with([
                     'type'   => 'danger',
@@ -61,7 +61,7 @@ class PKController extends Controller
         }
         $pk->admin = $request->input('admin');
         $pk->sender = $request->input('sender');
-       
+        $pk->subject = $request->input('subject');
         $pk->type = $request->input('type');
         $pk->created_at = Carbon::now('Asia/Jakarta');
         $pk->updated_at = Carbon::now('Asia/Jakarta');
@@ -137,8 +137,6 @@ class PKController extends Controller
      */
     public function update(Request $request, $id)
     {
-            //return $request->all();
-            //return $request->file('fileku')->getClientOriginalName();
             $pk = ProductKnowledge::find($id);
             $files = $request->file('fileku');
             if ($request->hasFile('fileku')) {
@@ -147,23 +145,25 @@ class PKController extends Controller
                 $files->move($file_path, $filename);
                 $pk->filePDF = $filename;
             }
-
+            if ($request->input('subject') == NULL) {
+                 return redirect()->route('pk')
+                    ->with([
+                        'type'   => 'danger',
+                        'title'  => 'Gagal!<br/>',
+                        'message'=> '<i class="em em-confounded mr-2"></i>Harap isi Subject!'
+                    ]);
+            }
             $pk->admin = $request->input('admin');
             $pk->sender = $request->input('sender');
             $pk->subject = $request->input('subject');
             $pk->target = $request->target == 'All' ? null : $request->target;
             $pk->save();
-            // $file = $files->getClientOriginalExtension();
-            
-            
-             return redirect()->route('pk')
+            return redirect()->route('pk')
                 ->with([
                     'type'      => 'success',
                     'title'     => 'Sukses!<br/>',
                     'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil merubah Product Knowledges!'
                 ]); 
-           
-      
     }
 
     /**

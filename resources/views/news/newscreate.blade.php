@@ -11,19 +11,19 @@
                    <div class="form-group row">
                     <label class="col-lg-3 col-form-label" for="example-hf-email">Sender</label>
                     <div class="col-lg-7">
-                        <input type="text" class="form-control" name="sender" placeholder="Sender">
+                        <input type="text" class="form-control" name="sender" placeholder="Sender" required="">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label" for="example-hf-email">Subject</label>
                     <div class="col-lg-7">
-                        <input type="text" class="form-control" name="subject" placeholder="Subject">
+                        <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label" for="example-hf-password">Content</label>
                     <div class="col-lg-7">
-                       <textarea class="summernote" name="content"></textarea>
+                       <textarea class="summernote" name="content" "></textarea>
                    </div>
                </div>
                <div class="form-group row">

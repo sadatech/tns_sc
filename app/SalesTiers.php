@@ -11,7 +11,7 @@ class SalesTiers extends Model
 
 	   public function stores()
     {
-    	return $this->belongsTo('App\Store');
+    	return $this->belongsTo('App\Store', 'id_salestier');
     }
 
 }
