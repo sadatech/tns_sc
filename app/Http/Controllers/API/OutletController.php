@@ -34,17 +34,23 @@ class OutletController extends Controller
 						'id_employee' => $user->id
 					])->first();
 					if (!empty($emp)) {
-						$outlets = array();
-						foreach ($data->outlet as $data) {
-							$outlets[] = array(
-								'id_employee_pasar'	=> $emp->id,
-								'name'				=> $data->name,
-								'phone'				=> $data->phone,
-								'active'			=> true,
-							);
-						}
-						$insert = DB::table('outlets')->insert($outlets);
-						if ($insert) {
+						// $outlets = array();
+						// foreach ($data->outlet as $data) {
+						// 	$outlets[] = array(
+						// 		'id_employee_pasar'	=> $emp->id,
+						// 		'name'				=> $data->name,
+						// 		'phone'				=> $data->phone,
+						// 		'active'			=> true,
+						// 	);
+						// }
+						// $insert = DB::table('outlets')->insert($outlets);
+						$insert = Outlet::create([
+							'id_employee_pasar'	=> $emp->id,
+							'name'				=> $request->input('name'),
+							'phone'				=> $$request->input('phone'),
+							'active'			=> true,
+						]);
+						if ($insert->id) {
 							$res['success'] = true;
 							$res['msg'] = "Success add outlets.";
 							$code = 200;
