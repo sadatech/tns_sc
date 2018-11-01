@@ -332,6 +332,7 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'TargetController@store')->name('target.add')->middleware('auth');
 		Route::put('/update/{id}', 'TargetController@update')->name('target.update')->middleware('auth');
 		Route::get('/delete/{id}', 'TargetController@delete')->name('target.delete')->middleware('auth');
+		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('target.download-sample')->middleware('auth');
 	});
 });
 
