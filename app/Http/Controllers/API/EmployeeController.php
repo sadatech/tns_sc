@@ -86,8 +86,6 @@ class EmployeeController extends Controller
 			$req = $this->_validateBodyTypeData($req);
 
 			DB::transaction(function() use ($req){
-
-				//
 				Employee::where("id", $this->employe_auth->id)
 				->update([
 					"name"           => (isset($req->name) && $req->name !== null) ? $req->name : $this->employe_auth->name,
