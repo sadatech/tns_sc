@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Outlet extends Model
 {
     protected $fillable = [
-		'id_employee_pasar', 'name', 'phone', ,'costumer_code' 'active'
+		'id_employee_pasar', 'name', 'phone', ,'customer_code' 'active'
     ];
     
     public function employeePasar()
