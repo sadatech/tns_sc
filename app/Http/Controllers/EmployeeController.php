@@ -13,10 +13,10 @@ use Carbon\Carbon;
 use App\Position;
 use App\Agency;
 use App\SubArea;
-use App\Brand;
 use App\Store;
 use App\Timezone;
 use App\Employee;
+use App\EmployeePasar;
 use App\Pasar;
 use App\EmployeeStore;
 use App\Filters\EmployeeFilters;
@@ -50,7 +50,10 @@ class EmployeeController extends Controller
 		$data['position'] 	= Position::get();
 		$data['agency'] 	= Agency::get();
 		$data['store'] 		= Store::get();
+		$data['pasar'] 		= Pasar::get();
+		$data['subarea'] 	= SubArea::get();
 		$data['store_selected'] = json_encode(EmployeeStore::where(['employee_stores.id_employee' => $id])->join('stores','stores.id','employee_stores.id_store')->select(DB::raw("concat(stores.id,'|',stores.name1) as stores_item"))->get()->toArray());
+		$data['pasar_selected'] = json_encode(EmployeePasar::where(['employee_pasars.id_employee' => $id])->join('pasars','pasars.id','employee_pasars.id_pasar')->select(DB::raw("concat(pasars.id,'|',pasars.name) as pasars_item"))->get()->toArray());
 		if ($data['emp']->isResign) {
 			return redirect()->route('employee');
 		} else {
@@ -134,14 +137,6 @@ class EmployeeController extends Controller
 					'id_agency' 	=> $request->input('agency')
 				]);
 				if ($insert->id) {
-							// $dataBrand = array();
-							// 	foreach ($request->input('brand') as $brand) {
-							// 		$dataBrand[] = array(
-							// 			'id_brand'    			=> $brand,
-							// 			'id_employee'          	=> $insert->id
-							// 		);
-							// 	}
-							// 	DB::table('employee_brands')->insert($dataBrand);
 					if ($request->input('status') == 'Stay') {
 						EmployeeStore::create([
 							'id_store' 		=> $request->input('store'),
@@ -177,7 +172,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_pasars')->insert($dataPasar);
-						return redirect()->route('employee')
+						return redirect()->route('employee.pasar')
 						->with([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
@@ -192,7 +187,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_sub_areas')->insert($dataSubArea);
-						return redirect()->route('employee')
+						return redirect()->route('employee.pasar')
 						->with([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
@@ -220,9 +215,33 @@ class EmployeeController extends Controller
 		// dd($employee->get()[0]);
 		return Datatables::of($employee)
 		->addColumn('action', function ($employee) {
+			$employeeS = EmployeeStore::where(['id_employee' => $employee->id])->get();
+			if ($employee->status = "Stay" && (!empty($employeeS->store)) && (!empty($employeeS->coverage)) && (!empty($employeeS->is_vito)) && (!empty($employeeS->address))) {
+				$store = $employeeS->store->id;
+				$coverage = $employeeS->store->id;
+				$is_vito = $employeeS->store->id;
+				$address = $employeeS->store->id;
+			} else {
+				$store = array();
+				$coverage = array();
+				foreach ($employeeS as $data) {
+				$store[] = $data->store->name1;
+				$coverage[] = $data->store->coverage;
+				$is_vito[] = $data->store->is_vito;
+				$address[] = $data->store->address;
+				}
+			}
+			$data = array(
+                'id'        	=> $employee->id,
+				'store'    		=> rtrim(implode(', ', $store), ','),
+				'coverage'		=> rtrim(implode(', ', $coverage), ','),
+				'is_vito'		=> rtrim(implode(', ', $is_vito), ','),
+				'address'		=> rtrim(implode(', ', $address), ','),
+			);
 			// if ($employee->isResign == false) {
 			return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
 			<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+			<button onclick='viewModal(".json_encode($data).")' class='btn btn-sm btn-warning btn-square' title='View Store'><i class='si si-picture mr-2'></i> STORE</button>
 			<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
 			<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
 			// } else {
@@ -304,16 +323,6 @@ class EmployeeController extends Controller
 			if($request->file('foto_tabungan')){
 				$employee->foto_tabungan = $foto_tabungan;
 			}
-				// if ($request->input('brand')) {
-                    // foreach ($request->input('brand') as $brand) {
-                        // EmployeeBrand::where('id_employee', $id)->delete();
-                        // $dataStore[] = array(
-                            // 'id_brand'    			=> $brand,
-                            // 'id_employee'          	=> $id,
-                        // );
-                    // }
-                    // DB::table('employee_brands')->insert($dataStore);
-                // }
 			if ($request->input('status') == 'Stay') {
 				$employee->status = $request->input('status');
 			}
@@ -322,6 +331,9 @@ class EmployeeController extends Controller
 			}
 			if ($request->input('position') == Position::where(['level' => 'tlmtc'])->first()->id) {
 				$employee->id_subarea = $request->input('subarea');
+			}
+			if ($request->input('password')) {
+				$employee->password = bcrypt($request->input('name'));
 			}
 			$employee->name 		= $request->input('name');
 			$employee->nik 			= $request->input('nik');
