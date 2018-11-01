@@ -23,14 +23,14 @@ class OutletController extends Controller
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
 			} else {
-				$data = json_decode($request->getContent());
-				if (empty($data->pasar) || empty($data->outlet)) {
+				$data = $request->all();
+				if (empty($data['code']) || empty($data['phone']) || empty($data['name']) || empty($data['pasar']) ) {
 					$res['success'] = false;
 					$res['msg'] = "Data cannot be empty.";
 					$code = 200;
 				} else {
 					$emp = EmployeePasar::where([
-						'id_pasar' => $request->input('pasar'),
+						'id_pasar' => $data['pasar'],
 						'id_employee' => $user->id
 					])->first();
 					if (!empty($emp)) {
@@ -46,9 +46,9 @@ class OutletController extends Controller
 						// $insert = DB::table('outlets')->insert($outlets);
 						$insert = Outlet::create([
 							'id_employee_pasar'	=> $emp->id,
-							'customer_code'		=> $request->input('code'),
-							'name'				=> $request->input('name'),
-							'phone'				=> $$request->input('phone'),
+							'customer_code'		=> $data['code'],
+							'name'				=> $data['name'],
+							'phone'				=> $data['pasar'],
 							'active'			=> true,
 						]);
 						if ($insert->id) {
