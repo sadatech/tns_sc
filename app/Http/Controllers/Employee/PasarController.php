@@ -50,9 +50,7 @@ class PasarController extends Controller
 		})
 		->addColumn('action', function ($employee) {
 			if (isset($employee->id)) {
-				$eP 		= EmployeePasar::where(['id_employee' => ($employee->id)])->first();
-				$employeeS 	= EmployeePasar::where(['id_employee' => $employee->id])->get();
-				$eOut 		= Outlet::where(['id_employee_pasar' => $eP->id])->get();
+				$employeeS = EmployeePasar::where(['id_employee' => $employee->id])->get();
 				$pasar = array();
 				$outlist = array();
 				foreach ($employeeS as $key => $data) 
@@ -108,6 +106,7 @@ class PasarController extends Controller
 					$pasarList[] = "-";
 				}
 			}
+
 			$data[] = array(
 				'NIK'          	=> $val->nik,
 				'Name'          => $val->name,

@@ -319,7 +319,9 @@
               addItem(value.stores_item);
           });
         } else {
-            $('#storeStay').val('{{ $store_selected }}');
+            var selected = {!! $store_selected !!};
+            var getId = selected[0].stores_item.split("|")[0];
+            $('#stayInput').val(getId).trigger("change");
             $('#storeMobile').hide();
             $('#storeStay').show();
         }
@@ -332,7 +334,9 @@
               addItem(value.stores_item);
           });
         } else {
-            $('#storeStay').val('{{ $store_selected }}');
+            var selected = {!! $store_selected !!};
+            var getId = selected[0].stores_item.split("|")[0];
+            $('#stayInput').val(getId).trigger("change");
             $('#storeMobile').hide();
             $('#storeStay').show();
         }
@@ -345,7 +349,7 @@
         var selected = {!! $pasar_selected !!};
         $.each(selected, function( index, value ) {
           addItemPasar(value.pasars_item);
-        });
+      });
         $('#pasarMobile').show();
         $('#status').hide();
         $('#subarea').hide();
@@ -357,7 +361,7 @@
         var selected = {!! $pasar_selected !!};
         $.each(selected, function( index, value ) {
           addItemPasar(value.pasars_item);
-        });
+      });
         $('#pasarMobile').show();
         $('#status').hide();
         $('#subarea').hide();
@@ -397,8 +401,8 @@
               var arr = []
               $siblings = $(this).siblings();
               $.each($siblings, function (i, key) {
-                 arr.push($(key).val()); 
-             });
+               arr.push($(key).val()); 
+           });
               if ($.inArray($(this).val(), arr) !== -1)
               {
                   alert("duplicate has been found");
@@ -442,7 +446,6 @@
         $('#position').on('change', e => {
             var select = $('#position').find(":selected").val()
             var status = $('#status').find(":selected").val()
-            console.log(select);
             if (select == "{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}") {
                 $('#status').show();
                 $('#subarea').hide();
@@ -499,13 +502,23 @@
             var select = $('#position').find(":selected").val()
             var status = $('#status').find(":selected").val()
             if (status == 'Stay') {
+                clearStores();
                 $('#storeMobile').hide();
                 $('#storeStay').show();
             } else {
+                clearStores();
                 $('#storeStay').hide();
                 $('#storeMobile').show();
             }
         })
+        function clearStores() {
+            $('#stores').val('');
+            $('#select2-stores-container').html('<span class="select2-selection__placeholder">Choose your Store</span>');
+        }
+        function clearPasar() {
+            $('#pasar').val('');
+            $('#select2-pasar-container').html('<span class="select2-selection__placeholder">Choose your Pasar</span>');
+        }
         function addItem(stores, get = '') {
             var storeSplit = stores.split("|");
             var a = selectedStoresId.indexOf(''+storeSplit[0]);
