@@ -99,14 +99,19 @@ class PasarController extends Controller
 				'id_employee', $val->id
 			)->get();
 			$pasarList = array();
+			$outletList = array();
 			foreach($pasar as $dataPasar) {
 				if(isset($dataPasar->id_pasar)) {
+					// $getOutlet = Outlet::where(['id_employee_pasar' => $dataPasar->id])->get();
+					// foreach ($getOutlet as $value) {
+					// 	$outletList[] = $value->name;
+					// }
 					$pasarList[] = $dataPasar->pasar->name;
 				} else {
 					$pasarList[] = "-";
 				}
 			}
-
+			// dd($outletList);
 			$data[] = array(
 				'NIK'          	=> $val->nik,
 				'Name'          => $val->name,
@@ -121,7 +126,8 @@ class PasarController extends Controller
 				'Gender'		=> $val->education,
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
-				'Pasar'			=> rtrim(implode(',', $pasarList), ',') ? rtrim(implode(',', $pasarList), ',') : "-"
+				'Pasar'			=> (isset($pasarList) ? rtrim(implode(',', $pasarList), ',') : "-"),
+				'Outlet'			=> (isset($outletList) ? rtrim(implode(',', $outletList), ',') : "-"),
 			);
 		}
 		$filename = "employeePasar_".Carbon::now().".xlsx";
