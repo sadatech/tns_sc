@@ -24,7 +24,7 @@ class OutletController extends Controller
 				$code = $e->getStatusCode();
 			} else {
 				$data = $request->all();
-				if (empty($data['code']) || empty($data['phone']) || empty($data['name']) || empty($data['pasar']) ) {
+				if (empty($data['phone']) || empty($data['pasar']) ) {
 					$res['success'] = false;
 					$res['msg'] = "Data cannot be empty.";
 					$code = 200;
