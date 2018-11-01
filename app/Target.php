@@ -2,11 +2,24 @@
 
 namespace App;
 
+use App\Components\traits\ValidationHelper;
 use Illuminate\Database\Eloquent\Model;
 
 class Target extends Model
 {
-    protected $fillable = ['id_employee', 'id_store', 'rilis', 'value', 'value_pf'];
+    use ValidationHelper;
+
+    public static function rule()
+    {
+        return [
+            'id_employee' => 'integer|required',
+            'rilis' => 'required',
+            'file' => 'required'
+            // 'id_store' => 'integer|required',
+        ];
+    }
+
+    protected $fillable = ['id_employee', 'id_store', 'rilis', 'id_product', 'quantity'];
 
     public function targetDetail()
     {
@@ -21,5 +34,10 @@ class Target extends Model
     public function store()
     {
         return $this->belongsTo('App\Store', 'id_store');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'id_product');
     }
 }

@@ -14,7 +14,7 @@ class CreateEmployeesTable extends Migration
             $table->integer('id_agency')->unsigned();
             $table->integer('id_timezone')->unsigned()->nullable();
             $table->string('name');
-            $table->string('nik')->nullable();
+            $table->string('nik')->unique();
             $table->string('ktp')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
             $table->string('email')->unique()->nullable();
