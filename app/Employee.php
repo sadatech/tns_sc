@@ -2,15 +2,17 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Components\traits\DropDownHelper;
+use App\Filters\QueryFilters;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use App\Filters\QueryFilters;
+use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Employee extends Model implements AuthenticatableContract, JWTSubject
 {
     use Authenticatable;
+    use DropDownHelper;
     
     protected $fillable = [
         'name', 'nik', 'id_position', 'ktp', 'phone', 'email', 'rekening', 'bank', 'status', 'joinAt', 'id_agency', 'gender', 'education', 'birthdate', 'foto_ktp', 'foto_tabungan', 'isResign', 'password', 'id_timezone'

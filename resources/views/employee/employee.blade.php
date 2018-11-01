@@ -20,7 +20,7 @@
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover" id="employeetable">
                     <thead>
-                        <th class="text-center" width="245px">Action</th>
+                        <th class="text-center" width="350px">Action</th>
                         <th width="200px">NIK</th>
                         <th width="200px">Name</th>
                         <th width="200px">No. KTP</th>
@@ -42,6 +42,49 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="fa fa-edit"></i> Store Information</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+                <input type="hidden" name="employee" id="employeeID">
+                <div class="block-content">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td width="100"><b>Store</b></td>
+                            <td id="reasonName" colspan="4">Example</td>
+                        </tr>
+                        <tr>
+                            <td><b>Coverage</b></td>
+                            <td id="reasonNIK" colspan="4">Example</td>
+                        </tr>
+                        <tr>
+                            <td><b>Is Vito</b></td>
+                            <td id="reasonPosition">Example</td>
+                        </tr>
+                        <tr>
+                            <td><b>Address</b></td>
+                            <td id="addressStore">Example</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                </div>
+        </div>
+    </div>
+</div>
+
+
 @endsection
 
 @section('css')
@@ -57,6 +100,15 @@
 <script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script type="text/javascript">
+    function viewModal(json) {
+        $('#viewModal').modal('show');
+        $('#employeeID').val(json.id);
+        $('#reasonName').html(json.store);
+        $('#reasonNIK').html(json.coverage);
+        $('#reasonPosition').html(json.is_vito);
+        $('#addressStore').html(json.address);
+        
+    }
     @if(session('type'))
     $(document).ready(function() {
         $.notify({

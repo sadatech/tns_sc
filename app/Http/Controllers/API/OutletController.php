@@ -23,28 +23,35 @@ class OutletController extends Controller
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
 			} else {
-				$data = json_decode($request->getContent());
-				if (empty($data->pasar) || empty($data->outlet)) {
+				$data = $request->all();
+				if (empty($data['phone']) || empty($data['pasar']) ) {
 					$res['success'] = false;
 					$res['msg'] = "Data cannot be empty.";
 					$code = 200;
 				} else {
 					$emp = EmployeePasar::where([
-						'id_pasar' => $request->input('pasar'),
+						'id_pasar' => $data['pasar'],
 						'id_employee' => $user->id
 					])->first();
 					if (!empty($emp)) {
-						$outlets = array();
-						foreach ($data->outlet as $data) {
-							$outlets[] = array(
-								'id_employee_pasar'	=> $emp->id,
-								'name'				=> $data->name,
-								'phone'				=> $data->phone,
-								'active'			=> true,
-							);
-						}
-						$insert = DB::table('outlets')->insert($outlets);
-						if ($insert) {
+						// $outlets = array();
+						// foreach ($data->outlet as $data) {
+						// 	$outlets[] = array(
+						// 		'id_employee_pasar'	=> $emp->id,
+						// 		'name'				=> $data->name,
+						// 		'phone'				=> $data->phone,
+						// 		'active'			=> true,
+						// 	);
+						// }
+						// $insert = DB::table('outlets')->insert($outlets);
+						$insert = Outlet::create([
+							'id_employee_pasar'	=> $emp->id,
+							'customer_code'		=> $data['code'],
+							'name'				=> $data['name'],
+							'phone'				=> $data['pasar'],
+							'active'			=> true,
+						]);
+						if ($insert->id) {
 							$res['success'] = true;
 							$res['msg'] = "Success add outlets.";
 							$code = 200;
@@ -216,6 +223,10 @@ class OutletController extends Controller
 						$res['msg'] = "Sudah melakukan checkout untuk hari ini.";
 						$code = 200;
 					}
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Kamu belum melakukan check-in.";
+					$code = 200;
 				}
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
