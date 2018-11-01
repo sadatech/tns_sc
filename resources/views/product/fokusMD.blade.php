@@ -1,13 +1,13 @@
 @extends('layouts.app')
-@section('title', "Product Target")
+@section('title', "Product Fokus MD")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Product Target <small>Manage</small></h2>
+  <h2 class="content-heading pt-10"> Product Fokus MD<small>Manage</small></h2>
   @if($errors->any())
     <div class="alert alert-danger">
       <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
       @foreach ($errors->all() as $error)
-      <div>> {{ $error }}</div>
+      <div> {{ $error }}</div>
       @endforeach
     </div>
   @endif
@@ -22,18 +22,17 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+            <button class="btn btn-info btn-square" title="Import Data"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+            <button class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="promoTable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th>Employee Name</th>
-          <th>Store</th>
-          <th>Release Month</th>
           <th>Product</th>
-          <th>Quantity</th>
+          <th>Area</th>
+          <th>Month From</th>
+          <th>Month Until</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -42,38 +41,12 @@
   </div>
 </div>
 
-{{-- MODAL EDIT TARGET --}}
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-edit"></i> Edit Product Target</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      {{ Form::open(['url' => '#', 'id' => 'editModalForm']) }}
-        {!! method_field('PUT') !!}
-        <div class="block-content">
-          {{ Form::numberInput('quantity', old('quantity'), ['required' => '', 'id' => 'editQuantity', 'min' => 1]) }}
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-alt-success">
-              <i class="fa fa-save"></i> Save
-            </button>
-            <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      {{ Form::close() }}
-    </div>
-  </div>
-</div>
+{{-- MODAL EDIT FOCUS --}}
+@include('product._form_focus_md', ['id' => 'editModal', 'type' => 'edit'])
 
-{{-- MODAL ADD TARGET --}}
-@include('product._form_target', ['id' => 'tambahModal', 'action' => route('target.add')])
+{{-- MODAL ADD FOCUS --}}
+@include('product._form_focus_md', ['id' => 'tambahModal', 'action' => route('fokusMD.add')])
+
 @endsection
 
 @section('css')
@@ -93,13 +66,6 @@
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script type="text/javascript">
-    function editModal(json) {
-      $('#editModal').modal('show');
-      $('#editModalForm').attr('action', "{{ url('/product/target/update') }}/"+json.id);
-      $('#editQuantity').val(json.quantity)
-      console.log(json);
-    }
-
       @if(session('type'))
       $(document).ready(function() {
           $.notify({
@@ -121,7 +87,6 @@
       $(function() {
           $('#promoTable').DataTable({
               processing: true,
-              serverSide: true,
               drawCallback: function(){
                   $('.js-swal-delete').on('click', function(){
                     var url = $(this).data("url");
@@ -149,15 +114,15 @@
                     });
                   });
               },
-              ajax: '{!! route('target.data') !!}',
+              ajax: '{!! route('fokusMD.data') !!}',
+              scrollY: "300px",
               columns: [
-	              { data: 'id', name: 'id' },
-                { data: 'employee.name', name: 'employee.name'},
-	              { data: 'store.name1', name: 'store.name1' },
-                { data: 'rilis', name: 'rilis' },
-                { data: 'product.name', name: 'product.name' },
-                { data: 'quantity', name: 'quantity' },
-	              { data: 'action', name: 'action' },
+	            { data: 'id', name: 'id' },
+                { data: 'product.name', name: 'product.name'},
+	            { data: 'area', name: 'area' },
+                { data: 'from', name: 'from' },
+                { data: 'to', name: 'to' },
+	            { data: 'action', name: 'action' },
               ]
           });
       });

@@ -21,7 +21,7 @@
                 <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="storetable">
                     <thead>
                         <th class="text-center" style="width: 150px;">Action</th>
-                        <th width="200px">Name</th>
+                        <th width="200px">Pasar</th>
                         <th width="200px">Address</th>
                         <th>Longitude</th>
                         <th>Latitude</th>

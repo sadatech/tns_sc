@@ -19,10 +19,10 @@
             <div class="block-content block-content-full">
                 <div class="block-header p-0 mb-20">
                     <h3 class="block-title">
-                        <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                    
                     </h3>
                     <div class="block-options">
-                        <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+                        <a href="{{ route('rejoin.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
 
@@ -91,7 +91,7 @@
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label>Rejoin Submission Date</label>
-                            <input class="js-datepicker form-control" type="date" name="join_date" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+                            <input class="js-datepicker form-control" type="text" name="join_date" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
                         </div>
                     </div>
                     <div class="row">

@@ -7,7 +7,11 @@ use Yajra\Datatables\Datatables;
 use App\Rejoin;
 use App\Resign;
 use App\Employee;
+use Carbon\Carbon;
+use DB;
 use Auth;
+use File;
+use Excel;;
 
 class RejoinController extends Controller
 {
@@ -85,5 +89,26 @@ class RejoinController extends Controller
                 'message'   => '<i class="em em-confetti_ball mr-2"></i>Kamu tidak diizinkan!'
             ]);
         }
+    }
+
+    public function export()
+    {
+        $rejoin = Employee::where('isResign', true)->orderBy('created_at', 'DESC')->get();
+        $data = array();
+        foreach ($rejoin as $val) {
+            $data[] = array(
+                'Nik'           => $val->nik,
+                'Employee'      => $val->name,
+                'Agency'        => $val->agency->name,
+                'Position'      => $val->position->name
+            );
+        }
+        $filename = "rejoin_".Carbon::now().".xlsx";
+        return Excel::create($filename, function($excel) use ($data) {
+            $excel->sheet('Rejoin', function($sheet) use ($data)
+            {
+                $sheet->fromArray($data);
+            });
+        })->download();
     }
 }
