@@ -7,6 +7,7 @@ use App\News;
 use Yajra\Datatables\Datatables;
 use App\Position;
 use Auth;
+use Carbon\Carbon;
 use DB;
 class NewsController extends Controller
 {
@@ -17,8 +18,8 @@ class NewsController extends Controller
      */
     public function index()
     {
-       return view('news.news');
-    }
+     return view('news.news');
+ }
 
     /**
      * Show the form for creating a new resource.
@@ -39,12 +40,27 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-         News::create([
-            'sender'          => $request->input('sender'),
-            'subject'          => $request->input('subject'),
-            'content'          => $request->input('content'),
-            'target'          => $request->input('target'),
-        ]);
+        $news = new News;
+        $news->sender = $request->input('sender');
+        $news->subject = $request->input('subject');
+        if ($request->input('content') == null) {
+               return redirect()->route('news')
+                ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Harap isi Content!'
+                ]);
+        }
+        $news->content = $request->input('content');
+        $news->created_at = Carbon::now('Asia/Jakarta');
+        $news->updated_at = Carbon::now('Asia/Jakarta');
+        if ($request->input('target') != 'All') {
+            $news->target = $request->input('target');
+        }
+        $news->save();
+        
+        
+        
         return redirect()->route('news')
         ->with([
             'type'      => 'success',
@@ -62,15 +78,18 @@ class NewsController extends Controller
     public function data()
     {
         $news = DB::table('news')
-            ->join('positions', 'news.target', '=', 'positions.id')
-              ->select('news.*', 'positions.name', 'news.target');
-     
+        ->leftjoin('positions', 'news.target', '=', 'positions.id')
+        ->select('news.*', 'positions.name');
+        
         return Datatables::of($news)
         ->addColumn('action', function ($news) {
             return "<a href=".route('ubah.news', $news->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
             <button data-url=".route('news.delete', $news->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })
         ->rawColumns(['action','sender','subject','content','target'])
+        ->editColumn('name',function($news){
+            return $news->target==null ? 'All' : $news->name;
+        })
         ->make(true);
     }
 
@@ -97,13 +116,16 @@ class NewsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        
         $news = News::findOrFail($id);
 
-        $news->sender = $request->get('sender');
-        $news->subject = $request->get('subject');
-        $news->content = $request->get('content');
-        $news->target = $request->get('target');
+        $news->sender = $request->input('sender');
+        $news->subject = $request->input('subject');
+        $news->content = $request->input('content');
+        $news->target = $request->target == 'All' ? null : $request->target;
+        $news->updated_at = Carbon::now('Asia/Jakarta');
         $news->save();
+
 
         return redirect()->route('news')
         ->with([
@@ -124,11 +146,11 @@ class NewsController extends Controller
         $news = News::findOrFail($id);
 
         $news->delete();
-         return redirect()->back()
-            ->with([
-                'type'      => 'success',
-                'title'     => 'Sukses!<br/>',
-                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-            ]);
+        return redirect()->back()
+        ->with([
+            'type'      => 'success',
+            'title'     => 'Sukses!<br/>',
+            'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+        ]);
     }
 }
