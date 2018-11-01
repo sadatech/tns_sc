@@ -46,6 +46,7 @@ class OutletController extends Controller
 						// $insert = DB::table('outlets')->insert($outlets);
 						$insert = Outlet::create([
 							'id_employee_pasar'	=> $emp->id,
+							'customer_code'		=> $request->input('code'),
 							'name'				=> $request->input('name'),
 							'phone'				=> $$request->input('phone'),
 							'active'			=> true,
