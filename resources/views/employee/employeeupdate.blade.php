@@ -121,11 +121,11 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>Nomor Rekening</label>
-                        <input type="text" id="txtboxToFilter" class="form-control" value="{{ old('rekening')}}" name="rekening" placeholder="Add rekening">
+                        <input type="text" id="txtboxToFilter" class="form-control" value="{{ $emp->rekening}}" name="rekening" placeholder="Add rekening">
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Name Bank</label>
-                        <input type="text" class="form-control" name="bank" value="{{ old('bank') }}" placeholder="Add bank">
+                        <label>Nama Bank</label>
+                        <input type="text" class="form-control" name="bank" value="{{ $emp->bank }}" placeholder="Add bank">
                     </div>
                 </div>
                 <div class="row">
