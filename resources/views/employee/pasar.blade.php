@@ -84,11 +84,11 @@
                     </div>
                 </div>
             </div>
-            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeedc.import') }}">
+            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeesmd.import') }}">
                 {{ csrf_field() }}
                 <div class="block-content">
                     <div class="form-group">
-                        <a href="{{ route('subarea.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+                        <a href="{{ route('smd.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
                     </div>
                     <div class="block-content">
                         <h5> Sample Data :</h5>

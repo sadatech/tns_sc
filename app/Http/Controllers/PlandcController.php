@@ -28,11 +28,12 @@ class PlandcController extends Controller
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
-            $data1['store_selected'] = json_encode(PlanEmployee::where(['plan_employees.id_plandc' => $plan->id])
+            $data1['employee_selected'] = json_encode(PlanEmployee::where(['plan_employees.id_plandc' => $plan->id])
             ->join('employees','employees.id','plan_employees.id_employee')
-            ->select(DB::raw("concat(employees.id,'|',employees.name) as stores_item"))
+            ->select(DB::raw("concat(employees.id,'|',employees.name) as employees_item"))
             ->get()
             ->toArray());
+            dd($data1);
             $data = array(
                 'id'            => $plan->id,
                 'date'          => $plan->date,
