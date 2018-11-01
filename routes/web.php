@@ -436,6 +436,19 @@ Route::prefix('report')->group(function () {
 		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
+
+		Route::prefix('availability')->group(function () {
+			Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
+			Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
+			Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@availabilityUpdate')->name('availability.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@Importavailability')->name('availability.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
 	});	
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 });
