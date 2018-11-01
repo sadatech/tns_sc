@@ -205,6 +205,10 @@ Route::prefix('employee')->group(function () {
 		{
 		return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
 		})->name('smd.download-template')->middleware('auth');
+		Route::get('/dc/download-template', function()
+		{
+		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
+		})->name('dc.download-template')->middleware('auth');
 	});
 
 	//Resign Pages
