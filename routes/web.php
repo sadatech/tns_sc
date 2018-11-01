@@ -200,6 +200,7 @@ Route::prefix('employee')->group(function () {
 		Route::get('/dc/export', 'Employee\DcController@export')->name('employeedc.export')->middleware('auth');
 		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
 		Route::post('/dc/import','Employee\DcController@import')->name('employeedc.import')->middleware('auth');
+		Route::post('/pasar/import','Employee\PasarController@import')->name('employeesmd.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));

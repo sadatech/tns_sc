@@ -84,7 +84,7 @@
                     </div>
                 </div>
             </div>
-            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeedc.import') }}">
+            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeesmd.import') }}">
                 {{ csrf_field() }}
                 <div class="block-content">
                     <div class="form-group">
