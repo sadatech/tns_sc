@@ -98,6 +98,7 @@ class AuthController extends Controller
 	public function login(Request $request)
 	{
 		$credentials = $request->only('nik', 'password');
+		// dd($credentials);
 		try {
 			Config::set('auth.providers.users.model', \App\Employee::class);
             // verify the credentials and create a token for the user

@@ -155,13 +155,6 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Photo</label>
-                        <div class="custom-file">
-                            <input type="file" name="photo" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp">
-                            <label class="custom-file-label">Choose Photo</label>
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-alt-success">
@@ -210,7 +203,7 @@
             locationNameInput:$('#us3-address')
         },
         enableAutocomplete:true,
-        markerIcon:"https://www.fratekindoapp.com/public/img/Map-Marker-PNG-File-70x70.png"
+        markerIcon: "{{ asset('img/Map-Marker-PNG-File-70x70.png') }}"
     });
     $('#us3').locationpicker('autosize');
     

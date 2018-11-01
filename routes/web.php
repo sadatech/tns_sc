@@ -28,6 +28,8 @@ Route::prefix('store')->group(function () {
 		Route::post('/create', 'StoreController@store')->name('store.add')->middleware('auth');
 		Route::put('/update/{id}', 'StoreController@update')->name('store.update')->middleware('auth');
 		Route::get('/delete/{id}', 'StoreController@delete')->name('store.delete')->middleware('auth');
+		Route::get('/exportXLS', 'StoreController@exportXLS')->name('store.exportXLS')->middleware('auth');
+		Route::post('/importXLS', 'StoreController@importXLS')->name('store.importXLS')->middleware('auth');
 	});
 
 	//Pasar Pages
@@ -411,7 +413,7 @@ Route::prefix('news')->group(function(){
 		Route::post('/store','PKController@store')->name('pk.store')->middleware('auth');
 		Route::get('/edit/{id}','PKController@edit')->name('ubah.pk')->middleware('auth');
 		Route::post('/update/{id}','PKController@update')->name('update.pk')->middleware('auth');
-		Route::get('/delete/{id}','PKController@delete')->name('pk.delete')->middleware('auth');
+		Route::get('/delete/{id}','PKController@destroy')->name('pk.delete')->middleware('auth');
 
 	});
 

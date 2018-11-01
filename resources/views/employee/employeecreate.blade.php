@@ -291,6 +291,26 @@
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script type="text/javascript">
+    var url = document.referrer;
+    if (url.split("/")[5] == null) {
+        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
+    } else if (url.split("/")[5] == "pasar") {
+        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
+    } else if (url.split("/")[5] == "dc") {
+        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
+
+    }
     var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
     var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;
     $(".js-select2").select2({
@@ -352,7 +372,6 @@
     $('#position').on('change', e => {
         var select = $('#position').find(":selected").val()
         var status = $('#status').find(":selected").val()
-        console.log(select);
         if (select == "{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}") {
             $('#status').show();
             $('#subarea').hide();
