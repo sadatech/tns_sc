@@ -38,7 +38,6 @@ class StoreController extends Controller
     public function readStore()
     {
         $data['subarea']        = SubArea::get();
-        $data['distributor']    = Distributor::get();
         $data['account']        = Account::get();
         $data['timezone']       = Timezone::get();
         $data['sales']    = SalesTiers::get();
@@ -51,14 +50,8 @@ class StoreController extends Controller
         $data['subarea']        = SubArea::get();
         $data['sales']          = SalesTiers::get();
         $data['timezone']       = Timezone::get();
-        $data['distributor']    = Distributor::get();
+       
         $data['account']        = Account::get();
-        $dist                   = StoreDistributor::where('id_store',$id)->get(['id_distributor']);
-        $distList = array();
-        foreach ($dist as $value) {
-            $distList[] = $value->id_distributor;
-        }
-        $data['dist'] = json_encode($distList);
         // return $data;
         return view('store.storeupdate', $data);
     }
@@ -71,7 +64,7 @@ class StoreController extends Controller
 
     public function store(Request $request)
     {
-        $data=$request->all();
+         $data=$request->all();
         $limit=[
            
             'name1'          => 'required',
@@ -79,7 +72,6 @@ class StoreController extends Controller
             'latitude'       => 'required',
             'longitude'      => 'required',
             'account'        => 'required|numeric',
-            'distributor'    => 'required',
             'subarea'        => 'required|numeric',
         ];
         $validator = Validator($data, $limit);
@@ -97,6 +89,7 @@ class StoreController extends Controller
                 'coverage'          => $request->input('coverage'),
                 'store_panel'       => $request->input('store_panel'),
                 'is_vito'           => $request->input('is_vito'),
+                'is_jawa'           => $request->input('is_jawa'),
                 'delivery'          => $request->input('delivery'),
                 'longitude'         => $request->input('longitude'),
                 'id_account'        => $request->input('account'),
@@ -105,16 +98,6 @@ class StoreController extends Controller
                 'id_account'        => $request->input('account'),
                 'id_subarea'        => $request->input('subarea'),
             ]);
-            if ($insert) 
-            {
-                $dataStore = array();
-                foreach ($request->input('distributor') as $distributor) {
-                    $dataStore[] = array(
-                        'id_distributor'    => $distributor,
-                        'id_store'          => $insert->id,
-                    );
-                }
-                DB::table('store_distributors')->insert($dataStore); 
                 return redirect()->route('store')
                 ->with([
                     'type'      => 'success',
@@ -123,11 +106,10 @@ class StoreController extends Controller
                 ]);
             }
         }
-    }  
 
     public function data()
     {
-        $store = Store::with(['distributor', 'account', 'subarea', 'sales'])
+        $store = Store::with([ 'account', 'subarea', 'sales'])
         ->select('stores.*');
         return Datatables::of($store)
         ->addColumn('action', function ($store) {
@@ -140,14 +122,14 @@ class StoreController extends Controller
         ->addColumn('sales', function($store) {
             return $store->sales->name."(".$store->sales->name.")";
         })
-        ->addColumn('distributor', function($store) {
-            $dist = StoreDistributor::where(['id_store'=>$store->id])->get();
-            $distList = array();
-            foreach ($dist as $data) {
-                array_push($distList,$data->distributor->name);
-            }
-            return rtrim(implode(',', $distList), ',');
-        })
+        // ->addColumn('distributor', function($store) {
+        //     $dist = StoreDistributor::where(['id_store'=>$store->id])->get();
+        //     $distList = array();
+        //     foreach ($dist as $data) {
+        //         array_push($distList,$data->distributor->name);
+        //     }
+        //     return rtrim(implode(',', $distList), ',');
+        // })
         ->addColumn('subarea', function($store) {
             return $store->subarea->name."(".$store->subarea->area->name.")";
         })->make(true);
@@ -158,21 +140,28 @@ class StoreController extends Controller
         $store = Store::orderBy('created_at', 'DESC')->get();
         $filename = "Store_".Carbon::now().".xlsx";
         (new FastExcel($store))->download($filename, function ($store) {
-            return [
-                'Name'  => $store->name1,
-                'Optional Name'      => $store->name2,
-                'Address'    => $store->address,
-                'Latitude'    => $store->latitude,
-                'Longitude'    => $store->longitude,
-                'Account'    => $store->account->name,
-                'Sub Area'    => $store->subarea->area->name,
-                'Timezone'    => $store->timezone->name,
-                'Sales Tiers'    => $store->sales->name,
-                'VITO'    => $store->is_vito,
-                'Store Panel'    => $store->store_panel,
-                'Coverage'    => $store->coverage,
-                'Delivery'    => $store->delivery,
-            ];
+            // return $sheet1 [
+            //     'Name'  => $store->name1,
+            //     'Optional Name'      => $store->name2,
+            //     'Address'    => $store->address,
+            //     'Latitude'    => $store->latitude,
+            //     'Longitude'    => $store->longitude,
+            //     'Account'    => $store->account->name,
+            //     'Sub Area'    => $store->subarea->area->name,
+            //     'Timezone'    => $store->timezone->name,
+            //     'Sales Tiers'    => $store->sales->name,
+            //     'Is Vito'    => $store->is_vito,
+            //     'Is Jawa'    => $store->is_jawa,
+            //     'Store Panel'    => $store->store_panel,
+            //     'Coverage'    => $store->coverage,
+            //     'Delivery'    => $store->delivery,
+            // ];
+
+            $sheet = new SheetCollection([
+                'Data Master Store' => SalesTiers::all(),
+                'Timezone' => Timezone::all()
+            ]);
+
         });
     }
      public function importXLS(Request $request)
@@ -291,7 +280,6 @@ class StoreController extends Controller
             'latitude'       => 'required',
             'longitude'      => 'required',
             'account'        => 'required|numeric',
-            'distributor'    => 'required',
             'subarea'        => 'required|numeric',
         ];
         $validator = Validator($data, $limit);
@@ -301,25 +289,15 @@ class StoreController extends Controller
             ->withInput();
         } else {
             $store = Store::find($id);
-                if ($request->input('distributor')) {
-                    foreach ($request->input('distributor') as $distributor) {
-                        StoreDistributor::where('id_store', $id)->delete();
-                        $dataStore[] = array(
-                            'id_distributor'    => $distributor,
-                            'id_store'          => $id,
-                        );
-                    }
-                    DB::table('store_distributors')->insert($dataStore);
-                }
                 $store->name1             = $request->input('name1');
                 $store->name2             = $request->input('name2');
                 $store->address           = $request->input('address');
                 $store->latitude          = $request->input('latitude');
                 $store->longitude         = $request->input('longitude');
                 $store->id_account        = $request->input('account');
-                // $store->id_distributor    = $request->input('distributor');
                 $store->id_subarea        = $request->input('subarea');
                 $store->is_vito           = $request->input('is_vito');
+                $store->is_jawa           = $request->input('is_jawa');
                 $store->coverage           = $request->input('coverage');
                 $store->delivery           = $request->input('delivery');
                 $store->store_panel           = $request->input('store_panel');

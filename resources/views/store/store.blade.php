@@ -25,7 +25,6 @@
                         <th width="200px">Optional Name</th>
                         <th width="200px">Sub Area</th>
                         <th width="200px">Account</th>
-                        <th>Distributor</th>
                         <th width="200px">Sales Tiers</th>
                         <th>Store Panel</th>
                         <th>Coverage</th>
@@ -197,7 +196,6 @@
             { data: 'name2', name: 'name2' },
             { data: 'subarea', name: 'subarea' },
             { data: 'account', name: 'account' },
-            { data: 'distributor', name: 'distributor' },
             { data: 'sales', name: 'sales' },
             { data: 'store_panel', name: 'store_panel' },
             { data: 'coverage', name: 'coverage' },
