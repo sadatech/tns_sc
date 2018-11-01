@@ -8,6 +8,7 @@ use Auth;
 use App\Brand;
 use App\Employee;
 use App\Category;
+use App\Product;
 
 class BrandController extends Controller
 {
@@ -35,8 +36,10 @@ class BrandController extends Controller
         $brand = Brand::get();
         return Datatables::of($brand)
         ->addColumn('action', function ($brand) {
-            return '<button onclick="editModal('.$brand->id.',&#39;'.$brand->name.'&#39;,&#39;'.$brand->keterangan.'&#39;)" class="btn btn-sm btn-primary btn-square"><i class="si si-pencil"></i></button>
-            <button data-url='.route("brand.delete", $brand->id).' class="btn btn-sm btn-danger btn-square js-swal-delete"><i class="si si-trash"></i></button>';
+            if($brand->product->isEmpty()){
+                return '<button onclick="editModal('.$brand->id.',&#39;'.$brand->name.'&#39;,&#39;'.$brand->keterangan.'&#39;)" class="btn btn-sm btn-primary btn-square"><i class="si si-pencil"></i></button>
+                <button data-url='.route("brand.delete", $brand->id).' class="btn btn-sm btn-danger btn-square js-swal-delete"><i class="si si-trash"></i></button>';
+            }
         })->make(true);
     }
 

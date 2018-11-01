@@ -202,10 +202,11 @@ Route::prefix('employee')->group(function () {
 		Route::get('/dc/export', 'Employee\DcController@export')->name('employeedc.export')->middleware('auth');
 		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
 		Route::post('/dc/import','Employee\DcController@import')->name('employeedc.import')->middleware('auth');
+		Route::post('/pasar/import','Employee\PasarController@import')->name('employeesmd.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
-		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
-		})->name('employeeDc.download-template')->middleware('auth');
+		return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
+		})->name('smd.download-template')->middleware('auth');
 	});
 
 	//Resign Pages
@@ -326,6 +327,7 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'TargetController@store')->name('target.add')->middleware('auth');
 		Route::put('/update/{id}', 'TargetController@update')->name('target.update')->middleware('auth');
 		Route::get('/delete/{id}', 'TargetController@delete')->name('target.delete')->middleware('auth');
+		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('target.download-sample')->middleware('auth');
 	});
 });
 
