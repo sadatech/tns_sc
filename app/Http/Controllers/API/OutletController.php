@@ -48,7 +48,7 @@ class OutletController extends Controller
 							'id_employee_pasar'	=> $emp->id,
 							'customer_code'		=> $data['code'],
 							'name'				=> $data['name'],
-							'phone'				=> $data['pasar'],
+							'phone'				=> $data['phone'],
 							'active'			=> true,
 						]);
 						if ($insert->id) {
