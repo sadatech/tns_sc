@@ -161,6 +161,10 @@ class PasarController extends Controller
                     foreach($results as $row)
                     {
 						echo "$row<hr>";
+						$dataSub['subarea_name']   	= $row->subarea;
+						$dataSub['area_name']   	= $row->area;
+						$dataSub['region_name']   	= $row->region;
+						$id_subarea = $this->findSub($dataSub);
 
                         $dataAgency['agency_name']   = $row->agency;
                         $id_agency = $this->findAgen($dataAgency);
@@ -223,15 +227,12 @@ class PasarController extends Controller
     {
         $dataPasar = Pasar::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
         if ($dataPasar->count() == 0) {
-
-			$dataSub['subarea_name']   = $data->subarea;
-
             $pasar = Pasar::create([
                 'name'       	=> $data,
 				'address'       => "-",
 				'latitude'		=> "",
 				'longitude'		=> "",
-				'id_subarea'	=> $this->findSub($dataSub)
+				'id_subarea'	=> $id_subarea
 
             ]);
             if ($pasar) {
@@ -260,14 +261,13 @@ class PasarController extends Controller
 	
 	public function findSub($data)
     {
-        $dataSub = Subarea::where('name','like','%'.trim($data).'%')->get();
+        $dataSub = SubArea::where('name','like','%'.trim($data['subarea_name']).'%')->get();
         if ($dataSub != null) {
 
-            $dataSub = $data;
-            $dataSub = $data;
-            $id_area = $this->findArea($dataSub);
-            $subarea = Subarea::create([
-              'name'        => $data,
+			$dataArea = $data;
+			$id_area = $this->findArea($dataArea);
+            $subarea = SubArea::create([
+              'name'        => $data['subarea_name'],
               'id_area'     => $id_area
           ]);
             $id_subarea = $subarea->id;
@@ -279,14 +279,13 @@ class PasarController extends Controller
 
     public function findArea($data)
     {
-        $dataArea = Area::where('name','like','%'.trim($data).'%');
+        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
         if ($dataArea->count() == 0) {
 
-            $dataRegion  = $data;
-            $id_region = $this->findRegion($dataRegion);
-
+			$dataRegion = $data;
+			$id_region = $this->findRegion($dataRegion);
             $area = Area::create([
-              'name'        => $data,
+              'name'        => $data['area_name'],
               'id_region'   => $id_region,
           ]);
             $id_area = $area->id;
@@ -298,11 +297,11 @@ class PasarController extends Controller
 
     public function findRegion($data)
     {
-        $dataRegion = Region::where('name','like','%'.trim($data).'%');
+        $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
         if ($dataRegion->count() == 0) {
 
             $region = Region::create([
-              'name'        => $data,
+              'name'        => $data['region_name'],
           ]);
             $id_region = $region->id;
         }else{

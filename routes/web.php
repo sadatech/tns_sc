@@ -203,16 +203,8 @@ Route::prefix('employee')->group(function () {
 		Route::post('/pasar/import','Employee\PasarController@import')->name('employeesmd.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
-		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
-		})->name('employeeDc.download-template')->middleware('auth');
-		Route::get('/download-template', function()
-		{
 		return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
-		})->name('employeeSmd.download-template')->middleware('auth');
-		Route::get('/download-template', function()
-		{
-		return response()->download(public_path('assets/EmployeeImport.xlsx'));
-		})->name('employee.download-template')->middleware('auth');
+		})->name('smd.download-template')->middleware('auth');
 	});
 
 	//Resign Pages
