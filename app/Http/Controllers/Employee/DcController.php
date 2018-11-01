@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Employee;
 
+use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
@@ -17,6 +18,8 @@ use App\Brand;
 use App\Store;
 use App\Timezone;
 use App\Employee;
+use App\Area;
+use App\Region;
 use App\EmployeeSubArea;
 use App\Filters\EmployeeFilters;
 
@@ -131,7 +134,7 @@ class DcController extends Controller
                         echo "$row<hr>";
 
 						$dataAgency['agency_name']   = $row->agency;
-						$id_agency = $this->findAgenc($dataAgency);
+						$id_agency = $this->findAgen($dataAgency);
 						
                         $insert = Employee::create([
 							'foto_ktp' 			=> "default.png",
@@ -146,7 +149,12 @@ class DcController extends Controller
 							'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
 							'birthdate'			=> Carbon::now(),
 							'id_agency'			=> $id_agency,
-							'id_position'       => 5,
+                            'id_position'       => 5,
+                            'joinAt'            => Carbon::now(),
+                            'gender'            => $row->gender,
+                            'education'         => $row->education,
+                            'password'          => bcrypt($row->password),
+                            'id_timezone'       => 1
 						]);
 						if ($insert) {
                             $dataSub = array();
@@ -199,14 +207,14 @@ class DcController extends Controller
 	
 	public function findSub($data)
     {
-        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
+        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
         if ($dataSub->count() < 1 ) {
 
-            $dataSub['area_name']  = $data['area_name'];
-            $dataSub['region_name']  = $data['region_name'];
+            $dataSub  = $data1;
+            $dataSub  = $data2;
             $id_area = $this->findArea($dataSub);
             $subarea = Subarea::create([
-              'name'        => $data['subarea_name'],
+              'name'        => $data,
               'id_area'     => $id_area
           ]);
             $id_subarea = $subarea->id;
@@ -217,16 +225,16 @@ class DcController extends Controller
     }
 
 
-    public function findArea($data)
+    public function findArea($data1)
     {
-        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
+        $dataArea = Area::where('name','like','%'.trim($data1).'%');
         if ($dataArea->count() == 0) {
             
-            $dataRegion['region_name']  = $data['region_name'];
+            $dataRegion  = $data2;
             $id_region = $this->findRegion($dataRegion);
 
             $area = Area::create([
-              'name'        => $data['area_name'],
+              'name'        => $data1,
               'id_region'   => $id_region,
             ]);
             $id_area = $area->id;
@@ -236,13 +244,13 @@ class DcController extends Controller
       return $id_area;
     }
 
-    public function findRegion($data)
+    public function findRegion($data2)
     {
-        $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
+        $dataRegion = Region::where('name','like','%'.trim($data2).'%');
         if ($dataRegion->count() == 0) {
             
             $region = Region::create([
-              'name'        => $data['region_name'],
+              'name'        => $data2,
             ]);
             $id_region = $region->id;
         }else{
