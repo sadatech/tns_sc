@@ -63,6 +63,11 @@ Route::prefix('pasar')->group(function () {
 	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');
 });
 
+// Stock
+Route::prefix('stock')->group(function () {
+	Route::post('/add', 'API\StockController@store')->name('api.stock.add');
+});
+
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
