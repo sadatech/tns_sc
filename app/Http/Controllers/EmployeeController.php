@@ -326,7 +326,7 @@ class EmployeeController extends Controller
 				$employee->id_subarea = $request->input('subarea');
 			}
 			if ($request->input('password')) {
-				$employee->password = bcrypt($request->input('name'));
+				$employee->password = bcrypt($request->input('password'));
 			}
 			$employee->name 		= $request->input('name');
 			$employee->nik 			= $request->input('nik');

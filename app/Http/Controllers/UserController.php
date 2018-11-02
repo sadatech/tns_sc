@@ -133,8 +133,8 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->cekAuth = Auth::user();
-
+       $cekAuth = Auth::user();
+       // return $cekAuth->password;
         $data=$request->all();
         $limit=[
             'name' => 'required|string|max:255',
@@ -150,12 +150,13 @@ class UserController extends Controller
             $check = User::where('id','!=',$id)->whereRaw("TRIM(UPPER(email)) = '". strtoupper($request->input('email'))."'")->count();
             if ($check < 1) {
                 User::findOrFail($id)
-                ->update([
-                    'name' => (isset($request->name) && $request->name !== null) ? $request->name : $this->cekAuth->name,
-                    'email' => (isset($request->email) && $request->email !== null) ? $request->email : $this->cekAuth->email,
-                    'role_id' => (isset($request->role) && $request->role !== null) ? $request->role : $this->cekAuth->role,
-                    'password' => bcrypt((isset($request->password) && $request->password !== null) ? $request->password : $this->cekAuth->password),
-                ]);
+                ->update(array_merge([
+                    'name' => (isset($request->name) && $request->name !== null) ? $request->name : $cekAuth->name,
+                    'email' => (isset($request->email) && $request->email !== null) ? $request->email : $cekAuth->email,
+                    'role_id' => (isset($request->role) && $request->role !== null) ? $request->role : $cekAuth->role,
+                ],
+                (isset($request->password) && $request->password !== null) ? ['password' => bcrypt($request->password)] : []
+            ));
                 return redirect()->back()
                 ->with([
                     'type'   => 'success',

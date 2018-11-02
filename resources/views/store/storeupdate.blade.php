@@ -153,15 +153,6 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Photo</label>
-                            <div class="custom-file">
-                                <input type="file" name="photo" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp">
-                                <label class="custom-file-label">Pilih Foto</label>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="modal-footer">
