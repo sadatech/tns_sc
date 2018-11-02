@@ -42,6 +42,10 @@ Route::prefix('category')->group(function () {
 	Route::get('/list', 'API\CategoryController@list')->name('api.category.list');
 });
 
+Route::prefix('subcategory')->group(function () {
+	Route::get('/list/{id_category}', 'API\SubCategoryController@list')->name('api.subcategory.list');
+});
+
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 });
