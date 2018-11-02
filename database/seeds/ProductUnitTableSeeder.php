@@ -16,7 +16,7 @@ class ProductUnitTableSeeder extends Seeder
     	foreach (Product::all() as $product) {
     		ProductUnit::create([
     			'product_id' => $product->id,
-    			'sku_unit_id' => rand(1, 10)
+    			'sku_unit_id' => rand(1, 10),
     		]);
     	}
     }
