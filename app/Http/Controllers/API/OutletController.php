@@ -100,7 +100,18 @@ class OutletController extends Controller
 						$code = 200;
 					} else {
 						$res['success'] = true;
-						$res['outlet'] = $outlet->get(['id','name','phone']);
+						foreach ($outlet->get(['outlets.*']) as $data) {
+							$listOutlet[] = array(
+								'id' => $data->id,
+								'name' => $data->name,
+								'code' => $data->customer_code,
+								'phone' => $data->phone,
+								'id_pasar' => $data->employeePasar->pasar->id,
+								'pasar' => $data->employeePasar->pasar->name,
+								'address' => $data->employeePasar->pasar->address,
+							);
+						}
+						$res['outlet'] = $listOutlet;
 						$code = 200;
 					}
 				} else if ($id == 2) {
@@ -115,7 +126,18 @@ class OutletController extends Controller
 						$code = 200;
 					} else {
 						$res['success'] = true;
-						$res['outlet'] = $outlet->get(['id','name','phone']);
+						foreach ($outlet->get(['outlets.*'])->with('pasar') as $data) {
+							$listOutlet[] = array(
+								'id' => $data->id,
+								'name' => $data->name,
+								'code' => $data->customer_code,
+								'phone' => $data->phone,
+								'id_pasar' => $data->employeePasar->pasar->id,
+								'pasar' => $data->employeePasar->pasar->name,
+								'address' => $data->employeePasar->pasar->address,
+							);
+						}
+						$res['outlet'] = $listOutlet;
 						$code = 200;
 					}
 				} else {
