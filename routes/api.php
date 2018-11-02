@@ -37,17 +37,25 @@ Route::prefix('store')->group(function () {
 Route::prefix('place')->group(function () {
 	Route::get('/list', 'API\PlaceController@list')->name('api.place.list');
 });
+
 Route::prefix('category')->group(function () {
 	Route::get('/list', 'API\CategoryController@list')->name('api.category.list');
 });
+
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 });
+
+Route::prefix('brand')->group(function () {
+	Route::get('/list', 'API\BrandController@list')->name('api.brand.list');
+});
+
 Route::prefix('sales')->group(function () {
 	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
 });
-Route::prefix('competitor')->group(function () {
-	Route::post('/promo', 'API\CompetitorController@promo')->name('api.competitor.promo');
+
+Route::prefix('promo')->group(function () {
+	Route::post('/add', 'API\PromoController@store')->name('api.promo.add');
 });
 
 Route::prefix('dataprice')->group(function () {

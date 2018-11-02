@@ -15,7 +15,7 @@ class SkuUnitTableSeeder extends Seeder
     	for ($i=1; $i < 11; $i++) { 
     		SkuUnit::create([
     			'name' => 'Satuan ' . $i,
-    			'conversion_value' => $i * 10
+    			'conversion_value' => $i * 10,
     		]);
         }
     }
