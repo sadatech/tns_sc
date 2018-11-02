@@ -60,6 +60,10 @@ class OutletController extends Controller
 							$res['msg'] = "Failed to add outlets.";
 							$code = 200;
 						}
+					} else {
+						$res['success'] = false;
+						$res['msg'] = "Pasar tidak bisa ditermukan.";
+						$code = 200;
 					}
 				}
 			}
