@@ -16,11 +16,13 @@
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="newstable">
                     <thead>
-                        <th class="text-center" style="width: 150px;">Action</th>
-                        <th width="200px">Sender</th>
+                        <th class="text-center" style="width: 70px;">Action</th>
+                        <th width="200px" style="width:150px">Type</th>
+                        <th width="200px" style="width:80px">Admin</th>
+                        <th width="200px" style="width:80px">Sender</th>
                         <th width="200px">Subject</th>
-                        <th width="200px">Content</th>
-                        <th width="200px">Target</th>
+                        <th width="200px">File</th>
+                        <th width="200px" style="width:80px">Target</th>
                     </thead>
                 </table>
             </div> 
@@ -95,14 +97,16 @@
                     });
                 });
             },
-            ajax: '{!! route('news.data') !!}',
+            ajax: '{!! route('pk.data') !!}',
             serverSide: true,
             scrollY: "300px",
             columns: [  
             { data: 'action', name: 'action' },
+            { data: 'type', name: 'type' },
+            { data: 'admin', name: 'admin' },
             { data: 'sender', name: 'sender' },
             { data: 'subject', name: 'subject' },
-            { data: 'content', name: 'content' },
+            { data: 'filePDF', name: 'filePDF' },
             { data: 'name', name: 'name' },
             ]
         });

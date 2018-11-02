@@ -14,4 +14,9 @@ class Timezone extends Model
     {
     	return $this->hasMany('App\Employees', 'id_timezone');
     }
+
+	   public function stores()
+    {
+    	return $this->belongsTo('App\Store', 'id_timezone');
+    }
 }

@@ -17,7 +17,7 @@ class StoreDistributor extends Model
     
     public function store()
     {
-		return $this->belongsTo('App\Store', 'id_store');
+		return $this->belongsTo('App\Store');
     }
 
 }
