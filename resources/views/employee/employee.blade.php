@@ -76,7 +76,7 @@
                                     <td><b>Area</b></td>
                                     <td><b>Region</td>
                                     <td><b>Rekening</b></td>
-                                    <td><b>Bank</b></td>
+                                    <td><b>Bank</b></td>    
                                     <td><b>Join Date</b></td>
                                     <td><b>Agency</b></td>
                                     <td><b>Gender</b></td>
@@ -143,7 +143,7 @@
 </div>
 
 <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout" role="document">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-gd-sun p-10">
@@ -158,22 +158,14 @@
                 <input type="hidden" name="employee" id="employeeID">
                 <div class="block-content">
                     <table class="table table-bordered">
-                        <tr>
-                            <td width="100"><b>Store</b></td>
-                            <td id="reasonName" colspan="4">Example</td>
-                        </tr>
-                        <tr>
-                            <td><b>Coverage</b></td>
-                            <td id="reasonNIK" colspan="4">Example</td>
-                        </tr>
-                        <tr>
-                            <td><b>Is Vito</b></td>
-                            <td id="reasonPosition">Example</td>
-                        </tr>
-                        <tr>
-                            <td><b>Address</b></td>
-                            <td id="addressStore">Example</td>
-                        </tr>
+                        <thead>
+                            <th>Store</th>
+                            <th>Account</th>
+                            <th>Address</th>
+                            <th>Coverage</th>
+                        </thead>
+                        <tbody id="storeGet">
+                        </tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
@@ -202,10 +194,7 @@
     function viewModal(json) {
         $('#viewModal').modal('show');
         $('#employeeID').val(json.id);
-        $('#reasonName').html(json.store);
-        $('#reasonNIK').html(json.coverage);
-        $('#reasonPosition').html(json.is_vito);
-        $('#addressStore').html(json.address);
+        $('#storeGet').html(json.store);
         
     }
     @if(session('type'))

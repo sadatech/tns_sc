@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\SkuUnit;
+use DB;
+use Auth;
+use File;
+use Excel;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Input;
+use Rap2hpoutre\FastExcel\FastExcel;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
 class SkuUnitController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function baca()
     {
         return view('product.sku_unit');
@@ -50,35 +52,6 @@ class SkuUnitController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $skuUnit = SkuUnit::findOrFail($id);
@@ -95,12 +68,6 @@ class SkuUnitController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         SkuUnit::findOrFail($id)->delete();
@@ -110,5 +77,75 @@ class SkuUnitController extends Controller
             'title' => 'Sukses!<br/>',
             'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menghapus SKU Unit!'
         ]);
+    }
+
+    public function export()
+    {
+ 
+        $data = SkuUnit::orderBy('created_at', 'DESC')->get();
+        $filename = "SkuUnit".Carbon::now().".xlsx";
+        (new FastExcel($data))->download($filename, function ($data) {
+            return [
+                'name'                => $data->name,
+                'value'               => $data->conversion_value,
+            ];
+        });
+    }
+
+    public function import(Request $request)
+    {
+        $this->validate($request, [
+            'file' =>   'required'
+        ]);
+
+        $transaction = DB::transaction(function () use ($request) {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+            if($request->hasFile('file')){
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
+                {
+                    foreach($results as $row)
+                    {
+                        echo "$row<hr>";
+                        $check = SkuUnit::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
+                        ->where(['conversion_value' => $row->value])->count();
+                        // dd($check);
+                        if ($check < 1) {
+                            SkuUnit::create([
+                                'name'              => $row->name,
+                                'conversion_value'  => $row->value
+                            ])->id;
+                        } else {
+                            return false;
+                        }
+                    }
+                },false);
+            }
+            return 'success';
+        });
+
+        if ($transaction == 'success') {
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
+            ]);
+        }else{
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+            ]);
+        }
     }
 }

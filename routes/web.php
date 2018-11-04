@@ -268,15 +268,27 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'SkuUnitController@store')->name('sku-unit.add')->middleware('auth');
 		Route::put('/update/{id}', 'SkuUnitController@update')->name('sku-unit.update')->middleware('auth');
 		Route::get('/delete/{id}', 'SkuUnitController@delete')->name('sku-unit.delete')->middleware('auth');
+		Route::get('/export', 'SkuUnitController@export')->name('sku-unit.export')->middleware('auth');
+		Route::post('/import', 'SkuUnitController@import')->name('sku-unit.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/SkuUnitImport.xlsx'));
+		})->name('sku-unit.download-template')->middleware('auth');
 	});
 
 	//Product Summary Pages
 	Route::prefix('summary')->group(function () {
 		Route::get('/', 'ProductController@baca')->name('product')->middleware('auth');
 		Route::get('/data', 'ProductController@data')->name('product.data')->middleware('auth');
+		Route::get('/export', 'ProductController@export')->name('product.export')->middleware('auth');
 		Route::post('/create', 'ProductController@store')->name('product.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductController@update')->name('product.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductController@delete')->name('product.delete')->middleware('auth');
+		Route::post('/import', 'ProductController@import')->name('product.import')->middleware('auth');
+		// Route::get('/download-template', function()
+		// {
+		// 	return response()->download(public_path('assets/SkuUnitImport.xlsx'));
+		// })->name('sku-unit.download-template')->middleware('auth');
 	});
 
 	//Product Competitor Pages
@@ -320,8 +332,14 @@ Route::prefix('product')->group(function () {
 		Route::get('/', 'ProductFokusMdController@baca')->name('fokusMD')->middleware('auth');
 		Route::get('/data', 'ProductFokusMdController@data')->name('fokusMD.data')->middleware('auth');
 		Route::post('/create', 'ProductFokusMdController@store')->name('fokusMD.add')->middleware('auth');
+		Route::post('/import', 'ProductFokusMdController@import')->name('fokusMD.import')->middleware('auth');
+		Route::get('/export', 'ProductFokusMdController@export')->name('fokusMD.export')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusMdController@update')->name('fokusMD.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusMdController@delete')->name('fokusMD.delete')->middleware('auth');
+		Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/FokusMDImport.xlsx'));
+			})->name('fokusMD.download-template')->middleware('auth');
 	});
 
 	//Target Pages
