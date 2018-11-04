@@ -348,15 +348,12 @@
     function deleteItem(id) {
         var a = selectedStoresId.indexOf(''+id);
         if (a >= 0) {
-            console.log(selectedStores)
             selectedStores.splice(a, 1);
             selectedStoresId.splice(a, 1);
             selectedStoresName.splice(a, 1);
-            console.log(selectedStores)
             tableIndex = 0;
             $('#selectedStoreTableBody').html('');
             $.each(selectedStores, function( index, value ) {
-                console.log(value)
                 addItem(value,'get');
             });
         }else{
@@ -370,7 +367,6 @@
         table = document.getElementById("selectedStoreTableBody");
         tr = table.getElementsByTagName("tr");
         for (i = 0; i < tr.length; i++) {
-            console.log(a)
             a = tr[i].getElementsByTagName("span")[0];
             if(a != null){
                 a= a.innerHTML;

@@ -12,7 +12,7 @@
                 <div class="block-header p-0 mb-20">
                     <h3 class="block-title">
                         <a href="{{ route('tambah.employee') }}" title="Add Data Employee" class="btn btn-primary btn-square"><i class="fa fa-plus mr-2"></i>Add Data</a>
-                        <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                        <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
                     </h3>
                     <div class="block-option">
                         <a href="{{ route('employee.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
@@ -43,8 +43,107 @@
     </div>
 </div>
 
+<div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Employee SPG, MD, & TL MTC</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeedc.import') }}">
+                {{ csrf_field() }}
+                <div class="block-content">
+                    <div class="form-group">
+                        <a href="{{ route('dc.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+                    </div>
+                    <div class="block-content">
+                        <h5> Sample Data :</h5>
+                        <table class="table table-bordered table-responsive table-vcenter">
+                            <thead>
+                                <tr>
+                                    <td><b>NIK</b></td>
+                                    <td><b>Name</b></td>
+                                    <td><b>KTP</b></td>
+                                    <td><b>Phone</b></td>
+                                    <td><b>Email</b></td>
+                                    <td><b>Sub Area</b></td>
+                                    <td><b>Area</b></td>
+                                    <td><b>Region</td>
+                                    <td><b>Rekening</b></td>
+                                    <td><b>Bank</b></td>    
+                                    <td><b>Join Date</b></td>
+                                    <td><b>Agency</b></td>
+                                    <td><b>Gender</b></td>
+                                    <td><b>Education</b></td>
+                                    <td><b>Birth Date</b></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>NIK 1</td>
+                                    <td>Name 1</td>
+                                    <td>KTP 1</td>
+                                    <td>Phone 1</td>
+                                    <td>Email 1</td>
+                                    <td>Sub Area 1</td>
+                                    <td>Area 1</td>
+                                    <td>Region 1</td>
+                                    <td>Rekening 1</td>
+                                    <td>Bank 1</td>
+                                    <td>Join Date 1</td>
+                                    <td>Agency 1</td>
+                                    <td>Gender 1</td>
+                                    <td>Education 1</td>
+                                    <td>Birth Date 1</td>
+                                </tr>
+                                <tr>
+                                    <td>NIK 2</td>
+                                    <td>Name 2</td>
+                                    <td>KTP 2</td>
+                                    <td>Phone 2</td>
+                                    <td>Email 2</td>
+                                    <td>Sub Area 2</td>
+                                    <td>Area 2</td>
+                                    <td>Region 2</td>
+                                    <td>Rekening 2</td>
+                                    <td>Bank 2</td>
+                                    <td>Join Date 2</td>
+                                    <td>Agency 2</td>
+                                    <td>Gender 2</td>
+                                    <td>Education 2</td>
+                                    <td>Birth Date 2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label>Upload Your Data Employee DC:</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                            <label class="custom-file-label">Choose file Excel</label>
+                            <code> *Type File Excel</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-alt-success">
+                    <i class="fa fa-save"></i> Import
+                  </button>
+                  <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout" role="document">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-gd-sun p-10">
@@ -59,22 +158,14 @@
                 <input type="hidden" name="employee" id="employeeID">
                 <div class="block-content">
                     <table class="table table-bordered">
-                        <tr>
-                            <td width="100"><b>Store</b></td>
-                            <td id="reasonName" colspan="4">Example</td>
-                        </tr>
-                        <tr>
-                            <td><b>Coverage</b></td>
-                            <td id="reasonNIK" colspan="4">Example</td>
-                        </tr>
-                        <tr>
-                            <td><b>Is Vito</b></td>
-                            <td id="reasonPosition">Example</td>
-                        </tr>
-                        <tr>
-                            <td><b>Address</b></td>
-                            <td id="addressStore">Example</td>
-                        </tr>
+                        <thead>
+                            <th>Store</th>
+                            <th>Account</th>
+                            <th>Address</th>
+                            <th>Coverage</th>
+                        </thead>
+                        <tbody id="storeGet">
+                        </tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
@@ -103,10 +194,7 @@
     function viewModal(json) {
         $('#viewModal').modal('show');
         $('#employeeID').val(json.id);
-        $('#reasonName').html(json.store);
-        $('#reasonNIK').html(json.coverage);
-        $('#reasonPosition').html(json.is_vito);
-        $('#addressStore').html(json.address);
+        $('#storeGet').html(json.store);
         
     }
     @if(session('type'))
