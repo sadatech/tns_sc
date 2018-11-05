@@ -68,6 +68,14 @@
                         @endforeach
                       </select>
                     </div>
+                    {{ 
+                        Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(['id_brand', 1]), [
+                            'labelText' => 'Sasa Product',
+                            'required' => '',
+                            'id' => 'add' . 'Product',
+                            'placeholder' => 'Choose your Product'
+                        ])
+                    }}
                     <div class="form-group">
                       <label>Sub Category Product</label>
                       <select class="js-select2 form-control" style="width: 100%" name="subcategory">
@@ -134,6 +142,14 @@
                             </select>
                         </div>
                     </div>
+                    {{ 
+                        Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(['id_brand', 1]), [
+                            'labelText' => 'Sasa Product',
+                            'required' => '',
+                            'id' => 'edit' . 'Product',
+                            'placeholder' => 'Choose your Product'
+                        ])
+                    }}
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label>Sub Category Product</label>

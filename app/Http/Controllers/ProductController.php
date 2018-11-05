@@ -72,8 +72,10 @@ class ProductController extends Controller
         }
 
         DB::transaction(function () use($data) {
+            $measure = $data['measure'];
+            unset($data['measure']);
             $product = Product::create($data);
-            foreach ($data['sku_units'] as $sku_id) {
+            foreach ($measure as $sku_id) {
                 ProductMeasure::create([
                     'id_product' => $product->id,
                     'id_measure' => $sku_id
@@ -93,20 +95,25 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $data = $request->all();
 
+        // return $data;
+
         if (($validator = Product::validate($data))->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
         DB::transaction(function () use($product, $data) {
+            $measure = $data['measure'];
+            unset($data['measure']);
+
             $product->fill($data)->save();
 
             $oldSkuUnits = $product->measure->pluck('id_measure');
-            $deletedSkuUnits = $oldSkuUnits->diff($data['measure']);
+            $deletedSkuUnits = $oldSkuUnits->diff($measure);
             foreach ($deletedSkuUnits as $deleted_id) {
                 ProductMeasure::where(['product_id' => $product->id, 'id_measure' => $deleted_id])->delete(); 
             }
 
-            foreach ($data['measure'] as $sku_id) {
+            foreach ($measure as $sku_id) {
                 ProductMeasure::updateOrCreate([
                     'id_product' => $product->id,
                     'id_measure' => $sku_id
