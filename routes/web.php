@@ -285,10 +285,10 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'ProductController@update')->name('product.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductController@delete')->name('product.delete')->middleware('auth');
 		Route::post('/import', 'ProductController@import')->name('product.import')->middleware('auth');
-		// Route::get('/download-template', function()
-		// {
-		// 	return response()->download(public_path('assets/SkuUnitImport.xlsx'));
-		// })->name('sku-unit.download-template')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/ProductImport.xlsx'));
+		})->name('product.download-template')->middleware('auth');
 	});
 
 	//Product Competitor Pages
