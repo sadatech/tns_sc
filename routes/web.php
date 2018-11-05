@@ -387,6 +387,7 @@ Route::prefix('planDc')->group(function () {
 	Route::get('/', 'PlandcController@read')->name('planDc')->middleware('auth');
 	Route::get('/data', 'PlandcController@data')->name('plan.data')->middleware('auth');
 	Route::post('/import','PlandcController@import')->name('plan.import')->middleware('auth');
+	Route::get('/update/{id}', 'PlandcController@readupdate')->name('ubah.plan')->middleware('auth');
 	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
 	Route::get('/delete/{id}', 'PlandcController@delete')->name('plan.delete')->middleware('auth');
 	Route::get('/export', 'PlandcController@exportXLS')->name('plan.export')->middleware('auth');
