@@ -38,11 +38,9 @@ class CategoryController extends Controller
 			// }
             $data = array(
                 'id'        => $category->id,
-                // 'brand'     => $brand,
                 'name'      => $category->name
             );
-            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('category.delete', $category->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>";
         })->make(true);
     }
 
