@@ -29,6 +29,7 @@
                         <th>Store Panel</th>
                         <th>Coverage</th>
                         <th>Is Vito</th>
+                        <th>Is Jawa</th>
                         <th>Delivery</th>
                         <th>Longitude</th>
                         <th>Latitude</th>
@@ -200,6 +201,7 @@
             { data: 'store_panel', name: 'store_panel' },
             { data: 'coverage', name: 'coverage' },
             { data: 'is_vito', name: 'is_vito' },
+            { data: 'is_jawa', name: 'is_jawa' },
             { data: 'delivery', name: 'delivery' },
             { data: 'longitude', name: 'longitude' },
             { data: 'latitude', name: 'latitude' },

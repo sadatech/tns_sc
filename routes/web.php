@@ -460,7 +460,21 @@ Route::prefix('report')->group(function () {
 		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
-	});	
+	});
+
+	Route::prefix('promoactivity')->group(function(){
+		Route::get('/','PromoActivityController@index')->name('promoactivity')->middleware('auth');
+		Route::get('/data', 'PromoActivityController@data')->name('pa.data')->middleware('auth');
+		Route::get('/create','PromoActivityController@create')->name('tambah.pa')->middleware('auth');
+		Route::post('/store','PromoActivityController@store')->name('pa.store')->middleware('auth');
+		Route::get('/edit/{id}','PromoActivityController@edit')->name('ubah.pa')->middleware('auth');
+		Route::post('/update/{id}','PromoActivityController@update')->name('update.pa')->middleware('auth');
+		Route::get('/delete/{id}','PromoActivityController@delete')->name('pa.delete')->middleware('auth');
+		Route::get('/exportXLS','PromoActivityController@exportXLS')->name('pa.exportXLS')->middleware('auth');
+		Route::post('/importXLS','PromoActivityController@importXLS')->name('pa.importXLS')->middleware('auth');
+	});
+
+
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 });
 

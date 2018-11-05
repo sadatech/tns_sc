@@ -216,6 +216,10 @@
                             </li>
                         </ul>
                     </li>
+                    {{-- PROMO--}}
+                    <li>
+                        <a class="{{ request()->is('report/promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Promo Activity</span></a>
+                    </li>  
                     {{-- Stock In Hand--}}
                     <li>
                         <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>

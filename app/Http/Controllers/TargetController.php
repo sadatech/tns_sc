@@ -101,10 +101,10 @@ class TargetController extends Controller
                 $sheet->row(1, ['ID STORE', 'NAME 1', 'NAME 2', 'ADDRESS']);
                 foreach (\App\EmployeeStore::where('id_employee', $employee_id)->with('store')->get() as $es) {
                     $sheet->appendRow([
-                        $es->store->id, 
-                        $es->store->name1, 
-                        $es->store->name2,
-                        $es->store->address
+                        @$es->store->id, 
+                        @$es->store->name1, 
+                        @$es->store->name2,
+                        @$es->store->address
                     ]);
                 }
             });
