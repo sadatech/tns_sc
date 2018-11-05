@@ -93,14 +93,14 @@
                         <label>Deskripsi</label>
                         <textarea class="form-control" name="deskripsi"></textarea>
                     </div>
- -->                    <div class="form-group">
+ -->                    <!-- <div class="form-group">
                       <label>Panel</label>
                       <select class="js-select2 form-control" style="width: 100%" name="panel">
                       <option disabled selected>Choose your Panel</option>
                             <option value="yes"> Yes </option>
                             <option value="no"> No </option>
                       </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-alt-success">
@@ -170,7 +170,7 @@
                         <label>Deskripsi</label>
                         <textarea class="form-control" name="deskripsi" id="deskripsiInput"></textarea>
                     </div> -->
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="form-group col-md-12">
                             <label>Panel</label>
                             <select class="js-edit form-control" id="panelinput" style="width: 100%" name="panel" >
@@ -178,7 +178,7 @@
                                 <option value="no"> No </option>
                             </select>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-alt-success">
