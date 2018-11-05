@@ -13,7 +13,7 @@ use App\Price;
 use App\Product;
 use App\ProductFokus;
 use App\ProductPromo;
-use App\ProductUnit;
+use App\ProductMeasure;
 use App\SubCategory;
 use Auth;
 use Illuminate\Http\Request;
@@ -48,13 +48,14 @@ class ProductController extends Controller
         ->addColumn('action', function ($product) {
             $data = array(
                 'id'            => $product->id,
+                'product'       => $product->id_product,
                 'subcategory'   => $product->subcategory->id,
                 'name'          => $product->name,
                 'code'          => $product->code,
                 'stock_type_id' => $product->stock_type_id,
                 'deskrispi'     => $product->deskripsi,
                 'panel'         => $product->panel,
-                'sku_units'     => $product->sku_units->pluck('sku_unit_id')
+                'measure'       => ProductMeasure::where('id_product',$product->id)->pluck('id_measure')
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('product.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -72,9 +73,9 @@ class ProductController extends Controller
         DB::transaction(function () use($data) {
             $product = Product::create($data);
             foreach ($data['sku_units'] as $sku_id) {
-                ProductUnit::create([
-                    'product_id' => $product->id,
-                    'sku_unit_id' => $sku_id
+                ProductMeasure::create([
+                    'id_product' => $product->id,
+                    'id_measure' => $sku_id
                 ]);
             }
         });
@@ -98,16 +99,16 @@ class ProductController extends Controller
         DB::transaction(function () use($product, $data) {
             $product->fill($data)->save();
 
-            $oldSkuUnits = $product->sku_units->pluck('sku_unit_id');
-            $deletedSkuUnits = $oldSkuUnits->diff($data['sku_units']);
+            $oldSkuUnits = $product->measure->pluck('id_measure');
+            $deletedSkuUnits = $oldSkuUnits->diff($data['measure']);
             foreach ($deletedSkuUnits as $deleted_id) {
-                ProductUnit::where(['product_id' => $product->id, 'sku_unit_id' => $deleted_id])->delete(); 
+                ProductMeasure::where(['product_id' => $product->id, 'id_measure' => $deleted_id])->delete(); 
             }
 
-            foreach ($data['sku_units'] as $sku_id) {
-                ProductUnit::updateOrCreate([
-                    'product_id' => $product->id,
-                    'sku_unit_id' => $sku_id
+            foreach ($data['measure'] as $sku_id) {
+                ProductMeasure::updateOrCreate([
+                    'id_product' => $product->id,
+                    'id_measure' => $sku_id
                 ]);
             }
         });
