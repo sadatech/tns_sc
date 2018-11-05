@@ -471,6 +471,30 @@ Route::prefix('report')->group(function () {
 			})->name('SellIn.download-template')->middleware('auth');
 		});
 
+		Route::prefix('display_share')->group(function () {
+			Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
+			// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
+			Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
+		Route::prefix('additional_display')->group(function () {
+			Route::get('/', 'ReportController@additionalDisplayIndex')->name('additional_display')->middleware('auth');
+			Route::get('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
+			Route::get('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@additionalDisplayUpdate')->name('additional_display.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportadditionalDisplay')->name('additional_display.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
 	});	
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 });

@@ -19,6 +19,7 @@ class CreateDisplayShareTable extends Migration
             $table->unsignedInteger('id_employee');
             $table->date('date');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_store')->references('id')->on('stores');
             $table->foreign('id_employee')->references('id')->on('employees');
@@ -32,6 +33,7 @@ class CreateDisplayShareTable extends Migration
             $table->unsignedInteger('tier')->nullable();
             $table->unsignedInteger('depth')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_display_share')->references('id')->on('display_shares');
             $table->foreign('id_brand')->references('id')->on('brands');

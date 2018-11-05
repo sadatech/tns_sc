@@ -19,6 +19,7 @@ class CreateAdditionalDisplayTable extends Migration
             $table->unsignedInteger('id_employee');
             $table->date('date');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_store')->references('id')->on('stores');
             $table->foreign('id_employee')->references('id')->on('employees');
@@ -31,9 +32,10 @@ class CreateAdditionalDisplayTable extends Migration
             $table->string('jumlah');
             $table->string('foto_additional');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_additional_display')->references('id')->on('additional_displays');
-            $table->foreign('id_jenis_display')->references('id')->on('categories');
+            $table->foreign('id_jenis_display')->references('id')->on('jenis_displays');
         });
     }
 
