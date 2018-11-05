@@ -42,13 +42,11 @@ class PlaceController extends Controller
 						$res['success'] = true;
 						$res['place'] = $placeArr;
 					} else {
-						$res['msg'] = "Place not found.";
+						$res['success'] = false;
+						$res['msg'] = "Gagal mencari place.";
 					}
 					$res['success'] = true;
 					$res['place'] = $placeArr;
-				} else {
-					$res['success'] = false;
-					$res['msg'] = "Gagal mencari place.";
 				}
 			}else{
 				$res['msg'] = "User not found.";
