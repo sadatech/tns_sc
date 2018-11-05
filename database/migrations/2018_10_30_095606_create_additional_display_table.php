@@ -30,7 +30,7 @@ class CreateAdditionalDisplayTable extends Migration
             $table->unsignedInteger('id_additional_display');
             $table->unsignedInteger('id_jenis_display');
             $table->string('jumlah');
-            $table->string('foto_additional');
+            $table->string('foto_additional')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

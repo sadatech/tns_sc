@@ -16,9 +16,9 @@ class CreateOutletsTable extends Migration
         Schema::create('outlets', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_employee_pasar')->unsigned();
-            $table->string('customer_code');
+            $table->string('customer_code')->nullable();
             $table->string('name');
-            $table->string('phone');
+            $table->string('phone')->nullable();
             $table->boolean('active');
             $table->timestamps();
 

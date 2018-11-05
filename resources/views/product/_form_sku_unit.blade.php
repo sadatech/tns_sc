@@ -22,7 +22,7 @@ $action = $action ?? '';
         @endif
         <div class="block-content">
           {{ Form::textInput('name', old('name'), ['id' => $type.'Name', 'required' => '']) }}
-          {{ Form::numberInput('conversion_value', old('conversion_value'), ['id' => $type.'ConversionValue', 'required' => '', 'min' => '1']) }}
+          {{ Form::numberInput('size', old('size'), ['id' => $type.'Size', 'required' => '', 'min' => '1']) }}
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-alt-success">
@@ -42,7 +42,7 @@ $action = $action ?? '';
     $('#editModal').modal('show');
     $('#{{$type}}Form').attr('action', "{{ url('/product/sku-unit/update') }}/"+json.id);
     $('#{{$type}}Name').val(json.name);
-    $('#{{$type}}ConversionValue').val(json.conversion_value);
+    $('#{{$type}}Size').val(json.size);
   }
   @endif
 </script>

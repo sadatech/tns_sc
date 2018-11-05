@@ -8,7 +8,7 @@ $action = $action ?? '';
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="fa fa-plus"></i> Add Product</h3>
+                    <h3 class="block-title"><i class="fa fa-plus"></i> {{ $type == 'edit' ? "Edit" : "Add" }} Product</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
                             <i class="si si-close"></i>
@@ -46,7 +46,7 @@ $action = $action ?? '';
                         </div>
                     </div>
 
-                    {{ Form::select2Input('sku_units', [], App\SkuUnit::toDropDownData(), ['multiple' => true, 'id' => $type.'SkuUnit']) }}
+                    {{ Form::select2Input('measure', [], App\MeasurementUnit::toDropDownData(), ['multiple' => true, 'id' => $type.'MeasurementUnit']) }}
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-alt-success">
@@ -68,9 +68,10 @@ $action = $action ?? '';
             $('#{{$type}}Name').val(json.name);
             $('#{{$type}}Code').val(json.code);
             $('#{{$type}}SubCategory').val(json.subcategory).trigger('change');
+            $('#{{$type}}Product').val(json.product).trigger('change');
             $('#{{$type}}Panel').val(json.panel).trigger('change');
             $('#{{$type}}StockType').val(json.stock_type_id).trigger('change');
-            $('#{{$type}}SkuUnit').val(json.sku_units).trigger('change');
+            $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
             console.log(json)
         }
     @endif
