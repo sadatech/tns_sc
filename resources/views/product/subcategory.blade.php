@@ -29,8 +29,8 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="sub-category">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th class="text-center">Name</th>
-          <th class="text-center">Category</th>
+          <th>SubCategory</th>
+          <th>Category</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>

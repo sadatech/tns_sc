@@ -29,8 +29,8 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="sku-unit">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th class="text-center">Name</th>
-          <th class="text-center">Conversion Value</th>
+          <th>Sku Unit</th>
+          <th>Conversion Value</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
