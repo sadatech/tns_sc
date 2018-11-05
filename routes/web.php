@@ -257,8 +257,13 @@ Route::prefix('product')->group(function () {
 		Route::get('/', 'SubCategoryController@baca')->name('sub-category')->middleware('auth');
 		Route::get('/data', 'SubCategoryController@data')->name('sub-category.data')->middleware('auth');
 		Route::post('/create', 'SubCategoryController@store')->name('sub-category.add')->middleware('auth');
+		Route::post('/import', 'SubCategoryController@import')->name('sub-category.import')->middleware('auth');
 		Route::put('/update/{id}', 'SubCategoryController@update')->name('sub-category.update')->middleware('auth');
 		Route::get('/delete/{id}', 'SubCategoryController@delete')->name('sub-category.delete')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/SubCategoryImport.xlsx'));
+		})->name('subcategory.download-template')->middleware('auth');
 	});
 
 	//SKU Unit Pages
@@ -267,7 +272,7 @@ Route::prefix('product')->group(function () {
 		Route::get('/data', 'SkuUnitController@data')->name('sku-unit.data')->middleware('auth');
 		Route::post('/create', 'SkuUnitController@store')->name('sku-unit.add')->middleware('auth');
 		Route::put('/update/{id}', 'SkuUnitController@update')->name('sku-unit.update')->middleware('auth');
-		Route::get('/delete/{id}', 'SkuUnitController@delete')->name('sku-unit.delete')->middleware('auth');
+		Route::get('/delete/{id}', 'SkuUnitController@destroy')->name('sku-unit.delete')->middleware('auth');
 		Route::get('/export', 'SkuUnitController@export')->name('sku-unit.export')->middleware('auth');
 		Route::post('/import', 'SkuUnitController@import')->name('sku-unit.import')->middleware('auth');
 		Route::get('/download-template', function()
