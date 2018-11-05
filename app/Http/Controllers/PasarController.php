@@ -273,8 +273,8 @@ class PasarController extends Controller
             $data[] = array(
                 'Pasar'             => $val->name,
                 'Address'           => $val->address,
-                'Longitude'         => $val->longitude,
-                'Latitude'          => $val->latitude,
+                'Longitude'         => (isset($val->longitude) ? $val->longitude : "-"),
+                'Latitude'          => (isset($val->latitude) ? $val->latitude : "-"),
                 'Subarea'           => $val->subarea->name,
                 'Area'              => $val->subarea->area->name,
                 'Region'            => $val->subarea->area->region->name
