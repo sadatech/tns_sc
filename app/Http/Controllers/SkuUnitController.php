@@ -39,7 +39,7 @@ class SkuUnitController extends Controller
      */
     public function store(Request $request)
     {
-        $skuUnit = new SkuUnit;
+        $skuUnit = new MeasurementUnit;
         if (($validator = $skuUnit->validate($request->all()))->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -86,8 +86,8 @@ class SkuUnitController extends Controller
         $filename = "SkuUnit".Carbon::now().".xlsx";
         (new FastExcel($data))->download($filename, function ($data) {
             return [
-                'name'                => $data->name,
-                'value'               => $data->size,
+                'name'  => $data->name,
+                'value' => $data->size,
             ];
         });
     }
@@ -120,7 +120,7 @@ class SkuUnitController extends Controller
                         // dd($check);
                         if ($check < 1) {
                             MeasurementUnit::create([
-                                'name'              => $row->name,
+                                'name'  => $row->name,
                                 'size'  => $row->value
                             ])->id;
                         } else {
