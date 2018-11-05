@@ -38,17 +38,19 @@ class SellController extends Controller
 		try {
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg']	= "User not found.";
-				$res['code']= $e->getStatusCode();
+				$res['code']= 200;
 			} else {
-				$date = Carbon::parse($data->date);
-				$date2 = Carbon::parse($data->date);
-				if ($type == 1) {
-					$res = $this->sellin($date, $date2, $user, $data->store, $data->product);
-				} else if ($type == 2) {
-					$res = $this->sellout($date, $date2, $user, $data->store, $data->product);
-				} else if ($type == 3) {
-					$res = $this->stock($date, $date2, $user, $data->store, $data->product);
-				}
+				DB::transaction(function () use ($data, $type, $user, &$res) {
+					$date = Carbon::parse($data->date);
+					$date2 = Carbon::parse($data->date);
+					if ($type == 1) {
+						$res = $this->sellin($date, $date2, $user, $data->store, $data->product);
+					} else if ($type == 2) {
+						$res = $this->sellout($date, $date2, $user, $data->store, $data->product);
+					} else if ($type == 3) {
+						$res = $this->stock($date, $date2, $user, $data->store, $data->product);
+					}
+				});
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			$res['msg'] = "Token Expired.";

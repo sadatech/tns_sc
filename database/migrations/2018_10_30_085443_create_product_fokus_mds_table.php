@@ -16,14 +16,12 @@ class CreateProductFokusMdsTable extends Migration
         Schema::create('product_fokus_mds', function (Blueprint $table) {
                         $table->increments('id');
             $table->integer('id_product')->unsigned();
-            $table->integer('id_area')->unsigned()->nullable();
             $table->string('from');
             $table->string('to')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('id_area')->references('id')->on('areas')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
