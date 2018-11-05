@@ -1,7 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use File;
+use Excel;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Input;
+use Rap2hpoutre\FastExcel\FastExcel;
 use App\Brand;
 use App\Category;
 use App\Filters\ProductFilters;
@@ -119,24 +123,59 @@ class ProductController extends Controller
     public function delete($id)
     {
         $product = Product::find($id);
-            $prc = Price::where(['id_product' => $product->id])->count();
-            $pf = ProductFokus::where(['id_product' => $product->id])->count();
-            $pp = ProductPromo::where(['id_product' => $product->id])->count();
-            if (!$prc < 1) {
-                return redirect()->back()
-                ->with([
-                    'type'    => 'danger',
-                    'title'   => 'Gagal!<br/>',
-                    'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di Price, Promo, dan Target Product!'
-                ]);
-            } else {
-                $product->delete();
-                return redirect()->back()
-                ->with([
-                    'type'      => 'success',
-                    'title'     => 'Sukses!<br/>',
-                    'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-               ]);
-            }
+        $prc = Price::where(['id_product' => $product->id])->count();
+        $pf = ProductFokus::where(['id_product' => $product->id])->count();
+        $pp = ProductPromo::where(['id_product' => $product->id])->count();
+        $jumlah = $prc + $pf + $pp;
+        if (!$jumlah < 1) 
+        {
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di Price, Promo, dan Target Product!'
+            ]);
+        } else {
+            $product->delete();
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+           ]);
+        }
     }
+
+    public function export()
+    
+    {
+		$emp = Product::orderBy('created_at', 'DESC')
+        ->get();
+		foreach ($emp as $val) {
+		// 	$unit = ProductUnit::where(
+		// 		'product_id', $val->id
+        //     )->get();
+		// 	$skuList = array();
+		// 	foreach($unit as $dataSku) {
+		// 		$skuList[] = $dataSku->panel;
+        //     }
+        //     dd($skuList);
+			$data[] = array(
+				'brand'             => (isset($val->brand->name) ? $val->brand->name : "-"),
+                'subcategory'       => $val->subcategory->name,
+                'category'          => (isset($val->subcategory->category->name) ? $val->subcategory->category->name : "-"),
+                'code'              => $val->code,
+                'sku'               => $val->name,
+                'panel'             => $val->panel,
+                'stocktype'         => $val->stocktype->name
+			);
+		}
+		$filename = "Product".Carbon::now().".xlsx";
+		return Excel::create($filename, function($excel) use ($data) {
+			$excel->sheet('Product', function($sheet) use ($data)
+			{
+				$sheet->fromArray($data);
+			});
+		})->download();
+	}
 }

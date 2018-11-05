@@ -32,15 +32,6 @@ $type = $type ?? '';
             </select>
           </div>
           <div class="row">
-            <div class="form-group col-md-12">
-              <label>Area</label>
-              <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Area" name="id_area">
-                <option disabled selected>Choose your Area</option>
-                @foreach(App\Area::get() as $data)
-                <option value="{{ $data->id }}">{{ $data->name }}</option>
-                @endforeach
-              </select>
-            </div>
             <div class="form-group col-md-6">
               <label>Month From</label>
               <input class="js-datepicker form-control" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from" data-month-highlight="true" required>
@@ -80,7 +71,6 @@ $type = $type ?? '';
     $('#editModal').modal('show');
     $('#{{$type}}Form').attr('action', "{{ url('/product/fokusMD/update') }}/"+json.id);
     $('#{{$type}}Product').val(json.product).trigger('change');
-    $('#{{$type}}Area').val(json.area).trigger('change');
     $('#{{$type}}DateFrom').val(json.from);
     $('#{{$type}}DateTo').val(json.to);
     console.log(json);

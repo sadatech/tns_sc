@@ -28,17 +28,25 @@ class PlandcController extends Controller
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
-            $data1['employee_selected'] = json_encode(PlanEmployee::where(['plan_employees.id_plandc' => $plan->id])
-            ->join('employees','employees.id','plan_employees.id_employee')
-            ->select(DB::raw("concat(employees.id,'|',employees.name) as employees_item"))
-            ->get()
-            ->toArray());
-            dd($data1);
+            // $data1['employee_selected'] = json_encode(PlanEmployee::where(['plan_employees.id_plandc' => $plan->id])
+            // ->join('employees','employees.id','plan_employees.id_employee')
+            // ->select(DB::raw("concat(employees.id,'|',employees.name) as employees_item"))
+            // ->get()
+            // ->toArray());
+            // dd($data1);
+            // $dist = PlanEmployee::where(['id_plandc'=>$plan->id])->get();
+            // $distList = array();
+            // foreach ($dist as $data) {
+            //     $distList[] = $data->employee->name;
+            // }
+            // dd($distList);
             $data = array(
                 'id'            => $plan->id,
                 'date'          => $plan->date,
                 'stocklist'     => $plan->stocklist,
-                'lokasi'        => $plan->lokasi
+                'lokasi'        => $plan->lokasi,
+                // 'employee'      => rtrim(implode(',', $distList), ',')
+        
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square'><i class='si si-pencil'></i></button>
             <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
