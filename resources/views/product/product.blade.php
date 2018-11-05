@@ -22,8 +22,8 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+            <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+            <a href="{{ route('product.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="product">
@@ -97,6 +97,81 @@
     </div>
 </div>
 
+<div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-gd-sun p-10">
+          <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import <i>Data Product</i></h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('product.import') }}">
+        {{ csrf_field() }}
+        <div class="block-content">
+          <div class="form-group">
+            <a href="{{ route('product.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <div class="block-content">
+            <h5> Sample Data :</h5>
+            <table class="table table-bordered table-vcenter">
+                <thead>
+                    <tr>
+                        <td><b>SubCategory</b></td>
+                        <td><b>Category</b></td>
+                        <td><b>Code</b></td>
+                        <td><b>SKU</b></td>
+                        <td><b>Type</b></td>
+                        <td><b>Panel</b></td>
+                        <td><b>SkuUnit</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SubCategory 1</td>
+                        <td>Category 1</td>
+                        <td>Code 1</td>
+                        <td>SKU 1</td>
+                        <td>Type 1</td>
+                        <td>Panel 1</td>
+                        <td>SkuUnit 1</td>
+                    </tr>
+                    <tr>
+                        <td>SubCategory 2</td>
+                        <td>Category 2</td>
+                        <td>Code 2</td>
+                        <td>SKU 2</td>
+                        <td>Type 2</td>
+                        <td>Panel 2</td>
+                        <td>SkuUnit 2</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+          <div class="form-group col-md-12">
+            <label>Upload Your Data Product:</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
+            </div>
+           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Import
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @section('css')
@@ -133,7 +208,6 @@
     $(function() {
         $('#product').DataTable({
             processing: true,
-            serverSide: true,
             drawCallback: function(){
                 $('.js-swal-delete').on('click', function(){
                     var url = $(this).data("url");
@@ -161,12 +235,12 @@
                     });
                 });
             },
-            // scrollY: "300px",
+            scrollY: "300px",
             ajax: '{!! route('product.data') !!}',
             columns: [
             { data: 'id', name: 'id' },
             { data: 'brand', name: 'brand' },
-            { data: 'subcategory', name: 'subcategory' },
+            { data: 'subcategory.name', name: 'subcategory.name' },
             { data: 'code', name: 'code' },
             { data: 'name', name: 'name' },
             { data: 'stockType', name: 'stockType' },

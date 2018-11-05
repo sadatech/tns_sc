@@ -1,9 +1,9 @@
 <?php
 
-use App\SkuUnit;
+use App\MeasurementUnit;
 use Illuminate\Database\Seeder;
 
-class SkuUnitTableSeeder extends Seeder
+class MeasurementUnitTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,9 +13,9 @@ class SkuUnitTableSeeder extends Seeder
     public function run()
     {
     	for ($i=1; $i < 11; $i++) { 
-    		SkuUnit::create([
+    		MeasurementUnit::create([
     			'name' => 'Satuan ' . $i,
-    			'conversion_value' => $i * 10
+    			'size' => $i * 10,
     		]);
         }
     }

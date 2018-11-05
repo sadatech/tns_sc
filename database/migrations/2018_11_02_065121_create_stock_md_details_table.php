@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProductFokusMdsTable extends Migration
+class CreateStockMdDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,17 @@ class CreateProductFokusMdsTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_fokus_mds', function (Blueprint $table) {
-                        $table->increments('id');
+        Schema::create('stock_md_details', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('id_stock')->unsigned();
             $table->integer('id_product')->unsigned();
-            $table->string('from');
-            $table->string('to')->nullable();
+            $table->integer('id_satuan')->unsigned();
             $table->timestamps();
             $table->softDeletes();
 
+            $table->foreign('id_stock')->references('id')->on('stock_md_headers')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_satuan')->references('id')->on('sku_units')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -32,6 +34,6 @@ class CreateProductFokusMdsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_fokus_mds');
+        Schema::dropIfExists('stock_md_details');
     }
 }

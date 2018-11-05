@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Components\traits\ValidationHelper;
+use App\Components\traits\DropDownHelper;
 use App\Filters\QueryFilters;
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ class Product extends Model
 {
     use SoftDeletes;
     use ValidationHelper;
+    use DropDownHelper;
     
     protected $guarded = ['sku_units'];
 
@@ -32,7 +34,6 @@ class Product extends Model
             'code' => 'required|string',
             'panel' => 'required|string',
             'stock_type_id' => 'required|integer',
-            'sku_units' => 'required'
         ];
     }
 
@@ -53,10 +54,19 @@ class Product extends Model
     {
         return $this->belongsTo('App\Brand', 'id_brand');
     }
+    public function product()
+    {
+        return $this->belongsTo('App\Product', 'id_product');
+    }
 
     public function stockType()
     {
         return $this->belongsTo(ProductStockType::class);
+    }
+
+    public function measure()
+    {
+        return $this->hasMany('App\ProductMeasure', 'id_product');
     }
 
     public function sku_units()

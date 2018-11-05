@@ -14,18 +14,19 @@
                         <a href="{{ route('tambah.store') }}" class="btn btn-primary btn-square" title="Add Data Store"><i class="fa fa-plus mr-2"></i>Add Data</a>
                     </h3>
                     <div class="block-option">
-                        <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                        <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+                        <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                        <a href="{{route('store.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="storetable">
                     <thead>
-                        <th class="text-center" style="width: 150px;">Action</th>
+                        <th class="text-center" style="width: 60px;">Action</th>
                         <th width="200px">Name</th>
                         <th width="200px">Optional Name</th>
                         <th width="200px">Sub Area</th>
                         <th width="200px">Account</th>
                         <th>Distributor</th>
+                        <th width="200px">Sales Tiers</th>
                         <th>Store Panel</th>
                         <th>Coverage</th>
                         <th>Is Vito</th>
@@ -37,7 +38,84 @@
                 </table>
             </div> 
         </div> 
-    </div>  
+    </div>
+
+
+<div class="modal s" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true" >
+  <div class="modal-dialog modal-dialog-popout" role="document" style="max-width: 100%;padding-left: 10px;">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary p-10">
+          <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import <i>Data Store</i></h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <h1>comingsoon</h1>
+      <!-- <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('store.importXLS') }}">
+        {{ csrf_field() }}
+        <div class="block-content">
+          <div class="form-group">
+            <a href="{{ route('subarea.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <div class="block-content">
+            <h5> Sample Data :</h5>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td><b>Name</b></td>
+                        <td><b>Optiopnal Name</b></td>
+                        <td><b>Address</b></td>
+                        <td><b>Latitude</b></td>
+                        <td><b>Longitude</b></td>
+                        <td><b>Account</b></td>
+                        <td><b>Sub Area</b></td>
+                        <td><b>Timezone</b></td>
+                        <td><b>Sales Tier</b></td>
+                        <td><b>Is Vito</b></td>
+                        <td><b>Store Panel</b></td>
+                        <td><b>Coverage</b></td>
+                        <td><b>Delivery</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John</td>
+                        <td>Johnny</td>
+                        <td>26932 Arno Rapids Apt. 771</td>
+                        <td>13.607672</td>
+                        <td>151.669133</td>
+                        <td>Merritt</td>
+                        <td>South Brody</td>
+                        <td>WIT</td>
+                        <td>Tier-1</td>
+                        <td>Vito</td>
+                        <td>No</td>
+                        <td>Direct</td>
+                        <td>Direct</td>
+                    </tr>
+                    <tr>
+                </tbody>
+            </table>
+          </div>
+          <div class="form-group">
+            <label>Select File</label>
+            <input type="file" name="file" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Import
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form> -->
+    </div>
+  </div>
+</div>  
 @endsection
 
 @section('css')
@@ -120,6 +198,7 @@
             { data: 'subarea', name: 'subarea' },
             { data: 'account', name: 'account' },
             { data: 'distributor', name: 'distributor' },
+            { data: 'sales', name: 'sales' },
             { data: 'store_panel', name: 'store_panel' },
             { data: 'coverage', name: 'coverage' },
             { data: 'is_vito', name: 'is_vito' },
