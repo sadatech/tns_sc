@@ -586,15 +586,12 @@
         function deleteItem(id) {
             var a = selectedStoresId.indexOf(''+id);
             if (a >= 0) {
-                console.log(selectedStores)
                 selectedStores.splice(a, 1);
                 selectedStoresId.splice(a, 1);
                 selectedStoresName.splice(a, 1);
-                console.log(selectedStores)
                 tableIndex = 0;
                 $('#selectedStoreTableBody').html('');
                 $.each(selectedStores, function( index, value ) {
-                    console.log(value)
                     addItem(value,'get');
                 });
             }else{
@@ -604,16 +601,13 @@
         function deleteItemPasar(id) {
             var a = selectedPasarId.indexOf(''+id);
             if (a >= 0) {
-                console.log(selectedPasar)
                 selectedPasar.splice(a, 1);
                 selectedPasarId.splice(a, 1);
                 selectedPasarName.splice(a, 1);
-                console.log(selectedPasar)
                 tableIndex = 0;
                 $('#selectedPasarTableBody').html('');
                 $.each(selectedPasar, function( index, value ) {
-                    console.log(value)
-                    addItem(value,'get');
+                    addItemPasar(value,'get');
                 });
             }else{
                 console.log("Index Item Not Found!");

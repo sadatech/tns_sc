@@ -518,18 +518,16 @@
         }
     }
     function deleteItemPasar(id) {
+        // console.log(id);
         var a = selectedPasarId.indexOf(''+id);
         if (a >= 0) {
-            console.log(selectedPasar)
             selectedPasar.splice(a, 1);
             selectedPasarId.splice(a, 1);
             selectedPasarName.splice(a, 1);
-            console.log(selectedPasar)
             tableIndex = 0;
             $('#selectedPasarTableBody').html('');
             $.each(selectedPasar, function( index, value ) {
-                console.log(value)
-                addItem(value,'get');
+                addItemPasar(value,'get');
             });
         }else{
             console.log("Index Item Not Found!");
