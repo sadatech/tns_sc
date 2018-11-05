@@ -509,7 +509,7 @@
                 clearStores();
                 $('#storeStay').hide();
                 $('#storeMobile').show();
-            }
+            } 
         })
         function clearStores() {
             $('#stores').val('');
