@@ -27,7 +27,7 @@ class SkuUnitController extends Controller
         ->addColumn('action', function ($row) {
             $data = $row->toArray();
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('sub-category.delete', $row->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            <button data-url=".route('sku-unit.delete', $row->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })->make(true);
     }
 
