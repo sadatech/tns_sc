@@ -121,11 +121,11 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>Nomor Rekening</label>
-                        <input type="text" id="txtboxToFilter" class="form-control" value="{{ old('rekening')}}" name="rekening" placeholder="Add rekening">
+                        <input type="text" id="txtboxToFilter" class="form-control" value="{{ $emp->rekening}}" name="rekening" placeholder="Add rekening">
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Name Bank</label>
-                        <input type="text" class="form-control" name="bank" value="{{ old('bank') }}" placeholder="Add bank">
+                        <label>Nama Bank</label>
+                        <input type="text" class="form-control" name="bank" value="{{ $emp->bank }}" placeholder="Add bank">
                     </div>
                 </div>
                 <div class="row">
@@ -319,7 +319,9 @@
               addItem(value.stores_item);
           });
         } else {
-            $('#storeStay').val('{{ $store_selected }}');
+            var selected = {!! $store_selected !!};
+            var getId = selected[0].stores_item.split("|")[0];
+            $('#stayInput').val(getId).trigger("change");
             $('#storeMobile').hide();
             $('#storeStay').show();
         }
@@ -332,7 +334,9 @@
               addItem(value.stores_item);
           });
         } else {
-            $('#storeStay').val('{{ $store_selected }}');
+            var selected = {!! $store_selected !!};
+            var getId = selected[0].stores_item.split("|")[0];
+            $('#stayInput').val(getId).trigger("change");
             $('#storeMobile').hide();
             $('#storeStay').show();
         }
@@ -345,7 +349,7 @@
         var selected = {!! $pasar_selected !!};
         $.each(selected, function( index, value ) {
           addItemPasar(value.pasars_item);
-        });
+      });
         $('#pasarMobile').show();
         $('#status').hide();
         $('#subarea').hide();
@@ -357,7 +361,7 @@
         var selected = {!! $pasar_selected !!};
         $.each(selected, function( index, value ) {
           addItemPasar(value.pasars_item);
-        });
+      });
         $('#pasarMobile').show();
         $('#status').hide();
         $('#subarea').hide();
@@ -393,17 +397,6 @@
         });
         $(".js-select").select2();
         $(document).ready(function() {
-            $('input[type=email]').bind('change', function () {
-              var arr = []
-              $siblings = $(this).siblings();
-              $.each($siblings, function (i, key) {
-                 arr.push($(key).val()); 
-             });
-              if ($.inArray($(this).val(), arr) !== -1)
-              {
-                  alert("duplicate has been found");
-              }
-          });    
             $("#txtboxToFilter").keydown(function (e) {
                 if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
                     (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
@@ -442,7 +435,6 @@
         $('#position').on('change', e => {
             var select = $('#position').find(":selected").val()
             var status = $('#status').find(":selected").val()
-            console.log(select);
             if (select == "{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}") {
                 $('#status').show();
                 $('#subarea').hide();
@@ -499,13 +491,23 @@
             var select = $('#position').find(":selected").val()
             var status = $('#status').find(":selected").val()
             if (status == 'Stay') {
+                clearStores();
                 $('#storeMobile').hide();
                 $('#storeStay').show();
             } else {
+                clearStores();
                 $('#storeStay').hide();
                 $('#storeMobile').show();
-            }
+            } 
         })
+        function clearStores() {
+            $('#stores').val('');
+            $('#select2-stores-container').html('<span class="select2-selection__placeholder">Choose your Store</span>');
+        }
+        function clearPasar() {
+            $('#pasar').val('');
+            $('#select2-pasar-container').html('<span class="select2-selection__placeholder">Choose your Pasar</span>');
+        }
         function addItem(stores, get = '') {
             var storeSplit = stores.split("|");
             var a = selectedStoresId.indexOf(''+storeSplit[0]);
@@ -573,15 +575,12 @@
         function deleteItem(id) {
             var a = selectedStoresId.indexOf(''+id);
             if (a >= 0) {
-                console.log(selectedStores)
                 selectedStores.splice(a, 1);
                 selectedStoresId.splice(a, 1);
                 selectedStoresName.splice(a, 1);
-                console.log(selectedStores)
                 tableIndex = 0;
                 $('#selectedStoreTableBody').html('');
                 $.each(selectedStores, function( index, value ) {
-                    console.log(value)
                     addItem(value,'get');
                 });
             }else{
@@ -591,16 +590,13 @@
         function deleteItemPasar(id) {
             var a = selectedPasarId.indexOf(''+id);
             if (a >= 0) {
-                console.log(selectedPasar)
                 selectedPasar.splice(a, 1);
                 selectedPasarId.splice(a, 1);
                 selectedPasarName.splice(a, 1);
-                console.log(selectedPasar)
                 tableIndex = 0;
                 $('#selectedPasarTableBody').html('');
                 $.each(selectedPasar, function( index, value ) {
-                    console.log(value)
-                    addItem(value,'get');
+                    addItemPasar(value,'get');
                 });
             }else{
                 console.log("Index Item Not Found!");

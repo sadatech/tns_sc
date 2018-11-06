@@ -6,7 +6,7 @@
     <div class="container">
 	<div class="block">
                 <div class="block-content">
-                    <form action="{{ route('pk.store') }}" method="post">
+                    <form action="{{ route('pk.store') }}" method="post" enctype="multipart/form-data">
                     	{!! csrf_field() !!}
                         <div class="form-group row">
                             <label class="col-lg-3 col-form-label" for="example-hf-email">Admin</label>
@@ -35,7 +35,8 @@
                          <div class="form-group row">
                             <label class="col-lg-3 col-form-label" for="example-hf-email">File Upload</label>
                             <div class="col-lg-7 mb-1">
-                                <input type="file" class="form-control" name="file" placeholder="File">
+                                <input type="file" class="form-control" name="fileku" accept=".pdf,application/pdf" placeholder="File">
+                                <code> *Type File PDF</code>
                             </div>
                         </div>
                          <div class="form-group row">
@@ -46,6 +47,7 @@
                             @foreach($positions as $time)
                                 <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
+                                <option value="All">All</option>
                         </select>
                             </div>
                         </div>
