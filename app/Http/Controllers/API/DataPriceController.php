@@ -46,6 +46,7 @@ class DataPriceController extends Controller
 							$modelDataPrice->id_store = $data->store;
 							$modelDataPrice->id_employee = $user->id;
 							$modelDataPrice->date = $date;
+							$modelDataPrice->week = $data->week;
 							$modelDataPrice->save();
 							foreach ($data->product as $product) {
 

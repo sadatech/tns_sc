@@ -45,6 +45,7 @@ class AvailabilityController extends Controller
 							$modelAvailability->id_store = $data->store;
 							$modelAvailability->id_employee = $user->id;
 							$modelAvailability->date = $date;
+							$modelAvailability->week = $data->week;
 							$modelAvailability->save();
 							foreach ($data->product as $product) {
 								$modelDetailAvailability = new DetailAvailability;
