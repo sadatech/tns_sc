@@ -173,7 +173,7 @@
       columns: [
       { data: 'id', name: 'id' },
       { data: 'name', name: 'name' },
-      { data: 'conversion_value', name: 'conversion_value' },
+      { data: 'size', name: 'size' },
       { data: 'action', name: 'action' },
       ]
     });
