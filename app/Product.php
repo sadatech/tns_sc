@@ -33,7 +33,6 @@ class Product extends Model
             'name' => 'required|string',
             'code' => 'required|string',
             'panel' => 'required|string',
-            'pcs' => 'numeric',
             'stock_type_id' => 'required|integer',
         ];
     }

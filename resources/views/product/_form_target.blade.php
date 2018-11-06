@@ -60,7 +60,7 @@ $action = $action ?? '';
   @if ($type == 'edit')
     function editModal(json) {
       $('#{{$id}}').modal('show');
-      $('#{{$id}}Form').attr('action', "{{ url('/product/target/update') }}/"+json.id);
+      $('#{{$id}}Form').attr('action', "{{ url('/target/mtc/update') }}/"+json.id);
       $('#{{$type}}Employee').val(json.employee).trigger('change');
       $('#{{$type}}Store').val(json.store).trigger('change');
       $('#{{$type}}type').val(json.type);
@@ -83,7 +83,7 @@ $action = $action ?? '';
 
   $('#downloadSampleBtn').click(function(e){
     e.preventDefault();
-    window.open("{{ url('product/target/sample-form/download') }}" + '/' + $('#Employee').val());
+    window.open("{{ url('target/mtc/sample-form/download') }}" + '/' + $('#Employee').val());
   })
 
   $(".{{$type}}-js-select2").select2({ 

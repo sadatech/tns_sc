@@ -347,20 +347,19 @@ Route::prefix('product')->group(function () {
 				return response()->download(public_path('assets/FokusMDImport.xlsx'));
 			})->name('fokusMD.download-template')->middleware('auth');
 	});
-
-	//Target Pages
-	Route::prefix('target')->group(function () {
-		Route::get('/', 'TargetController@baca')->name('target')->middleware('auth');
-		Route::get('/data', 'TargetController@data')->name('target.data')->middleware('auth');
-		Route::post('/create', 'TargetController@store')->name('target.add')->middleware('auth');
-		Route::put('/update/{id}', 'TargetController@update')->name('target.update')->middleware('auth');
-		Route::get('/delete/{id}', 'TargetController@delete')->name('target.delete')->middleware('auth');
-		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('target.download-sample')->middleware('auth');
-	});
 });
 
 // Master Target
 Route::prefix('target')->group(function () {
+	Route::prefix('mtc')->group(function () {
+		Route::get('/', 'TargetController@baca')->name('mtc')->middleware('auth');
+		Route::get('/data', 'TargetController@data')->name('mtc.data')->middleware('auth');
+		Route::post('/create', 'TargetController@store')->name('mtc.add')->middleware('auth');
+		Route::put('/update/{id}', 'TargetController@update')->name('mtc.update')->middleware('auth');
+		Route::get('/delete/{id}', 'TargetController@delete')->name('mtc.delete')->middleware('auth');
+		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('mtc.download-sample')->middleware('auth');
+	});
+
 	Route::prefix('dc')->group(function () {
 		Route::get('/', 'Target\DcController@baca')->name('target.dc')->middleware('auth');
 		Route::get('/data', 'Target\DcController@data')->name('target.dc.data')->middleware('auth');

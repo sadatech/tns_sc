@@ -2,12 +2,13 @@
 
 namespace App;
 
+use App\Components\traits\DropDownHelper;
 use App\Components\traits\ValidationHelper;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductFokus extends Model
 {
-
+    use DropDownHelper;
     use ValidationHelper;
 
     protected $fillable = [
@@ -32,6 +33,11 @@ class ProductFokus extends Model
     public function area()
     {
         return $this->belongsTo('App\Area', 'id_area');
+    }
+
+    public function Fokus()
+    {
+    	return $this->hasMany('App\FokusChannel', 'id_channel');
     }
 
     public function getFromAttribute($value)

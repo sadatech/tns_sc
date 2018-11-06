@@ -45,8 +45,6 @@ $action = $action ?? '';
                             {{ Form::select2Input('stock_type_id', old('stock_type_id'), App\ProductStockType::toDropDownData(), ['labelText' => 'Stock Type', 'required' => '', 'id' => $type.'StockType']) }}
                         </div>
                     </div>
-
-                    
                     <div class="form-group row">
                         <div class="col-md-12">
                             <div class="custom-control custom-checkbox custom-control-inline col-md-6">
@@ -68,7 +66,7 @@ $action = $action ?? '';
                     </div>
                     <div class="form-group">
                         <label>PCS</label>
-                        <input type="text" class="form-control" name="pcs" value="1" disabled>
+                        <input type="text" class="form-control" name="pcs" value="1" readOnly="">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -107,9 +105,6 @@ $("#example-inline-checkbox2").change(function() {
         $("#Input2").show();
     }
 });
-
-
-
     @if ($type == 'edit')
         function editModal(json) {
             $('#{{$id}}').modal('show');
@@ -120,7 +115,10 @@ $("#example-inline-checkbox2").change(function() {
             $('#{{$type}}Product').val(json.product).trigger('change');
             $('#{{$type}}Panel').val(json.panel).trigger('change');
             $('#{{$type}}StockType').val(json.stock_type_id).trigger('change');
-            $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
+            $('#Input1').val(json.carton);
+            $('#Input2').val(json.pack);
+            $('#{{$type}}Pcs').val(json.pcs);
+            // $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
             console.log(json)
         }
     @endif
