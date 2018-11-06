@@ -4,16 +4,16 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Availability extends Model
+class DisplayShare extends Model
 {
-    protected $table = 'availability';
+    protected $table = 'display_shares';
 
     protected $fillable = [
         'id_store', 'id_employee', 'date'
     ];
     
-    public function detail_availability(){
-    	return $this->hasMany(DetailAvailability::class,'id_availability');
+    public function detail_display_share(){
+    	return $this->hasMany(DetailDisplayShare::class,'id_display_share');
     }
 
     public function employee(){

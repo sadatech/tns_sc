@@ -22,15 +22,15 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+            <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
             <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="sub-category">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th class="text-center">Name</th>
-          <th class="text-center">Category</th>
+          <th>SubCategory</th>
+          <th>Category</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -93,7 +93,7 @@
           </div>
         </div>
       </div>
-      <form id="editForm" method="post">Category
+      <form id="editForm" method="post">
         {!! method_field('PUT') !!}
         {!! csrf_field() !!}
         <div class="block-content">
@@ -119,6 +119,69 @@
               <i class="fa fa-save"></i> Save
             </button>
             <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-gd-sun p-10">
+          <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import <i>SubCategory</i></h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('sub-category.import') }}">
+        {{ csrf_field() }}
+        <div class="block-content">
+          <div class="form-group">
+            <a href="{{ route('subcategory.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <div class="block-content">
+            <h5> Sample Data :</h5>
+            <table class="table table-bordered table-vcenter">
+                <thead>
+                    <tr>
+                        <td><b>SubCategory</b></td>
+                        <td><b>Category</b></td>
+                        <td><b>Deskripsi</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SubCategory 1</td>
+                        <td>Category 1</td>
+                        <td>Deskripsi 1</td>
+                    </tr>
+                    <tr>
+                        <td>SubCategory 2</td>
+                        <td>Category 2</td>
+                        <td> - </td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+          <div class="form-group col-md-12">
+            <label>Upload SubCategory:</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Import
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
         </div>
       </form>
     </div>
@@ -196,7 +259,7 @@
           });
         });
       },
-      // scrollY: "300px",
+      scrollY: "300px",
       ajax: '{!! route('sub-category.data') !!}',
       columns: [
       { data: 'id', name: 'id' },
