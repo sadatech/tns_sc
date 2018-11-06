@@ -58,10 +58,10 @@ $action = $action ?? '';
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <input type="text" class="form-control" name="carton" id="Input1">
+                            <input type="text" class="input1 form-control" name="carton" id="Input1">
                         </div>
                         <div class="col-md-6">
-                            <input type="text" class="form-control" name="pack" id="Input2">
+                            <input type="text" class="input2 form-control" name="pack" id="Input2">
                         </div>
                     </div>
                     <div class="form-group">
@@ -115,11 +115,11 @@ $("#example-inline-checkbox2").change(function() {
             $('#{{$type}}Product').val(json.product).trigger('change');
             $('#{{$type}}Panel').val(json.panel).trigger('change');
             $('#{{$type}}StockType').val(json.stock_type_id).trigger('change');
-            $('#Input1').val(json.carton);
-            $('#Input2').val(json.pack);
+            $('.input1').val(json.carton).trigger('change');
+            $('.input2').val(json.pack);
             $('#{{$type}}Pcs').val(json.pcs);
             // $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
-            console.log(json)
+            console.log(json.carton)
         }
     @endif
 </script>
