@@ -31,10 +31,12 @@ class DatabaseSeeder extends Seeder
         $this->call(CategoryTableSeeder::class);
         $this->call(SubCategoryTableSeeder::class);
         $this->call(ProductTableSeeder::class);
-        $this->call(SkuUnitTableSeeder::class);
-        $this->call(ProductUnitTableSeeder::class);
+
+        $this->call(MeasurementUnitTableSeeder::class);
+        $this->call(ProductMeasureTableSeeder::class);
 
         $this->call(PriceTableSeeder::class);
         // $this->call(SalesTableSeeder::class);
+
     }
 }

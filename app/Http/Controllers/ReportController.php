@@ -7,6 +7,14 @@ use App\DetailIn;
 use App\SellIn;
 use App\SellInSummary;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Collection;
+use App\Category;
+use App\Area;
+use App\Account;
+use App\DisplayShare;
+use App\DetailDisplayShare;
+use App\AdditionalDisplay;
+use App\DetailAdditionalDisplay;
 use Auth;
 use DB;
 use App\StoreDistributor;
@@ -408,4 +416,234 @@ class ReportController extends Controller
 
     }
 
-}
+    // *********** PRICE SASA VS COMPETITOR ****************** //
+
+    public function PriceVsIndex(){
+        return view('report.price-vs-competitor');
+    }
+
+    public function PriceVsData(){
+
+    
+    }
+
+    // *********** AVAILABILITY ****************** //
+
+    public function availabilityIndex(){
+        $data['categories'] = Category::get();
+        return view('report.availability', $data);
+    }
+
+    public function availabilityAreaData(){
+
+        $categories = Category::get();
+        $areas = Area::get();
+
+        $data = new Collection();
+        foreach ($areas as $area) {
+                $item['test0'] = $area->id;
+                $item['test1'] = $area->name;
+                $x = 2;
+            foreach ($categories as $category) {
+                $totalProduct = DB::select(
+                    "
+                    SELECT COUNT(dv.id) as data_count
+                    FROM detail_availability dv
+                    JOIN availability a ON dv.id_availability = a.id
+                    JOIN stores s ON a.id_store = s.id
+                    JOIN sub_areas sa ON s.id_subarea = sa.id
+                    JOIN areas ar ON sa.id_area = ar.id
+                    JOIN products p ON dv.id_product = p.id
+                    JOIN sub_categories sc ON p.id_subcategory = sc.id
+                    JOIN categories c ON sc.id_category = c.id
+                    WHERE c.id = '".$category->id."'
+                    AND ar.id = '".$area->id."'
+                    ")[0]->data_count * 1;
+                $totalProductAvailability = DB::select(
+                    "
+                    SELECT COUNT(dv.id) as data_count
+                    FROM detail_availability dv
+                    JOIN availability a ON dv.id_availability = a.id
+                    JOIN stores s ON a.id_store = s.id
+                    JOIN sub_areas sa ON s.id_subarea = sa.id
+                    JOIN areas ar ON sa.id_area = ar.id
+                    JOIN products p ON dv.id_product = p.id
+                    JOIN sub_categories sc ON p.id_subcategory = sc.id
+                    JOIN categories c ON sc.id_category = c.id
+                    WHERE c.id = '".$category->id."'
+                    AND ar.id = '".$area->id."'
+                    AND dv.available = 1
+                    ")[0]->data_count * 1;
+                // return response()->json(round($totalProductAvailability / $totalProduct, 2) * 100);
+                if ($totalProductAvailability == 0) {
+                    $total = 0;
+                }else{
+                    $total = round($totalProductAvailability / $totalProduct, 2) * 100; 
+                }
+                $item['test'.$x] = $total;
+                $x++;
+            }
+                $data->push($item);
+        }
+        return Datatables::of($data)->make(true);
+        // return response()->json($data);
+    }
+
+    public function availabilityAccountData(){
+
+        $categories = Category::get();
+        $accounts = Account::get();
+
+        $data = new Collection();
+        foreach ($accounts as $account) {
+                $item['test0'] = $account->id;
+                $item['test1'] = $account->name;
+                $x = 2;
+            foreach ($categories as $category) {
+                $totalProduct = DB::select(
+                    "
+                    SELECT COUNT(dv.id) as data_count
+                    FROM detail_availability dv
+                    JOIN availability a ON dv.id_availability = a.id
+                    JOIN stores s ON a.id_store = s.id
+                    JOIN accounts ac ON s.id_account = ac.id
+                    JOIN products p ON dv.id_product = p.id
+                    JOIN sub_categories sc ON p.id_subcategory = sc.id
+                    JOIN categories c ON sc.id_category = c.id
+                    WHERE c.id = '".$category->id."'
+                    AND ac.id = '".$account->id."'
+                    ")[0]->data_count * 1;
+                $totalProductAvailability = DB::select(
+                    "
+                    SELECT COUNT(dv.id) as data_count
+                    FROM detail_availability dv
+                    JOIN availability a ON dv.id_availability = a.id
+                    JOIN stores s ON a.id_store = s.id
+                    JOIN accounts ac ON s.id_account = ac.id
+                    JOIN products p ON dv.id_product = p.id
+                    JOIN sub_categories sc ON p.id_subcategory = sc.id
+                    JOIN categories c ON sc.id_category = c.id
+                    WHERE c.id = '".$category->id."'
+                    AND ac.id = '".$account->id."'
+                    AND dv.available = 1
+                    ")[0]->data_count * 1;
+                // return response()->json(round($totalProductAvailability / $totalProduct, 2) * 100);
+                if ($totalProductAvailability == 0) {
+                    $total = 0;
+                }else{
+                    $total = round($totalProductAvailability / $totalProduct, 2) * 100; 
+                }
+                $item['test'.$x] = $total;
+                $x++;
+            }
+                $data->push($item);
+        }
+        return Datatables::of($data)->make(true);
+        // return response()->json($data);
+    }
+
+    // *********** DISPLAY SHARE ****************** //
+
+    public function displayShareIndex(){
+        return view('report.display_share');
+    }
+
+    public function displayShareSpgData(){
+
+        $datas = DisplayShare::where('display_shares.deleted_at', null)
+                ->join("stores", "display_shares.id_store", "=", "stores.id")
+                ->join("employees", "display_shares.id_employee", "=", "employees.id")
+                ->select(
+                    'display_shares.*',
+                    'stores.name1 as store_name',
+                    'employees.name as emp_name')
+                ->get();
+            
+            $x = 0;
+        foreach($datas as $data)
+        {
+            $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
+                                            ->join('categories','detail_display_shares.id_category','categories.id')
+                                            ->join('brands','detail_display_shares.id_brand','brands.id')
+                                            ->select(
+                                                'detail_display_shares.*',
+                                                'categories.name as category_name',
+                                                'brands.name as brand_name')->get();
+            foreach ($detail_data as $detail) {
+                $data[$detail->category_name.'-'.$detail->brand_name.'-tier'] = $detail->tier;
+                $data[$detail->category_name.'-'.$detail->brand_name.'-depth'] = $detail->depth;
+            // if (condition) {
+            //     # code...
+            // }
+                $x++;
+                $data['x']=$x;
+            }
+
+        }    
+
+        $categories = Category::get();
+        $areas = Area::get();
+
+        // return Datatables::of($data)->make(true);
+        return response()->json($datas);
+    }
+
+    public function additionalDisplayIndex(){
+        return view('report.additional-display');
+    }
+
+    public function additionalDisplaySpgData(){
+
+        $datas = AdditionalDisplay::where('additional_displays.deleted_at', null)
+                ->join("stores", "additional_displays.id_store", "=", "stores.id")
+                ->join('sub_areas', 'stores.id_subarea', 'sub_areas.id')
+                ->join('areas', 'sub_areas.id_area', 'areas.id')
+                ->join('regions', 'areas.id_region', 'regions.id')
+                ->leftjoin('employee_sub_areas', 'stores.id', 'employee_sub_areas.id_subarea')
+                ->leftjoin('employees as empl_tl', 'employee_sub_areas.id_employee', 'empl_tl.id')
+                ->join("employees", "additional_displays.id_employee", "=", "employees.id")
+                ->leftjoin("detail_additional_displays", "additional_displays.id", "=", "detail_additional_displays.id_additional_display")
+                ->join("jenis_displays", "detail_additional_displays.id_jenis_display", "=", "jenis_displays.id")
+                ->select(
+                    'additional_displays.*',
+                    'stores.name1 as store_name',
+                    'employees.name as emp_name',
+                    'jenis_displays.name as jenis_display_name',
+                    'detail_additional_displays.jumlah as jumlah_add',
+                    'detail_additional_displays.foto_additional as foto_Add',
+                    'regions.name as region_name',
+                    'areas.name as area_name',
+                    'empl_tl.name as tl_name',
+                    'employees.status as jabatan'
+                    )
+                ->get();
+            
+        //     $x = 0;
+        // foreach($datas as $data)
+        // {
+        //     $detail_data = DetailAdditionalDisplay::where('detail_additional_displays.id_display_share', $data->id)
+        //                                     ->join('categories','detail_additional_displays.id_category','categories.id')
+        //                                     ->join('brands','detail_additional_displays.id_brand','brands.id')
+        //                                     ->select(
+        //                                         'detail_additional_displays.*',
+        //                                         'categories.name as category_name',
+        //                                         'brands.name as brand_name')->get();
+        //     foreach ($detail_data as $detail) {
+        //         $data[$detail->category_name.'-'.$detail->brand_name.'-tier'] = $detail->tier;
+        //         $data[$detail->category_name.'-'.$detail->brand_name.'-depth'] = $detail->depth;
+        //     // if (condition) {
+        //     //     # code...
+        //     // }
+        //         $x++;
+        //         $data['x']=$x;
+        //     }
+
+        // }    
+
+        $categories = Category::get();
+        $areas = Area::get();
+
+        return Datatables::of($datas)->make(true);
+        return response()->json($datas);
+
+    }

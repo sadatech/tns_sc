@@ -12,7 +12,8 @@ class CreatePlanDcsTable extends Migration
             $table->increments('id');
             $table->date('date');
             $table->string('lokasi');
-            $table->string('stocklist');
+            $table->string('stocklist')->nullable();
+            $table->enum('channel', ['MTC', 'GTC', 'ITC'])->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

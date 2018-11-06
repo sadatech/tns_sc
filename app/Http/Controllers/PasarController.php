@@ -181,7 +181,7 @@ class PasarController extends Controller
                             Pasar::create([
                                 'name'              => $row->pasar,
                                 'id_subarea'        => $id_subarea,
-                                'longitude'         => (isset($row->longitude)? $row->longitude : "-"),
+                                'longitude'         => (isset($row->longitude) ? $row->longitude : "-"),
                                 'latitude'          => (isset($row->latitude) ? $row->latitude : "-"),
                                 'address'           => $row->address
                             ])->id;
@@ -213,19 +213,19 @@ class PasarController extends Controller
 
     public function findSub($data)
     {
-        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
-        if ($dataSub->count() < 1 ) {
-
+        $dataSub1 = SubArea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
+        if ($dataSub1->count() < 1 ) {
+            
             $dataSub['area_name']  = $data['area_name'];
             $dataSub['region_name']  = $data['region_name'];
             $id_area = $this->findArea($dataSub);
-            $subarea = Subarea::create([
+            $subarea = SubArea::create([
               'name'        => $data['subarea_name'],
               'id_area'     => $id_area
           ]);
             $id_subarea = $subarea->id;
         }else{
-            $id_subarea = $dataSub->first()->id;
+            $id_subarea = $dataSub1->first()->id;
         }
         return $id_subarea;
     }
@@ -273,8 +273,8 @@ class PasarController extends Controller
             $data[] = array(
                 'Pasar'             => $val->name,
                 'Address'           => $val->address,
-                'Longitude'         => $val->longitude,
-                'Latitude'          => $val->latitude,
+                'Longitude'         => (isset($val->longitude) ? $val->longitude : "-"),
+                'Latitude'          => (isset($val->latitude) ? $val->latitude : "-"),
                 'Subarea'           => $val->subarea->name,
                 'Area'              => $val->subarea->area->name,
                 'Region'            => $val->subarea->area->region->name
