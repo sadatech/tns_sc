@@ -9,6 +9,7 @@ use DB;
 use Auth;
 use File;
 use Excel;
+use Carbon\Carbon;
 use App\Product;
 use App\Category;
 use App\SubCategory;
@@ -184,5 +185,25 @@ class SubCategoryController extends Controller
             $id_category = $dataCat->first()->id;
         }
         return $id_category;
+    }
+
+    public function export()
+    {
+        $dataSub = SubCategory::orderBy('created_at', 'DESC')->get();
+        $data = array();
+        foreach ($dataSub as $val) {
+            $data[] = array(
+                'SubCategory'       => $val->name,
+                'Category'          => (isset($val->category->name) ? $val->category->name : "-"),
+                'Deskripsi'         => (isset($val->category->description) ? $val->category->description : "-")
+            );
+        }
+        $filename = "SubCategory_".Carbon::now().".xlsx";
+        return Excel::create($filename, function($excel) use ($data) {
+            $excel->sheet('SubCategory', function($sheet) use ($data)
+            {
+                $sheet->fromArray($data);
+            });
+        })->download();
     }
 }

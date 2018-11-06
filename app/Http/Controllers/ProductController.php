@@ -56,7 +56,10 @@ class ProductController extends Controller
                 'stock_type_id' => $product->stock_type_id,
                 'deskrispi'     => $product->deskripsi,
                 'panel'         => $product->panel,
-                'measure'       => ProductMeasure::where('id_product',$product->id)->pluck('id_measure')
+                'carton'        => $product->carton,
+                'pack'          => $product->pack,
+                'pcs'           => $product->pcs,
+               
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('product.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -72,15 +75,15 @@ class ProductController extends Controller
         }
 
         DB::transaction(function () use($data) {
-            $measure = $data['measure'];
-            unset($data['measure']);
+            // $measure = $data['measure'];
+            // unset($data['measure']);
             $product = Product::create($data);
-            foreach ($measure as $sku_id) {
-                ProductMeasure::create([
-                    'id_product' => $product->id,
-                    'id_measure' => $sku_id
-                ]);
-            }
+            // foreach ($measure as $sku_id) {
+            //     ProductMeasure::create([
+            //         'id_product' => $product->id,
+            //         'id_measure' => $sku_id
+            //     ]);
+            // }
         });
 
         return redirect()->back()->with([
@@ -102,23 +105,23 @@ class ProductController extends Controller
         }
 
         DB::transaction(function () use($product, $data) {
-            $measure = $data['measure'];
-            unset($data['measure']);
+            // $measure = $data['measure'];
+            // unset($data['measure']);
 
             $product->fill($data)->save();
 
-            $oldSkuUnits = $product->measure->pluck('id_measure');
-            $deletedSkuUnits = $oldSkuUnits->diff($measure);
-            foreach ($deletedSkuUnits as $deleted_id) {
-                ProductMeasure::where(['product_id' => $product->id, 'id_measure' => $deleted_id])->delete(); 
-            }
+            // $oldSkuUnits = $product->measure->pluck('id_measure');
+            // $deletedSkuUnits = $oldSkuUnits->diff($measure);
+            // foreach ($deletedSkuUnits as $deleted_id) {
+            //     ProductMeasure::where(['product_id' => $product->id, 'id_measure' => $deleted_id])->delete(); 
+            // }
 
-            foreach ($measure as $sku_id) {
-                ProductMeasure::updateOrCreate([
-                    'id_product' => $product->id,
-                    'id_measure' => $sku_id
-                ]);
-            }
+            // foreach ($measure as $sku_id) {
+            //     ProductMeasure::updateOrCreate([
+            //         'id_product' => $product->id,
+            //         'id_measure' => $sku_id
+            //     ]);
+            // }
         });
 
         return redirect()->back()->with([
