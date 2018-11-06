@@ -260,6 +260,7 @@ Route::prefix('product')->group(function () {
 		Route::post('/import', 'SubCategoryController@import')->name('sub-category.import')->middleware('auth');
 		Route::put('/update/{id}', 'SubCategoryController@update')->name('sub-category.update')->middleware('auth');
 		Route::get('/delete/{id}', 'SubCategoryController@delete')->name('sub-category.delete')->middleware('auth');
+		Route::get('/export', 'SubCategoryController@export')->name('sub-category.export')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/SubCategoryImport.xlsx'));

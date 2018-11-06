@@ -74,7 +74,7 @@
                         <div class="row">
                             <div class="form-group col-md-12">
                                 <label>Lokasi</label>
-                                <input type="text" class="form-control" name="lokasi" value="{{ $plan->lokasi }}" required>
+                                <textarea type="text" class="form-control" name="lokasi" required>{{ $plan->lokasi }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer">

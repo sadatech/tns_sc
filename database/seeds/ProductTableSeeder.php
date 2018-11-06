@@ -15,6 +15,7 @@ class ProductTableSeeder extends Seeder
                 'code' => rand(10000, 100000),
                 'stock_type_id' => rand(1, 2),
                 'panel' => 'yes',
+                'pcs'   => 1
             ]);
         }
     }
