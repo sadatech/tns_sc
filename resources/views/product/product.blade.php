@@ -26,15 +26,18 @@
             <a href="{{ route('product.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="product">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover" id="product">
         <thead>
           <th style="width: 70px;"></th>
           <th>Brand</th>
-          <th>Sub Category</th>
+          <th width="400px">Sub Category</th>
           <th>Code</th>
           <th>SKU</th>
-          <th>Stock Type</th>
+          <th width="400px">Stock Type</th>
           <th>Panel</th>
+          <th>Carton</th>
+          <th>Pack</th>
+          <th>PCS</th>
           <th style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -248,6 +251,9 @@
             { data: 'name', name: 'name' },
             { data: 'stockType', name: 'stockType' },
             { data: 'panel', name: 'panel' },
+            { data: 'carton', name: 'carton' },
+            { data: 'pack', name: 'pack' },
+            { data: 'pcs', name: 'pcs' },
             { data: 'action', name: 'action' },
             ]
         });
