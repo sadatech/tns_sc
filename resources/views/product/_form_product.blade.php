@@ -4,7 +4,7 @@ $action = $action ?? '';
 @endphp
 
 <div class="modal fade" id="{{$id}}" tabindex="-1" role="dialog" aria-labelledby="{{$id}}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout" role="document">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-gd-sun p-10">
@@ -45,8 +45,29 @@ $action = $action ?? '';
                             {{ Form::select2Input('stock_type_id', old('stock_type_id'), App\ProductStockType::toDropDownData(), ['labelText' => 'Stock Type', 'required' => '', 'id' => $type.'StockType']) }}
                         </div>
                     </div>
-
-                    {{ Form::select2Input('measure', [], App\MeasurementUnit::toDropDownData(), ['multiple' => true, 'id' => $type.'MeasurementUnit']) }}
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="custom-control custom-checkbox custom-control-inline col-md-6">
+                                <input class="custom-control-input" type="checkbox" id="example-inline-checkbox1" checked>
+                                <label class="custom-control-label" for="example-inline-checkbox1">Carton</label>
+                            </div>
+                           
+                            <div class="custom-control custom-checkbox custom-control-inline col-md6">
+                                <input class="custom-control-input" type="checkbox" id="example-inline-checkbox2" checked>
+                                <label class="custom-control-label" for="example-inline-checkbox2">Pack</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="input1 form-control" name="carton" id="Input1">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="input2 form-control" name="pack" id="Input2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>PCS</label>
+                        <input type="text" class="form-control" name="pcs" value="1" readOnly="">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-alt-success">
@@ -61,6 +82,29 @@ $action = $action ?? '';
 
 @push('additional-js')
 <script type="text/javascript">
+$("#example-inline-checkbox1").change(function() {
+    if ($(this).removeAttr("checked")) {
+        $("#Input1").hide();
+    }
+});
+
+$("#example-inline-checkbox2").change(function() {
+    if ($(this).removeAttr("checked")) {
+        $("#Input2").hide();
+    }
+});
+
+$("#example-inline-checkbox1").change(function() {
+    if ($(this).prop("checked")) {
+        $("#Input1").show();
+    }
+});
+
+$("#example-inline-checkbox2").change(function() {
+    if ($(this).prop("checked")) {
+        $("#Input2").show();
+    }
+});
     @if ($type == 'edit')
         function editModal(json) {
             $('#{{$id}}').modal('show');
@@ -71,8 +115,11 @@ $action = $action ?? '';
             $('#{{$type}}Product').val(json.product).trigger('change');
             $('#{{$type}}Panel').val(json.panel).trigger('change');
             $('#{{$type}}StockType').val(json.stock_type_id).trigger('change');
-            $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
-            console.log(json)
+            $('.input1').val(json.carton).trigger('change');
+            $('.input2').val(json.pack);
+            $('#{{$type}}Pcs').val(json.pcs);
+            // $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
+            console.log(json.carton)
         }
     @endif
 </script>

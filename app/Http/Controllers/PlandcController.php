@@ -167,6 +167,11 @@ class PlandcController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
+           
+            // $data1 = Employee::where(['id' => $request->input('employee')])->first();
+            $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($request->input('lokasi')))."'");
+            // $data3 = PlanEmployee::where(['id_employee' => $data1->id]);
+            dd($data2);
             $store = Plandc::find($id);
                 if ($request->input('employee')) {
                     foreach ($request->input('employee') as $emp) {
@@ -195,6 +200,7 @@ class PlandcController extends Controller
                     'title'   => 'Sukses!<br/>',
                     'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
                 ]);
+                
         }
     }
 
