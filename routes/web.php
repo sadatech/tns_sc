@@ -257,8 +257,13 @@ Route::prefix('product')->group(function () {
 		Route::get('/', 'SubCategoryController@baca')->name('sub-category')->middleware('auth');
 		Route::get('/data', 'SubCategoryController@data')->name('sub-category.data')->middleware('auth');
 		Route::post('/create', 'SubCategoryController@store')->name('sub-category.add')->middleware('auth');
+		Route::post('/import', 'SubCategoryController@import')->name('sub-category.import')->middleware('auth');
 		Route::put('/update/{id}', 'SubCategoryController@update')->name('sub-category.update')->middleware('auth');
 		Route::get('/delete/{id}', 'SubCategoryController@delete')->name('sub-category.delete')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/SubCategoryImport.xlsx'));
+		})->name('subcategory.download-template')->middleware('auth');
 	});
 
 	//SKU Unit Pages
@@ -267,7 +272,7 @@ Route::prefix('product')->group(function () {
 		Route::get('/data', 'SkuUnitController@data')->name('sku-unit.data')->middleware('auth');
 		Route::post('/create', 'SkuUnitController@store')->name('sku-unit.add')->middleware('auth');
 		Route::put('/update/{id}', 'SkuUnitController@update')->name('sku-unit.update')->middleware('auth');
-		Route::get('/delete/{id}', 'SkuUnitController@delete')->name('sku-unit.delete')->middleware('auth');
+		Route::get('/delete/{id}', 'SkuUnitController@destroy')->name('sku-unit.delete')->middleware('auth');
 		Route::get('/export', 'SkuUnitController@export')->name('sku-unit.export')->middleware('auth');
 		Route::post('/import', 'SkuUnitController@import')->name('sku-unit.import')->middleware('auth');
 		Route::get('/download-template', function()
@@ -387,6 +392,7 @@ Route::prefix('planDc')->group(function () {
 	Route::get('/', 'PlandcController@read')->name('planDc')->middleware('auth');
 	Route::get('/data', 'PlandcController@data')->name('plan.data')->middleware('auth');
 	Route::post('/import','PlandcController@import')->name('plan.import')->middleware('auth');
+	Route::get('/update/{id}', 'PlandcController@readupdate')->name('ubah.plan')->middleware('auth');
 	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
 	Route::get('/delete/{id}', 'PlandcController@delete')->name('plan.delete')->middleware('auth');
 	Route::get('/export', 'PlandcController@exportXLS')->name('plan.export')->middleware('auth');
@@ -482,6 +488,43 @@ Route::prefix('report')->group(function () {
 		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
+
+		Route::prefix('availability')->group(function () {
+			Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
+			Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
+			Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@availabilityUpdate')->name('availability.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@Importavailability')->name('availability.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
+		Route::prefix('display_share')->group(function () {
+			Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
+			// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
+			Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
+		Route::prefix('additional_display')->group(function () {
+			Route::get('/', 'ReportController@additionalDisplayIndex')->name('additional_display')->middleware('auth');
+			Route::get('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
+			Route::get('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@additionalDisplayUpdate')->name('additional_display.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportadditionalDisplay')->name('additional_display.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
 	});	
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 });

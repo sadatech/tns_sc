@@ -128,6 +128,7 @@
                         <td><b>Type</b></td>
                         <td><b>Panel</b></td>
                         <td><b>SkuUnit</b></td>
+                        <td><b>Value</b></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,6 +140,7 @@
                         <td>Type 1</td>
                         <td>Panel 1</td>
                         <td>SkuUnit 1</td>
+                        <td>Value 1</td>
                     </tr>
                     <tr>
                         <td>SubCategory 2</td>
@@ -148,6 +150,7 @@
                         <td>Type 2</td>
                         <td>Panel 2</td>
                         <td>SkuUnit 2</td>
+                        <td>Value 2</td>
                     </tr>
                 </tbody>
             </table>
