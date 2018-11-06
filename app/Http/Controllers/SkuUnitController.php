@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\SkuUnit;
+use App\MeasurementUnit;
 use DB;
 use Auth;
 use File;
@@ -22,7 +22,7 @@ class SkuUnitController extends Controller
 
     public function data()
     {
-        $skuUnit = SkuUnit::get();
+        $skuUnit = MeasurementUnit::get();
         return Datatables::of($skuUnit)
         ->addColumn('action', function ($row) {
             $data = $row->toArray();
@@ -39,7 +39,7 @@ class SkuUnitController extends Controller
      */
     public function store(Request $request)
     {
-        $skuUnit = new SkuUnit;
+        $skuUnit = new MeasurementUnit;
         if (($validator = $skuUnit->validate($request->all()))->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -54,7 +54,7 @@ class SkuUnitController extends Controller
 
     public function update(Request $request, $id)
     {
-        $skuUnit = SkuUnit::findOrFail($id);
+        $skuUnit = MeasurementUnit::findOrFail($id);
 
         if (($validator = $skuUnit->validate($request->all()))->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -70,7 +70,7 @@ class SkuUnitController extends Controller
 
     public function destroy($id)
     {
-        SkuUnit::findOrFail($id)->delete();
+        MeasurementUnit::findOrFail($id)->delete();
 
         return redirect()->back()->with([
             'type' => 'success',
@@ -82,12 +82,12 @@ class SkuUnitController extends Controller
     public function export()
     {
  
-        $data = SkuUnit::orderBy('created_at', 'DESC')->get();
+        $data = MeasurementUnit::orderBy('created_at', 'DESC')->get();
         $filename = "SkuUnit".Carbon::now().".xlsx";
         (new FastExcel($data))->download($filename, function ($data) {
             return [
-                'name'                => $data->name,
-                'value'               => $data->conversion_value,
+                'name'  => $data->name,
+                'value' => $data->size,
             ];
         });
     }
@@ -115,13 +115,13 @@ class SkuUnitController extends Controller
                     foreach($results as $row)
                     {
                         echo "$row<hr>";
-                        $check = SkuUnit::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
-                        ->where(['conversion_value' => $row->value])->count();
+                        $check = MeasurementUnit::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
+                        ->where(['size' => $row->value])->count();
                         // dd($check);
                         if ($check < 1) {
-                            SkuUnit::create([
-                                'name'              => $row->name,
-                                'conversion_value'  => $row->value
+                            MeasurementUnit::create([
+                                'name'  => $row->name,
+                                'size'  => $row->value
                             ])->id;
                         } else {
                             return false;

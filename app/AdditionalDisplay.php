@@ -4,16 +4,16 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Availability extends Model
+class AdditionalDisplay extends Model
 {
-    protected $table = 'availability';
+    protected $table = 'additional_displays';
 
     protected $fillable = [
         'id_store', 'id_employee', 'date'
     ];
     
-    public function detail_availability(){
-    	return $this->hasMany(DetailAvailability::class,'id_availability');
+    public function detail_additional_display(){
+    	return $this->hasMany(DetailAdditionalDisplay::class,'id_additional_display');
     }
 
     public function employee(){

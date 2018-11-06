@@ -68,6 +68,14 @@
                         @endforeach
                       </select>
                     </div>
+                    {{ 
+                        Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(['id_brand', 1]), [
+                            'labelText' => 'Sasa Product',
+                            'required' => '',
+                            'id' => 'add' . 'Product',
+                            'placeholder' => 'Choose your Product'
+                        ])
+                    }}
                     <div class="form-group">
                       <label>Sub Category Product</label>
                       <select class="js-select2 form-control" style="width: 100%" name="subcategory">
@@ -85,14 +93,14 @@
                         <label>Deskripsi</label>
                         <textarea class="form-control" name="deskripsi"></textarea>
                     </div>
- -->                    <div class="form-group">
+ -->                    <!-- <div class="form-group">
                       <label>Panel</label>
                       <select class="js-select2 form-control" style="width: 100%" name="panel">
                       <option disabled selected>Choose your Panel</option>
                             <option value="yes"> Yes </option>
                             <option value="no"> No </option>
                       </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-alt-success">
@@ -134,6 +142,14 @@
                             </select>
                         </div>
                     </div>
+                    {{ 
+                        Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(['id_brand', 1]), [
+                            'labelText' => 'Sasa Product',
+                            'required' => '',
+                            'id' => 'edit' . 'Product',
+                            'placeholder' => 'Choose your Product'
+                        ])
+                    }}
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label>Sub Category Product</label>
@@ -154,7 +170,7 @@
                         <label>Deskripsi</label>
                         <textarea class="form-control" name="deskripsi" id="deskripsiInput"></textarea>
                     </div> -->
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="form-group col-md-12">
                             <label>Panel</label>
                             <select class="js-edit form-control" id="panelinput" style="width: 100%" name="panel" >
@@ -162,7 +178,7 @@
                                 <option value="no"> No </option>
                             </select>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-alt-success">

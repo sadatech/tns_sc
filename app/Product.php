@@ -67,7 +67,7 @@ class Product extends Model
 
     public function measure()
     {
-        return $this->belongsTo('App\ProductMeasure', 'id_measure');
+        return $this->hasMany('App\ProductMeasure', 'id_product');
     }
 
     public function sku_units()

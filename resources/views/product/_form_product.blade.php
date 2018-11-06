@@ -28,14 +28,6 @@ $action = $action ?? '';
                         ])
                     }}
 
-                    {{ 
-                        Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(['id_brand', 1]), [
-                            'labelText' => 'Sasa Product',
-                            'required' => '',
-                            'id' => $type . 'Product'
-                        ])
-                    }}
-
                     <div class="row">
                         <div class="col-md-6">
                             {{ Form::textInput('code', old('code'), ['labelText' => 'Code SKU Product', 'id' => $type.'Code',  'required' => '']) }}
