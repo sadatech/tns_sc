@@ -5,21 +5,52 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\DetailIn;
 use App\SellIn;
+use App\SellInSummary;
 use Yajra\Datatables\Datatables;
 use Auth;
 use DB;
 use App\StoreDistributor;
 use App\Distributor;
+use App\Filters\SummaryFilters;
+use App\Helper\ReportHelper as ReportHelper;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class ReportController extends Controller
 {
+    protected $reportHelper;
+
+    public function __construct(ReportHelper $reportHelper)
+    {
+        $this->reportHelper = $reportHelper;
+    }
+
     // *********** SELL IN ****************** //
 
 	public function sellInIndex(){
 		return view('report.sellin');
 	}
 
-    public function sellInData(Request $request){
+    public function sellInData(SummaryFilters $filters){
+
+        $data = SellInSummary::filter($filters);
+
+        return Datatables::of($data)
+            ->addColumn('action', function ($item) {
+                $data = array(
+                    'id'            => $item->id,
+                    'qty'           => $item->qty
+                );
+
+                return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
+                <button data-url=".route('sellin.delete', $item->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+                ";
+            })->make(true);
+
+    }
+
+    public function sellInDataRaw(Request $request){
 
         $data = DetailIn::where('deleted_at', null);
 
@@ -257,5 +288,124 @@ class ReportController extends Controller
 
 
     // *********** STOCK ****************** //
+
+
+    // *********** EXPORTING ****************** //
+
+    public function tes(){
+
+        $list = collect([
+            [ 'id' => 1, 'name' => 'Jane' ],
+            [ 'id' => 2, 'name' => 'John' ],
+        ]);
+
+        $data = SellInSummary::where('id', '!=', 0);
+
+        $sql = $data->toSql();
+        $bindings = $data->getBindings();
+
+        $sql = $data->toSql();
+        $bindings = $data->getBindings();
+
+        $data3 = collect(DB::select($sql, $bindings));
+
+        return (new FastExcel($this->reportHelper->mapForExportSalesNew($data3)))->download('file.xlsx');
+
+        // return redirect()->back();
+
+    }
+
+    public function export(Request $request, SummaryFilters $filters){
+
+        // $list = collect([
+        //     [ 'id' => 1, 'name' => 'Jane' ],
+        //     [ 'id' => 2, 'name' => 'John' ],
+        // ]);
+
+        // (new FastExcel($list))->export('file.xlsx');
+
+        // return;
+
+        // return response()->json(['name' => 'New.xlsx', 'file' => 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'.base64_encode($excel)]);
+
+        // return response()->json($request->all());
+
+        // return response()->json($this->reportHelper->getModel($request));
+
+        // $filterA = new SummaryFilters($request);
+
+        // return response()->json(SellInSummary::filter($filterA)->get());
+
+        // $filename = 'Philips Retail Report Sell Thru ' . Carbon::now()->format('d-m-Y');
+
+        $data = SellInSummary::filter($filters);
+
+        $sql = $data->toSql();
+        $bindings = $data->getBindings();
+
+        // $data2 = DB::select($data)->setBindings($bindings);
+
+        // $data2 = SellInSummary::select(DB::raw($data->toSql()), $bindings);
+
+        $data3 = collect(DB::select($sql, $bindings));
+
+        $dataNew = DB::select($sql, $bindings);
+
+        $data4 = SellInSummary::filter($filters)->get();
+
+        $arr = json_decode(json_encode($data3), TRUE);
+
+        // return response()->json($arr);
+
+        // return response()->json($data->limit(20)->get());
+
+        // $data = $this->reportHelper->getModel($request);
+
+        $filename = 'TEST REPORT '.rand(1000, 10000);
+        // $data = SellInSummary::filter(new SummaryFilters($request));
+
+        $excel = Excel::create($filename, function($excel) use ($arr) {
+
+            // Set the title
+            $excel->setTitle('Report Sell Thru');
+
+            // Chain the setters
+            $excel->setCreator('Philips')
+                  ->setCompany('Philips');
+
+            // Call them separately
+            $excel->setDescription('Sell Thru Data Reporting');
+
+            $excel->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+            $excel->sheet('SELL THRU', function ($sheet) use ($arr) {
+                $sheet->setAutoFilter('A1:S1');
+                $sheet->setHeight(1, 25);
+                // $sheet->fromModel($this->reportHelper->mapForExportSalesNew($data3), null, 'A1', true, true);
+                // $sheet->fromArray([['AAAA', 'BBBB', 'CCCC'],['AAAA', 'BBBB', 'CCCC']], null, 'A2', true, true);
+                $sheet->fromArray($arr, null, 'A1', true, true);
+                $sheet->row(1, function ($row) {
+                    $row->setBackground('#82abde');
+                });
+                $sheet->cells('A1:S1', function ($cells) {
+                    $cells->setFontWeight('bold');
+                });
+                $sheet->setBorder('A1:S1', 'thin');
+            });
+
+
+        })->string('xlsx');
+
+        // $model = $this->reportHelper->getModel($request);
+        // $excel = $this->reportHelper->exporting($model);
+
+        // return response()->json(['name' => $model['filename'].'.xlsx', 'file' => 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'.base64_encode($excel)]);
+
+        return response()->json(['name' => $filename.'.xlsx', 'file' => 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'.base64_encode($excel)]);
+
+    }
 
 }

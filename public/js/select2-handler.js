@@ -24,6 +24,9 @@ function triggerResetWithoutSearch (arrayOfData) {
     });
 
     this.filters = {};
+    if(typeof arrayOfData[8] !== 'undefined') {
+        this.filters['date_range'] = moment().format('YYYY-MM-DD')+'|'+moment().format('YYYY-MM-DD');
+    }
 
      // Datatable setup
 
@@ -47,10 +50,9 @@ function triggerResetWithoutSearch (arrayOfData) {
         "processing": true,
         "serverSide": true,
         "ajax": {
-            url: url,
+            url: url + "?" + $("#filterForm").serialize(),
             type: 'POST',
             dataType: 'json',
-            
             error: function (data) {
               swal("Error!", "Failed to load Data!", "error");
             },
@@ -125,7 +127,6 @@ function filteringReportWithoutSearch(arrayOfData) {
                 url: url + "?" + $("#filterForm").serialize(),
                 type: 'POST',
                 dataType: 'json',
-                
                 error: function (data) {
                   swal("Error!", "Failed to load Data!", "error");
                 },

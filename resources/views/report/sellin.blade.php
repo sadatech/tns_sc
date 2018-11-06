@@ -44,14 +44,18 @@
                   <select id="filterEmployee" class="inputFilter" name="id_emp"></select>
               </div>
               <div class="col-4 col-sm-4 text-center text-sm-left">
-                  <div class="font-size-sm font-w600 text-uppercase text-muted">Date</div>
+                  <!-- <div class="font-size-sm font-w600 text-uppercase text-muted">Date</div>
                   <button type="button" class="btn btn-default pull-right col-sm-12" id="daterange-btn">
                     <span>
                       <i class="fa fa-calendar"></i> Date Range picker
                     </span>
                     <i class="fa fa-caret-down"></i>
                   </button>
-                  <input type="hidden" id="inputDate" name="date_range">
+                  <input type="hidden" id="inputDate" name="date_range"> -->
+                  <span>
+                    <i class="fa fa-calendar"></i> Periode
+                  </span>
+                  <input type="text" id="filterMonth" class="form-control" placeholder="Month">
               </div>
           </div>
           <div class="row col-sm-12 col-md-12">
@@ -69,12 +73,12 @@
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
-            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Sell In</button>
-            <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+            <!-- <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Sell In</button>
+            <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button> -->
           </h3>
           <div class="block-option">
-            <button id="export" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button id="exportAll" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a class="button" href="{{ route('sellin.export') }}">TES</a>
+            <button id="exportAll" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
           </div>
         </div>
 
@@ -121,8 +125,6 @@
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Week</th>
-          <th>Distributor Code</th>
-          <th>Distributor Name</th>
           <th>Region</th>
           <th>Area</th>
           <th>Sub Area</th>
@@ -135,11 +137,12 @@
           <th>Date</th>
           <th>Product</th>
           <th>Category</th>
-          <th>Quantity</th>
+          <th>Actual Quantity</th>
+          <th>Measurement</th>
+          <th>Convertion Quantity</th>
           <th>Unit Price</th>
           <th>Value</th>
           <th>Value PF</th>
-          <th>SPV Name</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -267,6 +270,8 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}">
+
   <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
   <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
     <style type="text/css">
@@ -283,12 +288,14 @@
 @section('script')
 
   <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ asset('assets/js/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>
   <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script src="{{ asset('js/select2-handler.js') }}"></script>
   <script src="{{ asset('js/moment.min.js') }}"></script>
   <script src="{{ asset('js/daterangepicker.js') }}"></script>
+  <script src="{{ asset('js/datetimepicker-handler.js') }}"></script>
   <script type="text/javascript">
     var index = 0;
     var productSelected = [];
@@ -299,8 +306,6 @@
         var columnDefs = [{"className": "dt-center", "targets": [0]}];
         var tableColumns = [{ data: 'id', name: 'id', visible: false},
                 { data: 'week', name: 'week'},
-                { data: 'distributor_code', name: 'distributor_code'},
-                { data: 'distributor_name', name: 'distributor_name'},
                 { data: 'region', name: 'region'},
                 { data: 'area', name: 'area'},
                 { data: 'sub_area', name: 'sub_area'},
@@ -313,118 +318,175 @@
                 { data: 'date', name: 'date'},
                 { data: 'product_name', name: 'product_name'},
                 { data: 'category', name: 'category'},
+                { data: 'actual_qty', name: 'actual_qty'},
+                { data: 'measure_name', name: 'measure_name'},
                 { data: 'qty', name: 'qty'},
                 { data: 'unit_price', name: 'unit_price'},
                 { data: 'value', name: 'value'},
                 { data: 'value_pf', name: 'value_pf'},
-                { data: 'spv_name', name: 'spv_name'},
-                { data: 'action', name: 'action' }];
+                { data: 'action', name: 'action', visible: false }];
 
         var exportButton = '#export';
 
         var paramFilter = ['reportTable', $('#reportTable'), url, tableColumns, columnDefs, order, exportButton];
 
-        var paramReset = [filterId, 'reportTable', $('#reportTable'), url, tableColumns, columnDefs, order, exportButton, '#filterMonth'];
+        var paramReset = [filterId, 'reportTable', $('#reportTable'), url, tableColumns, columnDefs, order, exportButton, '#inputDate'];
 
-        $(document).ready(function() {
+        function dateRangeInit(){
+          $('#daterange-btn').daterangepicker(
+            {
+              opens: 'left',
+              ranges   : {
+                'Today'       : [moment(), moment()],
+                'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+                'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+              },
+              startDate: moment(),
+              endDate  : moment()
+            },
+            function (start, end) {
+              $('#daterange-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+              $('#inputDate').val(start.format('YYYY-MM-DD')+'|'+end.format('YYYY-MM-DD'))
+            }
+          )
+
+          // INITIATE
+          $('#daterange-btn span').html(moment().format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'))
+          $('#inputDate').val(moment().format('YYYY-MM-DD')+'|'+moment().format('YYYY-MM-DD'))
+        }
+
+      $(document).ready(function() {
           $.ajaxSetup({
             headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+            }                  
+
           });
 
-        $('#employeeSelect').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
-          return filterData('employee', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.nik+' - '+obj.name}
-            })
-          }
-        }));
+          // DATE RANGE
+          dateRangeInit();
 
-        $('#storeSelect').select2(setOptions('{{ route("store-select2") }}', 'Select Store', function (params) {
-          return filterData('store', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name1+' - '+obj.name2}
-            })
-          }
-        }));
+          $('#filterMonth').datetimepicker({
+              format: "MM yyyy",
+              startView: "3",
+              minView: "3",
+              autoclose: true,
+          });
 
-        $('.productSelect').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
-          filters['productExcept'] = productSelected;
-          return filterData('product', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name+' ('+obj.deskripsi+')'}
-            })
-          }
-        }));
-        $('.productSelect').on('change', function() {
-          productSelected.push($('.productSelect').val());
-          console.log(productSelected);
+          $('#employeeSelect').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
+            return filterData('employee', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.nik+' - '+obj.name}
+              })
+            }
+          }));
+
+          $('#storeSelect').select2(setOptions('{{ route("store-select2") }}', 'Select Store', function (params) {
+            return filterData('store', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name1+' - '+obj.name2}
+              })
+            }
+          }));
+
+          $('.productSelect').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
+            filters['productExcept'] = productSelected;
+            return filterData('product', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name+' ('+obj.deskripsi+')'}
+              })
+            }
+          }));
+          $('.productSelect').on('change', function() {
+            productSelected.push($('.productSelect').val());
+            console.log(productSelected);
+          });
+
+          $('#filterRegion').select2(setOptions('{{ route("region-select2") }}', 'Select Region', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Select Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          $('#filterSubArea').select2(setOptions('{{ route("sub-area-select2") }}', 'Select Sub Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Select Store', function (params) {
+            return filterData('store', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name1}
+              })
+            }
+          }));
+
+          $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
+            return filterData('employee', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          // TABLE
+          $('#reportTable').dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: url + "?" + $("#filterForm").serialize(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter": false,
+            "rowId": "id",
+            "columns": tableColumns,
+            "columnDefs": columnDefs,
+            "order": order,
         });
 
-        $('#filterRegion').select2(setOptions('{{ route("region-select2") }}', 'Select Region', function (params) {
-          return filterData('name', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name}
-            })
-          }
-        }));
+    });
 
-        $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Select Area', function (params) {
-          return filterData('name', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name}
-            })
-          }
-        }));
-
-        $('#filterSubArea').select2(setOptions('{{ route("sub-area-select2") }}', 'Select Sub Area', function (params) {
-          return filterData('name', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name}
-            })
-          }
-        }));
-
-        $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Select Store', function (params) {
-          return filterData('store', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name1}
-            })
-          }
-        }));
-
-        $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
-          return filterData('employee', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name}
-            })
-          }
-        }));
-
-      });
-
-//   $("#datepicker").datepicker( {
-//     format: "mm-yyyy",
-//     viewMode: "months", 
-//     minViewMode: "months"
-// });
       function editModal(json) {
           $('#editModal').modal('show');
           $('#editForm').attr('action', "{{ url('/report/sales/sellin/edit') }}/"+json.id);
@@ -446,7 +508,7 @@
               from: 'top',
               align: 'center'
             }
-          });
+          });          
 
       });
       @endif
@@ -492,36 +554,13 @@
         $(this).nextAll('input').first().val(this.value);
       })
 
-      //Date picker
-    $(function () {
-      $('#daterange-btn').daterangepicker(
-        {
-          ranges   : {
-            'Today'       : [moment(), moment()],
-            'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-            'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-          },
-          startDate: moment().subtract(29, 'days'),
-          endDate  : moment()
-        },
-        function (start, end) {
-          $('#daterange-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-          $('#inputDate').val(start.format('YYYY-MM-DD')+'|'+end.format('YYYY-MM-DD'))
-          filters['date_range'] = $('#inputDate').val();
-        }
-      )
-    });
+      
 
     $("#filterReset").click(function () {
-      $('#inputDate').val('')
-      $("#daterange-btn").html(
-        "<span>"+
-          "<i class='fa fa-calendar'></i> Date Range picker"+
-        "</span>"+
-        "<i class='fa fa-caret-down'></i>")
+
+      // DATE RANGE 
+      dateRangeInit();
+
       $.each($('#filterForm select'), function(key, value) {
         $('#'+this.id).val(null).trigger('change')
       })
@@ -534,66 +573,6 @@
       // });
     })
 
-    <!-- -->
-
-    $('#filterRegion').on('select2:select', function () {
-        self.selected('byRegion', $('#filterRegion').val());
-    });
-    $('#filterArea').on('select2:select', function () {
-        self.selected('byArea', $('#filterArea').val());
-    });
-    $('#filterSubArea').on('select2:select', function () {
-        self.selected('bySubArea', $('#filterSubArea').val());
-    });
-    $('#filterStore').on('select2:select', function () {
-        self.selected('byStore', $('#filterStore').val());
-    });
-    $('#filterEmployee').on('select2:select', function () {
-        self.selected('byEmployee', $('#filterEmployee').val());
-    });
-
-    $("#export").click( function(){
-
-        var element = $("#export");
-        var icon = $("#exportIcon");
-        if (element.attr('disabled') != 'disabled') {
-            var thisClass = icon.attr('class');
-
-            // Export data
-            exportFile = '';
-
-            $.ajax({
-                type: 'POST',
-                url: '../../utilities/report-download/export',
-                dataType: 'json',
-                data: {
-                        model: 1,
-                        type: 'SELECTED',
-                        data: JSON.stringify(data)
-                      },
-                global: false,
-                async: false,
-                beforeSend: function()
-                {   
-                    element.attr('disabled', 'disabled');
-                    icon.attr('class', 'fa fa-spinner fa-spin');
-                },
-                success: function (data) {
-                    element.removeAttr('disabled');
-                    icon.attr('class', thisClass);
-                    console.log(data);
-                },
-                error: function(xhr, textStatus, errorThrown){
-                    element.removeAttr('disabled');
-                    icon.attr('class', thisClass);
-                    console.log(errorThrown);
-                    alert('Export request failed');
-                }
-            });
-
-        }
-
-    });
 
     $("#exportAll").click( function(){
 
@@ -606,20 +585,26 @@
 
             $.ajax({
                 type: 'POST',
-                url: '../../utilities/report-download/export-all',
+                url: '../export' + "?" + $("#filterForm").serialize() + '&model=Sell In',
                 dataType: 'json',
-                data: filters,
                 beforeSend: function()
                 {   
+                    console.log($("#filterForm").serialize());
                     element.attr('disabled', 'disabled');
                     icon.attr('class', 'fa fa-spinner fa-spin');
                 },
                 success: function (data) {
                     
-                    element.removeAttr('disabled');
-                    icon.attr('class', thisClass);
                     console.log(data);
-
+                    // element.removeAttr('disabled');
+                    // icon.attr('class', thisClass);
+                    // var a = document.createElement("a");
+                    // a.href = data.file; 
+                    // a.download = data.name;
+                    // document.body.appendChild(a);
+                    // a.click();
+                    // a.remove();
+                    
                 },
                 error: function(xhr, textStatus, errorThrown){
                     element.removeAttr('disabled');

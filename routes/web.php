@@ -457,16 +457,20 @@ Route::prefix('report')->group(function () {
 			Route::post('/edit/{id}', 'ReportController@sellInUpdate')->name('sellin.edit')->middleware('auth');
 			Route::get('/delete/{id}', 'ReportController@sellInDelete')->name('sellin.delete')->middleware('auth');
 			Route::post('/add', 'ReportController@sellInAdd')->name('sellin.add')->middleware('auth');
-			Route::post('/import', 'ImportQueueController@ImportSellIn')->name('sellin.import')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportSellIn')->name('sellin.import')->middleware('auth');			
 			Route::get('/download-template', function()
 			{
 				return response()->download(public_path('assets/SellinImport.xlsx'));
 			})->name('SellIn.download-template')->middleware('auth');
+
+			Route::get('/tes', 'ReportController@tes')->name('sellin.export')->middleware('auth');
 		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
 	});	
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
+
+	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');
 });
 
 // ***************** REPORTING ***********************

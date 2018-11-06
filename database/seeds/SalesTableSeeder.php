@@ -25,8 +25,8 @@ class SalesTableSeeder extends Seeder
 	         DB::table('sell_ins')->insert([
 	            'id_employee' => $employee,
 	            'id_store' => $store_id,
-	            'date' => Carbon::parse('2018-10-'.$d),
-	            'week' => Carbon::parse('2018-10-'.$d)->weekOfMonth,
+	            'date' => Carbon::parse('2018-11-'.$d),
+	            'week' => Carbon::parse('2018-11-'.$d)->weekOfMonth,
 	            'created_at' => Carbon::now(),
 	            'updated_at' => Carbon::now(),
 	         ]);
@@ -34,8 +34,8 @@ class SalesTableSeeder extends Seeder
 	         DB::table('sell_outs')->insert([
 	            'id_employee' => $employee,
 	            'id_store' => $store_id,
-	            'date' => Carbon::parse('2018-10-'.$d),
-	            'week' => Carbon::parse('2018-10-'.$d)->weekOfMonth,
+	            'date' => Carbon::parse('2018-11-'.$d),
+	            'week' => Carbon::parse('2018-11-'.$d)->weekOfMonth,
 	            'created_at' => Carbon::now(),
 	            'updated_at' => Carbon::now(),
 	         ]);
