@@ -95,6 +95,7 @@ Route::prefix('outlet')->group(function () {
  * Employee
  */
 Route::prefix("employee")->group(function(){
+	Route::get('/get', 'API\EmployeeController@get')->name('api.employee.get');
 	Route::post("edit/password", "API\EmployeeController@editPassword")->name("api.employee.edit.password");
 	Route::post("edit/profile", "API\EmployeeController@editProfile")->name("api.employee.edit.profile");
 	Route::post("edit/profile/photo/{type?}", "API\EmployeeController@editProfilePhoto")->name("api.employee.edit.profile.photo");

@@ -51,7 +51,7 @@ class OutletController extends Controller
 							'name'				=> $data['name'],
 							'phone'				=> $data['phone'],
 							'address'			=> $data['address'],
-							'new_ro'			=> $data['new_ro'],
+							'new_ro'			=> ($data['new_ro'] == 'yes' ? Carbon::today()->toDateString() : '' ),
 							'active'			=> 1,
 						]);
 						if ($insert->id) {
