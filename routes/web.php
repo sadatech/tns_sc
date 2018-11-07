@@ -529,8 +529,6 @@ Route::prefix('report')->group(function () {
 			})->name('SellIn.download-template')->middleware('auth');
 		});
 
-	});
-
 	Route::prefix('salesmtc')->group(function () {
 			Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');
 			Route::post('/data', 'ReportController@salesMtcData')->name('salesmtc.data')->middleware('auth');
