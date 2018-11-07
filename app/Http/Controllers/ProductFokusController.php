@@ -63,7 +63,7 @@ class ProductFokusController extends Controller
             $data = array(
                 'id'            => $product->id,
                 'product'     	=> $product->product->id,
-                'area'          => (isset(FokusArea::where('id_pf',$product->id)->pluck('id_area')->id) ? FokusArea::where('id_pf',$product->id)->pluck('id_area')->id : null) ,
+                'area'          => FokusArea::where('id_pf',$product->id)->pluck('id_area'),
                 'from'          => $product->from,
                 'to'          	=> $product->to,
                 'channel'       => FokusChannel::where('id_pf',$product->id)->pluck('id_channel')
