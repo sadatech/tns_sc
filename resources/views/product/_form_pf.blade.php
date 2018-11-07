@@ -35,7 +35,7 @@ $type = $type ?? '';
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                        <label>Category 1</label>
+                        <label>Category 2</label>
                         <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_category2" id="{{$type}}Category2" required>
                             <option value="" disabled selected>Choose your Category 2</option>
                             @foreach($category as $data)
