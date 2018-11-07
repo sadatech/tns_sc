@@ -49,7 +49,9 @@ class OutletController extends Controller
 							'customer_code'		=> $data['code'],
 							'name'				=> $data['name'],
 							'phone'				=> $data['phone'],
-							'active'			=> true,
+							'address'			=> $data['address'],
+							'new_ro'			=> $data['new_ro'],
+							'active'			=> 1,
 						]);
 						if ($insert->id) {
 							$res['success'] = true;
@@ -89,7 +91,7 @@ class OutletController extends Controller
 				$code = $e->getStatusCode();
 			} else {
 				if ($id == 1) {
-					$outlet = Outlet::where('active', true)->with(['employeePasar' => function($query) use ($user) {
+					$outlet = Outlet::where('active', 1)->with(['employeePasar' => function($query) use ($user) {
 						$query->where([
 							'id_employee' => $user->id
 						]);
@@ -102,39 +104,41 @@ class OutletController extends Controller
 						$res['success'] = true;
 						foreach ($outlet->get(['outlets.*']) as $data) {
 							$listOutlet[] = array(
-								'id' => $data->id,
-								'name' => $data->name,
-								'code' => $data->customer_code,
-								'phone' => $data->phone,
-								'id_pasar' => $data->employeePasar->pasar->id,
-								'pasar' => $data->employeePasar->pasar->name,
-								'address' => $data->employeePasar->pasar->address,
+								'id' 		=> $data->id,
+								'name' 		=> $data->name,
+								'code' 		=> $data->customer_code,
+								'phone' 	=> $data->phone,
+								'address'	=> $data->address,
+								'new_ro'	=> $data->new_ro,
+								'id_pasar' 	=> $data->employeePasar->pasar->id,
+								'pasar' 	=> $data->employeePasar->pasar->name,
+								'address' 	=> $data->employeePasar->pasar->address,
 							);
 						}
 						$res['outlet'] = $listOutlet;
 						$code = 200;
 					}
 				} else if ($id == 2) {
-					$outlet = Outlet::where('active', false)->with(['employeePasar' => function($query) use ($user) {
+					$outlet = Outlet::where('active', 2)->with(['employeePasar' => function($query) use ($user) {
 						$query->where([
 							'id_employee' => $user->id
 						]);
-					}])->get();
+					}]);
 					if ($outlet->count() < 1) {
 						$res['success'] = false;
 						$res['msg'] = "Kamu tidak mempunyai outlet tidak aktif.";
 						$code = 200;
 					} else {
 						$res['success'] = true;
-						foreach ($outlet->get(['outlets.*'])->with('pasar') as $data) {
+						foreach ($outlet->get(['outlets.*']) as $data) {
 							$listOutlet[] = array(
-								'id' => $data->id,
-								'name' => $data->name,
-								'code' => $data->customer_code,
-								'phone' => $data->phone,
-								'id_pasar' => $data->employeePasar->pasar->id,
-								'pasar' => $data->employeePasar->pasar->name,
-								'address' => $data->employeePasar->pasar->address,
+								'id' 		=> $data->id,
+								'name' 		=> $data->name,
+								'code' 		=> $data->customer_code,
+								'phone' 	=> $data->phone,
+								'id_pasar' 	=> $data->employeePasar->pasar->id,
+								'pasar' 	=> $data->employeePasar->pasar->name,
+								'address' 	=> $data->employeePasar->pasar->address,
 							);
 						}
 						$res['outlet'] = $listOutlet;
