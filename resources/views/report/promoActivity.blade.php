@@ -30,6 +30,7 @@
                         <th width="200px">Description</th>
                         <th width="200px">Start Promo</th>
                         <th width="200px">End Promo</th>
+                        <th width="200px">Images</th>
                     </thead>
                 </table>
             </div> 
@@ -139,7 +140,10 @@
         $('#faqtable').DataTable({
             processing: true,
             scrollX: true,
-            drawCallback: function(){ 
+            drawCallback: function(){
+              $('.popup-image').magnificPopup({
+                    type: 'image',
+                }); 
                 $('.js-swal-delete').on('click', function(){
                     var url = $(this).data("url");
                     swal({
@@ -179,6 +183,7 @@
             { data: 'description', name: 'description' },
             { data: 'start_date', name: 'start_date' },
             { data: 'end_date', name: 'end_date' },
+            { data: 'images', name: 'images' },
             ]
         });
     });
