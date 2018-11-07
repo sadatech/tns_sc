@@ -63,7 +63,8 @@ class AdditionalDisplayController extends Controller
                         $transaction = AdditionalDisplay::create([
                                             'id_store' => $content['id_store'],
                                             'id_employee' => $employee->id,
-                                            'date' => Carbon::now()
+                                            'date' => Carbon::now(),
+                                            'week' => $content['week'],
                                         ]);
 
                         DetailAdditionalDisplay::create([

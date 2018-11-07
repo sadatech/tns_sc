@@ -37,7 +37,7 @@ $action = $action ?? '';
               </select> --}}
             <div class="form-group">
               <label>Release</label>
-              <input class="js-datepicker form-control" type="text" name="rilis" id="{{$type}}Rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+              <input class="js-datepicker form-control" type="text" name="rilis" id="{{$type}}Rilis" data-month-highlight="true" placeholder="yyyy-mm" required>
             </div>  
           <div class="form-group">
             <label>Select File (Format .xlsx, .xls)</label>
@@ -57,10 +57,16 @@ $action = $action ?? '';
 
 @push('additional-js')
 <script type="text/javascript">
+  $(".js-datepicker").datepicker( {
+    format: "mm/yyyy",
+    viewMode: "months",
+    autoclose: true,
+    minViewMode: "months"
+  });
   @if ($type == 'edit')
     function editModal(json) {
       $('#{{$id}}').modal('show');
-      $('#{{$id}}Form').attr('action', "{{ url('/product/target/update') }}/"+json.id);
+      $('#{{$id}}Form').attr('action', "{{ url('/target/mtc/update') }}/"+json.id);
       $('#{{$type}}Employee').val(json.employee).trigger('change');
       $('#{{$type}}Store').val(json.store).trigger('change');
       $('#{{$type}}type').val(json.type);
@@ -83,7 +89,7 @@ $action = $action ?? '';
 
   $('#downloadSampleBtn').click(function(e){
     e.preventDefault();
-    window.open("{{ url('product/target/sample-form/download') }}" + '/' + $('#Employee').val());
+    window.open("{{ url('target/mtc/sample-form/download') }}" + '/' + $('#Employee').val());
   })
 
   $(".{{$type}}-js-select2").select2({ 

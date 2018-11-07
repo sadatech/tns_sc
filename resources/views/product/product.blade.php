@@ -26,15 +26,18 @@
             <a href="{{ route('product.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="product">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover" id="product">
         <thead>
           <th style="width: 70px;"></th>
           <th>Brand</th>
-          <th>Sub Category</th>
+          <th width="400px">Sub Category</th>
           <th>Code</th>
           <th>SKU</th>
-          <th>Stock Type</th>
+          <th width="400px">Stock Type</th>
           <th>Panel</th>
+          <th>Carton</th>
+          <th>Pack</th>
+          <th>PCS</th>
           <th style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -128,6 +131,7 @@
                         <td><b>Type</b></td>
                         <td><b>Panel</b></td>
                         <td><b>SkuUnit</b></td>
+                        <td><b>Value</b></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,6 +143,7 @@
                         <td>Type 1</td>
                         <td>Panel 1</td>
                         <td>SkuUnit 1</td>
+                        <td>Value 1</td>
                     </tr>
                     <tr>
                         <td>SubCategory 2</td>
@@ -148,6 +153,7 @@
                         <td>Type 2</td>
                         <td>Panel 2</td>
                         <td>SkuUnit 2</td>
+                        <td>Value 2</td>
                     </tr>
                 </tbody>
             </table>
@@ -245,6 +251,9 @@
             { data: 'name', name: 'name' },
             { data: 'stockType', name: 'stockType' },
             { data: 'panel', name: 'panel' },
+            { data: 'carton', name: 'carton' },
+            { data: 'pack', name: 'pack' },
+            { data: 'pcs', name: 'pcs' },
             { data: 'action', name: 'action' },
             ]
         });

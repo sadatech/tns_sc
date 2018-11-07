@@ -14,6 +14,9 @@ class CreateProductsTable extends Migration
             $table->integer('id_brand')->unsigned();
             $table->string('deskripsi')->nullable();
             $table->string('name');
+            $table->integer('carton')->nullable();
+            $table->integer('pack')->nullable();
+            $table->integer('pcs')->nullable();
             $table->string('panel')->nullable();
             $table->timestamps();
             $table->softDeletes();

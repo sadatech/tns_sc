@@ -41,7 +41,7 @@
 </div>
 
 <div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout" role="document">
+  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
@@ -83,10 +83,14 @@
                 </tbody>
             </table>
           </div>
-          <div class="form-group">
-            <label>Select File</label>
-            <input type="file" name="file" class="form-control">
-          </div>
+          <div class="form-group col-md-12">
+            <label>Upload Your Data Product:</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
+            </div>
+           </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-alt-success">

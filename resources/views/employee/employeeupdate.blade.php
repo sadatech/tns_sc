@@ -397,17 +397,6 @@
         });
         $(".js-select").select2();
         $(document).ready(function() {
-            $('input[type=email]').bind('change', function () {
-              var arr = []
-              $siblings = $(this).siblings();
-              $.each($siblings, function (i, key) {
-               arr.push($(key).val()); 
-           });
-              if ($.inArray($(this).val(), arr) !== -1)
-              {
-                  alert("duplicate has been found");
-              }
-          });    
             $("#txtboxToFilter").keydown(function (e) {
                 if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
                     (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
@@ -509,7 +498,7 @@
                 clearStores();
                 $('#storeStay').hide();
                 $('#storeMobile').show();
-            }
+            } 
         })
         function clearStores() {
             $('#stores').val('');
