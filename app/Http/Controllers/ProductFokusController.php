@@ -38,11 +38,11 @@ class ProductFokusController extends Controller
 		// 	}
 		// 	return $area;
         // })
-        ->addColumn('fokusare', function($product) {
+        ->addColumn('fokusarea', function($product) {
             $area = FokusArea::where(['id_pf'=>$product->id])->get();
             $areaList = array();
             foreach ($area as $data) {
-                $areaList[] = (isset($data->ara->name) ? $data->area->name : "-");
+                $areaList[] = (isset($data->area->name) ? $data->area->name : "-");
             }
             return rtrim(implode(',', $areaList), ',');
         })
@@ -94,7 +94,7 @@ class ProductFokusController extends Controller
             DB::transaction(function () use($data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
-                $area = $data['area'];
+                $area = (isset($data['area']) ? $data['area'] : null);
                 unset($data['area']);
                 $product = ProductFokus::create($data);
                 foreach ($channel as $channel_id) {
@@ -103,11 +103,13 @@ class ProductFokusController extends Controller
                         'id_channel'         => $channel_id
                     ]);
                 }
-                foreach ($area as $area_id) {
-                    FokusArea::create([
-                        'id_pf'              => $product->id,
-                        'id_area'            => $area_id
-                    ]);
+                if (!empty($area)) {
+                    foreach ($area as $area_id) {
+                        FokusArea::create([
+                            'id_pf'              => $product->id,
+                            'id_area'            => $area_id
+                        ]);
+                    }
                 }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
@@ -138,7 +140,7 @@ class ProductFokusController extends Controller
             DB::transaction(function () use($product, $data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
-    
+
                 $product->fill($data)->save();
 
                 $oldChanel = $product->fokus->pluck('id_channel');
@@ -148,7 +150,7 @@ class ProductFokusController extends Controller
                         'id_pf'         => $product->id,
                         'id_channel'    => $deleted_id])->delete(); 
                 }
-    
+
                 foreach ($channel as $channel_id) {
                     FokusChannel::updateOrCreate([
                         'id_pf'         => $product->id,
@@ -165,12 +167,12 @@ class ProductFokusController extends Controller
     public function delete($id)
     {
         $product = ProductFokus::find($id);
-            $product->delete();
-            return redirect()->back()
-            ->with([
-                'type'      => 'success',
-                'title'     => 'Sukses!<br/>',
-                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-            ]);
+        $product->delete();
+        return redirect()->back()
+        ->with([
+            'type'      => 'success',
+            'title'     => 'Sukses!<br/>',
+            'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+        ]);
     }
 }
