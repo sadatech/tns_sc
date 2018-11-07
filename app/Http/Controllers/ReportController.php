@@ -42,7 +42,7 @@ class ReportController extends Controller
 
     public function sellInData(SummaryFilters $filters){
 
-        $data = SellInSummary::filter($filters);
+        $data = SellInSummary::where('id', '>', 0);
 
         return Datatables::of($data)
             ->addColumn('action', function ($item) {
