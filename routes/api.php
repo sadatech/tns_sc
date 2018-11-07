@@ -85,6 +85,7 @@ Route::prefix('stock')->group(function () {
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
 	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
+	Route::get('/disable/{id}/{status}', 'API\OutletController@disable')->name('api.outlet.disable');
 	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');
 	Route::get('/checkout', 'API\OutletController@checkout')->name('api.outlet.checkout');
 	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
