@@ -25,7 +25,7 @@ $type = $type ?? '';
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label>Category 1</label>
-                            <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_category1" id="{{$type}}category1" required >
+                            <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_category1" id="{{$type}}Category1" required >
                                 <option value="" disabled selected>Choose your Category 1</option>
                                 @foreach($category as $data)
                                 <option value="{{ $data->id }}">{{ $data->name }}</option>
@@ -36,7 +36,7 @@ $type = $type ?? '';
                     <div class="row">
                         <div class="form-group col-md-12">
                         <label>Category 1</label>
-                        <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_category2" id="{{$type}}category2" required>
+                        <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_category2" id="{{$type}}Category2" required>
                             <option value="" disabled selected>Choose your Category 2</option>
                             @foreach($category as $data)
                             <option value="{{ $data->id }}">{{ $data->name }}</option>
@@ -81,8 +81,8 @@ $type = $type ?? '';
   function editModal(json) {
     $('#editModal').modal('show');
     $('#{{$type}}Form').attr('action', "{{ url('/pf/update') }}/"+json.id);
-    $('#{{$type}}category1').val(json.category1).trigger('change');
-    $('#{{$type}}category2').val(json.category2).trigger('change');
+    $('#{{$type}}Category1').val(json.category1).trigger('change');
+    $('#{{$type}}Category2').val(json.category2).trigger('change');
     $('#{{$type}}DateFrom').val(json.from);
     $('#{{$type}}DateTo').val(json.to);
     console.log(json);
