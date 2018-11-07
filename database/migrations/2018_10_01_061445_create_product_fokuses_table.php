@@ -11,7 +11,7 @@ class CreateProductFokusesTable extends Migration
         Schema::create('product_fokuses', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_product')->unsigned();
-            $table->integer('id_area')->unsigned()->nullable();
+            // $table->integer('id_area')->unsigned()->nullable();
             // $table->enum('type',['TR','MR','ALL']);
             $table->string('from');
             $table->string('to')->nullable();
@@ -19,7 +19,7 @@ class CreateProductFokusesTable extends Migration
             $table->softDeletes();
 
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('id_area')->references('id')->on('areas')->onUpdate('cascade')->onDelete('cascade');
+            // $table->foreign('id_area')->references('id')->on('areas')->onUpdate('cascade')->onDelete('cascade');
         });
     }
     

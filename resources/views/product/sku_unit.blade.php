@@ -29,8 +29,8 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="sku-unit">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th class="text-center">Name</th>
-          <th class="text-center">Conversion Value</th>
+          <th>Sku Unit</th>
+          <th>Conversion Value</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -43,7 +43,7 @@
   <div class="modal-dialog modal-dialog-popout" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
+        <div class="block-header bg-gd-sun p-10">
           <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import <i>SKU Unit</i></h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -173,7 +173,7 @@
       columns: [
       { data: 'id', name: 'id' },
       { data: 'name', name: 'name' },
-      { data: 'conversion_value', name: 'conversion_value' },
+      { data: 'size', name: 'size' },
       { data: 'action', name: 'action' },
       ]
     });

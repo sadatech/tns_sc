@@ -36,78 +36,78 @@
 </div>  
 
 <div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Pasar</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <form id="import-form" method="post" enctype="multipart/form-data" action="{{ url('store/pasar/import') }}">
-        {{ csrf_field() }}
-        <div class="block-content">
-          <div class="form-group">
-            <a href="{{ route('pasar.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
-          </div>
-          <div class="block-content">
-            <h5> Sample Data :</h5>
-            <table class="table table-bordered table-vcenter">
-                <thead>
-                    <tr>
-                        <td><b>Market</b></td>
-                        <td><b>Address</b></td>
-                        <td><b>Longitude</b></td>
-                        <td><b>Latitude</b></td>
-                        <td><b>Subarea</b></td>
-                        <td><b>Area</b></td>
-                        <td><b>Region</b></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Market 1</td>
-                        <td>Address 1</td>
-                        <td>Longitude 1</td>
-                        <td>Latitude 1</td>
-                        <td>Subarea 1</td>
-                        <td>Area 1</td>
-                        <td>Region 1</td>
-                    </tr>
-                    <tr>
-                        <td>Market 2</td>
-                        <td>Address 2</td>
-                        <td>Longitude 2</td>
-                        <td>Latitude 2</td>
-                        <td>Subarea 2</td>
-                        <td>Area 2</td>
-                        <td>Region 2</td>
-                    </tr>
-                </tbody>
-            </table>
-          </div>
-          <div class="form-group col-md-12">
-            <label>Upload Your Data Plan DC:</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                <label class="custom-file-label">Choose file Excel</label>
-                <code> *Type File Excel</code>
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Pasar</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-           </div>
+            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ url('store/pasar/import') }}">
+                {{ csrf_field() }}
+                <div class="block-content">
+                    <div class="form-group">
+                      <a href="{{ route('pasar.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+                    </div>
+                    <div class="block-content">
+                        <h5> Sample Data :</h5>
+                        <table class="table table-bordered table-vcenter">
+                            <thead>
+                                <tr>
+                                    <td><b>Market</b></td>
+                                    <td><b>Address</b></td>
+                                    <td><b>Longitude</b></td>
+                                    <td><b>Latitude</b></td>
+                                    <td><b>Subarea</b></td>
+                                    <td><b>Area</b></td>
+                                    <td><b>Region</b></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Market 1</td>
+                                    <td>Address 1</td>
+                                    <td>Longitude 1</td>
+                                    <td>Latitude 1</td>
+                                    <td>Subarea 1</td>
+                                    <td>Area 1</td>
+                                    <td>Region 1</td>
+                                </tr>
+                                <tr>
+                                    <td>Market 2</td>
+                                    <td>Address 2</td>
+                                    <td>Longitude 2</td>
+                                    <td>Latitude 2</td>
+                                    <td>Subarea 2</td>
+                                    <td>Area 2</td>
+                                    <td>Region 2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label>Upload Your Data Market:</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                            <label class="custom-file-label">Choose file Excel</label>
+                            <code> *Type File Excel</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-alt-success">
+                        <i class="fa fa-save"></i> Import
+                    </button>
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Import
-          </button>
-          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 @endsection
 
