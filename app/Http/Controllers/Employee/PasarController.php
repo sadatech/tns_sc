@@ -11,6 +11,7 @@ use Auth;
 use File;
 use Excel;
 use App\Area;
+use App\Position;
 use App\Region;
 use App\Outlet;
 use App\Pasar;
@@ -172,7 +173,8 @@ class PasarController extends Controller
 						->count();
 						// dd($data2);
 						if ($data2 < 1) {
-							$getZone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
+							$getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
+							$getPosition 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
                         	$insert = Employee::create([
                             	'foto_ktp' 			=> "default.png",
 								'foto_tabungan'		=> "default.png",
@@ -185,7 +187,7 @@ class PasarController extends Controller
 								'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
 								'birthdate'			=> Carbon::now(),
 								'id_agency'			=> $id_agency,
-                            	'id_position'       => 4,
+                            	'id_position'       => ($getPosition ? $getPosition : 4),
                             	'joinAt'            => Carbon::now(),
                             	'gender'            => $row->gender,
                             	'education'         => $row->education,
