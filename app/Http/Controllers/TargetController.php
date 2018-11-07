@@ -36,7 +36,7 @@ class TargetController extends Controller
                 'rilis'         => $product->rilis
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('target.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            <button data-url=".route('mtc.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })->make(true);
     }
 
@@ -129,10 +129,10 @@ class TargetController extends Controller
                 $sheet->row(1, ['ID STORE', 'NAME 1', 'NAME 2', 'ADDRESS']);
                 foreach (\App\EmployeeStore::where('id_employee', $employee_id)->with('store')->get() as $es) {
                     $sheet->appendRow([
-                        $es->store->id, 
-                        $es->store->name1, 
-                        $es->store->name2,
-                        $es->store->address
+                        @$es->store->id, 
+                        @$es->store->name1, 
+                        @$es->store->name2,
+                        @$es->store->address
                     ]);
                 }
             });
@@ -148,7 +148,7 @@ class TargetController extends Controller
         return redirect()->back()->with([
           'type'    => 'success',
           'title'   => 'Sukses!<br/>',
-          'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!'
+          'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Target MTC!'
       ]);
     }
 

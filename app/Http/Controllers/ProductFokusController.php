@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Area;
 use App\Product;
+use App\FokusChannel;
+use App\FokusArea;
 use App\ProductFokus;
 use Auth;
+use DB;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+
 class ProductFokusController extends Controller
 {
     private $alert = [
@@ -23,29 +27,46 @@ class ProductFokusController extends Controller
 
     public function data()
     {
-        $product = ProductFokus::with(['product','area'])
+        $product = ProductFokus::with(['product','fokusarea','fokus', ])
         ->select('product_fokuses.*');
         return Datatables::of($product)
-        ->addColumn('area', function($product) {
-			if (isset($product->area)) {
-				$area = $product->area->name;
-			} else {
-				$area = "Without Area";
-			}
-			return $area;
-		})
+        // ->addColumn('area', function($product) {
+		// 	if (isset($product->area)) {
+		// 		$area = $product->area->name;
+		// 	} else {
+		// 		$area = "Without Area";
+		// 	}
+		// 	return $area;
+        // })
+        ->addColumn('fokusare', function($product) {
+            $area = FokusArea::where(['id_pf'=>$product->id])->get();
+            $areaList = array();
+            foreach ($area as $data) {
+                $areaList[] = (isset($data->ara->name) ? $data->area->name : "-");
+            }
+            return rtrim(implode(',', $areaList), ',');
+        })
+        ->addColumn('fokus', function($product) {
+            $chan = FokusChannel::where(['id_pf'=>$product->id])->get();
+            $channelList = array();
+            foreach ($chan as $data) {
+                $channelList[] = $data->channel->name;
+            }
+            return rtrim(implode(',', $channelList), ',');
+        })
         ->addColumn('action', function ($product) {
-            if (isset($product->area)) {
-				$area = $product->area->id;
-			} else {
-				$area = "Without Area";
-			}
+            // if (isset($product->area)) {
+			// 	$area = $product->area->id;
+			// } else {
+			// 	$area = "Without Area";
+			// }
             $data = array(
                 'id'            => $product->id,
                 'product'     	=> $product->product->id,
-                'area'          => $area,
+                'area'          => (isset(FokusArea::where('id_pf',$product->id)->pluck('id_area')->id) ? FokusArea::where('id_pf',$product->id)->pluck('id_area')->id : null) ,
                 'from'          => $product->from,
-                'to'          	=> $product->to
+                'to'          	=> $product->to,
+                'channel'       => FokusChannel::where('id_pf',$product->id)->pluck('id_channel')
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('fokus.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -70,7 +91,25 @@ class ProductFokusController extends Controller
             $this->alert['title'] = 'Warning!<br/>';
             $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
         } else {
-            ProductFokus::create($data);
+            DB::transaction(function () use($data) {
+                $channel = $data['channel'];
+                unset($data['channel']);
+                $area = $data['area'];
+                unset($data['area']);
+                $product = ProductFokus::create($data);
+                foreach ($channel as $channel_id) {
+                    FokusChannel::create([
+                        'id_pf'              => $product->id,
+                        'id_channel'         => $channel_id
+                    ]);
+                }
+                foreach ($area as $area_id) {
+                    FokusArea::create([
+                        'id_pf'              => $product->id,
+                        'id_area'            => $area_id
+                    ]);
+                }
+            });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
         }
 
@@ -96,7 +135,27 @@ class ProductFokusController extends Controller
             $this->alert['title'] = 'Warning!<br/>';
             $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
         } else {
-            $product->fill($data)->save();
+            DB::transaction(function () use($product, $data) {
+                $channel = $data['channel'];
+                unset($data['channel']);
+    
+                $product->fill($data)->save();
+
+                $oldChanel = $product->fokus->pluck('id_channel');
+                $deleteChannel = $oldChanel->diff($channel);
+                foreach ($deleteChannel as $deleted_id) {
+                    FokusChannel::where([
+                        'id_pf'         => $product->id,
+                        'id_channel'    => $deleted_id])->delete(); 
+                }
+    
+                foreach ($channel as $channel_id) {
+                    FokusChannel::updateOrCreate([
+                        'id_pf'         => $product->id,
+                        'id_channel'    => $channel_id
+                    ]);
+                }
+            });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!';
         }
 

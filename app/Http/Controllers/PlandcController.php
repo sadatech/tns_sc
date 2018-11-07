@@ -22,33 +22,25 @@ class PlandcController extends Controller
         return view('plandc.plandc', $data);
     }
 
+    public function readUpdate($id)
+    {
+        $data['plan'] 		    = PlanDc::where(['id' => $id])->first();
+        $data['employee']       = Employee::where('id_position', 5 )->get();
+        $data['employee_selected'] = json_encode(PlanEmployee::where(['plan_employees.id_plandc' => $id])
+            ->join('employees','employees.id','plan_employees.id_employee')
+            ->select(DB::raw("concat(employees.id,'|',employees.name) as employees_item"))
+            ->get()
+            ->toArray());
+        return view('plandc.update', $data);
+    }
+
     public function data()
     {
         $plan = PlanDc::with('planEmployee')
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
-            // $data1['employee_selected'] = json_encode(PlanEmployee::where(['plan_employees.id_plandc' => $plan->id])
-            // ->join('employees','employees.id','plan_employees.id_employee')
-            // ->select(DB::raw("concat(employees.id,'|',employees.name) as employees_item"))
-            // ->get()
-            // ->toArray());
-            // dd($data1);
-            // $dist = PlanEmployee::where(['id_plandc'=>$plan->id])->get();
-            // $distList = array();
-            // foreach ($dist as $data) {
-            //     $distList[] = $data->employee->name;
-            // }
-            // dd($distList);
-            $data = array(
-                'id'            => $plan->id,
-                'date'          => $plan->date,
-                'stocklist'     => $plan->stocklist,
-                'lokasi'        => $plan->lokasi,
-                // 'employee'      => rtrim(implode(',', $distList), ',')
-        
-            );
-            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square'><i class='si si-pencil'></i></button>
+            return "<a href=".route('ubah.plan', $plan->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
             <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
         })
         ->addColumn('planEmployee', function($plan) {
@@ -86,14 +78,11 @@ class PlandcController extends Controller
                 {
                     foreach($results as $row)
                     {
-                       
-                        // $check = PlanEmployee::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($row->lokasi))."'")
-                        // ->where(['id_' => $data1->id])->count();
-                     
                         $insert = PlanDc::create([
-                            'date'              => Carbon::now(),
+                            'date'              => $request->input('date'),
                             'lokasi'            => $row->lokasi,
-                            'stocklist'          => $row->stocklist
+                            'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
+                            'channel'           => (isset($row->channel) ? $row->channel : "-")
                         ]);
                         if (!empty($insert)) 
                             {
@@ -151,7 +140,8 @@ class PlandcController extends Controller
                 'Employee'          => rtrim(implode(',', $empList), ','),
                 'Date'              => $val->date,
                 'Lokasi'            => $val->lokasi,
-                'Stocklist'          => $val->stocklist
+                'Stocklist'         => (isset($val->stocklist) ? $val->stocklist : "-"),
+                'Channel'           => (isset($val->channel) ? $val->channel : "-")
             );
         }
         $filename = "PlanDemoCooking_".Carbon::now().".xlsx";
@@ -169,7 +159,6 @@ class PlandcController extends Controller
         $limit=[
             'date'           => 'required',
             'lokasi'         => 'required',
-            'stocklist'      => 'required',
             'employee'       => 'required'
         ];
         $validator = Validator($data, $limit);
@@ -178,6 +167,11 @@ class PlandcController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
+           
+            // $data1 = Employee::where(['id' => $request->input('employee')])->first();
+            $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($request->input('lokasi')))."'");
+            // $data3 = PlanEmployee::where(['id_employee' => $data1->id]);
+            dd($data2);
             $store = Plandc::find($id);
                 if ($request->input('employee')) {
                     foreach ($request->input('employee') as $emp) {
@@ -188,17 +182,25 @@ class PlandcController extends Controller
                         );
                     }
                     DB::table('plan_employees')->insert($dataEmp);
+                    return redirect()->route('planDc')
+                    ->with([
+                    'type'    => 'success',
+                    'title'   => 'Sukses!<br/>',
+                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
+                ]);
                 }
                 $store->date             = $request->input('date');
                 $store->lokasi           = $request->input('lokasi');
                 $store->stocklist        = $request->input('stocklist');
+                $store->channel          = $request->input('channel');
                 $store->save();
-                return redirect()->back()
+                return redirect()->route('planDc')
                 ->with([
                     'type'    => 'success',
                     'title'   => 'Sukses!<br/>',
                     'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
                 ]);
+                
         }
     }
 

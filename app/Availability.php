@@ -8,6 +8,10 @@ class Availability extends Model
 {
     protected $table = 'availability';
 
+    protected $fillable = [
+        'id_store', 'id_employee', 'date'
+    ];
+    
     public function detail_availability(){
     	return $this->hasMany(DetailAvailability::class,'id_availability');
     }

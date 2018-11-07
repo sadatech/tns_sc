@@ -158,9 +158,6 @@
                             <li>
                                 <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
                             </li>
-                            <li>
-                                <a class="{{ request()->is('product/target') ? 'active' : '' }}" href="{{ route('target') }}">Target</a>
-                            </li>
                             <!-- <li>
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
@@ -170,6 +167,9 @@
                     <li class="{{ request()->is('target/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-target"></i><span class="sidebar-mini-hide">Target(s)</span></a>
                         <ul>
+                            <li>
+                                <a class="{{ request()->is('target/mtc') ? 'active' : '' }}" href="{{ route('mtc') }}">MTC</a>
+                            </li>
                             <li>
                                 <a class="{{ request()->is('target/dc') ? 'active' : '' }}" href="{{ route('target.dc') }}">Demo Cooking</a>
                             </li>
@@ -216,6 +216,10 @@
                             </li>
                         </ul>
                     </li>
+                    {{-- PROMO--}}
+                    <li>
+                        <a class="{{ request()->is('report/promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Promo Activity</span></a>
+                    </li>  
                     {{-- Stock In Hand--}}
                     <li>
                         <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>

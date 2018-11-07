@@ -30,6 +30,7 @@
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Product</th>
+          <th>Channel</th>
           <th>Area</th>
           <th>Date From</th>
           <th>Date Until</th>
@@ -87,7 +88,7 @@
       $(function() {
           $('#promoTable').DataTable({
               processing: true,
-              serverSide: true,
+              scrollY: "300px",
               drawCallback: function(){
                   $('.js-swal-delete').on('click', function(){
                     var url = $(this).data("url");
@@ -119,7 +120,8 @@
               columns: [
 	              { data: 'id', name: 'id' },
                 { data: 'product.name', name: 'product.name'},
-	              { data: 'area', name: 'area' },
+                { data: 'fokus', name: 'fokus' },
+	              { data: 'fokusarea', name: 'fokusarea' },
                 { data: 'from', name: 'from' },
                 { data: 'to', name: 'to' },
 	              { data: 'action', name: 'action' },

@@ -127,7 +127,7 @@ class PasarController extends Controller
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
 				'Pasar'			=> (isset($pasarList) ? rtrim(implode(',', $pasarList), ',') : "-"),
-				'Outlet'			=> (isset($outletList) ? rtrim(implode(',', $outletList), ',') : "-"),
+				'Outlet'		=> (isset($outletList) ? rtrim(implode(',', $outletList), ',') : "-"),
 			);
 		}
 		$filename = "employeePasar_".Carbon::now().".xlsx";

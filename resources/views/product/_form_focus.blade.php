@@ -7,7 +7,7 @@ $type = $type ?? '';
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
+        <div class="block-header bg-gd-sun p-10">
           <h3 class="block-title"><i class="fa fa-plus"></i> {{ $type == '' ? 'Add' : ucfirst($type) }} Product Fokus</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -32,15 +32,15 @@ $type = $type ?? '';
             </select>
           </div>
           <div class="row">
-            <div class="form-group col-md-12">
-              <label>Area</label>
-              <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Area" name="id_area">
-                <option disabled selected>Choose your Area</option>
-                @foreach(App\Area::get() as $data)
-                <option value="{{ $data->id }}">{{ $data->name }}</option>
-                @endforeach
-              </select>
+            <div class="col-md-12">
+              {{ Form::select2Input('channel', [], App\Channel::toDropDownData(), ['multiple' => true, 'id' => $type.'Channel']) }}
             </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-12">
+            {{ Form::select2Input('area', [], App\Area::toDropDownData(), ['multiple' => true, 'id' => $type.'Area']) }}
+            </div>
+          
             <div class="form-group col-md-6">
               <label>Month From</label>
               <input class="js-datepicker form-control" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from" data-month-highlight="true" required>
@@ -83,6 +83,7 @@ $type = $type ?? '';
     $('#{{$type}}Area').val(json.area).trigger('change');
     $('#{{$type}}DateFrom').val(json.from);
     $('#{{$type}}DateTo').val(json.to);
+    $('#{{$type}}Channel').val(json.channel).trigger('change');
     console.log(json);
   }
   @endif

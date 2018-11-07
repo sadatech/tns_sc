@@ -216,7 +216,7 @@ class ProductFokusMdController extends Controller
             $listSku = explode(",", $data['sku']);
             foreach ($listSku as $sku) {
                 $dataSku[] = array(
-                    'sku_unit_id'    		=> $this->findSku($sku),
+                    'sku_unit_id'    		=> $this->findSku($sku, $data['value']),
                     'product_id'          	=> $product->id,
                 );
             }
@@ -228,14 +228,15 @@ class ProductFokusMdController extends Controller
         return $id_product;
     }
 
-    public function findSku($data)
+    public function findSku($data, $value)
     {
-        $dataSku = SkuUnit::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
-        if ($dataSku->count() == 0) {
+        $dataSku = SkuUnit::get();
+        if (!empty($dataSku)) {
             $sku = SkuUnit::create([
                 'name'       	         => $data,
-				'conversion_value'       => "1"
+				'conversion_value'       => $value
             ]);
+    
             if ($sku) {
                 $id_sku = $sku->id;
             }
@@ -248,21 +249,21 @@ class ProductFokusMdController extends Controller
 
     public function findSubcategory($data)
     {
-        $dataSu = SubCategory::where('name','like','%'.trim($data['category_name']).'%');
+        $dataSu = SubCategory::where('name','like','%'.trim($data['subcategory_name']).'%');
         if ($dataSu->count() == 0) {
             
             $dataCategory['category_name']  = $data['category_name'];
             $id_category = $this->findCategory($dataCategory);
 
-            $area = SubCategory::create([
+            $sub = SubCategory::create([
               'name'            => $data['subcategory_name'],
               'id_category'     => $id_category,
             ]);
-            $id_area = $area->id;
+            $id_sub = $sub->id;
         }else{
-            $id_area = $dataSu->first()->id;
+            $id_sub = $dataSu->first()->id;
         }
-      return $id_area;
+      return $id_sub;
     }
 
     public function findCategory($data)
@@ -271,8 +272,8 @@ class ProductFokusMdController extends Controller
         if ($dataCategory->count() == 0) {
             
             $region = Category::create([
-              'name'        => $data['category_name'],
-              'category'    => "-"
+              'name'           => $data['category_name'],
+              'description'    => "-"
             ]);
             $id_category = $region->id;
         }else{
