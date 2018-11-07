@@ -401,6 +401,17 @@ Route::prefix('planDc')->group(function () {
 		return response()->download(public_path('assets/PlanDcImport.xlsx'));
 	})->name('plan.download-template')->middleware('auth');
 });
+
+/*
+	Setting PF
+*/
+Route::prefix('pf')->group(function () {
+	Route::get('/', 'PfController@read')->name('pf')->middleware('auth');
+	Route::get('/data', 'PfController@data')->name('pf.data')->middleware('auth');
+	Route::post('/create', 'PfController@store')->name('pf.add')->middleware('auth');
+	Route::put('/update/{id}', 'PfController@update')->name('pf.update')->middleware('auth');
+	Route::get('/delete/{id}', 'PfController@delete')->name('pf.delete')->middleware('auth');
+});
 /*
 	USERS
 */
