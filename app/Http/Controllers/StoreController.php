@@ -137,27 +137,91 @@ public function data()
 
     public function exampleSheet()
     {
-        Excel::create('Target Store'.Cabon::now(), function($excel){
+        Excel::create('Target Store'.Carbon::now(), function($excel){
             $excel->sheet('Store Format',function($sheet){
-                $sheet->cells('A1:G1',function($cells){
+                $sheet->cells('A1:O1',function($cells){
                     $cells->setFontWeight('bold');
                     $cells->setAlignment('center');
-                    $cells->setBackground('yellow');
+                    $cells->setBackground('#aecc37');
                 });
                   $sheet->row(1, ['ID STORE', 'NAME 1', 'NAME 2', 'ADDRESS', 'LATITUDE', 'LONGITUDE', 'ACCOUNT','SUB AREA', 'TIMEZONE', 'SALES TIERS', 'IS VITO', 'IS JAWA', 'STORE PANEL', 'COVERAGE', 'DELIVERY']);
             });
+
+            $excel->sheet('STORES',function($sheet){
+                $sheet->cells('A1:C1',function($cells){
+                     $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                    $cells->setBackground('#17e84e');
+                });
+                  $sheet->row(1, ['ID STORES', 'NAME 1 (Name)', 'NAME 2(Optional Name)']);
+                $store = Store::orderBy('id','ASC')->get();
+                foreach ($store as $row) {
+                    $sheet->appendRow([
+                        $row->id,
+                        $row->name1,
+                        $row->name2,
+                    ]);
+                }
+            });
+
             $excel->sheet('Timezone',function($sheet){
                 $sheet->cells('A1:C1',function($cells){
                      $cells->setFontWeight('bold');
                     $cells->setAlignment('center');
-                    $cells->setBackground('yellow');
+                    $cells->setBackground('#17e84e');
                 });
-                $timezone = Timezone::orderBy('id','DESC')->get();
+                  $sheet->row(1, ['ID TIMEZONE', 'NAME', 'TIMEZONE']);
+                $timezone = Timezone::orderBy('id','ASC')->get();
                 foreach ($timezone as $row) {
                     $sheet->appendRow([
                         $row->id,
                         $row->name,
                         $row->timezone,
+                    ]);
+                }
+            });
+            $excel->sheet('Sub Area',function($sheet){
+                $sheet->cells('A1:B1',function($cells){
+                     $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                    $cells->setBackground('#17e84e');
+                });
+                  $sheet->row(1, ['ID SUB AREA', 'NAME SUB AREA']);
+                $subarea = SubArea::orderBy('id','ASC')->get();
+                foreach ($subarea as $row) {
+                    $sheet->appendRow([
+                        $row->id,
+                        $row->name,
+                    ]);
+                }
+            });
+            $excel->sheet('Account',function($sheet){
+                $sheet->cells('A1:B1',function($cells){
+                     $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                    $cells->setBackground('#17e84e');
+                });
+                  $sheet->row(1, ['ID ACCOUNT', 'NAME ACCOUNT']);
+                $account = Account::orderBy('id','ASC')->get();
+                foreach ($account as $row) {
+                    $sheet->appendRow([
+                        $row->id,
+                        $row->name,
+                    ]);
+                }
+            });
+            $excel->sheet('SALES TIERS',function($sheet){
+                $sheet->cells('A1:B1',function($cells){
+                     $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                    $cells->setBackground('#17e84e');
+                });
+                  $sheet->row(1, ['ID SALES TIERS', 'NAME SALES TIERS']);
+                $sales = SalesTiers::orderBy('id','ASC')->get();
+                foreach ($sales as $row) {
+                    $sheet->appendRow([
+                        $row->id,
+                        $row->name,
                     ]);
                 }
             });
@@ -250,19 +314,20 @@ public function importXLS(Request $request)
 
 
                  $insert = Store::create([
-                    'name1' => $row->name1,
-                    'name2' => $row->name2,
-                    'address' => $row->address,
-                    'latitude' => $row->latitude,
-                    'longitude' => $row->longitude,
-                    'id_account' => $row->id_account,
-                    'id_subarea' => $row->sub_area,
-                    'id_timezone' => $row->id_timezone,
-                    'id_salestier' => $row->id_salestier,
-                    'is_vito' => $row->is_vito,
-                    'store_panel' => $row->store_panel,
-                    'coverage' => $row->coverage,
-                    'delivery' => $row->delivery,
+                    'name1' => $row['name_1'],
+                    'name2' => $row['name_2'],
+                    'address' => $row['address'],
+                    'latitude' => $row['latitude'],
+                    'longitude' => $row['longitude'],
+                    'id_account' => $row['account'],
+                    'id_subarea' => $row['sub_area'],
+                    'id_timezone' => $row['timezone'],
+                    'id_salestier' => $row['sales_tiers'],
+                    'is_vito' => $row['is_vito'],
+                    'is_jawa' => $row['is_jawa'],
+                    'store_panel' => $row['store_panel'],
+                    'coverage' => $row['coverage'],
+                    'delivery' => $row['delivery'],
                 ]);
 
              }
