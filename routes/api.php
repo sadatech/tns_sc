@@ -43,7 +43,7 @@ Route::prefix('category')->group(function () {
 });
 
 Route::prefix('subcategory')->group(function () {
-	Route::get('/list/{id_category}', 'API\SubCategoryController@list')->name('api.subcategory.list');
+	Route::get('/list/{id_category?}', 'API\SubCategoryController@list')->name('api.subcategory.list');
 });
 
 Route::prefix('product')->group(function () {
@@ -55,7 +55,8 @@ Route::prefix('brand')->group(function () {
 });
 
 Route::prefix('sales')->group(function () {
-	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
+	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.process');
+	Route::post('/add', 'API\SalesController@store')->name('api.sales.add');
 });
 
 Route::prefix('promo')->group(function () {
