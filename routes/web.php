@@ -207,6 +207,10 @@ Route::prefix('employee')->group(function () {
 		{
 		return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
 		})->name('smd.download-template')->middleware('auth');
+		Route::get('/dc/download-template', function()
+		{
+		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
+		})->name('dc.download-template')->middleware('auth');
 	});
 
 	//Resign Pages
@@ -253,8 +257,14 @@ Route::prefix('product')->group(function () {
 		Route::get('/', 'SubCategoryController@baca')->name('sub-category')->middleware('auth');
 		Route::get('/data', 'SubCategoryController@data')->name('sub-category.data')->middleware('auth');
 		Route::post('/create', 'SubCategoryController@store')->name('sub-category.add')->middleware('auth');
+		Route::post('/import', 'SubCategoryController@import')->name('sub-category.import')->middleware('auth');
 		Route::put('/update/{id}', 'SubCategoryController@update')->name('sub-category.update')->middleware('auth');
 		Route::get('/delete/{id}', 'SubCategoryController@delete')->name('sub-category.delete')->middleware('auth');
+		Route::get('/export', 'SubCategoryController@export')->name('sub-category.export')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/SubCategoryImport.xlsx'));
+		})->name('subcategory.download-template')->middleware('auth');
 	});
 
 	//SKU Unit Pages
@@ -263,16 +273,28 @@ Route::prefix('product')->group(function () {
 		Route::get('/data', 'SkuUnitController@data')->name('sku-unit.data')->middleware('auth');
 		Route::post('/create', 'SkuUnitController@store')->name('sku-unit.add')->middleware('auth');
 		Route::put('/update/{id}', 'SkuUnitController@update')->name('sku-unit.update')->middleware('auth');
-		Route::get('/delete/{id}', 'SkuUnitController@delete')->name('sku-unit.delete')->middleware('auth');
+		Route::get('/delete/{id}', 'SkuUnitController@destroy')->name('sku-unit.delete')->middleware('auth');
+		Route::get('/export', 'SkuUnitController@export')->name('sku-unit.export')->middleware('auth');
+		Route::post('/import', 'SkuUnitController@import')->name('sku-unit.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/SkuUnitImport.xlsx'));
+		})->name('sku-unit.download-template')->middleware('auth');
 	});
 
 	//Product Summary Pages
 	Route::prefix('summary')->group(function () {
 		Route::get('/', 'ProductController@baca')->name('product')->middleware('auth');
 		Route::get('/data', 'ProductController@data')->name('product.data')->middleware('auth');
+		Route::get('/export', 'ProductController@export')->name('product.export')->middleware('auth');
 		Route::post('/create', 'ProductController@store')->name('product.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductController@update')->name('product.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductController@delete')->name('product.delete')->middleware('auth');
+		Route::post('/import', 'ProductController@import')->name('product.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/ProductImport.xlsx'));
+		})->name('product.download-template')->middleware('auth');
 	});
 
 	//Product Competitor Pages
@@ -316,23 +338,28 @@ Route::prefix('product')->group(function () {
 		Route::get('/', 'ProductFokusMdController@baca')->name('fokusMD')->middleware('auth');
 		Route::get('/data', 'ProductFokusMdController@data')->name('fokusMD.data')->middleware('auth');
 		Route::post('/create', 'ProductFokusMdController@store')->name('fokusMD.add')->middleware('auth');
+		Route::post('/import', 'ProductFokusMdController@import')->name('fokusMD.import')->middleware('auth');
+		Route::get('/export', 'ProductFokusMdController@export')->name('fokusMD.export')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusMdController@update')->name('fokusMD.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusMdController@delete')->name('fokusMD.delete')->middleware('auth');
-	});
-
-	//Target Pages
-	Route::prefix('target')->group(function () {
-		Route::get('/', 'TargetController@baca')->name('target')->middleware('auth');
-		Route::get('/data', 'TargetController@data')->name('target.data')->middleware('auth');
-		Route::post('/create', 'TargetController@store')->name('target.add')->middleware('auth');
-		Route::put('/update/{id}', 'TargetController@update')->name('target.update')->middleware('auth');
-		Route::get('/delete/{id}', 'TargetController@delete')->name('target.delete')->middleware('auth');
-		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('target.download-sample')->middleware('auth');
+		Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/FokusMDImport.xlsx'));
+			})->name('fokusMD.download-template')->middleware('auth');
 	});
 });
 
 // Master Target
 Route::prefix('target')->group(function () {
+	Route::prefix('mtc')->group(function () {
+		Route::get('/', 'TargetController@baca')->name('mtc')->middleware('auth');
+		Route::get('/data', 'TargetController@data')->name('mtc.data')->middleware('auth');
+		Route::post('/create', 'TargetController@store')->name('mtc.add')->middleware('auth');
+		Route::put('/update/{id}', 'TargetController@update')->name('mtc.update')->middleware('auth');
+		Route::get('/delete/{id}', 'TargetController@delete')->name('mtc.delete')->middleware('auth');
+		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('mtc.download-sample')->middleware('auth');
+	});
+
 	Route::prefix('dc')->group(function () {
 		Route::get('/', 'Target\DcController@baca')->name('target.dc')->middleware('auth');
 		Route::get('/data', 'Target\DcController@data')->name('target.dc.data')->middleware('auth');
@@ -365,6 +392,7 @@ Route::prefix('planDc')->group(function () {
 	Route::get('/', 'PlandcController@read')->name('planDc')->middleware('auth');
 	Route::get('/data', 'PlandcController@data')->name('plan.data')->middleware('auth');
 	Route::post('/import','PlandcController@import')->name('plan.import')->middleware('auth');
+	Route::get('/update/{id}', 'PlandcController@readupdate')->name('ubah.plan')->middleware('auth');
 	Route::put('/update/{id}', 'PlandcController@update')->name('plan.update')->middleware('auth');
 	Route::get('/delete/{id}', 'PlandcController@delete')->name('plan.delete')->middleware('auth');
 	Route::get('/export', 'PlandcController@exportXLS')->name('plan.export')->middleware('auth');
@@ -460,20 +488,46 @@ Route::prefix('report')->group(function () {
 		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
+
 	});
 
-	Route::prefix('promoactivity')->group(function(){
-		Route::get('/','PromoActivityController@index')->name('promoactivity')->middleware('auth');
-		Route::get('/data', 'PromoActivityController@data')->name('pa.data')->middleware('auth');
-		Route::get('/create','PromoActivityController@create')->name('tambah.pa')->middleware('auth');
-		Route::post('/store','PromoActivityController@store')->name('pa.store')->middleware('auth');
-		Route::get('/edit/{id}','PromoActivityController@edit')->name('ubah.pa')->middleware('auth');
-		Route::post('/update/{id}','PromoActivityController@update')->name('update.pa')->middleware('auth');
-		Route::get('/delete/{id}','PromoActivityController@delete')->name('pa.delete')->middleware('auth');
-		Route::get('/exportXLS','PromoActivityController@exportXLS')->name('pa.exportXLS')->middleware('auth');
-		Route::post('/importXLS','PromoActivityController@importXLS')->name('pa.importXLS')->middleware('auth');
-	});
+		Route::prefix('availability')->group(function () {
+			Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
+			Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
+			Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@availabilityUpdate')->name('availability.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@Importavailability')->name('availability.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
 
+		Route::prefix('display_share')->group(function () {
+			Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
+			// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
+			Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
+		Route::prefix('additional_display')->group(function () {
+			Route::get('/', 'ReportController@additionalDisplayIndex')->name('additional_display')->middleware('auth');
+			Route::get('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
+			Route::get('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
+			Route::post('/edit/{id}', 'ReportController@additionalDisplayUpdate')->name('additional_display.edit')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportadditionalDisplay')->name('additional_display.import')->middleware('auth');
+			Route::get('/download-template', function()
+			{
+				return response()->download(public_path('assets/SellinImport.xlsx'));
+			})->name('SellIn.download-template')->middleware('auth');
+		});
+
+	});	
 
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 });
@@ -506,6 +560,17 @@ Route::prefix('select2')->group(function () {
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
 });
 
+	Route::prefix('promoactivity')->group(function(){
+		Route::get('/','PromoActivityController@index')->name('promoactivity')->middleware('auth');
+		Route::get('/data', 'PromoActivityController@data')->name('pa.data')->middleware('auth');
+		Route::get('/create','PromoActivityController@create')->name('tambah.pa')->middleware('auth');
+		Route::post('/store','PromoActivityController@store')->name('pa.store')->middleware('auth');
+		Route::get('/edit/{id}','PromoActivityController@edit')->name('ubah.pa')->middleware('auth');
+		Route::post('/update/{id}','PromoActivityController@update')->name('update.pa')->middleware('auth');
+		Route::get('/delete/{id}','PromoActivityController@delete')->name('pa.delete')->middleware('auth');
+		Route::get('/exportXLS','PromoActivityController@exportXLS')->name('pa.exportXLS')->middleware('auth');
+		Route::post('/importXLS','PromoActivityController@importXLS')->name('pa.importXLS')->middleware('auth');
+	});
 
 Auth::routes();
 

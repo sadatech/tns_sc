@@ -30,6 +30,7 @@
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Product</th>
+          <th>Channel</th>
           <th>Area</th>
           <th>Date From</th>
           <th>Date Until</th>
@@ -119,6 +120,7 @@
               columns: [
 	              { data: 'id', name: 'id' },
                 { data: 'product.name', name: 'product.name'},
+                { data: 'fokus', name: 'fokus' },
 	              { data: 'area', name: 'area' },
                 { data: 'from', name: 'from' },
                 { data: 'to', name: 'to' },

@@ -21,16 +21,12 @@
           <h3 class="block-title">
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
-          <div class="block-option">
-            <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
-          </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="category">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th class="text-center">Name</th>
-          <th class="text-center" style="width: 15%;"> Action</th>
+          <th>Name</th>
+          <th style="width: 15%;"> Action</th>
         </thead>
         </table>
       </div>

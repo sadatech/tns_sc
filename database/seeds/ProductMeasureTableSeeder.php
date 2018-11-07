@@ -1,10 +1,10 @@
 <?php
 
 use App\Product;
-use App\ProductUnit;
+use App\ProductMeasure;
 use Illuminate\Database\Seeder;
 
-class ProductUnitTableSeeder extends Seeder
+class ProductMeasureTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,9 +14,9 @@ class ProductUnitTableSeeder extends Seeder
     public function run()
     {
     	foreach (Product::all() as $product) {
-    		ProductUnit::create([
-    			'product_id' => $product->id,
-    			'sku_unit_id' => rand(1, 10)
+    		ProductMeasure::create([
+    			'id_product' => $product->id,
+    			'id_measure' => rand(1, 10),
     		]);
     	}
     }
