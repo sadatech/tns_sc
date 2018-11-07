@@ -526,9 +526,6 @@ Route::prefix('report')->group(function () {
 				return response()->download(public_path('assets/SellinImport.xlsx'));
 			})->name('SellIn.download-template')->middleware('auth');
 		});
-
-	});	
-
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 });
 
