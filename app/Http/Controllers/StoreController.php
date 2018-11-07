@@ -134,6 +134,38 @@ public function data()
         return $store->subarea->name."(".$store->subarea->area->name.")";
     })->make(true);
 }
+
+    public function exampleSheet()
+    {
+        Excel::create('Target Store'.Cabon::now(), function($excel){
+            $excel->sheet('Store Format',function($sheet){
+                $sheet->cells('A1:G1',function($cells){
+                    $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                    $cells->setBackground('yellow');
+                });
+                  $sheet->row(1, ['ID STORE', 'NAME 1', 'NAME 2', 'ADDRESS', 'LATITUDE', 'LONGITUDE', 'ACCOUNT','SUB AREA', 'TIMEZONE', 'SALES TIERS', 'IS VITO', 'IS JAWA', 'STORE PANEL', 'COVERAGE', 'DELIVERY']);
+            });
+            $excel->sheet('Timezone',function($sheet){
+                $sheet->cells('A1:C1',function($cells){
+                     $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                    $cells->setBackground('yellow');
+                });
+                $timezone = Timezone::orderBy('id','DESC')->get();
+                foreach ($timezone as $row) {
+                    $sheet->appendRow([
+                        $row->id,
+                        $row->name,
+                        $row->timezone,
+                    ]);
+                }
+            });
+
+        })->export('xlsx');
+        return;
+    }
+
 public function exportXLS()
 {
 
