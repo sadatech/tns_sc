@@ -51,7 +51,6 @@ class PlandcController extends Controller
                 $distList[] = $data->employee->name;
             }
             return rtrim(implode(',', $distList), ',');
-            dd($distList);
 
         })->make(true);
     }
@@ -171,7 +170,6 @@ class PlandcController extends Controller
             // $data1 = Employee::where(['id' => $request->input('employee')])->first();
             $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($request->input('lokasi')))."'");
             // $data3 = PlanEmployee::where(['id_employee' => $data1->id]);
-            dd($data2);
             $store = Plandc::find($id);
                 if ($request->input('employee')) {
                     foreach ($request->input('employee') as $emp) {
