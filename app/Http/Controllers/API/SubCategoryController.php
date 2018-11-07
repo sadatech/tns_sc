@@ -23,7 +23,7 @@ class SubCategoryController extends Controller
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					if ($id_category != '') {
+					if ($id_category != 0) {
 						$subCategory = SubCategory::where('id_category',$id_category)->get();
 					}else{
 						$subCategory = SubCategory::get();
