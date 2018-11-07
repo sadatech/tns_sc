@@ -88,7 +88,7 @@
       $(function() {
           $('#promoTable').DataTable({
               processing: true,
-              serverSide: true,
+              scrollY: "300px",
               drawCallback: function(){
                   $('.js-swal-delete').on('click', function(){
                     var url = $(this).data("url");
@@ -121,7 +121,7 @@
 	              { data: 'id', name: 'id' },
                 { data: 'product.name', name: 'product.name'},
                 { data: 'fokus', name: 'fokus' },
-	              { data: 'area', name: 'area' },
+	              { data: 'fokusarea', name: 'fokusarea' },
                 { data: 'from', name: 'from' },
                 { data: 'to', name: 'to' },
 	              { data: 'action', name: 'action' },
