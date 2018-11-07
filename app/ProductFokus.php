@@ -54,16 +54,16 @@ class ProductFokus extends Model
         return date('m/Y', strtotime($value));
     }
 
-    public static function hasActivePF($data, $self_id = null)
-    {
-        $products = ProductFokus::where('id_product', $data['id_product'])
-                                // ->where('id_area', $data['id_area'])
-                                ->where('id', '!=', $self_id)
-                                ->where(function($query) use ($data){
-                                    $query->whereBetween('from', [$data['from'], $data['to']]);
-                                    $query->orWhereBetween('to', [$data['from'], $data['to']]);
-                                })->count();
+    // public static function hasActivePF($data, $self_id = null)
+    // {
+    //     $products = ProductFokus::where('id_product', $data['id_product'])
+    //                             ->where('fr', $data['id_area'])
+    //                             ->where('id', '!=', $self_id)
+    //                             ->where(function($query) use ($data){
+    //                                 $query->whereBetween('from', [$data['from'], $data['to']]);
+    //                                 $query->orWhereBetween('to', [$data['from'], $data['to']]);
+    //                             })->count();
 
-        return $products > 0;
-    }
+    //     return $products > 0;
+    // }
 }
