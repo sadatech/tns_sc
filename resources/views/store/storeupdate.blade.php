@@ -71,14 +71,14 @@
                 </div>
             </div>
             <div class="block-content">
-                <h5><b>Distributor, Account, Area</b></h5>
+                <h5><b>Account & Area</b></h5>
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label>Distributor</label>
-                        <select class="js-select2 custom-select" name="distributor[]" id="distributor" multiple required>
-                            @foreach ($distributor as $dis)
-                            <option value="{{ $dis->id }}">{{ $dis->name }}</option>
-                            @endforeach
+                        <label>Is Jawa</label>
+                        <select class="js-select2 custom-select" name="is_jawa" id="jawa">
+                            <option value="" disabled selected>Choose Jawa / Non Jawa</option>
+                            <option value="Jawa">JAWA</option>
+                            <option value="Non Jawa">NON JAWA</option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
@@ -184,18 +184,16 @@
         $('#timezone option[value="{{ $str->id_timezone }}"]').attr('selected','selected');
         $('#sales option[value="{{ $str->id_salestier }}"]').attr('selected','selected');
         $('#is_vito option[value="{{ $str->is_vito }}"]').attr('selected','selected');
+        $('#jawa option[value="{{ $str->is_jawa }}"]').attr('selected','selected');
         $('#coverage option[value="{{ $str->coverage }}"]').attr('selected','selected');
         $('#store_panel option[value="{{ $str->store_panel }}"]').attr('selected','selected');
         $('#delivery option[value="{{ $str->delivery }}"]').attr('selected','selected');
-
-      
-        var dists = {{ $dist }}
-        $('#distributor').val(dists).trigger('change');
         $('#account').trigger('change');
         $('#timezone').trigger('change');
         $('#subbarea').trigger('change');
         $('#sales').trigger('change');
         $('#is_vito').trigger('change');
+        $('#jawa').trigger('change');
         $('#coverage').trigger('change');
         $('#store_panel').trigger('change');
         $('#delivery').trigger('change');
