@@ -32,8 +32,8 @@ class DatabaseSeeder extends Seeder
         $this->call(SubCategoryTableSeeder::class);
         $this->call(ProductTableSeeder::class);
 
-        $this->call(MeasurementUnitTableSeeder::class);
-        $this->call(ProductMeasureTableSeeder::class);
+        // $this->call(MeasurementUnitTableSeeder::class);
+        // $this->call(ProductMeasureTableSeeder::class);
 
         $this->call(PriceTableSeeder::class);
         // $this->call(SalesTableSeeder::class);

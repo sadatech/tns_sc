@@ -205,6 +205,9 @@
 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- SALES --}}
+                    <li>
+                        <a class="{{ request()->is('report/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Sales MTC</span></a>
+                    </li>
                     <li class="{{ request()->is('report/sales/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Sales</span></a>
                         <ul>

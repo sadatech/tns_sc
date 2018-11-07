@@ -295,6 +295,31 @@ class ReportController extends Controller
     // *********** SELL OUT ****************** //
 
 
+    // *********** SALES MTC ****************** //
+
+    public function salesMtcIndex(){
+        return view('report.salesmtc');
+    }
+
+    public function salesMtcData(SummaryFilters $filters){
+
+        $data = SellInSummary::filter($filters);
+
+        return Datatables::of($data)
+            ->addColumn('action', function ($item) {
+                $data = array(
+                    'id'            => $item->id,
+                    'qty'           => $item->qty
+                );
+
+                return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
+                <button data-url=".route('sellin.delete', $item->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+                ";
+            })->make(true);
+
+    }
+
+
     // *********** STOCK ****************** //
 
 
@@ -647,3 +672,5 @@ class ReportController extends Controller
         return response()->json($datas);
 
     }
+
+}

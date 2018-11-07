@@ -527,7 +527,15 @@ Route::prefix('report')->group(function () {
 			})->name('SellIn.download-template')->middleware('auth');
 		});
 
-	});	
+	});
+
+	Route::prefix('salesmtc')->group(function () {
+			Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');
+			Route::post('/data', 'ReportController@salesMtcData')->name('salesmtc.data')->middleware('auth');
+
+			Route::get('/tes', 'ReportController@tes')->name('salesmtc.export')->middleware('auth');
+		});
+
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
 	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');

@@ -34,6 +34,9 @@ class Product extends Model
             'code' => 'required|string',
             'panel' => 'required|string',
             'stock_type_id' => 'required|integer',
+            'carton' => 'integer',
+            'pack' => 'integer',
+            'pcs' => 'integer',
         ];
     }
 
