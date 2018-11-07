@@ -130,7 +130,7 @@ class EmployeeController extends Controller
 					"rekening"       => (isset($req->rekening) && $req->rekening !== null) ? $req->rekening : $this->employe_auth->rekening,
 					"bank"           => (isset($req->bank) && $req->bank !== null) ? $req->bank : $this->employe_auth->bank,
 					"joinAt"         => (isset($req->join_date) && $req->join_date !== null) ? $req->join_date : $this->employe_auth->joinAt,
-					"birthdate"      => (isset($req->birthdate) && $req->birthdate !== null) ? $req->birthdate : $this->employe_auth->birthdate,
+					"birthdate"      => (isset($req->birth_date) && $req->birth_date !== null) ? $req->birth_date : $this->employe_auth->birthdate,
 					"id_agency"      => (isset($req->agency) && $req->agency !== null) ? $req->agency : $this->employe_auth->id_agency,
 					"id_position"    => (isset($req->position) && $req->position !== null) ? $req->position : $this->employe_auth->id_position,
 				]);
