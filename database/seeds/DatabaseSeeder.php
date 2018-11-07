@@ -15,18 +15,18 @@ class DatabaseSeeder extends Seeder
         $this->call(ChannelTableSeeder::class);
         $this->call(AccountTableSeeder::class);
         $this->call(DistributorTableSeeder::class);
-        // $this->call(UserTableSeeder::class);
+        $this->call(UserTableSeeder::class);
         $this->call(PasarTableSeeder::class);
         $this->call(StoreTableSeeder::class);
         $this->call(AgencyTableSeeder::class);
-        //$this->call(EmployeeTableSeeder::class);
-        //$this->call(EmployeeStoreTableSeeder::class);
+        $this->call(EmployeeTableSeeder::class);
+        // $this->call(EmployeeStoreTableSeeder::class);
         $this->call(PlaceTableSeeder::class);
         $this->call(BrandTableSeeder::class);
         $this->call(CategoryTableSeeder::class);
         $this->call(SubCategoryTableSeeder::class);
         $this->call(ProductTableSeeder::class);
-        $this->call(MeasurementUnitTableSeeder::class);
-        $this->call(ProductMeasureTableSeeder::class);
+        // $this->call(MeasurementUnitTableSeeder::class);
+        // $this->call(ProductMeasureTableSeeder::class);
     }
 }
