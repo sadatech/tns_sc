@@ -15,4 +15,13 @@ class Category extends Model
     	return $this->hasMany('App\SubCategory', 'id_category');
     }
 
+    public function Pf()
+    {
+    	return $this->hasMany('App\Pf', 'id_category1');
+    }
+
+    public function Pf2()
+    {
+    	return $this->hasMany('App\Pf', 'id_category2');
+    }
 }

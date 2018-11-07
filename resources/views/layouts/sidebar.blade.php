@@ -181,7 +181,9 @@
                             </li>
                         </ul>
                     </li>
-
+                    <li>
+                        <a class="{{ request()->is('pf') ? 'active' : '' }}" href="{{ route('pf') }}"><i class="si si-settings"></i><span class="sidebar-mini-hide">Setting PF</span></a>
+                    </li>  
                     </li> 
                     {{-- USERS--}}
 

@@ -84,7 +84,7 @@ $type = $type ?? '';
     $('#{{$type}}DateFrom').val(json.from);
     $('#{{$type}}DateTo').val(json.to);
     $('#{{$type}}Channel').val(json.channel).trigger('change');
-    console.log(json);
+    // console.log(json);
   }
   @endif
 </script>
