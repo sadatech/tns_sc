@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Area;
 use App\Product;
 use App\FokusChannel;
+use App\FokusArea;
 use App\ProductFokus;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+
 class ProductFokusController extends Controller
 {
     private $alert = [
@@ -25,19 +27,26 @@ class ProductFokusController extends Controller
 
     public function data()
     {
-        $product = ProductFokus::with(['product','area','fokus'])
+        $product = ProductFokus::with(['product','fokusarea','fokus', ])
         ->select('product_fokuses.*');
         return Datatables::of($product)
-        ->addColumn('area', function($product) {
-			if (isset($product->area)) {
-				$area = $product->area->name;
-			} else {
-				$area = "Without Area";
-			}
-			return $area;
+        // ->addColumn('area', function($product) {
+		// 	if (isset($product->area)) {
+		// 		$area = $product->area->name;
+		// 	} else {
+		// 		$area = "Without Area";
+		// 	}
+		// 	return $area;
+        // })
+        ->addColumn('fokusare', function($product) {
+            $area = FokusArea::where(['id_pf'=>$product->id])->get();
+            $areaList = array();
+            foreach ($area as $data) {
+                $areaList[] = (isset($data->ara->name) ? $data->area->name : "-");
+            }
+            return rtrim(implode(',', $areaList), ',');
         })
         ->addColumn('fokus', function($product) {
-           
             $chan = FokusChannel::where(['id_pf'=>$product->id])->get();
             $channelList = array();
             foreach ($chan as $data) {
@@ -46,15 +55,15 @@ class ProductFokusController extends Controller
             return rtrim(implode(',', $channelList), ',');
         })
         ->addColumn('action', function ($product) {
-            if (isset($product->area)) {
-				$area = $product->area->id;
-			} else {
-				$area = "Without Area";
-			}
+            // if (isset($product->area)) {
+			// 	$area = $product->area->id;
+			// } else {
+			// 	$area = "Without Area";
+			// }
             $data = array(
                 'id'            => $product->id,
                 'product'     	=> $product->product->id,
-                'area'          => $area,
+                'area'          => (isset(FokusArea::where('id_pf',$product->id)->pluck('id_area')->id) ? FokusArea::where('id_pf',$product->id)->pluck('id_area')->id : null) ,
                 'from'          => $product->from,
                 'to'          	=> $product->to,
                 'channel'       => FokusChannel::where('id_pf',$product->id)->pluck('id_channel')
@@ -85,11 +94,19 @@ class ProductFokusController extends Controller
             DB::transaction(function () use($data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
+                $area = $data['area'];
+                unset($data['area']);
                 $product = ProductFokus::create($data);
                 foreach ($channel as $channel_id) {
                     FokusChannel::create([
                         'id_pf'              => $product->id,
                         'id_channel'         => $channel_id
+                    ]);
+                }
+                foreach ($area as $area_id) {
+                    FokusArea::create([
+                        'id_pf'              => $product->id,
+                        'id_area'            => $area_id
                     ]);
                 }
             });
