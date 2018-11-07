@@ -32,7 +32,6 @@ class EmployeeTableSeeder extends Seeder
             'phone' => '0857'.rand(0000000,99999999),
             'password' => bcrypt('admin'),
             'foto_ktp' => 'default.png',
-            'foto_profile' => 'default.png',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
@@ -64,5 +63,4 @@ class EmployeeTableSeeder extends Seeder
             ]);
         }
     }
-}
 }
