@@ -55,15 +55,10 @@ class ProductFokusController extends Controller
             return rtrim(implode(',', $channelList), ',');
         })
         ->addColumn('action', function ($product) {
-            // if (isset($product->area)) {
-			// 	$area = $product->area->id;
-			// } else {
-			// 	$area = "Without Area";
-			// }
             $data = array(
                 'id'            => $product->id,
                 'product'     	=> $product->product->id,
-                'area'          => (isset(FokusArea::where('id_pf',$product->id)->pluck('id_area')->id) ? FokusArea::where('id_pf',$product->id)->pluck('id_area')->id : null) ,
+                'area'          => FokusArea::where('id_pf',$product->id)->pluck('id_area'),
                 'from'          => $product->from,
                 'to'          	=> $product->to,
                 'channel'       => FokusChannel::where('id_pf',$product->id)->pluck('id_channel')
@@ -86,11 +81,11 @@ class ProductFokusController extends Controller
         $to = explode('/', $data['to']);
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        } else {
+        // if (ProductFokus::hasActivePF($data)) {
+        //     $this->alert['type'] = 'warning';
+        //     $this->alert['title'] = 'Warning!<br/>';
+        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+        // } else {
             DB::transaction(function () use($data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
@@ -113,7 +108,7 @@ class ProductFokusController extends Controller
                 }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
-        }
+        // }
 
         return redirect()->back()->with($this->alert);
     }
@@ -132,11 +127,11 @@ class ProductFokusController extends Controller
         $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data, $product->id)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        } else {
+        // if (ProductFokus::hasActivePF($data, $product->id)) {
+        //     $this->alert['type'] = 'warning';
+        //     $this->alert['title'] = 'Warning!<br/>';
+        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+        // } else {
             DB::transaction(function () use($product, $data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
@@ -159,7 +154,7 @@ class ProductFokusController extends Controller
                 }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!';
-        }
+        // }
 
         return redirect()->back()->with($this->alert);
     }
