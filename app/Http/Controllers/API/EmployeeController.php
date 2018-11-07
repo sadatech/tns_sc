@@ -79,6 +79,40 @@ class EmployeeController extends Controller
 		}
 	}
 
+	public function get()
+	{
+		try {
+			$code = 200;
+			if (JWTAuth::getToken() != null) {
+				if (!$user = JWTAuth::parseToken()->authenticate()) {
+					$res['msg'] = "User not found.";
+					$code = $e->getStatusCode();
+				} else {
+					$employee = Employee::where("id", $user->id)->get();
+					if ($employee->count() > 0) {
+						$res['success'] 	= true;
+						$res['employee'] 	= $employee;
+					} else {
+						$res['success'] 	= false;
+						$res['msg'] 		= "Type outlet tidak diketahui.";
+					}
+				}
+			}else{
+				$res['msg'] = "User not found.";
+			}
+		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			$res['msg'] = "Token Expired.";
+			$code = $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			$res['msg'] = "Token Invalid.";
+			$code = $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+			$res['msg'] = "Token Absent.";
+			$code = $e->getStatusCode();
+		}
+		return response()->json($res, $code);
+	}
+
 	public function editProfile(Request $req)
 	{
 		if ($this->_validateEmployeeAuth())
@@ -95,8 +129,11 @@ class EmployeeController extends Controller
 					"email"          => (isset($req->email) && $req->email !== null) ? $req->email : $this->employe_auth->email,
 					"rekening"       => (isset($req->rekening) && $req->rekening !== null) ? $req->rekening : $this->employe_auth->rekening,
 					"bank"           => (isset($req->bank) && $req->bank !== null) ? $req->bank : $this->employe_auth->bank,
+					"joinAt"         => (isset($req->join_date) && $req->join_date !== null) ? $req->join_date : $this->employe_auth->joinAt,
+					"birthdate"      => (isset($req->birthdate) && $req->birthdate !== null) ? $req->birthdate : $this->employe_auth->birthdate,
+					"id_agency"      => (isset($req->agency) && $req->agency !== null) ? $req->agency : $this->employe_auth->id_agency,
+					"id_position"    => (isset($req->position) && $req->position !== null) ? $req->position : $this->employe_auth->id_position,
 				]);
-
 			});
 
 			return response()->json(["message"=>"Operation Success"], 200);
