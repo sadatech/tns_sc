@@ -48,6 +48,7 @@ Route::prefix('subcategory')->group(function () {
 
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
+	Route::get('pf/list/{id_pasar}', 'API\ProductController@pfList')->name('api.product.pf.list');
 });
 
 Route::prefix('brand')->group(function () {
@@ -89,6 +90,7 @@ Route::prefix('stock')->group(function () {
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
+	Route::post('/edit/{id}', 'API\OutletController@update')->name('api.outlet.edit');
 	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
 	Route::get('/disable/{id}/{status}', 'API\OutletController@disable')->name('api.outlet.disable');
 	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');

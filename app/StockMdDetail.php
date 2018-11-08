@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class StockMdDetail extends Model
 {
     protected $fillable = [
-        'id_stock', 'id_product', 'id_satuan'
+        'id_stock', 'id_product', 'oos'
     ];
 
     public function stock()
