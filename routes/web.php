@@ -332,6 +332,7 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
 		Route::get('/export', 'ProductFokusController@export')->name('fokus.export')->middleware('auth');
+		Route::post('/import', 'ProductFokusController@import')->name('fokus.import')->middleware('auth');
 	});
 
 	//Fokus MD Pages
