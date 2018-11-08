@@ -12,6 +12,11 @@ class Channel extends Model
         'name'
     ];
 
+    public static function defaultChannel()
+    {
+    	return self::get()->first();
+    }
+
     public function accounts()
     {
     	return $this->hasMany('App\Account', 'id_channel');
