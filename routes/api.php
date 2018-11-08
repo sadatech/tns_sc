@@ -77,6 +77,10 @@ Route::prefix('cbd')->group(function () {
 	Route::post('/add', 'API\CbdController@store')->name('api.cbd.add');
 });
 
+Route::prefix('distribution')->group(function () {
+	Route::post('/add', 'API\DistributionController@store')->name('api.distribution.add');
+});
+
 // Pasar
 Route::prefix('pasar')->group(function () {
 	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');

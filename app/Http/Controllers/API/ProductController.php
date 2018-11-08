@@ -5,7 +5,11 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Product;
+use App\ProductFokus;
+use App\FokusArea;
+use App\FokusChannel;
 use App\Pasar;
+use Carbon\Carbon;
 use Config;
 use JWTAuth;
 
@@ -79,20 +83,31 @@ class ProductController extends Controller
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					$area 	= Pasar::find($id_pasar)->get();
-					return $area;
-					if (!empty($request->input('subcategory'))) {
-						$where = [
-							'id_brand' 			=> $request->input('brand'),
-							'id_subcategory' 	=> $request->input('subcategory')
-						];
-					}else{
-						$where = [
-							'id_brand' 			=> $request->input('brand')
-						];
+					$today 	= Carbon::today()->toDateString();
+					$area 	= Pasar::find($id_pasar)->first()->subarea->id_area;
+					$pf 	= ProductFokus::with('Fokus.channel')->
+					whereHas('Fokus', function($query)
+					{
+						return $query->whereHas('channel', function($query2)
+						{
+							return $query2->where('name','GTC');
+						});
+					})->whereRaw("'$today' BETWEEN product_fokuses.from and product_fokuses.to")->get();
+
+					$product= [];
+					foreach ($pf as $key => $value) {
+						$areas__ = FokusArea::where('id_pf',$value->id)->get();
+						if ($areas__->count() == 0) {
+							$product[] = $value->product;
+						}else{
+							foreach ($areas__ as $key2 => $value2) {
+								if ($value2->id_area == $area) {
+									$product[] = $value->product;
+								}
+							}
+						}
 					}
-					$product 	= Product::where($where)->get();
-					if ($product->count() > 0) {
+					if (sizeof($product) > 0) {
 						$dataArr = array();
 						foreach ($product as $key => $pro) {
 							$dataArr[] = array(

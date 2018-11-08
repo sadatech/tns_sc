@@ -36,7 +36,7 @@ class ProductFokus extends Model
 
     public function Fokus()
     {
-    	return $this->hasMany('App\FokusChannel', 'id_channel');
+    	return $this->hasMany('App\FokusChannel', 'id_pf');
     }
 
     public function fokusarea()
