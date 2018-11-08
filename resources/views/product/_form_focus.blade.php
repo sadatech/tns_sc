@@ -22,48 +22,69 @@ $type = $type ?? '';
         @endif
         {!! csrf_field() !!}
         <div class="block-content">
-          <div class="form-group">
-            <label>Product</label>
-            <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Product" name="id_product" required>
-              <option value="" disabled selected>Choose your Product</option>
-              @foreach(App\Product::get() as $data)
-              <option value="{{ $data->id }}">{{ $data->name }} </option>
-              @endforeach
-            </select>
-          </div>
+          {{ 
+            Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(), [
+              'labelText' => 'Product',
+              'required' => '',
+              'id' => $type . 'Product'
+            ])
+          }}
           <div class="row">
-            <div class="col-md-12">
-              {{ Form::select2Input('channel', [], App\Channel::toDropDownData(), ['multiple' => true, 'id' => $type.'Channel']) }}
+            <div class="col-md-6">
+            {{ Form::select2Input('channel', [], App\Channel::toDropDownData(), ['multiple' => true, 'id' => $type.'Channel']) }}
+            </div>
+            <div class="col-md-6">
+              <div class="custom-control custom-checkbox custom-control-inline">
+                  <input class="custom-control-input" type="checkbox" id="example-inline-checkbox2" checked>
+                  <label class="custom-control-label" for="example-inline-checkbox2">ALL</label>
+              </div>
+              <div id="test">
+                <select class="{{$type}}-js-select2 custom-select" id="{{$type}}Area" name="area[]" multiple>
+                    <option disabled>Choose Area</option>
+                    @foreach ($area as $dis)
+                    <option value="{{ $dis->id }}">{{ $dis->name }}</option>
+                    @endforeach
+                </select>
+              </div>
             </div>
           </div>
           <div class="row">
-            <div class="form-group col-md-12">
-            {{ Form::select2Input('area', [], App\Area::toDropDownData(), ['multiple' => true, 'id' => $type.'Area']) }}
-            </div>
-          
-            <div class="form-group col-md-6">
+            <div class="col-md-6">
               <label>Month From</label>
               <input class="js-datepicker form-control" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from" data-month-highlight="true" required>
             </div>
-            <div class="form-group col-md-6">
+            <div class="col-md-6">
               <label>Month Until</label>
               <input class="js-datepicker form-control" type="text" placeholder="Month Until" id="{{$type}}DateTo" name="to" data-month-highlight="true" required>
             </div>
           </div>
-          <div class="modal-footer">
+        </div>
+        <div class="modal-footer">
             <button type="submit" class="btn btn-alt-success">
-              <i class="fa fa-save"></i> Save
+                <i class="fa fa-save"></i> Save
             </button>
             <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-          </div>
         </div>
       </form>
     </div>
   </div>
 </div>
 
+ 
 @push('additional-js')
 <script type="text/javascript">
+$('#test').hide();
+$("#example-inline-checkbox2").change(function() {
+    if ($(this).removeAttr("checked")) {
+      $('#test').show().val(null);
+    }
+});
+
+$("#example-inline-checkbox2").change(function() {
+    if ($(this).prop("checked")) {
+      $('#test').hide().val(null);
+    }
+});
   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",

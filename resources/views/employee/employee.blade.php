@@ -218,7 +218,6 @@
     $(function() {
         $('#employeetable').DataTable({
             processing: true,
-            scrollX: true,
             scrollY: "300px",
             drawCallback: function(){
                 $('.popup-image').magnificPopup({
@@ -251,7 +250,6 @@
                 });
             },
             ajax: '{!! route('employee.data') !!}',
-            serverSide: true,
             columns: [
             { data: 'action', name: 'action' },
             { data: 'nik', name: 'nik' },
