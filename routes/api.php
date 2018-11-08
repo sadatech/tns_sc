@@ -43,7 +43,7 @@ Route::prefix('category')->group(function () {
 });
 
 Route::prefix('subcategory')->group(function () {
-	Route::get('/list/{id_category}', 'API\SubCategoryController@list')->name('api.subcategory.list');
+	Route::get('/list/{id_category?}', 'API\SubCategoryController@list')->name('api.subcategory.list');
 });
 
 Route::prefix('product')->group(function () {
@@ -55,7 +55,8 @@ Route::prefix('brand')->group(function () {
 });
 
 Route::prefix('sales')->group(function () {
-	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.add');
+	Route::post('/process/{type}', 'API\SellController@store')->name('api.sales.process');
+	Route::post('/add', 'API\SalesController@store')->name('api.sales.add');
 });
 
 Route::prefix('promo')->group(function () {
@@ -84,6 +85,7 @@ Route::prefix('stock')->group(function () {
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
 	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
+	Route::get('/disable/{id}/{status}', 'API\OutletController@disable')->name('api.outlet.disable');
 	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');
 	Route::get('/checkout', 'API\OutletController@checkout')->name('api.outlet.checkout');
 	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
@@ -93,6 +95,7 @@ Route::prefix('outlet')->group(function () {
  * Employee
  */
 Route::prefix("employee")->group(function(){
+	Route::get('/get', 'API\EmployeeController@get')->name('api.employee.get');
 	Route::post("edit/password", "API\EmployeeController@editPassword")->name("api.employee.edit.password");
 	Route::post("edit/profile", "API\EmployeeController@editProfile")->name("api.employee.edit.profile");
 	Route::post("edit/profile/photo/{type?}", "API\EmployeeController@editProfilePhoto")->name("api.employee.edit.profile.photo");

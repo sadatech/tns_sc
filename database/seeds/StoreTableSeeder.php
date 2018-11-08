@@ -21,6 +21,7 @@ class StoreTableSeeder extends Seeder
                 'id_timezone'       => rand(1, 3),
                 'id_salestier'      => rand(1, 3),
                 'is_vito'           => "default is_vito",
+                'is_jawa'           => "default is_jawa",
                 'store_panel'       => "default store_panel",
                 'coverage'          => "default coverage",
                 'delivery'          => "default delivery",

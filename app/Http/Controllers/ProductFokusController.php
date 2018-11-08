@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Area;
 use App\Product;
 use App\FokusChannel;
+use App\FokusArea;
 use App\ProductFokus;
-use Auth;
 use DB;
+use Auth;
+use File;
+use Excel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+
 class ProductFokusController extends Controller
 {
     private $alert = [
@@ -25,19 +30,26 @@ class ProductFokusController extends Controller
 
     public function data()
     {
-        $product = ProductFokus::with(['product','area','fokus'])
+        $product = ProductFokus::with(['product','fokusarea','fokus', ])
         ->select('product_fokuses.*');
         return Datatables::of($product)
-        ->addColumn('area', function($product) {
-			if (isset($product->area)) {
-				$area = $product->area->name;
-			} else {
-				$area = "Without Area";
-			}
-			return $area;
+        // ->addColumn('area', function($product) {
+		// 	if (isset($product->area)) {
+		// 		$area = $product->area->name;
+		// 	} else {
+		// 		$area = "Without Area";
+		// 	}
+		// 	return $area;
+        // })
+        ->addColumn('fokusarea', function($product) {
+            $area = FokusArea::where(['id_pf'=>$product->id])->get();
+            $areaList = array();
+            foreach ($area as $data) {
+                $areaList[] = (isset($data->area->name) ? $data->area->name : "-");
+            }
+            return rtrim(implode(',', $areaList), ',');
         })
         ->addColumn('fokus', function($product) {
-           
             $chan = FokusChannel::where(['id_pf'=>$product->id])->get();
             $channelList = array();
             foreach ($chan as $data) {
@@ -46,15 +58,10 @@ class ProductFokusController extends Controller
             return rtrim(implode(',', $channelList), ',');
         })
         ->addColumn('action', function ($product) {
-            if (isset($product->area)) {
-				$area = $product->area->id;
-			} else {
-				$area = "Without Area";
-			}
             $data = array(
                 'id'            => $product->id,
                 'product'     	=> $product->product->id,
-                'area'          => $area,
+                'area'          => FokusArea::where('id_pf',$product->id)->pluck('id_area'),
                 'from'          => $product->from,
                 'to'          	=> $product->to,
                 'channel'       => FokusChannel::where('id_pf',$product->id)->pluck('id_channel')
@@ -77,14 +84,16 @@ class ProductFokusController extends Controller
         $to = explode('/', $data['to']);
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        } else {
+        // if (ProductFokus::hasActivePF($data)) {
+        //     $this->alert['type'] = 'warning';
+        //     $this->alert['title'] = 'Warning!<br/>';
+        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+        // } else {
             DB::transaction(function () use($data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
+                $area = (isset($data['area']) ? $data['area'] : null);
+                unset($data['area']);
                 $product = ProductFokus::create($data);
                 foreach ($channel as $channel_id) {
                     FokusChannel::create([
@@ -92,9 +101,17 @@ class ProductFokusController extends Controller
                         'id_channel'         => $channel_id
                     ]);
                 }
+                if (!empty($area)) {
+                    foreach ($area as $area_id) {
+                        FokusArea::create([
+                            'id_pf'              => $product->id,
+                            'id_area'            => $area_id
+                        ]);
+                    }
+                }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
-        }
+        // }
 
         return redirect()->back()->with($this->alert);
     }
@@ -113,15 +130,15 @@ class ProductFokusController extends Controller
         $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data, $product->id)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        } else {
+        // if (ProductFokus::hasActivePF($data, $product->id)) {
+        //     $this->alert['type'] = 'warning';
+        //     $this->alert['title'] = 'Warning!<br/>';
+        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+        // } else {
             DB::transaction(function () use($product, $data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
-    
+
                 $product->fill($data)->save();
 
                 $oldChanel = $product->fokus->pluck('id_channel');
@@ -131,7 +148,7 @@ class ProductFokusController extends Controller
                         'id_pf'         => $product->id,
                         'id_channel'    => $deleted_id])->delete(); 
                 }
-    
+
                 foreach ($channel as $channel_id) {
                     FokusChannel::updateOrCreate([
                         'id_pf'         => $product->id,
@@ -140,7 +157,7 @@ class ProductFokusController extends Controller
                 }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!';
-        }
+        // }
 
         return redirect()->back()->with($this->alert);
     }
@@ -148,12 +165,66 @@ class ProductFokusController extends Controller
     public function delete($id)
     {
         $product = ProductFokus::find($id);
-            $product->delete();
+        $product->delete();
+        return redirect()->back()
+        ->with([
+            'type'      => 'success',
+            'title'     => 'Sukses!<br/>',
+            'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+        ]);
+    }
+
+    public function export()
+	{
+        $emp = ProductFokus::orderBy('created_at', 'DESC');
+        if ($emp->count() > 0) {
+		    foreach ($emp->get() as $val) {
+		    	$area = FokusArea::where(
+		    		'id_pf', $val->id
+		    	)->get();
+		    	$areaList = array();
+		    	foreach($area as $dataArea) {
+		    		if(isset($dataArea->id_area)) {
+		    			$areaList[] = $dataArea->area->name;
+		    		} else {
+		    			$areaList[] = "-";
+		    		}
+                }
+                $channel = FokusChannel::where(
+		    		'id_pf', $val->id
+		    	)->get();
+		    	$channelList = array();
+		    	foreach($channel as $dataChannel) {
+		    		if(isset($dataChannel->id_channel)) {
+		    			$channelList[] = $dataChannel->channel->name;
+		    		} else {
+		    			$channelList[] = "-";
+		    		}
+		    	}
+		    	$data[] = array(
+		    		'Product'		=> $val->product->name,
+                    'Channel'	    => rtrim(implode(',', $channelList), ','),
+                    'Area'			=> rtrim(implode(',', $areaList), ','),
+                    'Month From'    => (isset($val->from) ? $val->from : "-"),
+                    'Month Until'   => (isset($val->to) ? $val->to : "-")
+		    	);
+            }
+        
+		    $filename = "ProductFokus_".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('Employee', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
             return redirect()->back()
             ->with([
-                'type'      => 'success',
-                'title'     => 'Sukses!<br/>',
-                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
             ]);
+        }
     }
+    
 }

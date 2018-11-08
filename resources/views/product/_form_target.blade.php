@@ -37,7 +37,7 @@ $action = $action ?? '';
               </select> --}}
             <div class="form-group">
               <label>Release</label>
-              <input class="js-datepicker form-control" type="text" name="rilis" id="{{$type}}Rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+              <input class="js-datepicker form-control" type="text" name="rilis" id="{{$type}}Rilis" data-month-highlight="true" placeholder="yyyy-mm" required>
             </div>  
           <div class="form-group">
             <label>Select File (Format .xlsx, .xls)</label>
@@ -57,6 +57,12 @@ $action = $action ?? '';
 
 @push('additional-js')
 <script type="text/javascript">
+  $(".js-datepicker").datepicker( {
+    format: "mm/yyyy",
+    viewMode: "months",
+    autoclose: true,
+    minViewMode: "months"
+  });
   @if ($type == 'edit')
     function editModal(json) {
       $('#{{$id}}').modal('show');

@@ -332,6 +332,7 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'ProductFokusController@store')->name('fokus.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
+		Route::get('/export', 'ProductFokusController@export')->name('fokus.export')->middleware('auth');
 	});
 
 	//Fokus MD Pages
@@ -401,6 +402,17 @@ Route::prefix('planDc')->group(function () {
 	{
 		return response()->download(public_path('assets/PlanDcImport.xlsx'));
 	})->name('plan.download-template')->middleware('auth');
+});
+
+/*
+	Setting PF
+*/
+Route::prefix('pf')->group(function () {
+	Route::get('/', 'PfController@read')->name('pf')->middleware('auth');
+	Route::get('/data', 'PfController@data')->name('pf.data')->middleware('auth');
+	Route::post('/create', 'PfController@store')->name('pf.add')->middleware('auth');
+	Route::put('/update/{id}', 'PfController@update')->name('pf.update')->middleware('auth');
+	Route::get('/delete/{id}', 'PfController@delete')->name('pf.delete')->middleware('auth');
 });
 /*
 	USERS
