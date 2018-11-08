@@ -9,6 +9,7 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use Excel;
 use Yajra\Datatables\Datatables;
 use Auth;
+use App\EmployeeStore;
 use App\Product;
 use App\Employee;
 use App\Store;
@@ -145,11 +146,16 @@ class PromoActivityController extends Controller
            //    ->select('promo_details.*', 'employees.name', 'stores.name1', 'brands.name', 'products.name');
         $promoDetail = PromoDetail::with(['promo', 'product'])
         ->select('promo_details.*');
-     
         return Datatables::of($promoDetail)
+        
         ->addColumn('action', function ($promoDetail) {
             return "<a href=".route('ubah.pk', $promoDetail->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
             <button data-url=".route('pk.delete', $promoDetail->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+        })
+        ->addColumn('images', function($promoDetail) {
+
+            return "
+            <a href=".asset('uploads/promo/'.$promoDetail->promo->image1)." class='btn btn-sm btn-info btn-square popup-image'><i class='si si-picture mr-2'></i> Image Product</a>";
         })
         ->addColumn('store', function($promoDetail) {
         return $promoDetail->promo->store->name1;
@@ -163,6 +169,7 @@ class PromoActivityController extends Controller
         ->addColumn('brand', function($promoDetail) {
         return $promoDetail->promo->brand->name;
         })
+        ->rawColumns(['images', 'action'])
         ->make(true);
     }
 

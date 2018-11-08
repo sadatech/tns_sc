@@ -16,10 +16,14 @@ use DB;
 
 class OutletController extends Controller
 {
+	public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
+
 	public function store(Request $request)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
@@ -83,10 +87,46 @@ class OutletController extends Controller
 		return response()->json($res, $code);
 	}
 
+	public function update(Request $request, $id)
+	{
+		try {
+			if (!$user = JWTAuth::parseToken()->authenticate()) {
+				$res['msg'] = "User not found.";
+				$code = $e->getStatusCode();
+			} else {
+				$data = $request->all();
+				$update = Outlet::where('id',$id)->update([
+					'customer_code'		=> $data['code'],
+					'name'				=> $data['name'],
+					'phone'				=> $data['phone'],
+					'address'			=> $data['address'],
+				]);
+				if ($update) {
+					$res['success'] = true;
+					$res['msg'] = "Success update outlets.";
+					$code = 200;
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Failed to update outlets.";
+					$code = 200;
+				}
+			}
+		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			$res['msg'] = "Token Expired.";
+			$code = $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			$res['msg'] = "Token Invalid.";
+			$code = $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+			$res['msg'] = "Token Absent.";
+			$code = $e->getStatusCode();
+		}
+		return response()->json($res, $code);
+	}
+
 	public function list($id = 1)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
@@ -167,7 +207,6 @@ class OutletController extends Controller
 	public function checkin(Request $request)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
@@ -229,7 +268,6 @@ class OutletController extends Controller
 	public function checkout()
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
@@ -278,7 +316,6 @@ class OutletController extends Controller
 	public function status()
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 			} else {
@@ -327,7 +364,6 @@ class OutletController extends Controller
 	public function disable($id, $status)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
