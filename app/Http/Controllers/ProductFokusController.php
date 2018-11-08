@@ -7,8 +7,11 @@ use App\Product;
 use App\FokusChannel;
 use App\FokusArea;
 use App\ProductFokus;
-use Auth;
 use DB;
+use Auth;
+use File;
+use Excel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
@@ -170,4 +173,58 @@ class ProductFokusController extends Controller
             'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
         ]);
     }
+
+    public function export()
+	{
+        $emp = ProductFokus::orderBy('created_at', 'DESC');
+        if ($emp->count() > 0) {
+		    foreach ($emp->get() as $val) {
+		    	$area = FokusArea::where(
+		    		'id_pf', $val->id
+		    	)->get();
+		    	$areaList = array();
+		    	foreach($area as $dataArea) {
+		    		if(isset($dataArea->id_area)) {
+		    			$areaList[] = $dataArea->area->name;
+		    		} else {
+		    			$areaList[] = "-";
+		    		}
+                }
+                $channel = FokusChannel::where(
+		    		'id_pf', $val->id
+		    	)->get();
+		    	$channelList = array();
+		    	foreach($channel as $dataChannel) {
+		    		if(isset($dataChannel->id_channel)) {
+		    			$channelList[] = $dataChannel->channel->name;
+		    		} else {
+		    			$channelList[] = "-";
+		    		}
+		    	}
+		    	$data[] = array(
+		    		'Product'		=> $val->product->name,
+                    'Channel'	    => rtrim(implode(',', $channelList), ','),
+                    'Area'			=> rtrim(implode(',', $areaList), ','),
+                    'Month From'    => (isset($val->from) ? $val->from : "-"),
+                    'Month Until'   => (isset($val->to) ? $val->to : "-")
+		    	);
+            }
+        
+		    $filename = "ProductFokus_".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('Employee', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+    
 }
