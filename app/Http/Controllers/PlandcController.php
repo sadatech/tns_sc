@@ -11,6 +11,7 @@ use DB;
 use Auth;
 use File;
 use Excel;
+use Validator;
 use App\Employee;
 use Carbon\Carbon;
 
@@ -59,6 +60,7 @@ class PlandcController extends Controller
     {
         $this->validate($request, [
             'employee'  => 'required',
+            'date'      => 'required',
             'file'      => 'required'
         ]);
         $transaction = DB::transaction(function () use ($request) {
@@ -75,34 +77,51 @@ class PlandcController extends Controller
                 
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
+                    $rowRules = [
+                        'lokasi' => 'required',
+                    ];
+                    $customMessages = [
+                        'required' => 'Row Lokasi Tidak Boleh Kosong!'
+                    ];
                     foreach($results as $row)
                     {
-                        $insert = PlanDc::create([
-                            'date'              => $request->input('date'),
-                            'lokasi'            => $row->lokasi,
-                            'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
-                            'channel'           => (isset($row->channel) ? $row->channel : "-")
-                        ]);
-                        if (!empty($insert)) 
-                            {
-                                $dataStore = array();
-                                foreach ($request->input('employee') as $distributor) {
-                                    // $data1 = Employee::where(['id' => $distributor])->first();
-                                    // $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($row->lokasi))."'");
-                                    // $check = PlanEmployee::where(['id_employee' => $data1->id]);
-                                    // if(!empty($data1) && $data2->count() < 1 && $chec   k->count() < 1 ) {
-                                        $dataStore[] = array(
-                                            'id_employee'    => $distributor,
-                                            'id_plandc'      => $insert->id,
-                                        );
-                                    // } else {
-                                    //     break;
-                                    //     return false;
-                                    // }
+                        $validator = Validator::make($row->toArray(), $rowRules, $customMessages);
+                        if ($validator->fails()) {
+                            return redirect()->back()
+                            ->withErrors($validator)
+                            ->withInput();
+                        } else {
+                            // $data1 = Employee::where(['id' => $request->input('employee')])->first();
+                            // $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($row['lokasi']))."'");
+                            // $check = PlanEmployee::where(['id_employee' => $data1->id])->where(['id_plandc' => $data2->id]);
+                            // if($check->count() < 1 ) {
+                            // dd($check);
+                            $insert = PlanDc::create([
+                                'date'              => $request->input('date'),
+                                'lokasi'            => $row['lokasi'],
+                                'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
+                                'channel'           => (isset($row->channel) ? $row->channel : "-")
+                            ]);
+                            if (!empty($insert)) 
+                                {
+                                    $dataStore = array();
+                                    foreach ($request->input('employee') as $distributor) {
+                                            $dataStore[] = array(
+                                                'id_employee'    => $distributor,
+                                                'id_plandc'      => $insert->id,
+                                            );
+                                        // } else {
+                                        //     break;
+                                        //     return false;
+                                        // }
+                                    }
+                                    DB::table('plan_employees')->insert($dataStore); 
                                 }
-                                DB::table('plan_employees')->insert($dataStore); 
+                            } return false;
+                            
                             }
-                    }
+                    // }
+                // }
                 },false);
             }
             return 'success';
