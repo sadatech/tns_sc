@@ -59,40 +59,58 @@
                 {{ csrf_field() }}
                 <div class="block-content">
                     <div class="form-group">
-                      <a href="{{ route('pasar.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+                      <a href="{{ route('fokus.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
                     </div>
                     <div class="block-content">
                         <h5> Sample Data :</h5>
-                        <table class="table table-bordered table-vcenter">
+                        <table class="table table-bordered table-responsive table-vcenter">
                             <thead>
                                 <tr>
-                                    <td><b>Market</b></td>
-                                    <td><b>Address</b></td>
-                                    <td><b>Longitude</b></td>
-                                    <td><b>Latitude</b></td>
-                                    <td><b>Subarea</b></td>
+                                    <td><b>SKU</b></td>
+                                    <td><b>Channel</b></td>
                                     <td><b>Area</b></td>
                                     <td><b>Region</b></td>
+                                    <td><b>Month From</b></td>
+                                    <td><b>Month To</b></td>
+                                    <td><b>Code</b></td>
+                                    <td><b>Panel</b></td>
+                                    <td><b>Carton</b></td>
+                                    <td><b>Pack</b></td>
+                                    <td><b>Subcategory</b></td>
+                                    <td><b>Category</b></td>
+                                    <td><b>Type</b></td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Market 1</td>
-                                    <td>Address 1</td>
-                                    <td>Longitude 1</td>
-                                    <td>Latitude 1</td>
-                                    <td>Subarea 1</td>
-                                    <td>Area 1</td>
+                                    <td>SKU 1</td>
+                                    <td>Channel1, Channel2, Channel3</td>
+                                    <td>Area1, Area2</td>
                                     <td>Region 1</td>
+                                    <td>Month From</td>
+                                    <td>Month To</td>
+                                    <td>Code</td>
+                                    <td>Panel</td>
+                                    <td>Carton</td>
+                                    <td>Pack</td>
+                                    <td>Subcategory 2</td>
+                                    <td>Category 2</td>
+                                    <td>Type 1</td>
                                 </tr>
                                 <tr>
-                                    <td>Market 2</td>
-                                    <td>Address 2</td>
-                                    <td>Longitude 2</td>
-                                    <td>Latitude 2</td>
-                                    <td>Subarea 2</td>
-                                    <td>Area 2</td>
-                                    <td>Region 2</td>
+                                    <td>SKU 2</td>
+                                    <td>Channel1</td>
+                                    <td></td>
+                                    <td>Region</td>
+                                    <td>Month From</td>
+                                    <td>Month To</td>
+                                    <td>Code</td>
+                                    <td>Panel</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>Subcategory 2</td>
+                                    <td>Category 2</td>
+                                    <td>Type 2</td>
                                 </tr>
                             </tbody>
                         </table>

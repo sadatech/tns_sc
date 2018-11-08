@@ -319,10 +319,11 @@ class ProductFokusController extends Controller
 
     public function findCategory($category)
     {
-        $dataChannel = Category::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($category))."'");
-        if ($dataChannel->count() == 0) {
+        $dataChannel = Category::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($category['category']))."'");
+        if ($dataChannel->get() != null) {
             $data2 = Category::create([
-                'name'  => $category
+                'name'              => $category['category'],
+                'description'       => "-"
             ]);
             if ($data2) {
                 $id_channel = $data2->id;

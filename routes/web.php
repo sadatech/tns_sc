@@ -333,6 +333,10 @@ Route::prefix('product')->group(function () {
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
 		Route::get('/export', 'ProductFokusController@export')->name('fokus.export')->middleware('auth');
 		Route::post('/import', 'ProductFokusController@import')->name('fokus.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/ProductFokusImport.xlsx'));
+		})->name('fokus.download-template')->middleware('auth');
 	});
 
 	//Fokus MD Pages
