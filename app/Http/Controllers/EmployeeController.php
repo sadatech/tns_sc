@@ -523,7 +523,7 @@ class EmployeeController extends Controller
 								$dataAgency['agency']   = $row['agency'];
 								$id_agency = $this->findAgen($dataAgency);
 								
-								// $getPosisi 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
+								$getPosisi 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
 								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
                             	$insert = Employee::create([
 									'nik'              	=> $row['nik'],
@@ -540,10 +540,10 @@ class EmployeeController extends Controller
 									'education'			=> ($row->education ? $row->education : "SLTA"),
 									'birthdate'			=> Carbon::now(),
 									'password'			=> bcrypt($row['password']),
-									'id_position'		=> 1,
-									'status'			=> ($row->status ? $row->status : "")	
+									'id_position'		=> ($getPosisi ? $getPosisi : 1),
+									'status'			=> (isset($row->status) ? $row->status : "")	
                             	]);
-                            		if (!empty($insert)) {
+                            		if ($insert->status != "")  {
 										$dataStore = array();
 										$listStore = explode(",", $row->store);
 										foreach ($listStore as $store) {

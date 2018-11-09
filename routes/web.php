@@ -215,7 +215,7 @@ Route::prefix('employee')->group(function () {
 		})->name('dc.download-template')->middleware('auth');
 		Route::get('/employee/download-template', function()
 		{
-		return response()->download(public_path('assets/EmployeeImport.xls'));
+		return response()->download(public_path('assets/EmployeeImport.xlsx'));
 		})->name('employee.download-template')->middleware('auth');
 		
 	});
