@@ -60,6 +60,10 @@ Route::prefix('sales')->group(function () {
 	Route::post('/add', 'API\SalesController@store')->name('api.sales.add');
 });
 
+Route::prefix('sales-md')->group(function () {
+	Route::post('/add', 'API\SalesMdController@store')->name('api.sales-md.add');
+});
+
 Route::prefix('promo')->group(function () {
 	Route::post('/add', 'API\PromoController@store')->name('api.promo.add');
 });
