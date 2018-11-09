@@ -130,8 +130,8 @@
                         <td><b>SKU</b></td>
                         <td><b>Type</b></td>
                         <td><b>Panel</b></td>
-                        <td><b>SkuUnit</b></td>
-                        <td><b>Value</b></td>
+                        <td><b>Carton</b></td>
+                        <td><b>Pack</b></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -142,8 +142,8 @@
                         <td>SKU 1</td>
                         <td>Type 1</td>
                         <td>Panel 1</td>
-                        <td>SkuUnit 1</td>
-                        <td>Value 1</td>
+                        <td>Carton 1</td>
+                        <td>Pack 1</td>
                     </tr>
                     <tr>
                         <td>SubCategory 2</td>
@@ -152,8 +152,8 @@
                         <td>SKU 2</td>
                         <td>Type 2</td>
                         <td>Panel 2</td>
-                        <td>SkuUnit 2</td>
-                        <td>Value 2</td>
+                        <td></td>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>

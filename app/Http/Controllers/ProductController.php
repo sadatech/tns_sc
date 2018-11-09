@@ -162,14 +162,6 @@ class ProductController extends Controller
 		$emp = Product::orderBy('created_at', 'DESC')
         ->get();
 		foreach ($emp as $val) {
-			// $unit = ProductUnit::where(
-			// 	'product_id', $val->id
-            // )->get();
-			// $skuList = array();
-			// foreach($unit as $dataSku) {
-			// 	$skuList[] = $dataSku->val->name;
-            // }
-            // dd($unit);
 			$data[] = array(
 				'brand'             => (isset($val->brand->name) ? $val->brand->name : "-"),
                 'subcategory'       => $val->subcategory->name,
@@ -177,7 +169,10 @@ class ProductController extends Controller
                 'code'              => $val->code,
                 'sku'               => $val->name,
                 'panel'             => $val->panel,
-                'stocktype'         => $val->stocktype->name
+                'stocktype'         => $val->stocktype->name,
+                'Carton'            => (isset($val->carton) ? $val->carton : "-"),
+                'Pack'              => (isset($val->pack) ? $val->pack : "-"),
+                'PCS'               => (isset($val->pcs) ? $val->pcs : "1")
 			);
 		}
 		$filename = "Product_".Carbon::now().".xlsx";
@@ -226,19 +221,22 @@ class ProductController extends Controller
                                 'id_subcategory'    => $id_subcategory,
                                 'code'              => $row->code,
                                 'name'              => $row->sku,
+                                'carton'            => (isset($row->carton) ? $row->carton : "-"),
+                                'pack'              => (isset($row->pack) ? $row->pack : "1"),
+                                'pcs'               => 1,
                                 'stock_type_id'     => ($getType ? $getType : 1),
                                 'panel'             => ($row->panel ? $row->panel : "yes")
                             ]);
-                            if (!empty($insert))
-                                $dataSKu = array();
-                                $listSku = explode(",", $row->unit);
-                                foreach ($listSku as $sku) {
-                                    $dataSku[] = array(
-                                        'sku_unit_id'    		=> $this->findSku($sku, $row->value),
-                                        'product_id'          	=> $insert->id,
-                                    );
-                                }
-                                DB::table('product_units')->insert($dataSku);                
+                            // if (!empty($insert))
+                            //     $dataSKu = array();
+                            //     $listSku = explode(",", $row->unit);
+                            //     foreach ($listSku as $sku) {
+                            //         $dataSku[] = array(
+                            //             'sku_unit_id'    		=> $this->findSku($sku, $row->value),
+                            //             'product_id'          	=> $insert->id,
+                            //         );
+                            //     }
+                            //     DB::table('product_units')->insert($dataSku);                
                         } else {
                             return false;
                         }
@@ -265,22 +263,22 @@ class ProductController extends Controller
         }
     }
 
-    public function findSku($data, $value)
-    {
-        $dataSku = SkuUnit::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
-        if ($dataSku->count() == 0) {
-            $sku = SkuUnit::create([
-                'name'       	         => $data,
-				'conversion_value'       => $value
-            ]);
-            if ($sku) {
-                $id_sku = $sku->id;
-            }
-        } else {
-            $id_sku = $dataSku->first()->id;
-        }
-        return $id_sku;
-    }
+    // public function findSku($data, $value)
+    // {
+    //     $dataSku = SkuUnit::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
+    //     if ($dataSku->count() == 0) {
+    //         $sku = SkuUnit::create([
+    //             'name'       	         => $data,
+	// 			'conversion_value'       => $value
+    //         ]);
+    //         if ($sku) {
+    //             $id_sku = $sku->id;
+    //         }
+    //     } else {
+    //         $id_sku = $dataSku->first()->id;
+    //     }
+    //     return $id_sku;
+    // }
 
     public function findSub($data)
     {

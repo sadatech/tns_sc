@@ -11,12 +11,12 @@ use Auth;
 use File;
 use Excel;
 use Carbon\Carbon;
-use App\Position;
 use App\Agency;
 use App\SubArea;
 use App\Employee;
 use App\Area;
 use App\Region;
+use App\Timezone;
 use App\EmployeeSubArea;
 use App\Filters\EmployeeFilters;
 
@@ -76,33 +76,41 @@ class DcController extends Controller
         $emp = Employee::where([
 		'isResign' => false, 
 		'id_position' => 5
-		])->orderBy('created_at', 'DESC')
-		->get();
-		foreach ($emp as $val) {
-        	$data[] = array(
-        	    'NIK'          	=> $val->nik,
-        	    'Name'          => $val->name,
-        	    'KTP'         	=> $val->ktp,
-        	    'Phone'         => $val->phone,
-				'Email'     	=> $val->email,
-				'Timezone'		=> $val->timezone->name,
-        	    'Rekening'      => (isset($val->rekening) ? $val->rekening : "-"),
-        	    'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
-				'Join Date'		=> $val->joinAt,
-				'Agency'		=> $val->agency->name,
-				'SubArea'		=> (isset($val->subarea->name) ? $val->subarea->name : "-"),
-				'Gender'		=> $val->education,
-				'Birthdate'		=> $val->birthdate,
-				'Position'		=> $val->position->name
-			);
-		}
-        $filename = "employeeDemoCooking_".Carbon::now().".xlsx";
-        return Excel::create($filename, function($excel) use ($data) {
-            $excel->sheet('Employee', function($sheet) use ($data)
-            {
-                $sheet->fromArray($data);
-            });
-        })->download();
+        ])->orderBy('created_at', 'DESC');
+        if (!empty($emp->count() > 1)) {
+		    foreach ($emp->get() as $val) {
+            	$data[] = array(
+            	    'NIK'          	=> $val->nik,
+            	    'Name'          => $val->name,
+            	    'KTP'         	=> $val->ktp,
+            	    'Phone'         => $val->phone,
+		    		'Email'     	=> $val->email,
+		    		'Timezone'		=> $val->timezone->name,
+            	    'Rekening'      => (isset($val->rekening) ? $val->rekening : "-"),
+            	    'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
+		    		'Join Date'		=> $val->joinAt,
+		    		'Agency'		=> $val->agency->name,
+		    		'SubArea'		=> (isset($val->subarea->name) ? $val->subarea->name : "-"),
+		    		'Gender'		=> $val->education,
+		    		'Birthdate'		=> $val->birthdate,
+		    		'Position'		=> $val->position->name
+		    	);
+		    }
+            $filename = "employeeDemoCooking_".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('Employee', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+           return redirect()->back()
+	    	->with([
+	    		'type' 		=> 'danger',
+	    		'title' 	=> 'Terjadi Kesalahan!<br/>',
+	    		'message'	=> '<i class="em em-thinking_face mr-2"></i>Data Excel Kosong!'
+	    	]);
+        }   
 	}
 
 	public function import(Request $request)
@@ -132,11 +140,11 @@ class DcController extends Controller
 
 						$dataAgency['agency_name']   = $row->agency;
 						$id_agency = $this->findAgen($dataAgency);
-						
+                        
+                        $getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
                         $insert = Employee::create([
 							'foto_ktp' 			=> "default.png",
 							'foto_tabungan'		=> "default.png",
-							'foto_profile' 		=> "default.png",
                             'name'             	=> $row->name,
 							'nik'              	=> $row->nik,
 							'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
@@ -148,17 +156,17 @@ class DcController extends Controller
 							'id_agency'			=> $id_agency,
                             'id_position'       => 5,
                             'joinAt'            => Carbon::now(),
-                            'gender'            => $row->gender,
-                            'education'         => $row->education,
+                            'gender'            => ($row->gender ? $row->gender : "Perempuan"),
+                            'education'         => ($row->education ? $row->education : "SLTA"),
                             'password'          => bcrypt($row->password),
-                            'id_timezone'       => 1
+                            'id_timezone'       => ($getZone ? $getZone : 1)
 						]);
 						if ($insert) {
                             $dataSub = array();
                             $listSub = explode(",", $row->subarea);
                             foreach ($listSub as $sub) {
                                 $dataSub[] = array(
-                                    'id_subarea'    	=> $this->findSub($sub),
+                                    'id_subarea'    	=> $this->findSub($sub, $row->area, $row->region),
                                     'id_employee'       => $insert->id
                                 );
                             }
@@ -202,15 +210,15 @@ class DcController extends Controller
     }
 
 	
-	public function findSub($data)
+	public function findSub($data, $area, $region)
     {
-        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
+        $dataSub = SubArea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
         if ($dataSub->count() < 1 ) {
 
-            $dataSub  = $data1;
-            $dataSub  = $data2;
-            $id_area = $this->findArea($dataSub);
-            $subarea = Subarea::create([
+            $dataArea['area']  = $area;
+            $dataArea['region'] = $region;
+            $id_area = $this->findArea($dataArea);
+            $subarea = SubArea::create([
               'name'        => $data,
               'id_area'     => $id_area
           ]);
@@ -222,16 +230,16 @@ class DcController extends Controller
     }
 
 
-    public function findArea($data1)
+    public function findArea($data)
     {
-        $dataArea = Area::where('name','like','%'.trim($data1).'%');
+        $dataArea = Area::where('name','like','%'.trim($data['area']).'%');
         if ($dataArea->count() == 0) {
             
-            $dataRegion  = $data2;
+            $dataRegion  = $data;
             $id_region = $this->findRegion($dataRegion);
 
             $area = Area::create([
-              'name'        => $data1,
+              'name'        => $data['area'],
               'id_region'   => $id_region,
             ]);
             $id_area = $area->id;
@@ -241,13 +249,13 @@ class DcController extends Controller
       return $id_area;
     }
 
-    public function findRegion($data2)
+    public function findRegion($data)
     {
-        $dataRegion = Region::where('name','like','%'.trim($data2).'%');
+        $dataRegion = Region::where('name','like','%'.trim($data['region']).'%');
         if ($dataRegion->count() == 0) {
             
             $region = Region::create([
-              'name'        => $data2,
+              'name'        => $data['region'],
             ]);
             $id_region = $region->id;
         }else{

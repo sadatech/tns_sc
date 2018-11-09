@@ -29,6 +29,7 @@ Route::prefix('store')->group(function () {
 		Route::put('/update/{id}', 'StoreController@update')->name('store.update')->middleware('auth');
 		Route::get('/delete/{id}', 'StoreController@delete')->name('store.delete')->middleware('auth');
 		Route::get('/exportXLS', 'StoreController@exportXLS')->name('store.exportXLS')->middleware('auth');
+		Route::get('/exampleSheet', 'StoreController@exampleSheet')->name('store.exampleSheet')->middleware('auth');
 		Route::post('/importXLS', 'StoreController@importXLS')->name('store.importXLS')->middleware('auth');
 	});
 
@@ -331,6 +332,12 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'ProductFokusController@store')->name('fokus.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
+		Route::get('/export', 'ProductFokusController@export')->name('fokus.export')->middleware('auth');
+		Route::post('/import', 'ProductFokusController@import')->name('fokus.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/ProductFokusImport.xlsx'));
+		})->name('fokus.download-template')->middleware('auth');
 	});
 
 	//Fokus MD Pages
@@ -400,6 +407,17 @@ Route::prefix('planDc')->group(function () {
 	{
 		return response()->download(public_path('assets/PlanDcImport.xlsx'));
 	})->name('plan.download-template')->middleware('auth');
+});
+
+/*
+	Setting PF
+*/
+Route::prefix('pf')->group(function () {
+	Route::get('/', 'PfController@read')->name('pf')->middleware('auth');
+	Route::get('/data', 'PfController@data')->name('pf.data')->middleware('auth');
+	Route::post('/create', 'PfController@store')->name('pf.add')->middleware('auth');
+	Route::put('/update/{id}', 'PfController@update')->name('pf.update')->middleware('auth');
+	Route::get('/delete/{id}', 'PfController@delete')->name('pf.delete')->middleware('auth');
 });
 /*
 	USERS
