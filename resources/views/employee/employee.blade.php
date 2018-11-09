@@ -2,6 +2,14 @@
 @section('title', "Employee")
 @section('content')
 <div class="content">
+    @if($errors->any())
+    <div class="alert alert-danger">
+        <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
+        @foreach ($errors->all() as $error)
+        <div> {{ $error }}</div>
+        @endforeach
+    </div>
+    @endif
     <h2 class="content-heading pt-10">Employee <small>Manage</small></h2>
     <div class="block block-themed"> 
         <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
@@ -56,11 +64,11 @@
                     </div>
                 </div>
             </div>
-            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeedc.import') }}">
+            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('employeess.import') }}">
                 {{ csrf_field() }}
                 <div class="block-content">
                     <div class="form-group">
-                        <a href="{{ route('dc.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+                        <a href="{{ route('employee.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
                     </div>
                     <div class="block-content">
                         <h5> Sample Data :</h5>
