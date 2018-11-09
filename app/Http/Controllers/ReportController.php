@@ -17,7 +17,13 @@ use App\DetailAdditionalDisplay;
 use Auth;
 use DB;
 use App\StoreDistributor;
+use App\EmployeePasar;
 use App\Distributor;
+use Carbon\Carbon;
+use App\StockMdHeader as StockMD;
+use App\Outlet;
+use App\Attendance;
+use App\AttendanceOutlet;
 
 class ReportController extends Controller
 {
@@ -404,4 +410,78 @@ class ReportController extends Controller
         return response()->json($datas);
     }
 
+
+    // ************ SMD PASAR ************ //
+    public function SMDpasar()
+    {
+        $employeePasar = EmployeePasar::with([
+            'employee','pasar','pasar.subarea.area',
+            'employee.position'
+        ])->select('employee_pasars.*');
+        $report = array();
+        $id = 1;
+        for ($i=1; $i <= Carbon::now()->day ; $i++) {
+            foreach ($employeePasar->get() as $data) {
+                $report[] = array(
+                    'id' => $id++,
+                    'area' => $data->pasar->subarea->area->name,
+                    'nama' => $data->employee->name,
+                    'jabatan' => $data->employee->position->name,
+                    'pasar' =>   $data->pasar->name,
+                    'stockist' => $this->getStockist($data, $i),
+                    'bulan' => Carbon::now()->month,
+                    'tanggal' => $i,
+                    'call' => $this->getCall($data, $i),
+                    'ro' => $this->getRo($data, $i),
+                );
+            }
+        }
+        return Datatables::of(collect($report))->make(true);
+    }
+
+    public function getStockist($data, $day)
+    {
+        $date = Carbon::now()->format('Y-m-').$day;
+        $stock = StockMD::where([
+            'id_pasar' => $data['id_pasar'],
+            'date' => $date
+        ])->first();
+        return (isset($stock->stockist) ? $stock->stockist : "Tidak ada");
+    }
+
+    public function getCall($data, $day)
+    {
+        $date = Carbon::now()->format('Y-m-').$day;
+        $call = DB::table('attendances')
+        ->join('attendance_outlets', 'attendances.id', '=', 'attendance_outlets.id_attendance')
+        ->where([
+            'keterangan' => 'Check-in',
+            'id_employee' => $data['id_employee']
+        ])
+        ->whereRaw("DATE(date) = '".$date."'");
+        // $call = Attendance::where([
+        //     'keterangan' => 'Check-in',
+        //     'id_employee' => $data['id_employee']
+        // ])->whereRaw("DATE(date) = '".$date."'")
+        // ->with('attendanceOutlet');
+        // $call = AttendanceOutlet::with(['attendance' => function($q) use ($data, $date) {
+        //     $q->where([
+        //         'keterangan' => 'Check-in',
+        //         'id_employee' => $data['id_employee']
+        //     ])->whereRaw("DATE(date) = '".$date."'");
+        // }, 'outlet' => function($q) use ($data) {
+        //     $q->where('id_employee_pasar', $data['id']);
+        // }]);
+        return $call->count();
+    }
+
+    public function getRo($data, $day)
+    {
+        $date = Carbon::now()->format('Y-m-').$day;
+        $ro = Outlet::where([
+            'id_employee_pasar' => $data['id'],
+            'active' => true
+        ])->whereRaw("DATE(created_at) > '".$date."'");
+        return $ro->count();
+    }
 }
