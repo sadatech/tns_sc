@@ -31,17 +31,30 @@ class StockController extends Controller
 					$data = json_decode($request->getContent());
 					DB::beginTransaction();
 					$date = Carbon::parse($data->date);
-					$header = MDHeader::create([
+					$checkStock = MDHeader::where([
 						'id_employee' 	=> $user->id,
 						'id_pasar' 		=> $data->pasar,
 						'stockist' 		=> $data->stockist,
 						'date' 			=> $date,
-						'week' 			=> $date->weekOfMonth,
-					]);
-					if (isset($header->id)) {
+					])->first();
+
+					if (!$checkStock) {
+						
+						$header = MDHeader::create([
+							'id_employee' 	=> $user->id,
+							'id_pasar' 		=> $data->pasar,
+							'stockist' 		=> $data->stockist,
+							'date' 			=> $date,
+							'week' 			=> $date->weekOfMonth,
+						]);
+						$headerId = $header->id;
+					}else{
+						$headerId = $checkStock->id;
+					}
+					if (isset($headerId)) {
 						foreach ($data->product as $product) {
 							$detail = MDDetail::create([
-								'id_stock' 		=> $header->id,
+								'id_stock' 		=> $headerId,
 								'id_product' 	=> $product->id,
 								'oos' 			=> $product->oos,
 							]);

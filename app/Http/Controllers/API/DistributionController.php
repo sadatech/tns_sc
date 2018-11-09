@@ -6,8 +6,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Distribution;
 use App\DistributionDetail;
+use App\Outlet;
 use JWTAuth;
 use Config;
+use DB;
+use Carbon\Carbon;
 
 class DistributionController extends Controller
 {
@@ -18,69 +21,60 @@ class DistributionController extends Controller
 
 	public function store(Request $request)
 	{
-		return $request->getContent();
+		$data = json_decode($request->getContent());
 		try {
 			$res['success'] = false;
+			$res['code'] = 200;
+			
 			if (JWTAuth::getToken() != null) {
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					DB::transaction(function () use ($data, $user, &$res) {
-						$date 	= Carbon::parse($data->date);
-						$checkSales = Sales::where('week', $date->weekOfMonth)->where('type', $type)->first();
-						$store = Store::where([
-							'id' => $request_store,
-						])->first();
-						$res['code'] = 200;
-						if (!$checkSales) {
-							$sales = Sales::create([
+					$outlet = Outlet::where('id', $data->outlet)->get();
+					if ( !empty($data->date) && !empty($data->outlet) && !empty($data->product) && ($outlet->count() > 0) ) {
+						DB::transaction(function () use ($data, $user, &$res) {
+							$date 	= Carbon::parse($data->date);
+							$checkDistribution = Distribution::where([
 								'id_employee'	=> $user->id,
-								'id_store'		=> $request_store,
-								'date'			=> $date2,
-								'week'			=> $date->weekOfMonth,
-								'type'			=> $type,
-							]);
-							if ($sales) {
-								$detailSales = array();
-								foreach ($request_product as $product) {
-									$detailSales[] = array(
-										'id_sales'		=> $sales->id,
-										'id_product'	=> $product->id,
-										'qty'			=> $product->qty,
-										'qty_actual'	=> $product->qty_actual,
-										'satuan'	=> $product->satuan,
-									);
-								}
-								$insert_sales = DB::table('detail_sales')->insert($detailSales);
-								if ($insert_sales) {
-									$res['success'] = true;
-									$res['msg'] 	= "Berhasil melakukan sales.";
-								} else {
-									$res['success'] = false;
-									$res['msg'] 	= "Gagal melakukan sales.";
-								}
-							}
-						} else {
-							$detailSales = array();
-							foreach ($request_product as $product) {
-								$detailSales[] = array(
-									'id_sales'		=> $checkSales->id,
-									'id_product'	=> $product->id,
-									'qty'			=> $product->qty,
-									'qty_actual'	=> $product->qty_actual,
-									'satuan'	=> $product->satuan,
-								);
-							}
-							$insert_sales = DB::table('detail_sales')->insert($detailSales);
-							if ($insert_sales) {
-								$res['success'] = true;
-								$res['msg'] 	= "Berhasil melakukan sales.";
+								'id_outlet'		=> $data->outlet,
+								'date'			=> $date,
+							])->first();
+							if (!$checkDistribution) {
+								$distribution = Distribution::create([
+									'id_employee'	=> $user->id,
+									'id_outlet'		=> $data->outlet,
+									'date'			=> $date,
+								]);
+								$distributionId = $distribution->id;
 							} else {
-								$res['success'] = false;
-								$res['msg'] 	= "Gagal melakukan sales.";
+								$distributionId	= $checkDistribution->id;
 							}
-						}
-					});
+							if (isset($distributionId)) {
+								$distributionDetail = array();
+								foreach ($data->product as $product) {
+									$detail = DistributionDetail::where([
+										'id_distribution'	=> $distributionId,
+										'id_product'		=> $product->id,
+									])->first();
+									if (!$detail) {
+										DistributionDetail::create([
+											'id_distribution'	=> $distributionId,
+											'id_product'		=> $product->id,
+											'value'				=> $product->value,
+										]);
+									}else{
+										$detail->value = $product->value;
+										$detail->save();
+									}
+								}
+								$res['success'] = true;
+								$res['msg'] 	= "Berhasil melakukan distribution.";
+							}
+						});
+					}else{
+						$res['success'] = false;
+						$res['msg'] 	= "Gagal melakukan distribution.";
+					}
 				}
 			}else{
 				$res['msg'] = "User not found.";
