@@ -18,7 +18,7 @@ class FokusChannel extends Model
 
     public function pf()
     {
-    	return $this->belongsTo('App\ProductFokus', 'id_productfokus');
+    	return $this->belongsTo('App\ProductFokus', 'id_pf');
     }
 
 }

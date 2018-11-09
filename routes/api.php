@@ -48,6 +48,7 @@ Route::prefix('subcategory')->group(function () {
 
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
+	Route::get('pf/list/{id_pasar}', 'API\ProductController@pfList')->name('api.product.pf.list');
 });
 
 Route::prefix('brand')->group(function () {
@@ -71,6 +72,15 @@ Route::prefix('availability')->group(function () {
 	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
 });
 
+Route::prefix('cbd')->group(function () {
+	Route::get('/list', 'API\CbdController@list')->name('api.cbd.list');
+	Route::post('/add', 'API\CbdController@store')->name('api.cbd.add');
+});
+
+Route::prefix('distribution')->group(function () {
+	Route::post('/add', 'API\DistributionController@store')->name('api.distribution.add');
+});
+
 // Pasar
 Route::prefix('pasar')->group(function () {
 	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');
@@ -84,7 +94,9 @@ Route::prefix('stock')->group(function () {
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
+	Route::post('/edit/{id}', 'API\OutletController@update')->name('api.outlet.edit');
 	Route::get('/list/{id}', 'API\OutletController@list')->name('api.outlet.list');
+	Route::get('/disable/{id}/{status}', 'API\OutletController@disable')->name('api.outlet.disable');
 	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');
 	Route::get('/checkout', 'API\OutletController@checkout')->name('api.outlet.checkout');
 	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
@@ -94,6 +106,7 @@ Route::prefix('outlet')->group(function () {
  * Employee
  */
 Route::prefix("employee")->group(function(){
+	Route::get('/get', 'API\EmployeeController@get')->name('api.employee.get');
 	Route::post("edit/password", "API\EmployeeController@editPassword")->name("api.employee.edit.password");
 	Route::post("edit/profile", "API\EmployeeController@editProfile")->name("api.employee.edit.profile");
 	Route::post("edit/profile/photo/{type?}", "API\EmployeeController@editProfilePhoto")->name("api.employee.edit.profile.photo");
