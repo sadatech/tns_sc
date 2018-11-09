@@ -496,33 +496,34 @@ class EmployeeController extends Controller
                 
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
-                    $rowRules = [
-						'nik' 		=> 'required|numeric|unique:employees',
-						'name'		=> 'required',
-						'ktp'		=> 'unique:employees|min:16',
-						'phone'		=> 'unique:employees',
-						'email'		=> 'unique:employees',
-						'password'	=> 'required',
-						'agency'	=> 'required'
-                    ];
+                   
                     foreach($results as $row)
                     {
-                        $validator = Validator::make($row->toArray(), $rowRules);
+						$rowRules = [
+							'nik' 		=> 'required|numeric|unique:employees',
+							'name'		=> 'required',
+							'ktp'		=> 'unique:employees|min:16',
+							'phone'		=> 'unique:employees',
+							'email'		=> 'unique:employees',
+							'password'	=> 'required',
+							'agency'	=> 'required'
+						];
+                        $validator = Validator($row->toArray(), $rowRules);
                         if ($validator->fails()) {
                             return redirect()->back()
                             ->withErrors($validator)
                             ->withInput();
                         } else {
-							$check = Employee::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['name']))."'")
-							->where(['nik' => $row['nik'], 'isResign' => false])
-							->whereIn('id_position', [1,2,6])
-							->count();
+							// $check = Employee::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
+							// ->where(['nik' => $row->nik, 'isResign' => false])
+							// ->whereIn('id_position', [1,2,6])
+							// ->count();
 
-							if ($check < 1) {
+							// if ($check < 1) {
 								$dataAgency['agency']   = $row['agency'];
 								$id_agency = $this->findAgen($dataAgency);
 								
-								$getPosisi 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
+								// $getPosisi 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
 								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
                             	$insert = Employee::create([
 									'nik'              	=> $row['nik'],
@@ -531,16 +532,16 @@ class EmployeeController extends Controller
 									'phone'   			=> (isset($row['phone']) ? $row['phone'] : ""),
 									'email'   			=> (isset($row['email']) ? $row['email'] : ""),
 									'id_timezone'		=> ($getTimezone ? $getTimezone : 1),
-									'rekening'			=> (isset($row['rekening']) ? $row['rekening'] : ""),
-									'bank' 				=> (isset($row['bank']) ? $row['bank'] : ""),
+									'rekening'			=> (isset($row->rekening) ? $row->rekening : ""),
+									'bank' 				=> (isset($row->bank) ? $row->bank : ""),
 									'joinAt'			=> Carbon::now(),
 									'id_agency'			=> $id_agency,
-									'gender'			=> ($row['gender'] ? $row['gender'] : "Perempuan"),
-									'education'			=> ($row['education'] ? $row['education'] : "SLTA"),
+									'gender'			=> ($row->gender ? $row->gender : "Perempuan"),
+									'education'			=> ($row->education ? $row->education : "SLTA"),
 									'birthdate'			=> Carbon::now(),
 									'password'			=> bcrypt($row['password']),
-									'id_position'		=> ($getPosisi ? $getPosisi : 6),
-									'status'			=> ($row['status'] ? $row['status'] : "")	
+									'id_position'		=> 1,
+									'status'			=> ($row->status ? $row->status : "")	
                             	]);
                             		if (!empty($insert)) {
 										$dataStore = array();
@@ -557,7 +558,7 @@ class EmployeeController extends Controller
 										// dd($store);
 										DB::table('employee_stores')->insert($dataStore);
 									}
-								}return false;
+								// }return false;
                             };
                         }
                 },false);
