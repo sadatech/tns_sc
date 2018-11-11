@@ -77,15 +77,17 @@ class PlandcController extends Controller
                 
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
-                    $rowRules = [
-                        'lokasi' => 'required',
-                    ];
-                    $customMessages = [
-                        'required' => 'Row Lokasi Tidak Boleh Kosong!'
-                    ];
+                    
                     foreach($results as $row)
                     {
-                        $validator = Validator::make($row->toArray(), $rowRules, $customMessages);
+                        $rowRules = [
+                            'lokasi' => 'required',
+                        ];
+                        $customMessages = [
+                            'required' => 'Row Lokasi Tidak Boleh Kosong!'
+                        ];
+                        
+                        $validator = Validator($row->toArray(), $rowRules, $customMessages);
                         if ($validator->fails()) {
                             return redirect()->back()
                             ->withErrors($validator)
@@ -117,8 +119,8 @@ class PlandcController extends Controller
                                     }
                                     DB::table('plan_employees')->insert($dataStore); 
                                 }
-                            } return false;
-                            
+                            // } return false;
+                                }
                             }
                     // }
                 // }

@@ -204,6 +204,7 @@ Route::prefix('employee')->group(function () {
 		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
 		Route::post('/dc/import','Employee\DcController@import')->name('employeedc.import')->middleware('auth');
 		Route::post('/pasar/import','Employee\PasarController@import')->name('employeesmd.import')->middleware('auth');
+		Route::post('/import','EmployeeController@import')->name('employeess.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
@@ -212,6 +213,11 @@ Route::prefix('employee')->group(function () {
 		{
 			return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
 		})->name('dc.download-template')->middleware('auth');
+		Route::get('/employee/download-template', function()
+		{
+		return response()->download(public_path('assets/EmployeeImport.xlsx'));
+		})->name('employee.download-template')->middleware('auth');
+		
 	});
 
 	//Resign Pages
