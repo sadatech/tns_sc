@@ -132,18 +132,14 @@ class OutletController extends Controller
 				$code = $e->getStatusCode();
 			} else {
 				if ($id == 1) {
-					$outlet = Outlet::where('active', 1)->with(['employeePasar' => function($query) use ($user) {
-						$query->where([
-							'id_employee' => $user->id
-						]);
-					}]);
-					if ($outlet->count() < 1) {
-						$res['success'] = false;
-						$res['msg'] = "Kamu tidak mempunyai outlet aktif.";
-						$code = 200;
-					} else {
+					$outlet = Outlet::where('active', 1)->whereHas('employeePasar', function($query) use ($user) {
+						return $query->where('id_employee', $user->id);
+					})->get();
+					$code = 200;
+					if ($outlet->count() > 0) {
+						$listOutlet = [];
 						$res['success'] = true;
-						foreach ($outlet->get(['outlets.*']) as $data) {
+						foreach ($outlet as $data) {
 							$listOutlet[] = array(
 								'id' 		=> $data->id,
 								'name' 		=> $data->name,
@@ -157,14 +153,14 @@ class OutletController extends Controller
 							);
 						}
 						$res['outlet'] = $listOutlet;
-						$code = 200;
+					} else {
+						$res['success'] = false;
+						$res['msg'] = "Kamu tidak mempunyai outlet aktif.";
 					}
 				} else if ($id == 2) {
-					$outlet = Outlet::where('active', 2)->with(['employeePasar' => function($query) use ($user) {
-						$query->where([
-							'id_employee' => $user->id
-						]);
-					}]);
+					$outlet = Outlet::where('active', 2)->whereHas('employeePasar', function($query) use ($user) {
+						return $query->where('id_employee', $user->id);
+					})->get();
 					if ($outlet->count() < 1) {
 						$res['success'] = false;
 						$res['msg'] = "Kamu tidak mempunyai outlet tidak aktif.";
