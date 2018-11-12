@@ -62,6 +62,7 @@ Route::prefix('sales')->group(function () {
 
 Route::prefix('sales-md')->group(function () {
 	Route::post('/add', 'API\SalesMdController@store')->name('api.sales-md.add');
+	Route::get('/list/{date?}', 'API\SalesMdController@list')->name('api.sales-md.list');
 });
 
 Route::prefix('promo')->group(function () {
@@ -104,6 +105,11 @@ Route::prefix('outlet')->group(function () {
 	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');
 	Route::get('/checkout', 'API\OutletController@checkout')->name('api.outlet.checkout');
 	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
+});
+
+// History
+Route::prefix('history')->group(function () {
+	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
 });
 
 /**

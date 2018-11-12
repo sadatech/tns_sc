@@ -12,6 +12,7 @@ use App\Store;
 use App\ProductFokus;
 use App\Target;
 use App\Price;
+use App\MtcReportTemplate;
 use DB;
 use JWTAuth;
 use Config;
@@ -39,8 +40,7 @@ class SalesController extends Controller
 			} else {
 				DB::transaction(function () use ($data, $user, &$res) {
 					$date 	= Carbon::parse($data->date);
-					$date2 	= Carbon::parse($data->date);
-					$res 	= $this->sales($date, $date2, $user, $data->store, $data->product, $data->type);
+					$res 	= $this->sales($date, $user, $data->store, $data->product, $data->type);
 				});
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -114,7 +114,7 @@ class SalesController extends Controller
 		return response()->json($res, $code);	
 	}
 
-	public function sales($date, $date2, $user, $request_store, $request_product, $type)
+	public function sales($date, $user, $request_store, $request_product, $type)
 	{
 		$checkSales = Sales::where('week', $date->weekOfMonth)->where('type', $type)->first();
 		$store = Store::where([
@@ -125,7 +125,7 @@ class SalesController extends Controller
 			$sales = Sales::create([
 				'id_employee'	=> $user->id,
 				'id_store'		=> $request_store,
-				'date'			=> $date2,
+				'date'			=> $date,
 				'week'			=> $date->weekOfMonth,
 				'type'			=> $type,
 			]);
@@ -152,6 +152,24 @@ class SalesController extends Controller
 				$checkSalesDetail->qty_actual 	+= $product->qty_actual;
 				$checkSalesDetail->save();
 			}
+			
+			$reportTemplate = MtcReportTemplate::where([
+				'id_employee' 	=> $user->id,
+				'id_store' 		=> $request_store,
+				'id_product' 	=> $product->id
+			])
+			->whereYear('date',$date->year)
+			->whereMonth('date',$date->month)
+			->get();
+			if ($reportTemplate->count() <= 0) {
+				MtcReportTemplate::create([
+					'id_employee' 	=> $user->id,
+					'id_store' 		=> $request_store,
+					'id_product' 	=> $product->id,
+					'date' 			=> $date
+				]);
+			}
+
 		}
 
 		$res['success'] = true;
