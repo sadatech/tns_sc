@@ -10,7 +10,7 @@ use DB;
 use Auth;
 use File;
 use Excel;
-use Validator;
+use App\TargetGtc;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
@@ -421,14 +421,26 @@ class EmployeeController extends Controller
 
 	public function delete($id)
 	{
-		$employee = Employee::find($id);
-		$employee->delete();
-		return redirect()->back()
-		->with([
-			'type'    => 'success',
-			'title'   => 'Sukses!<br/>',
-			'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-		]);
+		{
+			$emp = Employee::find($id);
+			$sub = TargetGtc::where(['id_employee' => $emp->id])->count();
+			if (!$sub < 1) {
+				return redirect()->back()
+				->with([
+					'type'    => 'danger',
+					'title'   => 'Gagal!<br/>',
+					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di TargetSMD!'
+				]);
+			} else {
+				$emp->delete();
+				return redirect()->back()
+				->with([
+					'type'      => 'success',
+					'title'     => 'Sukses!<br/>',
+					'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+			   ]);
+			}
+		}
 	}
 
 	public function export()
