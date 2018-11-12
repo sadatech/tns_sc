@@ -17,6 +17,7 @@ use App\DetailAdditionalDisplay;
 use Auth;
 use DB;
 use App\StoreDistributor;
+use App\Employee;
 use App\EmployeePasar;
 use App\Distributor;
 use Carbon\Carbon;
@@ -437,6 +438,48 @@ class ReportController extends Controller
             }
         }
         return Datatables::of(collect($report))->make(true);
+    }
+
+    public function SMDattendance()
+    {
+        $employee = Employee::where('id_position', \App\Position::where('level', 'mdgtc')->first()->id)
+        ->with('employeePasar')
+        ->select('employees.*')
+        ->get();
+        $data = array();
+        $absen = array();
+        $id = 1;
+        foreach ($employee as $value) {
+            if (isset($value->employeePasar)) {   
+                foreach ($value->employeePasar as $key => $val) {
+                    for ($i=1; $i <= Carbon::now()->endOfMonth()->day ; $i++) {
+                        $check = Attendance::where('id_employee', $value->id)
+                        ->whereMonth('date', Carbon::now()->month)
+                        ->whereDay('date', $i);
+                        $absen[$key][] = "<td class='".($check->count() > 0 ? ($check->first()->keterangan == "Check-in" ? "bg-success text-white" : ($check->first()->keterangan == "Cuti" || $check->first()->keterangan == "Off" || $check->first()->keterangan == "Sakit" ? "bg-warning text-white" : "" ) ) : "")."'>".$i."</td>";
+                    }
+                    $data[] = array(
+                        'id' => $id++,
+                        'region' => $val->pasar->name,
+                        'area' => $val->pasar->subarea->area->name,
+                        'subarea' => $val->pasar->subarea->name,
+                        'nama' => $value->name,
+                        'jabatan' => $value->position->name,
+                        'pasar' => $val->pasar->name,
+                        'bulan' => implode(" ", $absen[$key]),
+                    );
+                }
+            }
+        }
+        // dd($data);
+        return Datatables::of(collect($data))
+        ->addColumn('action', function ($data) {
+            $html = "<table class='table table-bordered'><tr>";
+            $html .= "<td class='bg-gd-cherry text-white'>".Carbon::now()->format('F')."</td>";
+            $html .= $data['bulan'];
+            $html .= "</tr></table>";
+            return $html;
+        })->make(true);
     }
 
     public function getStockist($data, $day)
