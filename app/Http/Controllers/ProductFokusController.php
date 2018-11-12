@@ -37,7 +37,7 @@ class ProductFokusController extends Controller
 
     public function data()
     {
-        $product = ProductFokus::with(['product','fokusarea','fokus', ])
+        $product = ProductFokus::with(['product','fokusarea','fokus'])
         ->select('product_fokuses.*');
         return Datatables::of($product)
         // ->addColumn('area', function($product) {

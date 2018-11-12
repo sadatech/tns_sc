@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\StockMdHeader as MDHeader;
 use App\StockMdDetail as MDDetail;
 use App\SkuUnit;
+use Exception;
 
 class StockController extends Controller
 {
@@ -60,6 +61,7 @@ class StockController extends Controller
 							]);
 							if (!isset($detail->id)) {
 								throw new Exception("Error Processing Request", 1);
+
 							}
 						}
 						DB::commit();
@@ -76,6 +78,13 @@ class StockController extends Controller
 					$res['msg'] = "Gagal menambah stock.";
 				}	
 			}
+		} catch (\Illuminate\Database\QueryException $e) {
+			throw new Exception("Error", 1);
+		} catch (Exception $e) {
+			DB::rollback();
+			$res['success'] = false;
+			$res['msg'] = "Gagal menambah stock.";
+			$code = 200;
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			$res['msg'] = "Token Expired.";
 			$code = $e->getStatusCode();
