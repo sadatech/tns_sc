@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\TargetGtc;
 use App\Employee;
+use Carbon\Carbon;
+use DB;
 use Auth;
+use File;
+use Excel;
 
 class SmdController extends Controller
 {
@@ -49,7 +53,8 @@ class SmdController extends Controller
             'hk'            => 'required|numeric',
             'pf'            => 'required',
             'cbd'           => 'required',
-            'value'         => 'required'
+            'value'         => 'required',
+            'rilis'         => 'required|date'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -85,7 +90,8 @@ class SmdController extends Controller
             'hk'            => 'required|numeric',
             'pf'            => 'required|numeric',
             'cbd'           => 'required|numeric',
-            'value'         => 'required'
+            'value'         => 'required',
+            'rilis'         => 'required|date'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -134,6 +140,39 @@ class SmdController extends Controller
                 'type'      => 'danger',
                 'title'     => 'Terjadi Kesalahan!<br/>',
                 'message'   => '<i class="em em-thinking_face mr-2"></i>Gagal menghapus data!'
+            ]);
+        }
+    }
+
+    public function export()
+	{
+        $x = TargetGtc::orderBy('created_at', 'DESC');
+        if ($x->count() > 0) {
+		    foreach ($x->get() as $val) {
+		    	$data[] = array(
+		    		'Employee'		=> $val->employee->name,
+                    'HK'	        => $val->hk,
+                    'ReleaseDate'	=> $val->rilis,
+                    'SalesValue'    => $val->value_sales,
+                    'EC'            => $val->ec,
+                    'PF'            => $val->pf,
+                    'CBD'           => $val->cbd
+		    	);
+            }
+        
+		    $filename = "TargetGtc_".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('TargetGtc', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
             ]);
         }
     }
