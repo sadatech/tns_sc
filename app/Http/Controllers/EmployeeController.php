@@ -461,7 +461,8 @@ class EmployeeController extends Controller
 				'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
 				'Join Date'		=> $val->joinAt,
 				'Agency'		=> $val->agency->name,
-				'Gender'		=> $val->education,
+				'Gender'		=> $val->gender,
+				'Education'		=> $val->education,
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
 				'Status'		=> (isset($val->status) ? $val->status : "-"),
@@ -501,8 +502,7 @@ class EmployeeController extends Controller
                     {
 						$rowRules = [
 							'nik' 		=> 'required|numeric|unique:employees',
-							'name'		=> 'required',
-							'ktp'		=> 'unique:employees|min:16',
+							'name'		=> 'required',	
 							'phone'		=> 'unique:employees',
 							'email'		=> 'unique:employees',
 							'password'	=> 'required',
@@ -523,12 +523,12 @@ class EmployeeController extends Controller
 								$dataAgency['agency']   = $row['agency'];
 								$id_agency = $this->findAgen($dataAgency);
 								
-								$getPosisi 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
+								$getPosisi 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
 								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
                             	$insert = Employee::create([
 									'nik'              	=> $row['nik'],
 									'name'				=> $row['name'],    
-									'ktp'				=> (isset($row['ktp']) ? $row['ktp'] : ""),
+									'ktp'				=> (isset($row->ktp) ? $row->ktp : ""),
 									'phone'   			=> (isset($row['phone']) ? $row['phone'] : ""),
 									'email'   			=> (isset($row['email']) ? $row['email'] : ""),
 									'id_timezone'		=> ($getTimezone ? $getTimezone : 1),
