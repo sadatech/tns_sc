@@ -27,7 +27,7 @@ class SalesController extends Controller
 	public function store(Request $request)
 	{
 		$data = json_decode($request->getContent());
-		// return response()->json($data);
+
 		if (empty($data->store) || empty($data->product) || empty($data->type) ) {
 			$res['msg']	= "Please select Store and Product.";
 			$res['code']= 200;
