@@ -22,8 +22,7 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+            <a href="{{ route('target.smd.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="promoTable">
@@ -49,7 +48,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="fa fa-edit"></i> Update Target</h3>
+          <h3 class="block-title"><i class="fa fa-edit"></i> Update Target SMD</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -120,7 +119,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Target</h3>
+          <h3 class="block-title"><i class="fa fa-plus"></i> Add Target SMD</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -263,6 +262,7 @@
               });
             },
             ajax: '{!! route('target.smd.data') !!}',
+            scrollY: "300px",
             columns: [
             { data: 'id', name: 'id' },
             { data: 'employee.name', name: 'employee.name'},
