@@ -26,7 +26,7 @@ class SalesMdController extends Controller
 	public function store(Request $request)
 	{
 		$data = json_decode($request->getContent());
-		$res['code']= 200;
+
 		if (empty($data->outlet) || empty($data->product) || empty($data->type) ) {
 			$res['msg']	= "Please select Outlet and Product.";
 			$res['code']= 200;
@@ -166,6 +166,7 @@ class SalesMdController extends Controller
 			$res['success'] = false;
 			$res['msg'] 	= "Gagal melakukan sales.";
 		}
+		$res['code']= 200;
 		return $res;
 	}
 }
