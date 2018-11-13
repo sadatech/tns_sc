@@ -482,6 +482,11 @@ class ReportController extends Controller
         })->make(true);
     }
 
+    public function SMDdistpf()
+    {
+        
+    }
+
     public function getStockist($data, $day)
     {
         $date = Carbon::now()->format('Y-m-').$day;
