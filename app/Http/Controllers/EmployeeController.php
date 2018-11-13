@@ -447,47 +447,55 @@ class EmployeeController extends Controller
 	{
 		$emp = Employee::where(['isResign' => false])
 		->whereIn('id_position', [1,2,6])
-		->orderBy('created_at', 'DESC')
-		->get();
-		$dataBrand = array();
-		foreach ($emp as $val) {
-			$store = EmployeeStore::where(
-				'id_employee', $val->id
-			)->get();
-			$storeList = array();
-			foreach($store as $dataStore) {
-				if(isset($dataStore->id_store)) {
-					$storeList[] = $dataStore->store->name1;
-				} else {
-					$storeList[] = "-";
+		->orderBy('created_at', 'DESC');
+		if ($emp->count() > 0) {
+			$dataBrand = array();
+			foreach ($emp->get() as $val) {
+				$store = EmployeeStore::where(
+					'id_employee', $val->id
+				)->get();
+				$storeList = array();
+				foreach($store as $dataStore) {
+					if(isset($dataStore->id_store)) {
+						$storeList[] = $dataStore->store->name1;
+					} else {
+						$storeList[] = "-";
+					}
 				}
+				$data[] = array(
+					'NIK'          	=> $val->nik,
+					'Name'          => $val->name,
+					'KTP'         	=> (isset($val->ktp) ? $val->ktp : "-"),
+					'Phone'         => (isset($val->phone) ? $val->phone : "-"),
+					'Email'     	=> (isset($val->email) ? $val->email : "-"),
+					'Timezone'		=> $val->timezone->name,
+					'Rekening'      => (isset($val->rekening) ? $val->rekening : "-"),
+					'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
+					'Join Date'		=> (isset($val->joinAt) ? $val->joinAt : ""),
+					'Agency'		=> $val->agency->name,
+					'Gender'		=> $val->gender,
+					'Education'		=> (isset($val->education) ? $val->education : ""),
+					'Birthdate'		=> (isset($val->birthdate) ? $val->birthdate : ""),
+					'Position'		=> $val->position->name,
+					'Status'		=> (isset($val->status) ? $val->status : "-"),
+					'Store'			=> rtrim(implode(',', $storeList), ',') ? rtrim(implode(',', $storeList), ',') : "-"
+				);
 			}
-			$data[] = array(
-				'NIK'          	=> $val->nik,
-				'Name'          => $val->name,
-				'KTP'         	=> $val->ktp,
-				'Phone'         => $val->phone,
-				'Email'     	=> $val->email,
-				'Timezone'		=> $val->timezone->name,
-				'Rekening'      => (isset($val->rekening) ? $val->rekening : "-"),
-				'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
-				'Join Date'		=> $val->joinAt,
-				'Agency'		=> $val->agency->name,
-				'Gender'		=> $val->gender,
-				'Education'		=> $val->education,
-				'Birthdate'		=> $val->birthdate,
-				'Position'		=> $val->position->name,
-				'Status'		=> (isset($val->status) ? $val->status : "-"),
-				'Store'			=> rtrim(implode(',', $storeList), ',') ? rtrim(implode(',', $storeList), ',') : "-"
-			);
+			$filename = "employee_".Carbon::now().".xlsx";
+			return Excel::create($filename, function($excel) use ($data) {
+				$excel->sheet('Employee', function($sheet) use ($data)
+				{
+					$sheet->fromArray($data);
+				});
+			})->download();
+		} else {
+			return redirect()->back()
+			>with([
+				'type'   => 'danger',
+				'title'  => 'Gagal Unduh!<br/>',
+				'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+			]);
 		}
-		$filename = "employee_".Carbon::now().".xlsx";
-		return Excel::create($filename, function($excel) use ($data) {
-			$excel->sheet('Employee', function($sheet) use ($data)
-			{
-				$sheet->fromArray($data);
-			});
-		})->download();
 	}
 
 	public function import(Request $request)
