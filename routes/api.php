@@ -86,9 +86,24 @@ Route::prefix('distribution')->group(function () {
 	Route::post('/add', 'API\DistributionController@store')->name('api.distribution.add');
 });
 
+Route::prefix('faq')->group(function () {
+	Route::get('/list', 'API\FaqController@list')->name('api.faq.list');
+});
+
+Route::prefix('news')->group(function () {
+	Route::get('/list', 'API\NewsController@list')->name('api.news.list');
+});
+
+Route::prefix('pk')->group(function () {
+	Route::get('/list', 'API\PkController@list')->name('api.pk.list');
+});
+
 // Pasar
 Route::prefix('pasar')->group(function () {
-	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');
+	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');	
+	Route::post('/checkin', 'API\PasarController@checkin')->name('api.pasar.checkin');
+	Route::get('/checkout', 'API\PasarController@checkout')->name('api.pasar.checkout');
+	Route::get('/status', 'API\PasarController@status')->name('api.pasar.status');
 });
 
 // Stock
@@ -110,6 +125,10 @@ Route::prefix('outlet')->group(function () {
 // History
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
+	Route::get('/sales/{type}/{date?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
+	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
+	Route::get('/distribution/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
+	Route::get('/cbd/{date?}', 'API\HistoryController@cbdHistory')->name('api.cbd-history.list');
 });
 
 /**

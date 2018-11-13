@@ -569,7 +569,14 @@ Route::prefix('report')->group(function () {
 		Route::get('/', function(){
 			return view('report.sales');
 		})->name('report.sales.pasar')->middleware('auth');
-		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
+	});
+
+	Route::prefix('distributorPf')->group(function () {
+		Route::get('/', function(){
+			return view('report.distpf');
+		})->name('report.dist.pf')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
 	});
 });
 
