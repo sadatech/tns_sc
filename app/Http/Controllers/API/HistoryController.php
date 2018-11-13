@@ -14,6 +14,9 @@ use App\SalesMd;
 use App\SalesMdDetail;
 use App\StockMdHeader;
 use App\StockMdDetail;
+use App\Distribution;
+use App\DistributionDetail;
+use App\Cbd;
 use Carbon\Carbon;
 use Config;
 use JWTAuth;
@@ -146,22 +149,22 @@ class HistoryController extends Controller
 		if ($check['success'] == true) {
 			$user = $check['user'];
 			
-				$header = StockMdHeader::where('id_employee', $user->id)->whereHas('stockDetail', function($query) use ($date)
-				{
-					if ($date == '') {
-						$now 	= Carbon::now();
-						$year 	= $now->year;
-						$month 	= $now->month;
-						return $query->whereMonth('date', $month)->whereYear('date', $year);
-					}else
-					return $query->whereDate('date', $date);
-				})->get();
+			$header = StockMdHeader::where('id_employee', $user->id)->whereHas('stockDetail', function($query) use ($date)
+			{
+				if ($date == '') {
+					$now 	= Carbon::now();
+					$year 	= $now->year;
+					$month 	= $now->month;
+					return $query->whereMonth('date', $month)->whereYear('date', $year);
+				}else
+				return $query->whereDate('date', $date);
+			})->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
 				foreach ($header as $key => $head) {
 					
-						$detail = StockMdDetail::where('id_stock',$head->id)->get();
+					$detail = StockMdDetail::where('id_stock',$head->id)->get();
 					
 					$dataArr[] = array(
 						'id' 			=> $head->id,
@@ -184,5 +187,82 @@ class HistoryController extends Controller
 		
 		return response()->json($res);
 	}
+
+	public function distributionHistory($date = '')
+	{
+		$check = $this->authCheck();
+		$code = 200;
+		if ($check['success'] == true) {
+			$user = $check['user'];
+			
+			$header = Distribution::where('id_employee', $user->id)->whereHas('distributionDetail', function($query) use ($date)
+			{
+				if ($date == '') {
+					$now 	= Carbon::now();
+					$year 	= $now->year;
+					$month 	= $now->month;
+					return $query->whereMonth('date', $month)->whereYear('date', $year);
+				}else
+				return $query->whereDate('date', $date);
+			})->get();
+
+			if ($header->count() > 0) {
+				$dataArr = array();
+				foreach ($header as $key => $head) {
+					
+					$detail = DistributionDetail::where('id_distribution',$head->id)->get();
+					
+					$dataArr[] = array(
+						'id' 			=> $head->id,
+						'id_employee' 	=> $head->id_employee,
+						'date' 			=> $head->date,
+						'keterangan' 	=> $head->keterangan,
+						'detail' 		=> $detail,
+					);
+				}
+				$res['success'] = true;
+				$res['distribution'] = $dataArr;
+			} else {
+				$res['msg'] 	= "Distribution not Found.";
+			}
+		}else{
+			$res = $check;
+			$code = $res['code'];
+			unset($res['code']);
+		}
+		
+		return response()->json($res);
+	}
 	
+	public function cbdHistory($date = '')
+	{
+		$check = $this->authCheck();
+		$code = 200;
+		if ($check['success'] == true) {
+			$user = $check['user'];
+
+			$data 	= Cbd::where(function($query) use ($date)
+			{
+				if ($date == '') {
+					$now 	= Carbon::now();
+					$year 	= $now->year;
+					$month 	= $now->month;
+					return $query->whereMonth('date', $month)->whereYear('date', $year);
+				}else
+				return $query->whereDate('date', $date);
+			})->get();
+			if ($data->count() > 0) {
+				$res['success'] = true;
+				$res['cbd'] = $data;
+			} else {
+				$res['msg'] 	= "CBD not Found.";
+			}
+		}else{
+			$res = $check;
+			$code = $res['code'];
+			unset($res['code']);
+		}
+		
+		return response()->json($res);
+	}
 }
