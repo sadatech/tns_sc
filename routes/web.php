@@ -29,6 +29,7 @@ Route::prefix('store')->group(function () {
 		Route::put('/update/{id}', 'StoreController@update')->name('store.update')->middleware('auth');
 		Route::get('/delete/{id}', 'StoreController@delete')->name('store.delete')->middleware('auth');
 		Route::get('/exportXLS', 'StoreController@exportXLS')->name('store.exportXLS')->middleware('auth');
+		Route::get('/exampleSheet', 'StoreController@exampleSheet')->name('store.exampleSheet')->middleware('auth');
 		Route::post('/importXLS', 'StoreController@importXLS')->name('store.importXLS')->middleware('auth');
 	});
 
@@ -203,14 +204,20 @@ Route::prefix('employee')->group(function () {
 		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
 		Route::post('/dc/import','Employee\DcController@import')->name('employeedc.import')->middleware('auth');
 		Route::post('/pasar/import','Employee\PasarController@import')->name('employeesmd.import')->middleware('auth');
+		Route::post('/import','EmployeeController@import')->name('employeess.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
-		return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
+			return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
 		})->name('smd.download-template')->middleware('auth');
 		Route::get('/dc/download-template', function()
 		{
-		return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
+			return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
 		})->name('dc.download-template')->middleware('auth');
+		Route::get('/employee/download-template', function()
+		{
+		return response()->download(public_path('assets/EmployeeImport.xlsx'));
+		})->name('employee.download-template')->middleware('auth');
+		
 	});
 
 	//Resign Pages
@@ -331,6 +338,12 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'ProductFokusController@store')->name('fokus.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
+		Route::get('/export', 'ProductFokusController@export')->name('fokus.export')->middleware('auth');
+		Route::post('/import', 'ProductFokusController@import')->name('fokus.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/ProductFokusImport.xlsx'));
+		})->name('fokus.download-template')->middleware('auth');
 	});
 
 	//Fokus MD Pages
@@ -343,9 +356,9 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'ProductFokusMdController@update')->name('fokusMD.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusMdController@delete')->name('fokusMD.delete')->middleware('auth');
 		Route::get('/download-template', function()
-			{
-				return response()->download(public_path('assets/FokusMDImport.xlsx'));
-			})->name('fokusMD.download-template')->middleware('auth');
+		{
+			return response()->download(public_path('assets/FokusMDImport.xlsx'));
+		})->name('fokusMD.download-template')->middleware('auth');
 	});
 });
 
@@ -371,6 +384,7 @@ Route::prefix('target')->group(function () {
 	Route::prefix('smd')->group(function () {
 		Route::get('/', 'Target\SmdController@baca')->name('target.smd')->middleware('auth');
 		Route::get('/data', 'Target\SmdController@data')->name('target.smd.data')->middleware('auth');
+		Route::get('/export', 'Target\SmdController@export')->name('target.smd.export')->middleware('auth');
 		Route::post('/create', 'Target\SmdController@store')->name('target.smd.add')->middleware('auth');
 		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
 		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
@@ -401,6 +415,17 @@ Route::prefix('planDc')->group(function () {
 		return response()->download(public_path('assets/PlanDcImport.xlsx'));
 	})->name('plan.download-template')->middleware('auth');
 });
+
+/*
+	Setting PF
+*/
+Route::prefix('pf')->group(function () {
+	Route::get('/', 'PfController@read')->name('pf')->middleware('auth');
+	Route::get('/data', 'PfController@data')->name('pf.data')->middleware('auth');
+	Route::post('/create', 'PfController@store')->name('pf.add')->middleware('auth');
+	Route::put('/update/{id}', 'PfController@update')->name('pf.update')->middleware('auth');
+	Route::get('/delete/{id}', 'PfController@delete')->name('pf.delete')->middleware('auth');
+});
 /*
 	USERS
 */
@@ -419,7 +444,7 @@ Route::prefix('planDc')->group(function () {
 	NEWS
 */
 
-Route::prefix('news')->group(function(){
+	Route::prefix('news')->group(function(){
 		Route::get('/','NewsController@index')->name('news')->middleware('auth');
 		Route::get('/data', 'NewsController@data')->name('news.data')->middleware('auth');
 		Route::get('/create','NewsController@create')->name('tambah.news')->middleware('auth');
@@ -450,7 +475,7 @@ Route::prefix('news')->group(function(){
 	FAQ
 */
 
-Route::prefix('faq')->group(function(){
+	Route::prefix('faq')->group(function(){
 		Route::get('/','FAQController@index')->name('faq')->middleware('auth');
 		Route::get('/data', 'FAQController@data')->name('faq.data')->middleware('auth');
 		Route::get('/create','FAQController@create')->name('tambah.faq')->middleware('auth');
@@ -458,7 +483,7 @@ Route::prefix('faq')->group(function(){
 		Route::get('/edit/{id}','FAQController@edit')->name('ubah.faq')->middleware('auth');
 		Route::post('/update/{id}','FAQController@update')->name('update.faq')->middleware('auth');
 		Route::get('/delete/{id}','FAQController@delete')->name('faq.delete')->middleware('auth');
-});
+	});
 
 
 /**
@@ -490,7 +515,6 @@ Route::prefix('report')->group(function () {
 		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
-
 	});
 
 	Route::prefix('availability')->group(function () {
@@ -507,7 +531,7 @@ Route::prefix('report')->group(function () {
 
 	Route::prefix('display_share')->group(function () {
 		Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
-		// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
+			// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
 		Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
@@ -540,6 +564,35 @@ Route::prefix('report')->group(function () {
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
 	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');
+
+	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
+
+
+	Route::prefix('smd')->group(function () {
+		Route::get('/', function(){
+			return view('report.smd');
+		})->name('report.smd.pasar')->middleware('auth');
+		Route::get('/attendance', function(){
+			return view('report.attendance-smd');
+		})->name('report.attendance.smd')->middleware('auth');
+		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+	});
+
+	Route::prefix('sales')->group(function () {
+		Route::get('/', function(){
+			return view('report.sales');
+		})->name('report.sales.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+	});
+
+	Route::prefix('distributorPf')->group(function () {
+		Route::get('/', function(){
+			return view('report.distpf');
+		})->name('report.dist.pf')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
+	});
+
 });
 
 // ***************** REPORTING ***********************
@@ -571,17 +624,17 @@ Route::prefix('select2')->group(function () {
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
 });
 
-	Route::prefix('promoactivity')->group(function(){
-		Route::get('/','PromoActivityController@index')->name('promoactivity')->middleware('auth');
-		Route::get('/data', 'PromoActivityController@data')->name('pa.data')->middleware('auth');
-		Route::get('/create','PromoActivityController@create')->name('tambah.pa')->middleware('auth');
-		Route::post('/store','PromoActivityController@store')->name('pa.store')->middleware('auth');
-		Route::get('/edit/{id}','PromoActivityController@edit')->name('ubah.pa')->middleware('auth');
-		Route::post('/update/{id}','PromoActivityController@update')->name('update.pa')->middleware('auth');
-		Route::get('/delete/{id}','PromoActivityController@delete')->name('pa.delete')->middleware('auth');
-		Route::get('/exportXLS','PromoActivityController@exportXLS')->name('pa.exportXLS')->middleware('auth');
-		Route::post('/importXLS','PromoActivityController@importXLS')->name('pa.importXLS')->middleware('auth');
-	});
+Route::prefix('promoactivity')->group(function(){
+	Route::get('/','PromoActivityController@index')->name('promoactivity')->middleware('auth');
+	Route::get('/data', 'PromoActivityController@data')->name('pa.data')->middleware('auth');
+	Route::get('/create','PromoActivityController@create')->name('tambah.pa')->middleware('auth');
+	Route::post('/store','PromoActivityController@store')->name('pa.store')->middleware('auth');
+	Route::get('/edit/{id}','PromoActivityController@edit')->name('ubah.pa')->middleware('auth');
+	Route::post('/update/{id}','PromoActivityController@update')->name('update.pa')->middleware('auth');
+	Route::get('/delete/{id}','PromoActivityController@delete')->name('pa.delete')->middleware('auth');
+	Route::get('/exportXLS','PromoActivityController@exportXLS')->name('pa.exportXLS')->middleware('auth');
+	Route::post('/importXLS','PromoActivityController@importXLS')->name('pa.importXLS')->middleware('auth');
+});
 
 Auth::routes();
 

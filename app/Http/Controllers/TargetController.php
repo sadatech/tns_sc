@@ -8,6 +8,7 @@ use App\Store;
 use App\Target;
 use Auth;
 use Excel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -41,13 +42,11 @@ class TargetController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->all();
-
-        if (($validator = Target::validate($data))->fails()){
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        DB::transaction(function () use ($request) {
+        try {
+            $data = $request->all();
+            if (($validator = Target::validate($data))->fails()){
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
             $file = Input::file('file')->getClientOriginalName();
             $filename = pathinfo($file, PATHINFO_FILENAME);
             $extension = pathinfo($file, PATHINFO_EXTENSION);
@@ -59,28 +58,57 @@ class TargetController extends Controller
             if($request->hasFile('file')) {
                 $file = $request->file('file')->getRealPath();
                 $ext = '';
-                
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
-                    foreach($results as $row) {
-                        Target::updateOrCreate([
-                            'rilis' => $request->rilis,
-                            'id_employee' => $request->id_employee,
-                            'id_store' => $row->id_store,
-                            'id_product' => \App\Product::where('name', $row->product_name)->first()->id,
-                        ], [
-                            'quantity' => $row->quantity,
+                    try {
+                        if (!empty($results->all())) {
+                            foreach($results as $row) {
+                                $target = Target::updateOrCreate([
+                                    'rilis' => Carbon::parse("01/".$request->rilis),
+                                    'id_employee' => $request->id_employee,
+                                    'id_store' => $row->id_store,
+                                    'id_product' => \App\Product::where('name', $row->product_name)->first()->id,
+                                ], [
+                                    'quantity' => $row->quantity,
+                                ]);
+                                if (!isset($target->id)) {
+                                    throw new Exception("Error Processing Request", 1);
+                                }
+                            }
+                            DB::commit();
+                        } else {
+                            throw new Exception("Error Processing Request", 1);
+                            
+                        }
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return redirect()->back()->with([
+                            'type' => 'danger',
+                            'title' => 'Gagal!<br/>',
+                            'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
                         ]);
                     }
                 }, false);
+                return redirect()->back()->with([
+                    'type' => 'success',
+                    'title' => 'Sukses!<br/>',
+                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk target!'
+                ]);
+            } else {
+                DB::rollback();
+                return redirect()->back()->with([
+                    'type' => 'danger',
+                    'title' => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>File harus di isi!'
+                ]);
             }
-        });
-
-
-        return redirect()->back()->with([
-            'type' => 'success',
-            'title' => 'Sukses!<br/>',
-            'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Target MTC!'
-        ]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with([
+                'type' => 'danger',
+                'title' => 'Gagal!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
+            ]);
+        }
     }
 
     public function downloadSampleForm($employee_id)
@@ -114,9 +142,29 @@ class TargetController extends Controller
 
     public function update(Request $request, $id) 
     {
-        $product = Target::findOrFail($id);
-        $product->fill($request->all());
-        $product->save();
+        DB::transaction(function () use ($data, $user, &$res) {
+            $product = Target::findOrFail($id);
+            $product->fill($request->all());
+            $product->save();
+
+            $date   = Carbon::parse($request->rilis);
+            $reportTemplate = MtcReportTemplate::where([
+                'id_employee'   => $request->id_employee,
+                'id_store'      => $request->id_store,
+                'id_product'    => $request->id_product
+            ])
+            ->whereYear('date',$date->year)
+            ->whereMonth('date',$date->month)
+            ->get();
+            if ($reportTemplate->count() <= 0) {
+                MtcReportTemplate::create([
+                    'id_employee'   => $request->id_employee,
+                    'id_store'      => $request->id_store,
+                    'id_product'    => $request->id_product
+                    'date'          => $date
+                ]);
+            }
+        });
         return redirect()->back()->with([
           'type'    => 'success',
           'title'   => 'Sukses!<br/>',

@@ -67,15 +67,18 @@ class EmployeeTableSeeder extends Seeder
             'email' => $faker->email,
             'status' => 'Mobile',
             'joinAt' => Carbon::now(),
+            'birthdate' => Carbon::now(),
             'gender' => 'Laki-laki',
             'education' => 'D3',
             'isResign' => 0,
             'rekening' => '9'.rand(0000000,99999999),
             'phone' => '0857'.rand(0000000,99999999),
             'password' => bcrypt('admin'),
+            'foto_ktp' => 'default.png',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
+
       }
 
       // SPG STAY
@@ -124,4 +127,5 @@ class EmployeeTableSeeder extends Seeder
         ]);
       }
   }
+
 }

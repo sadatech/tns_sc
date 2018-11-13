@@ -12,6 +12,7 @@ use App\Store;
 use App\ProductFokus;
 use App\Target;
 use App\Price;
+use App\MtcReportTemplate;
 use DB;
 use JWTAuth;
 use Config;
@@ -27,7 +28,7 @@ class SalesController extends Controller
 	public function store(Request $request)
 	{
 		$data = json_decode($request->getContent());
-		// return response()->json($data);
+
 		if (empty($data->store) || empty($data->product) || empty($data->type) ) {
 			$res['msg']	= "Please select Store and Product.";
 			$res['code']= 200;
@@ -39,8 +40,7 @@ class SalesController extends Controller
 			} else {
 				DB::transaction(function () use ($data, $user, &$res) {
 					$date 	= Carbon::parse($data->date);
-					$date2 	= Carbon::parse($data->date);
-					$res 	= $this->sales($date, $date2, $user, $data->store, $data->product, $data->type);
+					$res 	= $this->sales($date, $user, $data->store, $data->product, $data->type);
 				});
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -114,7 +114,7 @@ class SalesController extends Controller
 		return response()->json($res, $code);	
 	}
 
-	public function sales($date, $date2, $user, $request_store, $request_product, $type)
+	public function sales($date, $user, $request_store, $request_product, $type)
 	{
 		$checkSales = Sales::where('week', $date->weekOfMonth)->where('type', $type)->first();
 		$store = Store::where([
@@ -125,50 +125,55 @@ class SalesController extends Controller
 			$sales = Sales::create([
 				'id_employee'	=> $user->id,
 				'id_store'		=> $request_store,
-				'date'			=> $date2,
+				'date'			=> $date,
 				'week'			=> $date->weekOfMonth,
 				'type'			=> $type,
 			]);
-			if ($sales) {
-				$detailSales = array();
-				foreach ($request_product as $product) {
-					$detailSales[] = array(
-						'id_sales'		=> $sales->id,
-						'id_product'	=> $product->id,
-						'qty'			=> $product->qty,
-						'qty_actual'	=> $product->qty_actual,
-						'satuan'	=> $product->satuan,
-					);
-				}
-				$insert_sales = DB::table('detail_sales')->insert($detailSales);
-				if ($insert_sales) {
-					$res['success'] = true;
-					$res['msg'] 	= "Berhasil melakukan sales.";
-				} else {
-					$res['success'] = false;
-					$res['msg'] 	= "Gagal melakukan sales.";
-				}
-			}
+			$sales_id = $sales->id;
 		} else {
-			$detailSales = array();
-			foreach ($request_product as $product) {
-				$detailSales[] = array(
-					'id_sales'		=> $checkSales->id,
+			$sales_id = $checkSales->id;
+		}
+		foreach ($request_product as $product) {
+			$checkSalesDetail = DetailSales::where([
+				'id_sales'		=> $sales_id,
+				'id_product'	=> $product->id,
+				'satuan'		=> $product->satuan,
+			])->first();
+			if (!$checkSalesDetail) {
+				DetailSales::create([
+					'id_sales'		=> $sales_id,
 					'id_product'	=> $product->id,
 					'qty'			=> $product->qty,
 					'qty_actual'	=> $product->qty_actual,
-					'satuan'	=> $product->satuan,
-				);
+					'satuan'		=> $product->satuan,
+				]);
+			}else{
+				$checkSalesDetail->qty 			+= $product->qty;
+				$checkSalesDetail->qty_actual 	+= $product->qty_actual;
+				$checkSalesDetail->save();
 			}
-			$insert_sales = DB::table('detail_sales')->insert($detailSales);
-			if ($insert_sales) {
-				$res['success'] = true;
-				$res['msg'] 	= "Berhasil melakukan sales.";
-			} else {
-				$res['success'] = false;
-				$res['msg'] 	= "Gagal melakukan sales.";
+			
+			$reportTemplate = MtcReportTemplate::where([
+				'id_employee' 	=> $user->id,
+				'id_store' 		=> $request_store,
+				'id_product' 	=> $product->id
+			])
+			->whereYear('date',$date->year)
+			->whereMonth('date',$date->month)
+			->get();
+			if ($reportTemplate->count() <= 0) {
+				MtcReportTemplate::create([
+					'id_employee' 	=> $user->id,
+					'id_store' 		=> $request_store,
+					'id_product' 	=> $product->id,
+					'date' 			=> $date
+				]);
 			}
+
 		}
+
+		$res['success'] = true;
+		$res['msg'] 	= "Berhasil melakukan sales.";
 		return $res;
 	}
 }
