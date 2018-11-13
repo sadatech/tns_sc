@@ -204,6 +204,7 @@ Route::prefix('employee')->group(function () {
 		Route::get('/pasar/export', 'Employee\PasarController@export')->name('employeepasar.export')->middleware('auth');
 		Route::post('/dc/import','Employee\DcController@import')->name('employeedc.import')->middleware('auth');
 		Route::post('/pasar/import','Employee\PasarController@import')->name('employeesmd.import')->middleware('auth');
+		Route::post('/import','EmployeeController@import')->name('employeess.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/EmployeeSmdImport.xlsx'));
@@ -212,6 +213,11 @@ Route::prefix('employee')->group(function () {
 		{
 			return response()->download(public_path('assets/EmployeeDcImport.xlsx'));
 		})->name('dc.download-template')->middleware('auth');
+		Route::get('/employee/download-template', function()
+		{
+		return response()->download(public_path('assets/EmployeeImport.xlsx'));
+		})->name('employee.download-template')->middleware('auth');
+		
 	});
 
 	//Resign Pages
@@ -378,6 +384,7 @@ Route::prefix('target')->group(function () {
 	Route::prefix('smd')->group(function () {
 		Route::get('/', 'Target\SmdController@baca')->name('target.smd')->middleware('auth');
 		Route::get('/data', 'Target\SmdController@data')->name('target.smd.data')->middleware('auth');
+		Route::get('/export', 'Target\SmdController@export')->name('target.smd.export')->middleware('auth');
 		Route::post('/create', 'Target\SmdController@store')->name('target.smd.add')->middleware('auth');
 		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
 		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
@@ -555,6 +562,20 @@ Route::prefix('report')->group(function () {
 			return view('report.attendance-smd');
 		})->name('report.attendance.smd')->middleware('auth');
 		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+	});
+
+	Route::prefix('sales')->group(function () {
+		Route::get('/', function(){
+			return view('report.sales');
+		})->name('report.sales.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+	});
+
+	Route::prefix('distributorPf')->group(function () {
+		Route::get('/', function(){
+			return view('report.distpf');
+		})->name('report.dist.pf')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 	});
 });

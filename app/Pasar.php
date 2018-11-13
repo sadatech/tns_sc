@@ -25,11 +25,6 @@ class Pasar extends Model
         return $this->hasMany('App\EmployeePasar', 'id_pasar');
     }
 
-    public function targetGtc()
-    {
-        return $this->hasMany('App\TargetGtc', 'id_pasar');
-    }
-
     public function stock()
     {
         return $this->hasMany('App\StockMdHeader', 'id_pasar');
