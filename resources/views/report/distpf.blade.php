@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sales SMD Pasar")
+@section('title', "Report Distributor PF")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sales MD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Distributor PF <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -21,10 +21,11 @@
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama</th>
+              <th>Nama SMD</th>
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Outlet</th>
+              <th>Product</th>
             </tr>
           </thead>
         </table>
@@ -59,13 +60,14 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.sales.smd') !!}',
+      ajax: '{!! route('data.distpf.smd') !!}',
       columns: [
       { data: 'id' },
       { data: 'nama' },
       { data: 'pasar' },
       { data: 'tanggal' },
       { data: 'outlet' },
+      { data: 'action' },
       ]
     });
   });
