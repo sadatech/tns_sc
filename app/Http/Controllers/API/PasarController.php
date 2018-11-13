@@ -5,6 +5,9 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Pasar;
+use App\Attendance;
+use Carbon\Carbon;
+use App\AttendancePasar;
 use App\EmployeePasar;
 use JWTAuth;
 use Config;
@@ -190,9 +193,6 @@ class PasarController extends Controller
 							$res['id'] 		= (isset($attendance->id_pasar) ? $attendance->id_pasar : null);
 							$res['name'] 	= (isset($attendance->pasar->name) ? $attendance->pasar->name : null);
 							$res['time'] 	= $attendance->checkin;
-
-							$cbd = Cbd::where('id_pasar',$attendance->id_pasar)->where('id_employee',$user->id)->whereDate('date', '=', Carbon::today()->toDateString())->count();
-							$res['cbd'] 	= ($cbd > 0 ? 'true' : 'false');
 						} else {
 							$res['success'] = false;
 							$res['msg'] = "Sudah melakukan checkout.";

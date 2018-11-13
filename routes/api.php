@@ -100,7 +100,10 @@ Route::prefix('pk')->group(function () {
 
 // Pasar
 Route::prefix('pasar')->group(function () {
-	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');
+	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');	
+	Route::post('/checkin', 'API\PasarController@checkin')->name('api.pasar.checkin');
+	Route::get('/checkout', 'API\PasarController@checkout')->name('api.pasar.checkout');
+	Route::get('/status', 'API\PasarController@status')->name('api.pasar.status');
 });
 
 // Stock
