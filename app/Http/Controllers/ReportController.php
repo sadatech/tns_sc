@@ -27,6 +27,7 @@ use App\Attendance;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
+use App\SalesMD;
 
 class ReportController extends Controller
 {
@@ -512,6 +513,23 @@ class ReportController extends Controller
             $html .= "</tr></table>";
             return $html;
         })->make(true);
+    }
+
+    public function SMDsales()
+    {
+        $sales = SalesMD::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $id = 1;
+        foreach ($sales as $value) {
+            $data[] = array(
+                'id' => $id++,
+                'nama' => $sales->employee->name,
+                'pasar' => $sales->outlet->employeePasar->pasar->name,
+                'tanggal' => $sales->date,
+                'outlet' => $sales->outlet->name,
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
     }
 
     public function getStockist($data, $day)
