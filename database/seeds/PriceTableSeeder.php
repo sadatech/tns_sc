@@ -13,27 +13,27 @@ class PriceTableSeeder extends Seeder
      */
     public function run()
     {
-        for ($i=1; $i < 11; $i++) { 
+        for ($i=1; $i < 51; $i++) { 
             Price::create([
                 'id_product' => $i,
                 'price' => rand(10000, 100000),
-                'rilis' => Carbon::parse('2018-10-01')
+                'rilis' => Carbon::parse('2018-11-01')
             ]);
         }
 
-        for ($i=1; $i < 11; $i++) { 
+        for ($i=1; $i < 51; $i++) { 
             Price::create([
                 'id_product' => $i,
                 'price' => rand(10000, 100000),
-                'rilis' => Carbon::parse('2018-10-15')
+                'rilis' => Carbon::parse('2018-11-15')
             ]);
         }
 
-        for ($i=1; $i < 11; $i++) { 
+        for ($i=1; $i < 51; $i++) { 
             Price::create([
                 'id_product' => $i,
                 'price' => rand(10000, 100000),
-                'rilis' => Carbon::parse('2018-10-25')
+                'rilis' => Carbon::parse('2018-11-25')
             ]);
         }
     }

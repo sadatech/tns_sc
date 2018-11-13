@@ -44,18 +44,10 @@
                   <select id="filterEmployee" class="inputFilter" name="id_emp"></select>
               </div>
               <div class="col-4 col-sm-4 text-center text-sm-left">
-                  <!-- <div class="font-size-sm font-w600 text-uppercase text-muted">Date</div>
-                  <button type="button" class="btn btn-default pull-right col-sm-12" id="daterange-btn">
-                    <span>
-                      <i class="fa fa-calendar"></i> Date Range picker
-                    </span>
-                    <i class="fa fa-caret-down"></i>
-                  </button>
-                  <input type="hidden" id="inputDate" name="date_range"> -->
                   <span>
                     <i class="fa fa-calendar"></i> Periode
                   </span>
-                  <input type="text" id="filterMonth" class="form-control" placeholder="Month">
+                  <input type="text" id="filterMonth" class="form-control" placeholder="Periode" name="periode">
               </div>
           </div>
           <div class="row col-sm-12 col-md-12">
@@ -73,8 +65,6 @@
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
-            <!-- <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Sell In</button>
-            <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button> -->
           </h3>
           <div class="block-option">
             <a class="button" href="{{ route('sellin.export') }}">TES</a>
@@ -82,189 +72,78 @@
           </div>
         </div>
 
-                <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModal" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-popout" role="document">
-                        <div class="modal-content">
-                            <div class="block block-themed block-transparent mb-0">
-                                <div class="block-header bg-primary p-10">
-                                    <h3 class="block-title"><i class="si si-cloud-upload"></i> Import Sell In</h3>
-                                    <div class="block-options">
-                                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                                            <i class="si si-close"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <form action="{{ route('sellin.import') }}" method="post" enctype="multipart/form-data">
-                                {!! csrf_field() !!}
-                                <div class="block-content">
-                                    <div class="form-group">
-                                        <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Import Sell In</label>
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                                            <label class="custom-file-label">Choose file Excel</label>
-                                            <code> *Type File Excel</code>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-alt-success">
-                                        <i class="fa fa-save"></i> Import File
-                                    </button>
-                                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                                </div>
-                            </form>
-                        </div>
+        <div class="col-lg-12">
+            <div class="block">
+                <ul class="nav nav-tabs nav-tabs-alt js-tabs-enabled" data-toggle="tabs" role="tablist" style="cursor: pointer;">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="onTarget">Sales On Target</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="offTarget">Sales Off Target</a>
+                    </li>
+                </ul>
+                <div class="block-content tab-content">
+                    <div class="tab-pane active" id="tabOnTarget" role="tabpanel">
+                        <table class="table table-striped table-vcenter js-dataTable-full" id="onTargetTable">
+                          <thead>          
+                            <th>Periode</th>
+                            <th>Region</th>
+                            <th>Jawa / Non Jawa</th>
+                            <th>Jabatan</th>
+                            <th>Nama</th>
+                            <th>Area</th>
+                            <th>Sub Area</th>
+                            <th>Outlet</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Product Line</th>
+                            <th>Product Name</th>
+                            <th>Actual Out Qty</th>
+                            <th>Actual In Qty</th>
+                            <th>Price</th>
+                            <th>Actual Out Value</th>
+                            <th>Actual In Value</th>
+                            <th>Total Actual</th>
+                            <th>Target Qty</th>
+                            <th>Target Value</th>
+                          </thead>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="tabOffTarget" role="tabpanel">
+                        <table class="table table-striped table-vcenter js-dataTable-full" id="offTargetTable">
+                          <thead>          
+                            <th>Periode</th>
+                            <th>Region</th>
+                            <th>Jawa / Non Jawa</th>
+                            <th>Jabatan</th>
+                            <th>Nama</th>
+                            <th>Area</th>
+                            <th>Sub Area</th>
+                            <th>Outlet</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Product Line</th>
+                            <th>Product Name</th>
+                            <th>Actual Out Qty</th>
+                            <th>Actual In Qty</th>
+                            <th>Price</th>
+                            <th>Actual Out Value</th>
+                            <th>Actual In Value</th>
+                            <th>Total Actual</th>
+                            <th>Target Qty</th>
+                            <th>Target Value</th>
+                          </thead>
+                        </table>
                     </div>
                 </div>
+            </div>
+        </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
-        <thead>
-          <th class="text-center" style="width: 70px;"></th>
-          <th>Week</th>
-          <th>Region</th>
-          <th>Area</th>
-          <th>Sub Area</th>
-          <th>Account</th>
-          <th>Channel</th>
-          <th>Store Name 1</th>
-          <th>Store Name 2</th>
-          <th>NIK</th>
-          <th>Employee Name</th>
-          <th>Date</th>
-          <th>Product</th>
-          <th>Category</th>
-          <th>Actual Quantity</th>
-          <th>Measurement</th>
-          <th>Convertion Quantity</th>
-          <th>Unit Price</th>
-          <th>Value</th>
-          <th>Value PF</th>
-          <th class="text-center" style="width: 15%;"> Action</th>
-        </thead>
-        </table>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout" role="document">
-        <div class="modal-content">
-            <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="fa fa-edit"></i> Edit Quantity - Sell In</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="si si-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <form id="editForm" method="post">
-                {!! csrf_field() !!}
-                <div class="block-content">
-                    <div class="row">
-                        <div class="form-group col-md-12">
-                            <label>Quantity</label>
-                            <input type="text" class="form-control" name="qty" id="qtyInput" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="tambahModal" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Sell In</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <form action="{{ route('sellin.add') }}" method="post">
-        {!! csrf_field() !!}
-        <div class="block-content">
-          <div class="col-md-12 col-sm-12" style="padding: 0">
-            <label class="col-md-12 col-sm-12" style="padding: 0">Employee</label>
-            <div class="input-group mb-3 col-sm-12 col-md-12">
-              <div class="offset-md-2 col-md-8 col-sm-12" style="padding: 0">
-                <select class="form-control" style="width: 100%" name="employee" id="employeeSelect" >
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-12 col-sm-12" style="padding: 0">
-            <label class="col-md-12 col-sm-12" style="padding: 0">Store</label>
-            <div class="input-group mb-3 col-sm-12 col-md-12">
-              <div class="offset-md-2 col-md-8 col-sm-12" style="padding: 0">
-                <select class="form-control" style="width: 100%" name="store" id="storeSelect" >
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-12 col-sm-12" style="padding: 0">
-            <label class="col-md-12 col-sm-12" style="padding: 0">Date</label>
-            <div class="input-group mb-3 col-sm-12 col-md-12">
-              <div class="offset-md-2 col-md-8 col-sm-12" style="padding: 0">
-                <input class="form-control" type="date" name="date" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" >
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-12 col-sm-12" style="padding: 0">
-            <label class="col-md-12 col-sm-12" style="padding: 0">
-              Product 
-              <p class="btn btn-sm btn-primary" id="addProduct" style="float: right;"><i class="fa fa-plus"></i>More Product</p>
-            </label>
-              <div class="input-group mb-3 col-sm-12 col-md-12 row">
-                <div class="col-md-6 col-sm-6">
-                  <select class="form-control productSelect">
-                  </select>
-                  <input type="hidden" name="product[product_id][]">
-                </div>
-                <div class='col-md-6 col-sm-6 row' style='padding:0;'>
-                  <div class='col-md-9 col-sm-9'>
-                    <input type='text' class='form-control' name='product[qty][]' placeholder='Input quantity' >
-                  </div>
-                  <div class='col-md-3 col-sm-3'>
-                  </div>
-                </div>
-              </div>
-              <div class="otherProduct">
-                
-              </div>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Save
-          </button>
-          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
 @endsection
 
@@ -297,66 +176,41 @@
   <script src="{{ asset('js/daterangepicker.js') }}"></script>
   <script src="{{ asset('js/datetimepicker-handler.js') }}"></script>
   <script type="text/javascript">
-    var index = 0;
-    var productSelected = [];
 
-      var filterId = ['#filterRegion', '#filterArea', '#filterSubArea', '#filterStore', '#filterEmployee'];
-        var url = "{!! route('salesmtc.data') !!}";
+        var table = 'onTargetTable';
+        var filterId = ['#filterRegion', '#filterArea', '#filterSubArea', '#filterStore', '#filterEmployee'];
+        var url = "{!! route('salesmtc.data.sales') !!}";
+        var url_target = "{!! route('salesmtc.data.target') !!}";
         var order = [ [0, 'desc'] ];
         var columnDefs = [{"className": "dt-center", "targets": [0]}];
-        var tableColumns = [{ data: 'id', name: 'id', visible: false},
-                { data: 'week', name: 'week'},
+        var tableColumns = [
+                { data: 'periode', name: 'periode'},
                 { data: 'region', name: 'region'},
+                { data: 'is_jawa', name: 'is_jawa'},
+                { data: 'jabatan', name: 'jabatan'},
+                { data: 'employee_name', name: 'employee_name'},
                 { data: 'area', name: 'area'},
                 { data: 'sub_area', name: 'sub_area'},
+                { data: 'store_name', name: 'store_name'},
                 { data: 'account', name: 'account'},
-                { data: 'channel', name: 'channel'},
-                { data: 'store_name_1', name: 'store_name_1'},
-                { data: 'store_name_2', name: 'store_name_2'},
-                { data: 'nik', name: 'nik'},
-                { data: 'employee_name', name: 'employee_name'},
-                { data: 'date', name: 'date'},
-                { data: 'product_name', name: 'product_name'},
                 { data: 'category', name: 'category'},
-                { data: 'actual_qty', name: 'actual_qty'},
-                { data: 'measure_name', name: 'measure_name'},
-                { data: 'qty', name: 'qty'},
-                { data: 'unit_price', name: 'unit_price'},
-                { data: 'value', name: 'value'},
-                { data: 'value_pf', name: 'value_pf'},
-                { data: 'action', name: 'action', visible: false }];
+                { data: 'product_line', name: 'product_line'},
+                { data: 'product_name', name: 'product_name'},
+                { data: 'actual_out_qty', name: 'actual_out_qty'},
+                { data: 'actual_in_qty', name: 'actual_in_qty'},
+                { data: 'price', name: 'price'},
+                { data: 'actual_out_value', name: 'actual_out_value'},
+                { data: 'actual_in_value', name: 'actual_in_value'},
+                { data: 'total_actual', name: 'total_actual'},
+                { data: 'target_qty', name: 'target_qty'},
+                { data: 'target_value', name: 'target_value'}];
 
         var exportButton = '#export';
 
-        var paramFilter = ['reportTable', $('#reportTable'), url, tableColumns, columnDefs, order, exportButton];
+        var paramFilter = [table, $('#'+table), url, tableColumns, columnDefs, order, exportButton];
 
-        var paramReset = [filterId, 'reportTable', $('#reportTable'), url, tableColumns, columnDefs, order, exportButton, '#inputDate'];
+        var paramReset = [filterId, table, $('#'+table), url, tableColumns, columnDefs, order, exportButton, '#filterMonth'];
 
-        function dateRangeInit(){
-          $('#daterange-btn').daterangepicker(
-            {
-              opens: 'left',
-              ranges   : {
-                'Today'       : [moment(), moment()],
-                'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month'  : [moment().startOf('month'), moment().endOf('month')],
-                'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-              },
-              startDate: moment(),
-              endDate  : moment()
-            },
-            function (start, end) {
-              $('#daterange-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
-              $('#inputDate').val(start.format('YYYY-MM-DD')+'|'+end.format('YYYY-MM-DD'))
-            }
-          )
-
-          // INITIATE
-          $('#daterange-btn span').html(moment().format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'))
-          $('#inputDate').val(moment().format('YYYY-MM-DD')+'|'+moment().format('YYYY-MM-DD'))
-        }
 
       $(document).ready(function() {
           $.ajaxSetup({
@@ -366,15 +220,14 @@
 
           });
 
-          // DATE RANGE
-          dateRangeInit();
-
           $('#filterMonth').datetimepicker({
               format: "MM yyyy",
               startView: "3",
               minView: "3",
               autoclose: true,
           });
+
+          $('#filterMonth').val(moment().format("MMMM Y"));
 
           $('#employeeSelect').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
             return filterData('employee', params.term);
@@ -461,8 +314,8 @@
             }
           }));
 
-          // TABLE
-          $('#reportTable').dataTable({
+          // TABLE BY SALES
+          $('#onTargetTable').dataTable({
             "fnCreatedRow": function (nRow, data) {
                 $(nRow).attr('class', data.id);
             },
@@ -483,94 +336,47 @@
             "columns": tableColumns,
             "columnDefs": columnDefs,
             "order": order,
-        });
+          });
+
+          // TABLE BY TARGET
+          // $('#offTargetTable').dataTable({
+          //   "fnCreatedRow": function (nRow, data) {
+          //       $(nRow).attr('class', data.id);
+          //   },
+          //   "processing": true,
+          //   "serverSide": true,
+          //   "ajax": {
+          //       url: url_target + "?" + $("#filterForm").serialize(),
+          //       type: 'POST',
+          //       dataType: 'json',
+          //       error: function (data) {
+          //         swal("Error!", "Failed to load Data!", "error");
+          //       },
+          //   },
+          //   scrollX:        true,
+          //   scrollCollapse: true,
+          //   "bFilter": false,
+          //   "rowId": "id",
+          //   "columns": tableColumns,
+          //   "columnDefs": columnDefs,
+          //   "order": order,
+          // });
 
     });
-
-      function editModal(json) {
-          $('#editModal').modal('show');
-          $('#editForm').attr('action', "{{ url('/report/sales/sellin/edit') }}/"+json.id);
-          $('#qtyInput').val(json.qty);
-          console.log(json);
-      }
-      @if(session('type'))
-      $(document).ready(function() {
-          $.notify({
-            title: '<strong>{!! session('title') !!}</strong>',
-            message: '{!! session('message') !!}'
-          }, {
-            type: '{!! session('type') !!}',
-            animate: {
-              enter: 'animated zoomInDown',
-              exit: 'animated zoomOutUp'
-            },
-            placement: {
-              from: 'top',
-              align: 'center'
-            }
-          });          
-
-      });
-      @endif
-
-      $("#addProduct").click(function () {
-        index++;
-        $(".otherProduct").append("<div class='input-group mb-3 col-sm-12 col-md-12 row'>"+
-                "<div class='col-md-6 col-sm-6'>"+
-                  "<select class='form-control productSelect productSelect"+index+"'>"+
-                  "</select>"+
-                  "<input type='text' name='product[product_id][]'>"+
-                "</div>"+
-                "<div class='col-md-6 col-sm-6 row' style='padding:0;'>"+
-                  "<div class='col-md-9 col-sm-9'>"+
-                    "<input type='text' class='form-control' name='product[qty][]' placeholder='Input quantity' >"+
-                  "</div>"+
-                  "<div class='col-md-3 col-sm-3'>"+
-                    "<p class='btn btn-sm btn-danger deleteProduct'><i class='fa fa-trash'></i></p>"+
-                  "</div>"+
-                "</div>"+
-              "</div>")
-        $('.productSelect'+index).select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
-          filters['productExcept'] = productSelected;
-          return filterData('product', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name+' ('+obj.deskripsi+')'}
-            })
-          }
-        }));
-        $('.productSelect'+index).on('change', function() {
-          productSelected.push($('.productSelect'+index).val());
-          console.log(productSelected);
-        });
-      })
-
-      $("body").on('click','.deleteProduct',function(){
-        $(this).parent().parent().parent().remove();
-      })
-
-      $("body").on('change','.productSelect',function(){
-        $(this).nextAll('input').first().val(this.value);
-      })
-
       
 
     $("#filterReset").click(function () {
 
-      // DATE RANGE 
-      dateRangeInit();
-
       $.each($('#filterForm select'), function(key, value) {
         $('#'+this.id).val(null).trigger('change')
       })
+
+      $('#filterMonth').val(moment().format("MMMM Y"));
     })
 
     $("#filterSearch").click(function() {
       var serial = $("#filterForm").serialize()
-      // $.each( $(".inputFilter"), function( key, value ) {
-      //   alert( key + ": " + value.val() );
-      // });
+      console.log(serial)
     })
 
 
@@ -618,6 +424,20 @@
 
 
     });
+
+    $("#offTarget").click(function() {
+      $('#onTarget').removeClass('active');
+      $('#offTarget').addClass('active');
+      $('#tabOnTarget').removeClass('active');
+      $('#tabOffTarget').addClass('active');
+    })
+
+    $("#onTarget").click(function() {
+      $('#onTarget').addClass('active');
+      $('#offTarget').removeClass('active');
+      $('#tabOnTarget').addClass('active');
+      $('#tabOffTarget').removeClass('active');
+    })
 
   </script>
 @endsection

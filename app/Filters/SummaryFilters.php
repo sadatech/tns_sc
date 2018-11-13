@@ -29,9 +29,8 @@ class SummaryFilters extends QueryFilters
 
     public function date_range($value) {
     	if(!$this->requestAllData($value)){
-    		$dates = explode('|', $value);
-    		return $this->builder->whereDate('date', '>=', Carbon::parse($dates[0]))
-    							 ->whereDate('date', '<=', Carbon::parse($dates[1]));
+    		return $this->builder->whereMonth('date', '=', Carbon::parse($value)->format('m'))
+    							 ->whereDate('date', '<=', Carbon::parse($value)->format('Y'));
     	}else{
     		return null;
     	}

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\DetailIn;
 use App\SellIn;
 use App\SellInSummary;
+use App\SalesMtcSummary;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Collection;
 use App\Category;
@@ -24,6 +25,9 @@ use App\Helper\ReportHelper as ReportHelper;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Sales;
+use App\DetailSales;
+use App\Target;
 
 class ReportController extends Controller
 {
@@ -301,22 +305,77 @@ class ReportController extends Controller
         return view('report.salesmtc');
     }
 
-    public function salesMtcData(SummaryFilters $filters){
+    public function salesMtcDataSales(SummaryFilters $filters){
 
-        $data = SellInSummary::filter($filters);
-
+        // $data = new SalesMtcSummary('sales_mtc_summary_by_sales');
+        $data = DetailSales::where('id', '>', 0);
+        
         return Datatables::of($data)
-            ->addColumn('action', function ($item) {
-                $data = array(
-                    'id'            => $item->id,
-                    'qty'           => $item->qty
-                );
+        ->addColumn('periode', function($item) {
+            return $item->getSummary('periode');
+        })
+        ->addColumn('region', function($item) {
+            return $item->getSummary('region');
+        })
+        ->addColumn('is_jawa', function($item) {
+            return $item->getSummary('is_jawa');
+        })
+        ->addColumn('jabatan', function($item) {
+            return $item->getSummary('jabatan');
+        })
+        ->addColumn('employee_name', function($item) {
+            return $item->getSummary('employee_name');
+        })
+        ->addColumn('area', function($item) {
+            return $item->getSummary('area');
+        })
+        ->addColumn('sub_area', function($item) {
+            return $item->getSummary('sub_area');
+        })
+        ->addColumn('store_name', function($item) {
+            return $item->getSummary('store_name');
+        })
+        ->addColumn('account', function($item) {
+            return $item->getSummary('account');
+        })
+        ->addColumn('category', function($item) {
+            return $item->getSummary('category');
+        })
+        ->addColumn('product_line', function($item) {
+            return $item->getSummary('product_line');
+        })
+        ->addColumn('product_name', function($item) {
+            return $item->getSummary('product_name');
+        })
+        ->addColumn('actual_out_qty', function($item) {
+            return $item->getSummary('actual_out_qty');
+        })
+        ->addColumn('actual_in_qty', function($item) {
+            return $item->getSummary('actual_in_qty');
+        })
+        ->addColumn('price', function($item) {
+            return $item->getSummary('price');
+        })
+        ->addColumn('actual_out_value', function($item) {
+            return $item->getSummary('actual_out_value');
+        })
+        ->addColumn('actual_in_value', function($item) {
+            return $item->getSummary('actual_in_value');
+        })
+        ->addColumn('total_actual', function($item) {
+            return $item->getSummary('total_actual');
+        })
+        ->addColumn('target_qty', function($item) {
+            return $item->getSummary('target_qty');
+        })
+        ->addColumn('target_value', function($item) {
+            return $item->getSummary('target_value');
+        })
+        ->make(true);
+    }
 
-                return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-                <button data-url=".route('sellin.delete', $item->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
-                ";
-            })->make(true);
-
+    public function salesMtcDataTarget(SummaryFilters $filters){
+        return Datatables::of(SalesMtcSummary('sales_mtc_summary_by_target')->filter($filters))->make(true);
     }
 
 

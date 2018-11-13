@@ -22,20 +22,22 @@ class SalesTableSeeder extends Seeder
 	        foreach(range(1, 20) as $i){
 	         $employee += 1;
 	         $store_id = EmployeeStore::where('id_employee', ($employee))->first()->id_store;
-	         DB::table('sell_ins')->insert([
+	         DB::table('sales')->insert([
 	            'id_employee' => $employee,
 	            'id_store' => $store_id,
 	            'date' => Carbon::parse('2018-11-'.$d),
 	            'week' => Carbon::parse('2018-11-'.$d)->weekOfMonth,
+	            'type' => 'Sell In',
 	            'created_at' => Carbon::now(),
 	            'updated_at' => Carbon::now(),
 	         ]);
 
-	         DB::table('sell_outs')->insert([
+	         DB::table('sales')->insert([
 	            'id_employee' => $employee,
 	            'id_store' => $store_id,
 	            'date' => Carbon::parse('2018-11-'.$d),
 	            'week' => Carbon::parse('2018-11-'.$d)->weekOfMonth,
+	            'type' => 'Sell Out',
 	            'created_at' => Carbon::now(),
 	            'updated_at' => Carbon::now(),
 	         ]);
@@ -43,23 +45,27 @@ class SalesTableSeeder extends Seeder
 	        }
 	    }
 
+	    $satuan = ['pack', 'karton'];
+
 	    // SALES DETAIL
 	    foreach(range(1, 600) as $i){
 	    	foreach(range(1, 10) as $j){
-	         DB::table('detail_ins')->insert([
-	            'id_sellin' => $i,
+	         DB::table('detail_sales')->insert([
+	            'id_sales' => $i,
 	            'id_product' => $j,
 	            'qty' => rand(1, 10),
-	            'id_measure' => 1,
+	            'qty_actual' => rand(20, 100),
+	            'satuan' => $satuan[rand(0,1)],
 	            'created_at' => Carbon::now(),
 	            'updated_at' => Carbon::now(),
 	         ]);
 
-	         DB::table('detail_outs')->insert([
-	            'id_sellout' => $i,
+	         DB::table('detail_sales')->insert([
+	            'id_sales' => $i,
 	            'id_product' => $j,
 	            'qty' => rand(1, 10),
-	            'id_measure' => 1,
+	            'qty_actual' => rand(20, 100),
+	            'satuan' => $satuan[rand(0,1)],
 	            'created_at' => Carbon::now(),
 	            'updated_at' => Carbon::now(),
 	         ]);
