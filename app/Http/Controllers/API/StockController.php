@@ -40,7 +40,6 @@ class StockController extends Controller
 					])->first();
 
 					if (!$checkStock) {
-						
 						$header = MDHeader::create([
 							'id_employee' 	=> $user->id,
 							'id_pasar' 		=> $data->pasar,
@@ -52,16 +51,26 @@ class StockController extends Controller
 					}else{
 						$headerId = $checkStock->id;
 					}
+
 					if (isset($headerId)) {
 						foreach ($data->product as $product) {
-							$detail = MDDetail::create([
+							$checkDetail = MDDetail::where([
 								'id_stock' 		=> $headerId,
 								'id_product' 	=> $product->id,
-								'oos' 			=> $product->oos,
-							]);
-							if (!isset($detail->id)) {
-								throw new Exception("Error Processing Request", 1);
+							])->first();
+							if (!$checkDetail) {
+								$detail = MDDetail::create([
+									'id_stock' 		=> $headerId,
+									'id_product' 	=> $product->id,
+									'oos' 			=> $product->oos,
+								]);
+								if (!isset($detail->id)) {
+									throw new Exception("Error Processing Request", 1);
 
+								}
+							}else{
+								$checkDetail->oos = $product->oos;
+								$checkDetail->save();
 							}
 						}
 						DB::commit();
