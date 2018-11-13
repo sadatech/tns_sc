@@ -119,7 +119,7 @@ $("#example-inline-checkbox2").change(function() {
             $('.input2').val(json.pack);
             $('#{{$type}}Pcs').val(json.pcs);
             // $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
-            console.log(json.carton)
+            // console.log(json.carton)
         }
     @endif
 </script>

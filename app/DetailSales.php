@@ -10,7 +10,7 @@ class DetailSales extends Model
         'id_sales', 'id_product', 'id_measure', 'qty', 'qty_actual', 'satuan'
     ];
 
-    public function sellin()
+    public function sales()
     {
         return $this->belongsTo('App\Sales', 'id_sales');
     }
@@ -18,11 +18,6 @@ class DetailSales extends Model
     public function product()
     {
         return $this->belongsTo('App\Product', 'id_product');
-    }
-
-    public function measure()
-    {
-        return $this->belongsTo('App\MeasurementUnit', 'id_measure');
     }
 
 }

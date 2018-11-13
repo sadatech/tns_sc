@@ -53,13 +53,13 @@ class ChannelController extends Controller
     {
         $channel = Channel::get();
         return Datatables::of($channel)
-        ->addColumn('name', function($channel) {
-            return $channel->name;
-        })
         ->addColumn('action', function ($channel) {
-            return '<button onclick="editModal('.$channel->id.',&#39;'.$channel->name.'&#39;)" class="btn btn-sm btn-primary btn-square"><i class="si si-pencil"></i></button>
-            <button data-url='.route("channel.delete", $channel->id).' class="btn btn-sm btn-danger btn-square js-swal-delete"><i class="si si-trash"></i></button>';
+            if($channel->name != "GTC"){
+                return '<button onclick="editModal('.$channel->id.',&#39;'.$channel->name.'&#39;)" class="btn btn-sm btn-primary btn-square"><i class="si si-pencil"></i></button>
+                <button data-url='.route("channel.delete", $channel->id).' class="btn btn-sm btn-danger btn-square js-swal-delete"><i class="si si-trash"></i></button>';
+            }
         })->make(true);
+
     }
 
     public function update(Request $request, $id) 
