@@ -571,6 +571,13 @@ Route::prefix('report')->group(function () {
 		})->name('report.sales.pasar')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 	});
+
+	Route::prefix('distributorPf')->group(function () {
+		Route::get('/', function(){
+			return view('report.distpf');
+		})->name('report.dist.pf')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+	});
 });
 
 // ***************** REPORTING ***********************
