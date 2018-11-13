@@ -25,6 +25,7 @@
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Outlet</th>
+              <th>Product</th>
             </tr>
           </thead>
         </table>
@@ -59,13 +60,14 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.smd.pasar') !!}',
+      ajax: '{!! route('data.distpf.smd') !!}',
       columns: [
-      { data: 'id', name: 'id' },
-      { data: 'nama', name: 'name' },
-      { data: 'jabatan', name: 'jabatan' },
-      { data: 'tanggal', name: 'tanggal' },
-      { data: 'call', name: 'call' },
+      { data: 'id' },
+      { data: 'nama' },
+      { data: 'pasar' },
+      { data: 'tanggal' },
+      { data: 'outlet' },
+      { data: 'action' },
       ]
     });
   });

@@ -20,7 +20,7 @@ class AttendancePasar extends Model
 		return $this->belongsTo('App\Attendance', 'id_attendance');
 	}
 
-	public function outlet()
+	public function pasar()
 	{
 		return $this->belongsTo('App\Pasar', 'id_pasar');
 	}

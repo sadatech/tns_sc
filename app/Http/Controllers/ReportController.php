@@ -25,6 +25,8 @@ use App\StockMdHeader as StockMD;
 use App\Outlet;
 use App\Attendance;
 use App\AttendanceOutlet;
+use App\Distribution;
+use App\DistributionDetail;
 
 class ReportController extends Controller
 {
@@ -477,6 +479,36 @@ class ReportController extends Controller
             $html = "<table class='table table-bordered'><tr>";
             $html .= "<td class='bg-gd-cherry text-white'>".Carbon::now()->format('F')."</td>";
             $html .= $data['bulan'];
+            $html .= "</tr></table>";
+            return $html;
+        })->make(true);
+    }
+
+    public function SMDdistpf()
+    {
+        $dist = Distribution::whereMonth('date',Carbon::now()->month)->get();
+        $data = array();
+        $product = array();
+        $id = 1;
+        foreach ($dist as $key => $value) {
+            $detail = DistributionDetail::where('id_distribution', $value->id)->get();
+            foreach ($detail as $val) {
+                $product[$key][] = "<td class='bg-grey' style='min-width:200px'>".$val->product->name."</td>"."<td class='bg-primary text-white'>".$val->value."</td>";
+            }
+            $data[] = array(
+                'id' => $id++,
+                'nama' => $value->employee->name,
+                'pasar' => $value->outlet->employeePasar->pasar->name,
+                'tanggal' => Carbon::parse($value->date)->day,
+                'outlet' => $value->outlet->name,
+                'product' => implode(" ", $product[$key])
+            );
+        }
+        return Datatables::of(collect($data))
+        ->addColumn('action', function ($data) {
+            $html = "<table class='table table-bordered'><tr>";
+            // $html .= "<td class='bg-gd-cherry text-white'>Product</td>";
+            $html .= $data['product'];
             $html .= "</tr></table>";
             return $html;
         })->make(true);
