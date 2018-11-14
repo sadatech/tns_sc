@@ -23,11 +23,12 @@ class FaqController extends Controller
 		$check = $this->authCheck();
 		$code = 200;
 		if ($check['success'] == true) {
-			$data 	= FAQ::get();
+			$data 	= FAQ::orderBy('id','desc')->get();
 			if ($data->count() > 0) {
 				$res['success'] = true;
 				$res['faq'] = $data;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "Gagal mengambil FAQ.";
 			}
 		}else{

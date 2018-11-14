@@ -23,11 +23,12 @@ class NewsController extends Controller
 		$check = $this->authCheck();
 		$code = 200;
 		if ($check['success'] == true) {
-			$data 	= News::get();
+			$data 	= News::select('news.*','sender as from')->orderBy('id','desc')->get();
 			if ($data->count() > 0) {
 				$res['success'] = true;
 				$res['news'] = $data;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "Gagal mengambil News.";
 			}
 		}else{
