@@ -27,7 +27,10 @@
               <th>Region</th>
               <th>Area</th>
               <th>Sub Area</th>
-              <th>Absensi</th>
+              <th>Outlet</th>
+              <th>Tanggal</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
             </tr>
           </thead>
         </table>
@@ -71,7 +74,10 @@ table.table thead tr th {
       { data: 'region' },
       { data: 'area' },
       { data: 'subarea' },
-      { data: 'action' },
+      { data: 'outlet' },
+      { data: 'tanggal' },
+      { data: 'checkin' },
+      { data: 'checkout' },
       ]
     });
   });
