@@ -191,11 +191,12 @@ class EmployeeController extends Controller
 						foreach ($request->input('subarea') as $subarea) {
 							$dataSubArea[] = array(
 								'id_employee' 	=> $insert->id,
-								'id_subarea' 	=> $subarea,
+								'isTl'			=> $request->input('tl'),
+								'id_subarea' 	=> $subarea
 							);
 						}
 						DB::table('employee_sub_areas')->insert($dataSubArea);
-						return redirect()->route('employee.pasar')
+						return redirect()->route('employee.dc')
 						->with([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
@@ -405,11 +406,12 @@ class EmployeeController extends Controller
 				foreach ($request->input('subarea') as $subarea) {
 					$dataSubArea[] = array(
 						'id_employee' 	=> $id,
-						'id_subarea' 	=> $subarea,
+						'isTl'			=> $request->input('tl'),
+						'id_subarea' 	=> $subarea
 					);
 				}
 				DB::table('employee_sub_areas')->insert($dataSubArea);
-				return redirect()->route('employee.pasar')
+				return redirect()->route('employee.dc')
 				->with([
 					'type' 		=> 'success',
 					'title' 	=> 'Sukses!<br/>',

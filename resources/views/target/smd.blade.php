@@ -22,6 +22,7 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
+          <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal" title="Unduh Data"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
             <a href="{{ route('target.smd.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
@@ -33,7 +34,6 @@
             <th>Release Date</th>
             <th>Sales Value</th>
             <th>EC</th>
-            <th>PF</th>
             <th>CBD</th>
             <th class="text-center" style="width: 15%;"> Action</th>
           </thead>
@@ -92,10 +92,6 @@
             <div class="form-group col-md-6">
               <label>EC</label>
               <input class="JustAngka form-control" type="text" id="ecInput" name="ec" required>
-            </div>
-            <div class="form-group col-md-6">
-              <label>PF</label>
-              <input class="JustAngka form-control" type="text" id="pfInput" name="pf" required>
             </div>
             <div class="form-group col-md-6">
               <label>CBD</label>
@@ -165,10 +161,6 @@
               <input class="JustAngka form-control" type="text" name="ec" placeholder="Input EC"required>
             </div>
             <div class="form-group col-md-6">
-              <label>PF</label>
-              <input class="JustAngka form-control" type="text" name="pf" placeholder="Input PF" required>
-            </div>
-            <div class="form-group col-md-6">
               <label>CBD</label>
               <input class="JustAngka form-control" type="text" name="cbd" placeholder="Input CBD" required>
             </div>
@@ -179,10 +171,70 @@
             </button>
             <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
           </div>
-        </form>
-      </div>
+      </form>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary p-10">
+          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Account</h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form action="{{ route('account.import') }}" method="post" enctype="multipart/form-data">
+        {!! csrf_field() !!}
+        <div class="block-content">
+          <div class="form-group">
+              <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <h5> Sample Data :</h5>
+          <table class="table table-bordered table-vcenter">
+            <thead>
+              <tr>
+                  <td><b>account</b></td>
+                  <td><b>channel</b></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                  <td>Name Account 1</td>
+                  <td>Name Channel 1</td>
+              </tr>
+              <tr>
+                  <td>Name Account 1</td>
+                  <td>Name Channel 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="block-content">
+          <div class="form-group">
+          <label>Upload Your Data Account:</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Save
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('css')
@@ -210,7 +262,6 @@
     $('#valueInput').val(json.value);
     $('#hkInput').val(json.hk);
     $('#ecInput').val(json.ec);
-    $('#pfInput').val(json.pf);
     $('#cbdInput').val(json.cbd);
         }
         @if(session('type'))
@@ -270,7 +321,6 @@
             { data: 'rilis', name: 'rilis' },
             { data: 'value_sales', name: 'value_sales' },
             { data: 'ec', name: 'ec' },
-            { data: 'pf', name: 'pf' },
             { data: 'cbd', name: 'cbd' },
             { data: 'action', name: 'action' }
             ]

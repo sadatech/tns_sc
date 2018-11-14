@@ -183,7 +183,7 @@ class PasarController extends Controller
 				$res['msg'] = "User not found.";
 			} else {
 				$code 	= 200;
-				$attId 	= Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->first();
+				$attId 	= Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->orderBy('created_at', 'DESC')->first();
 				if (isset($attId->id)) {
 					$attendance = AttendancePasar::where(['id_attendance' => $attId->id])->first();
 					if (!empty($attendance)) {
