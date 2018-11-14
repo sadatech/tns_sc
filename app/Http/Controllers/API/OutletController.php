@@ -167,7 +167,7 @@ class OutletController extends Controller
 						$code = 200;
 					} else {
 						$res['success'] = true;
-						foreach ($outlet->get(['outlets.*']) as $data) {
+						foreach ($outlet as $data) {
 							$listOutlet[] = array(
 								'id' 		=> $data->id,
 								'name' 		=> $data->name,
