@@ -160,7 +160,7 @@ class TargetController extends Controller
                 MtcReportTemplate::create([
                     'id_employee'   => $request->id_employee,
                     'id_store'      => $request->id_store,
-                    'id_product'    => $request->id_product
+                    'id_product'    => $request->id_product,
                     'date'          => $date
                 ]);
             }
