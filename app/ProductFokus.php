@@ -12,13 +12,12 @@ class ProductFokus extends Model
     use ValidationHelper;
 
     protected $fillable = [
-        'id_product', 'from', 'to'
+        'from', 'to'
     ];
 
     public static function rule()
     {
         return [
-            'id_product'    => 'required|integer',
             'from'          => 'required',
             'to'            => 'required'
         ];
@@ -42,6 +41,11 @@ class ProductFokus extends Model
     public function fokusarea()
     {
     	return $this->hasMany('App\FokusArea', 'id_area');
+    }
+
+    public function fokusproduct()
+    {
+    	return $this->hasMany('App\FokusProduct', 'id_product');
     }
 
     public function getFromAttribute($value)
