@@ -376,13 +376,13 @@ class OutletController extends Controller
 						if ($status == 'true') {
 							$update = Outlet::where("id", $id)
 							->update([
-								'active'	=> 2,
+								'active'	=> false,
 							]);
 							$disableStatus = 'disable';
 						} else {
 							$update = Outlet::where("id", $id)
 							->update([
-								'active'	=> 1,
+								'active'	=> true,
 							]);
 							$disableStatus = 'enable';
 						}
