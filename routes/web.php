@@ -528,6 +528,11 @@ Route::prefix('report')->group(function () {
 			})->name('SellIn.download-template')->middleware('auth');
 		});
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
+
+	Route::prefix('attendance')->group(function(){
+		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
+	});
 });
 
 // ***************** REPORTING ***********************

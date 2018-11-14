@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Promo Activity")
+@section('title', "Attendance Report")
 @section('content')
 <div class="content">
-    <h2 class="content-heading pt-10">Promo Activity <small>Manage</small></h2>
+    <h2 class="content-heading pt-10">Attendance Report <small>Manage</small></h2>
     <div class="block block-themed"> 
         <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
             <h3 class="block-title">Datatables</h3>
@@ -14,23 +14,18 @@
                         <a href="{{ route('tambah.faq') }}" class="btn btn-primary btn-square" title="Add Data Store"><i class="fa fa-plus mr-2"></i>Add Data</a>
                     </h3> -->
                     <div class="block-option">
-                       <!--  <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button> -->
-                        <a href="{{route('pa.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                    <!--     <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                        <a href="{{route('pa.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a> -->
                     </div>
                 </div>
 
                 <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="faqtable">
                     <thead>
-                        <th class="text-center" style="width: 150px;">Action</th>
-                        <th width="200px">Store Name</th>
-                        <th width="200px">Employee Name</th>
-                        <th width="200px">Product Name</th>
-                        <th width="200px">Brand Name</th>
-                        <th width="200px">Type</th>
-                        <th width="200px">Description</th>
-                        <th width="200px">Start Promo</th>
-                        <th width="200px">End Promo</th>
-                        <th width="300px">Images</th>
+                        <th width="70px">NIK</th>
+                        <th width="100px">Name</th>
+                        <th width="30px">Role</th>
+                        <th width="30px">Attendance</th>
+                        <th width="2600px">Attendance Detail</th>
                     </thead>
                 </table>
             </div> 
@@ -38,64 +33,36 @@
     </div>
 
 
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Account</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="modal-slideup" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-slideup" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="name"></h3>
+                  <!--   <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div> -->
+                </div>
+                <div class="block-content">
+                    <div class="block">
+        
+        <div class="block-content block-content-full">
+            <ul class="list list-timeline list-timeline-modern pull-t" style="left: -100px !important;" id="attendance-detail">
+            </ul>
         </div>
-      </div>
-      <form action="{{ route('pa.importXLS') }}" method="post" enctype="multipart/form-data">
-        {!! csrf_field() !!}
-       <!--  <div class="block-content">
-          <div class="form-group">
-              <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
-          </div>
-          <h5> Sample Data :</h5>
-          <table class="table table-bordered table-vcenter">
-            <thead>
-              <tr>
-                  <td><b>account</b></td>
-                  <td><b>channel</b></td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
-              </tr>
-              <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
-              </tr>
-            </tbody>
-          </table>
-        </div> -->
-        <div class="block-content">
-          <div class="form-group">
-          <label>Upload Your Data Account:</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                <label class="custom-file-label">Choose file Excel</label>
-                <code> *Type File Excel</code>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Save
-          </button>
-          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
     </div>
-  </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-alt-success" data-dismiss="modal">
+                    <i class="fa fa-check"></i> Perfect
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
   
 @endsection
@@ -118,6 +85,31 @@
     <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
     <script type="text/javascript">
+       function detailModal(json) {
+        $('#detailModal').modal('show');
+        $('#name').text(json.name);
+        $('#attendanceDetail').text(json.attendanceDetail);
+        $('#checkin').val(json.checkin);
+        $('#checkout').val(json.checkout);
+        $('#keterangan').val(json.keterangan);
+        $('#date').val(json.date);
+
+        console.log(json);
+        $('#attendance-detail').html('');
+        $.each(json.attandaceDetail, function(k, v){
+          $('#attendance-detail').append(
+              '<li>' +
+                  '<i class="list-timeline-icon fa fa-building bg-info"></i>' +
+                  '<div class="list-timeline-content">' +
+                      '<p class="font-w600" id="name"><b>Store : '+  v.store.name1 +'</b></p>' +
+                      '<p">Place : '+  v.place.name +'</p>' +
+                      '<p>Checkin  : '+ v.checkin +'</p>' +
+                      '<p>Checkout :'+  v.checkout +'</p>' +
+                  '</div>' +
+              '</li>'
+            )
+        })
+    }
     @if(session('type'))
     $(document).ready(function() {
             $.notify({
@@ -170,20 +162,16 @@
                     });
                 });
             },
-            ajax: '{!! route('pa.data') !!}',
+            ajax: '{!! route('attendance.data') !!}',
             serverSide: true,
             scrollY: "300px",
             columns: [  
-            { data: 'action', name: 'action' },
-            { data: 'store', name: 'store' },
+            { data: 'nik', name: 'nik' },
             { data: 'employee', name: 'employee' },
-            { data: 'product', name: 'product' },
-            { data: 'brand', name: 'brand' },
-            { data: 'type', name: 'type' },
-            { data: 'description', name: 'description' },
-            { data: 'start_date', name: 'start_date' },
-            { data: 'end_date', name: 'end_date' },
-            { data: 'images', name: 'images' },
+            { data: 'role', name: 'role' },
+            { data: 'attendance', name: 'attendance' },
+            { data: 'attendance_detail', name: 'attendance_detail' },
+
             ]
         });
     });

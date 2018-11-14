@@ -204,6 +204,10 @@
                     </li>  
 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">REPORT</span></li>
+                    {{-- ATTENDANCE --}}
+                     <li>
+                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance</span></a>
+                    </li>  
                     {{-- SALES --}}
                     <li class="{{ request()->is('report/sales/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Sales</span></a>
