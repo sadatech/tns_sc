@@ -35,7 +35,6 @@ class SmdController extends Controller
                 'value'         => $target->value_sales,
                 'hk'            => $target->hk,
                 'ec'            => $target->ec,
-                'pf'            => $target->pf,
                 'rilis'         => $target->rilis,
                 'cbd'           => $target->cbd
             );
@@ -51,7 +50,6 @@ class SmdController extends Controller
             'employee'      => 'required|numeric',
             'ec'            => 'required|numeric',
             'hk'            => 'required|numeric',
-            'pf'            => 'required',
             'cbd'           => 'required',
             'value'         => 'required',
             'rilis'         => 'required|date'
@@ -67,7 +65,6 @@ class SmdController extends Controller
                 'rilis'         => $request->input('rilis'),
                 'hk'            => $request->input('hk'),
                 'ec'            => $request->input('ec'),
-                'pf'            => $request->input('pf'),
                 'cbd'           => $request->input('cbd'),
                 'value_sales'   => $request->input('value')
 
@@ -88,7 +85,6 @@ class SmdController extends Controller
             'employee'      => 'required|numeric',
             'ec'            => 'required|numeric',
             'hk'            => 'required|numeric',
-            'pf'            => 'required|numeric',
             'cbd'           => 'required|numeric',
             'value'         => 'required',
             'rilis'         => 'required|date'
@@ -105,7 +101,6 @@ class SmdController extends Controller
             $target->value_sales    = $request->get('value');
             $target->hk             = $request->get('hk');
             $target->ec             = $request->get('ec');
-            $target->pf             = $request->get('pf');
             $target->cbd            = $request->get('cbd');
             if ($target->save()) {
                 return redirect()->back()->with([
@@ -155,7 +150,6 @@ class SmdController extends Controller
                     'ReleaseDate'	=> $val->rilis,
                     'SalesValue'    => $val->value_sales,
                     'EC'            => $val->ec,
-                    'PF'            => $val->pf,
                     'CBD'           => $val->cbd
 		    	);
             }

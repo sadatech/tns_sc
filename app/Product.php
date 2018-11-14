@@ -45,6 +45,11 @@ class Product extends Model
         ];
     }
 
+    public function fokusproduct()
+    {
+    	return $this->hasMany('App\FokusProduct', 'id_product');
+    }
+
     public function subcategory()
     {
         return $this->belongsTo('App\SubCategory', 'id_subcategory');
