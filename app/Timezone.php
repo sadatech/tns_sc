@@ -12,7 +12,7 @@ class Timezone extends Model
 
     public function employees()
     {
-    	return $this->hasMany('App\Employees', 'id_timezone');
+    	return $this->hasMany('App\Employee', 'id_timezone');
     }
 
 	   public function stores()
