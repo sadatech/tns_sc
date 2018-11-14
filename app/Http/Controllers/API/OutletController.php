@@ -158,7 +158,7 @@ class OutletController extends Controller
 						$res['msg'] = "Kamu tidak mempunyai outlet aktif.";
 					}
 				} else if ($id == 2) {
-					$outlet = Outlet::where('active', 2)->whereHas('employeePasar', function($query) use ($user) {
+					$outlet = Outlet::where('active', false)->whereHas('employeePasar', function($query) use ($user) {
 						return $query->where('id_employee', $user->id);
 					})->get();
 					if ($outlet->count() < 1) {
