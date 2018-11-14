@@ -11,9 +11,9 @@ trait ApiAuthHelper
 {
 
 	public static function authCheck(){
+		$res['success'] = false;
 		try {
 			$res['code'] = 200;
-			$res['success'] = false;
 			if (JWTAuth::getToken() != null) {
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
