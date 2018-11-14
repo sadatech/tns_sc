@@ -21,15 +21,10 @@
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Area</th>
-              <th>Nama SMD</th>
-              <th>Jabatan</th>
+              <th>Nama</th>
               <th>Pasar</th>
-              <th>Nama Stockist</th>
-              <th>Bulan</th>
               <th>Tanggal</th>
-              <th>CALL</th>
-              <th>RO</th>
+              <th>Outlet</th>
             </tr>
           </thead>
         </table>
@@ -64,18 +59,13 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.smd.pasar') !!}',
+      ajax: '{!! route('data.sales.smd') !!}',
       columns: [
-      { data: 'id', name: 'id' },
-      { data: 'area', name: 'area' },
-      { data: 'nama', name: 'name' },
-      { data: 'jabatan', name: 'jabatan' },
-      { data: 'pasar', name: 'pasar' },
-      { data: 'stockist', name: 'stockist' },
-      { data: 'bulan', name: 'bulan' },
-      { data: 'tanggal', name: 'tanggal' },
-      { data: 'call', name: 'call' },
-      { data: 'ro', name: 'ro' }
+      { data: 'id' },
+      { data: 'nama' },
+      { data: 'pasar' },
+      { data: 'tanggal' },
+      { data: 'outlet' },
       ]
     });
   });

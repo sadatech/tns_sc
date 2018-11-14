@@ -27,6 +27,8 @@ use App\Attendance;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
+use App\SalesMD;
+use App\Product;
 
 class ReportController extends Controller
 {
@@ -444,44 +446,61 @@ class ReportController extends Controller
 
     public function SMDattendance()
     {
-        $employee = Employee::where('id_position', \App\Position::where('level', 'mdgtc')->first()->id)
-        ->with('employeePasar')
-        ->select('employees.*')
-        ->get();
+        $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month)->get();
+        // $employee = Employee::where('id_position', \App\Position::where('level', 'mdgtc')->first()->id)
+        // ->with('employeePasar')
+        // ->select('employees.*')
+        // ->get();
         $data = array();
         $absen = array();
         $id = 1;
-        foreach ($employee as $value) {
-            if (isset($value->employeePasar)) {   
-                foreach ($value->employeePasar as $key => $val) {
-                    for ($i=1; $i <= Carbon::now()->endOfMonth()->day ; $i++) {
-                        $check = Attendance::where('id_employee', $value->id)
-                        ->whereMonth('date', Carbon::now()->month)
-                        ->whereDay('date', $i);
-                        $absen[$key][] = "<td class='".($check->count() > 0 ? ($check->first()->keterangan == "Check-in" ? "bg-success text-white" : ($check->first()->keterangan == "Cuti" || $check->first()->keterangan == "Off" || $check->first()->keterangan == "Sakit" ? "bg-warning text-white" : "" ) ) : "")."'>".$i."</td>";
-                    }
-                    $data[] = array(
-                        'id' => $id++,
-                        'region' => $val->pasar->name,
-                        'area' => $val->pasar->subarea->area->name,
-                        'subarea' => $val->pasar->subarea->name,
-                        'nama' => $value->name,
-                        'jabatan' => $value->position->name,
-                        'pasar' => $val->pasar->name,
-                        'bulan' => implode(" ", $absen[$key]),
-                    );
-                }
-            }
+        foreach ($employee as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'region' => $val->outlet->employeePasar->pasar->name,
+                'area' => $val->outlet->employeePasar->pasar->subarea->area->name,
+                'subarea' => $val->outlet->employeePasar->pasar->subarea->name,
+                'nama' => $val->attendance->employee->name,
+                'jabatan' => $val->attendance->employee->position->name,
+                'pasar' => $val->outlet->employeePasar->pasar->name,
+                'outlet' => $val->outlet->name,
+                'tanggal' => Carbon::parse($val->checkin)->day,
+                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
+                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+            );
         }
+        // foreach ($employee as $value) {
+        //     if (isset($value->employeePasar)) {
+        //         foreach ($value->employeePasar as $key => $val) {
+        //             for ($i=1; $i <= Carbon::now()->endOfMonth()->day ; $i++) {
+        //                 $check = Attendance::where('id_employee', $value->id)
+        //                 ->whereMonth('date', Carbon::now()->month)
+        //                 ->whereDay('date', $i);
+        //                 $absen[$key][] = "<td class='".($check->count() > 0 ? ($check->first()->keterangan == "Check-in" ? "bg-success text-white" : ($check->first()->keterangan == "Cuti" || $check->first()->keterangan == "Off" || $check->first()->keterangan == "Sakit" ? "bg-warning text-white" : "" ) ) : "")."'>".$i."</td>";
+        //             }
+        //             $data[] = array(
+        //                 'id' => $id++,
+        //                 'region' => $val->pasar->name,
+        //                 'area' => $val->pasar->subarea->area->name,
+        //                 'subarea' => $val->pasar->subarea->name,
+        //                 'nama' => $value->name,
+        //                 'jabatan' => $value->position->name,
+        //                 'pasar' => $val->pasar->name,
+        //                 'bulan' => implode(" ", $absen[$key]),
+        //             );
+        //         }
+        //     }
+        // }
         // dd($data);
-        return Datatables::of(collect($data))
-        ->addColumn('action', function ($data) {
-            $html = "<table class='table table-bordered'><tr>";
-            $html .= "<td class='bg-gd-cherry text-white'>".Carbon::now()->format('F')."</td>";
-            $html .= $data['bulan'];
-            $html .= "</tr></table>";
-            return $html;
-        })->make(true);
+        return Datatables::of(collect($data))->make(true);
+        // return Datatables::of(collect($data))
+        // ->addColumn('action', function ($data) {
+        //     $html = "<table class='table table-bordered'><tr>";
+        //     $html .= "<td class='bg-gd-cherry text-white'>".Carbon::now()->format('F')."</td>";
+        //     $html .= $data['bulan'];
+        //     $html .= "</tr></table>";
+        //     return $html;
+        // })->make(true);
     }
 
     public function SMDdistpf()
@@ -491,27 +510,43 @@ class ReportController extends Controller
         $product = array();
         $id = 1;
         foreach ($dist as $key => $value) {
-            $detail = DistributionDetail::where('id_distribution', $value->id)->get();
-            foreach ($detail as $val) {
-                $product[$key][] = "<td class='bg-grey' style='min-width:200px'>".$val->product->name."</td>"."<td class='bg-primary text-white'>".$val->value."</td>";
-            }
             $data[] = array(
                 'id' => $id++,
                 'nama' => $value->employee->name,
                 'pasar' => $value->outlet->employeePasar->pasar->name,
                 'tanggal' => Carbon::parse($value->date)->day,
-                'outlet' => $value->outlet->name,
-                'product' => implode(" ", $product[$key])
+                'outlet' => $value->outlet->name
             );
         }
-        return Datatables::of(collect($data))
-        ->addColumn('action', function ($data) {
-            $html = "<table class='table table-bordered'><tr>";
-            // $html .= "<td class='bg-gd-cherry text-white'>Product</td>";
-            $html .= $data['product'];
-            $html .= "</tr></table>";
-            return $html;
-        })->make(true);
+        $dt = Datatables::of(collect($data));
+        foreach (Product::get() as $pdct) {
+            $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
+                // dd($pdct->id);
+                $distribution = DistributionDetail::where([
+                    'id_distribution' => $dist['id'],
+                    'id_product' => $pdct->id
+                ])->first();
+                return $distribution['value'];
+            });
+        }
+        return $dt->make(true);
+    }
+
+    public function SMDsales()
+    {
+        $sales = SalesMD::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $id = 1;
+        foreach ($sales as $value) {
+            $data[] = array(
+                'id' => $id++,
+                'nama' => $sales->employee->name,
+                'pasar' => $sales->outlet->employeePasar->pasar->name,
+                'tanggal' => $sales->date,
+                'outlet' => $sales->outlet->name,
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
     }
 
     public function getStockist($data, $day)

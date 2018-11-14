@@ -12,7 +12,7 @@ class SalesMd extends Model
 
     public function detailSales()
     {
-    	return $this->hasMany('App\DetailSales', 'id_sales');
+    	return $this->hasMany('App\SalesMdDetail', 'id_sales');
     }
 
     public function employee()
