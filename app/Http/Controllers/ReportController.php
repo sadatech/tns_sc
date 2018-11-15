@@ -457,15 +457,17 @@ class ReportController extends Controller
                     ]);
 
                 dispatch(new ExportJob($trace, $request->all(), Auth::user()));
+                return true;
                 return 'Export succeed, please go to download page';       
             }catch(\Exception $e){
                 DB::rollback();
+                return false;
                 return 'Export request failed '.$e->getMessage();
             }
 
         });
 
-        return response()->json(['message' => $result]);
+        return response()->json(['result' => $result]);
 
     }
 
