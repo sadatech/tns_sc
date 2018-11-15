@@ -25,7 +25,9 @@
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Outlet</th>
-              <th>Product</th>
+              @foreach(\App\Product::get() as $product)
+              <th>{{ $product->name }}</th>
+              @endforeach
             </tr>
           </thead>
         </table>
@@ -62,12 +64,14 @@ table.table thead tr th {
       scrollY: "300px",
       ajax: '{!! route('data.distpf.smd') !!}',
       columns: [
-      { data: 'id' },
-      { data: 'nama' },
-      { data: 'pasar' },
-      { data: 'tanggal' },
-      { data: 'outlet' },
-      { data: 'action' },
+      { data: 'id', name:'' },
+      { data: 'nama', name:'Nama' },
+      { data: 'pasar', name:'Pasar' },
+      { data: 'tanggal', name:'Tanggal' },
+      { data: 'outlet', name:'Outlet' },
+      @foreach(\App\Product::get() as $product)
+      { data: 'product-{{ $product->id }}' },
+      @endforeach
       ]
     });
   });

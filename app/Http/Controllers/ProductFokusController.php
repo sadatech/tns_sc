@@ -7,11 +7,13 @@ use App\Region;
 use App\SubCategory;
 use App\Category;
 use App\ProductStockType;
-use App\Product;
 use App\Channel;
 use App\FokusChannel;
+use App\FokusProduct;
 use App\FokusArea;
 use App\ProductFokus;
+use App\Product;
+use Exception;
 use DB;
 use Auth;
 use File;
@@ -48,6 +50,14 @@ class ProductFokusController extends Controller
 		// 	}
 		// 	return $area;
         // })
+        ->addColumn('fokusproduct', function($product) {
+            $sku = FokusProduct::where(['id_pf'=>$product->id])->get();
+            $skuList = array();
+            foreach ($sku as $data) {
+                $skuList[] = $data->product->name;
+            }
+            return rtrim(implode(',', $skuList), ',');
+        })
         ->addColumn('fokusarea', function($product) {
             $area = FokusArea::where(['id_pf'=>$product->id])->get();
             $areaList = array();
@@ -67,7 +77,7 @@ class ProductFokusController extends Controller
         ->addColumn('action', function ($product) {
             $data = array(
                 'id'            => $product->id,
-                'product'     	=> $product->product->id,
+                'product'       => FokusProduct::where('id_pf',$product->id)->pluck('id_product'),
                 'area'          => FokusArea::where('id_pf',$product->id)->pluck('id_area'),
                 'from'          => $product->from,
                 'to'          	=> $product->to,
@@ -97,6 +107,8 @@ class ProductFokusController extends Controller
         //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
         // } else {
             DB::transaction(function () use($data) {
+                $productData = $data['product'];
+                unset($data['product']);
                 $channel = $data['channel'];
                 unset($data['channel']);
                 $area = (isset($data['area']) ? $data['area'] : null);
@@ -106,6 +118,12 @@ class ProductFokusController extends Controller
                     FokusChannel::create([
                         'id_pf'              => $product->id,
                         'id_channel'         => $channel_id
+                    ]);
+                }
+                foreach ($productData as $product_id) {
+                    FokusProduct::create([
+                        'id_pf'              => $product->id,
+                        'id_product'         => $product_id
                     ]);
                 }
                 if (!empty($area)) {
@@ -145,11 +163,38 @@ class ProductFokusController extends Controller
             DB::transaction(function () use($product, $data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
-
+                $sku = $data['product'];
+                unset($data['sku']);
+                $area = (isset($data['area']) ? $data['area'] : null);
+                unset($data['area']);
                 $product->fill($data)->save();
 
                 $oldChanel = $product->fokus->pluck('id_channel');
                 $deleteChannel = $oldChanel->diff($channel);
+                $oldProduct = $product->fokus->pluck('id_product');
+                $deleteProduct = $oldProduct->diff($sku);
+                foreach ($deleteProduct as $deleteProduct) {
+                    FokusProduct::where([
+                        'id_pf'         => $product->id,
+                        'id_product'    => $deleteProduct])->delete(); 
+                }
+
+                foreach ($sku as $product_id) {
+                    FokusProduct::updateOrCreate([
+                        'id_pf'         => $product->id,
+                        'id_product'    => $product_id
+                    ]);
+                }
+                FokusArea::where([
+                    'id_pf'         => $product->id])->delete(); 
+                if (!empty($area)) {
+                    foreach ($area as $area_id) {
+                        FokusArea::updateOrCreate([
+                            'id_pf'         => $product->id,
+                            'id_area'       => $area_id
+                        ]);
+                    } 
+                }
                 foreach ($deleteChannel as $deleted_id) {
                     FokusChannel::where([
                         'id_pf'         => $product->id,
@@ -159,7 +204,7 @@ class ProductFokusController extends Controller
                 foreach ($channel as $channel_id) {
                     FokusChannel::updateOrCreate([
                         'id_pf'         => $product->id,
-                        'id_channel'    => $channel_id
+                        'id_channel'       => $channel_id
                     ]);
                 }
             });
@@ -181,13 +226,9 @@ class ProductFokusController extends Controller
         ]);
     }
 
-    public function import(Request $request)
+    public function importXLS(Request $request)
     {
-        $this->validate($request, [
-            'file' =>   'required'
-        ]);
-
-        $transaction = DB::transaction(function () use ($request) {
+        try {
             $file = Input::file('file')->getClientOriginalName();
             $filename = pathinfo($file, PATHINFO_FILENAME);
             $extension = pathinfo($file, PATHINFO_EXTENSION);
@@ -195,143 +236,89 @@ class ProductFokusController extends Controller
             if ($extension != 'xlsx' && $extension !=  'xls') {
                 return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
             }
-            if($request->hasFile('file')){
+
+            if($request->hasFile('file')) {
                 $file = $request->file('file')->getRealPath();
                 $ext = '';
-                
-                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
-                {
-                    foreach($results as $row)
-                    {
-                        echo "$row<hr>";
-                        $dataProduct['product']           = $row->sku;
-                        $dataProduct['code']              = $row->code;
-                        $dataProduct['panel']             = $row->panel;
-                        $dataProduct['carton']            = (isset($row->carton) ? $row->carton : "");
-                        $dataProduct['pack']              = (isset($row->pack) ? $row->pack : "");
-                        $dataProduct['type']              = $row->type;
-                        $dataProduct['subcategory']       = $row->subcategory;
-                        $dataProduct['category']          = $row->category;
-                        $id_product = $this->findProduct($dataProduct);
-
-                        $insert = ProductFokus::create([
-                            'id_product'        => $id_product,
-                            'from'             => (isset($row->from) ? $row->from : "-"),
-                            'to'                => (isset($row->to) ? $row->to : "-")
-                        ]);
-                        if ($insert) {
-                            $dataChannel = array();
-                            $listChannel = explode(",", $row->channel);
-                            foreach ($listChannel as $channel) {
-                                $dataChannel[] = array(
-                                    'id_channel'    	=> $this->findChannel($channel),
-                                    'id_pf'          	=> $insert->id
-                                );
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
+                    try {
+                        DB::beginTransaction();
+                        if (!empty($results->all())) {
+                            foreach($results as $row)
+                            {
+                                $fokus = ProductFokus::create([
+                                    'from'  => Carbon::now(),
+                                    'to'    => Carbon::now() 
+                                ]);
+                                if (!isset($fokus->id)) {
+                                    
+                                } else {
+                                    $listProduct = explode(",", $row->sku);
+                                    // dd($listProduct);
+                                    foreach ($listProduct as $key => $product) {
+                                        $getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($product))."'")->first();
+                                        if (isset($getSku->id)) {
+                                            FokusProduct::create([
+                                                'id_pf'         => $fokus->id,
+                                                'id_product'    => $getSku->id
+                                            ]);
+                                        }
+                                    }
+                                    $listChannel = explode(",", $row->channel);
+                                    foreach ($listChannel as $channel) {
+                                        FokusChannel::create([
+                                            'id_channel'    => $this->findChannel($channel),
+                                            'id_pf'         => $fokus->id
+                                        ]);
+                                    }
+                                    $listArea = explode(",", $row->area);
+                                    foreach ($listArea as $area) {
+                                        $getArea = \App\Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($area))."'")->first();
+                                        if (isset($getArea->id)) {
+                                            FokusArea::create([
+                                                'id_area'            => $getArea->id,
+                                                'id_pf'              => $fokus->id
+                                            ]);
+                                        }
+                                    }
+                                    // dd($listArea);
+                                    // dd($getArea);
+                                }
                             }
-                            DB::table('fokus_channels')->insert($dataChannel);
-
-                            $dataArea = array();
-                            $listArea = explode(",", (isset($row->area) ? $row->area : ""));
-                            foreach ($listArea as $area) {
-                                $dataArea[] = array(
-                                    'id_area'    	    => $this->findArea($area, $row->region),
-                                    'id_pf'          	=> $insert->id
-                                );
-                            }
-                            DB::table('fokus_areas')->insert($dataArea);
+                            DB::commit();
                         } else {
-                            return false;
-                        }                
+                            throw new Exception("Error Processing Request", 1);
+                        }
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return redirect()->back()->with([
+                            'type' => 'danger',
+                            'title' => 'Gagal!<br/>',
+                            'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
+                        ]);
                     }
-                },false);
+                }, false);
+                return redirect()->back()->with([
+                    'type' => 'success',
+                    'title' => 'Sukses!<br/>',
+                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk target!'
+                ]);
+            } else {
+                DB::rollback();
+                return redirect()->back()->with([
+                    'type' => 'danger',
+                    'title' => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>File harus di isi!'
+                ]);
             }
-            return 'success';
-        });
-
-        if ($transaction == 'success') {
-            return redirect()->back()
-            ->with([
-                'type'      => 'success',
-                'title'     => 'Sukses!<br/>',
-                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
-            ]);
-        }else{
-            return redirect()->back()
-            ->with([
-                'type'    => 'danger',
-                'title'   => 'Gagal!<br/>',
-                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with([
+                'type' => 'danger',
+                'title' => 'Gagal!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
             ]);
         }
-    }
-
-    public function findProduct($data)
-    {
-        // $dataProduct = Product::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['product']))."'");
-        // if ($dataProduct->count() == 0) {
-
-			$data2['subcategory']   	= $data['subcategory'];
-			$data2['category']   	    = $data['category'];
-            $id_subcategory = $this->findSub($data2);
-
-            $getType    = ProductStockType::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['type']))."'")->first()->id;
-            $data1      = Product::create([
-                'name'       	    => $data['product'],
-				'code'              => $data['code'],
-				'panel'		        => ($data['panel'] ? $data['panel'] : "yes"),
-				'carton'		    => (isset($data['carton']) ? $data['carton'] : ""),
-                'pack'	            => (isset($data['pack']) ? $data['pack'] : ""),
-                'pcs'               => 1,
-                'id_brand'          => 1,
-                'stock_type_id'     => ($getType ? $getType : 1 ),
-                'id_subcategory'    => $id_subcategory
-
-            ]);
-            if ($data1) {
-                $id_pasar = $data1->id;
-            }
-        // } else {
-        //     $id_pasar = $dataProduct->first()->id;
-        // }
-        return $id_pasar;
-    }
-
-    public function findSub($subcategory)
-    {
-        $dataChannel = SubCategory::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($subcategory['subcategory']))."'");
-        if ($dataChannel->count() == 0) {
-
-            $dataCategory = $subcategory['category'];
-            $id_category = $this->findCategory($dataCategory);
-
-            $channel = SubCategory::create([
-                'name'              => $subcategory['subcategory'],
-                'id_category'       => $id_category
-            ]);
-            if ($channel) {
-                $id_channel = $channel->id;
-            }
-        } else {
-            $id_channel = $dataChannel->first()->id;
-        }
-        return $id_channel;
-    }
-
-    public function findCategory($category)
-    {
-        $dataChannel = Category::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($category['category']))."'");
-        if ($dataChannel->get() != null) {
-            $data2 = Category::create([
-                'name'              => $category['category'],
-                'description'       => "-"
-            ]);
-            if ($data2) {
-                $id_channel = $data2->id;
-            }
-        } else {
-            $id_channel = $dataChannel->first()->id;
-        }
-        return $id_channel;
     }
 
     public function findChannel($channel)
@@ -346,44 +333,6 @@ class ProductFokusController extends Controller
             }
         } else {
             $id_channel = $dataChannel->first()->id;
-        }
-        return $id_channel;
-    }
-
-    public function findArea($area, $region)
-    {
-        $dataChannel = Area::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($area))."'");
-        if ($dataChannel->count() == 0) {
-
-            $dataRegion = $region;
-            $id_region = $this->findRegion($dataRegion);
-
-            $channel = Area::create([
-                'name'          => $area,
-                'id_region'     => $id_region
-            ]);
-            if ($channel) {
-                $id_channel = $channel->id;
-            }
-        } else {
-            $id_channel = $dataChannel->first()->id;
-        }
-        return $id_channel;
-    }
-
-    public function findRegion($region)
-    {
-        $dataRegion = Region::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($region))."'");
-        if ($dataRegion->count() == 0) {
-
-            $channel = Region::create([
-                'name'          => $region,
-            ]);
-            if ($channel) {
-                $id_channel = $channel->id;
-            }
-        } else {
-            $id_channel = $dataRegion->first()->id;
         }
         return $id_channel;
     }

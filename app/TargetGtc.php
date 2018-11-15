@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class TargetGtc extends Model
 {
     protected $fillable = [
-        'id_employee', 'rilis', 'value_sales', 'hk', 'ec', 'pf', 'cbd'
+        'id_employee', 'rilis', 'value_sales', 'hk', 'ec', 'cbd'
     ];
 
     public function employee()

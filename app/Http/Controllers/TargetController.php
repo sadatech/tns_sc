@@ -185,6 +185,7 @@ class TargetController extends Controller
             //         'date'          => $date
             //     ]);
             // }
+
         });
         return redirect()->back()->with([
           'type'    => 'success',

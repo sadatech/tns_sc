@@ -339,7 +339,7 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
 		Route::get('/export', 'ProductFokusController@export')->name('fokus.export')->middleware('auth');
-		Route::post('/import', 'ProductFokusController@import')->name('fokus.import')->middleware('auth');
+		Route::post('/import', 'ProductFokusController@importXLS')->name('fokus.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/ProductFokusImport.xlsx'));
@@ -562,7 +562,11 @@ Route::prefix('report')->group(function () {
 
 	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');
 
-	Route::prefix('smd')->group(function () {
+	Route::prefix('attendance')->group(function(){
+		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
+	});
+Route::prefix('smd')->group(function () {
 		Route::get('/', function(){
 			return view('report.smd');
 		})->name('report.smd.pasar')->middleware('auth');
@@ -571,13 +575,15 @@ Route::prefix('report')->group(function () {
 		})->name('report.attendance.smd')->middleware('auth');
 		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+
 	});
+
 
 	Route::prefix('sales')->group(function () {
 		Route::get('/', function(){
 			return view('report.sales');
 		})->name('report.sales.pasar')->middleware('auth');
-		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
 	});
 
 	Route::prefix('distributorPf')->group(function () {

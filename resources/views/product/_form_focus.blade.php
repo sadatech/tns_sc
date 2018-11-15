@@ -22,13 +22,7 @@ $type = $type ?? '';
         @endif
         {!! csrf_field() !!}
         <div class="block-content">
-          {{ 
-            Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(), [
-              'labelText' => 'Product',
-              'required' => '',
-              'id' => $type . 'Product'
-            ])
-          }}
+        {{ Form::select2Input('product', [], App\Product::toDropDownData(), ['multiple' => true, 'id' => $type.'Product']) }}
           <div class="row">
             <div class="col-md-6">
             {{ Form::select2Input('channel', [], App\Channel::toDropDownData(), ['multiple' => true, 'id' => $type.'Channel']) }}
