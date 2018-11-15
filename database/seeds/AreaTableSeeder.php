@@ -12,7 +12,7 @@ class AreaTableSeeder extends Seeder
         foreach(range(1,20) as $i){
             DB::table('areas')->insert([
                 'name'          => $faker->city,
-                'id_region'     => rand(1, 10),
+                'id_region'     => rand(1, 4),
                 'created_at'    => Carbon::now(),
                 'updated_at'    => Carbon::now()
             ]);
