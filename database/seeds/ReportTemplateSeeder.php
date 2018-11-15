@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Employee;
 use Carbon\Carbon;
+use App\MtcReportTemplate;
+use App\Employee;
 use App\EmployeeStore;
-use App\Target;
 
-class TargetTableSeeder extends Seeder
+class ReportTemplateSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -24,15 +24,14 @@ class TargetTableSeeder extends Seeder
 
     		foreach ($store_id as $j) {
     			$howMany = 20;
-				if($i->position->level == 'spgmtc') $howMany = 50;
+				// if($i->position->level == 'spgmtc') $type = 50;
 
     			foreach(range(1, $howMany) as $k){
-    				Target::create([
+    				MtcReportTemplate::create([
 						'id_employee' => $i->id,
 			            'id_store' => $j,
 			            'id_product' => $k,
-			            'quantity' => rand(1000, 10000),
-			            'rilis' => '2018-11-01',
+			            'date' => '2018-11-30',
 			            'created_at' => Carbon::now(),
 			            'updated_at' => Carbon::now(),
 					]);

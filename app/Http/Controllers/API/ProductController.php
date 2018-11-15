@@ -22,6 +22,7 @@ class ProductController extends Controller
 
 	public function list(Request $request)
 	{
+		return response()->json(Product::get()->toArray());
 		try {
 			$res['success'] = false;
 			if (JWTAuth::getToken() != null) {

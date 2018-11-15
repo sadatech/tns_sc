@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Filters\QueryFilters;
 
 class JobTrace extends Model
 {
@@ -27,6 +28,11 @@ class JobTrace extends Model
 
     public function user()
     {
-        return $this->hasMany('App\User', 'id_user');
+        return $this->belongsTo('App\User', 'id_user');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }

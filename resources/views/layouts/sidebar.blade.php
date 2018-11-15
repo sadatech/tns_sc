@@ -204,22 +204,14 @@
                     <li>
                         <a class="{{ request()->is('faq/index') ? 'active' : '' }}" href="{{ route('faq') }}"><i class="si si-bubbles"></i><span class="sidebar-mini-hide">FAQ</span></a>
                     </li>  
+                    <li>
+                        <a class="{{ request()->is('utility/export-download') ? 'active' : '' }}" href="{{ route('export-download') }}"><i class="si si-cloud-download"></i><span class="sidebar-mini-hide">Download Export(s)</span></a>
+                    </li> 
 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- SALES --}}
                     <li>
-                        <a class="{{ request()->is('report/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Sales MTC</span></a>
-                    </li>
-                    <li class="{{ request()->is('report/sales/*') ? 'open' : '' }}">
-                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Sales</span></a>
-                        <ul>
-                            <li>
-                                <a class="{{ request()->is('report/sales/sellin') ? 'active' : '' }}" href="{{ route('sellin') }}">Sell In</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('report/sales/sellout') ? 'active' : '' }}" href="{{ route('sellout') }}">Sell Out</a>
-                            </li>
-                        </ul>
+                        <a class="{{ request()->is('report/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Sales MTC</span></a>
                     </li>
                     {{-- PROMO--}}
                     <li>

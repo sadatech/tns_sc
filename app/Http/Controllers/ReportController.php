@@ -7,6 +7,7 @@ use App\DetailIn;
 use App\SellIn;
 use App\SellInSummary;
 use App\SalesMtcSummary;
+use App\MtcReportTemplate;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Collection;
 use App\Category;
@@ -30,13 +31,14 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use App\Sales;
 use App\DetailSales;
 use App\Target;
-use Carbon\Carbon;
 use App\StockMdHeader as StockMD;
 use App\Outlet;
 use App\Attendance;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
+use App\JobTrace;
+use App\Jobs\ExportJob;
 
 class ReportController extends Controller
 {
@@ -317,70 +319,85 @@ class ReportController extends Controller
     public function salesMtcDataSales(SummaryFilters $filters){
 
         // $data = new SalesMtcSummary('sales_mtc_summary_by_sales');
-        $data = DetailSales::where('id', '>', 0);
+        $data = SalesMtcSummary::filter($filters);
         
         return Datatables::of($data)
-        ->addColumn('periode', function($item) {
-            return $item->getSummary('periode');
-        })
-        ->addColumn('region', function($item) {
-            return $item->getSummary('region');
-        })
-        ->addColumn('is_jawa', function($item) {
-            return $item->getSummary('is_jawa');
-        })
-        ->addColumn('jabatan', function($item) {
-            return $item->getSummary('jabatan');
-        })
-        ->addColumn('employee_name', function($item) {
-            return $item->getSummary('employee_name');
-        })
-        ->addColumn('area', function($item) {
-            return $item->getSummary('area');
-        })
-        ->addColumn('sub_area', function($item) {
-            return $item->getSummary('sub_area');
-        })
-        ->addColumn('store_name', function($item) {
-            return $item->getSummary('store_name');
-        })
-        ->addColumn('account', function($item) {
-            return $item->getSummary('account');
-        })
-        ->addColumn('category', function($item) {
-            return $item->getSummary('category');
-        })
-        ->addColumn('product_line', function($item) {
-            return $item->getSummary('product_line');
-        })
-        ->addColumn('product_name', function($item) {
-            return $item->getSummary('product_name');
-        })
-        ->addColumn('actual_out_qty', function($item) {
-            return $item->getSummary('actual_out_qty');
-        })
-        ->addColumn('actual_in_qty', function($item) {
-            return $item->getSummary('actual_in_qty');
-        })
-        ->addColumn('price', function($item) {
-            return $item->getSummary('price');
-        })
-        ->addColumn('actual_out_value', function($item) {
-            return $item->getSummary('actual_out_value');
-        })
-        ->addColumn('actual_in_value', function($item) {
-            return $item->getSummary('actual_in_value');
-        })
-        ->addColumn('total_actual', function($item) {
-            return $item->getSummary('total_actual');
-        })
-        ->addColumn('target_qty', function($item) {
-            return $item->getSummary('target_qty');
-        })
-        ->addColumn('target_value', function($item) {
-            return $item->getSummary('target_value');
-        })
+        // ->addColumn('periode', function($item) {
+        //     return $item->getSummary('periode');
+        // })
+        // ->addColumn('region', function($item) {
+        //     return $item->getSummary('region');
+        // })
+        // ->addColumn('is_jawa', function($item) {
+        //     return $item->getSummary('is_jawa');
+        // })
+        // ->addColumn('jabatan', function($item) {
+        //     return $item->getSummary('jabatan');
+        // })
+        // ->addColumn('employee_name', function($item) {
+        //     return $item->getSummary('employee_name');
+        // })
+        // ->addColumn('area', function($item) {
+        //     return $item->getSummary('area');
+        // })
+        // ->addColumn('sub_area', function($item) {
+        //     return $item->getSummary('sub_area');
+        // })
+        // ->addColumn('store_name', function($item) {
+        //     return $item->getSummary('store_name');
+        // })
+        // ->addColumn('account', function($item) {
+        //     return $item->getSummary('account');
+        // })
+        // ->addColumn('category', function($item) {
+        //     return $item->getSummary('category');
+        // })
+        // ->addColumn('product_line', function($item) {
+        //     return $item->getSummary('product_line');
+        // })
+        // ->addColumn('product_name', function($item) {
+        //     return $item->getSummary('product_name');
+        // })
+        // ->addColumn('actual_out_qty', function($item) {
+        //     return $item->getSummary('actual_out_qty');
+        // })
+        // ->addColumn('actual_in_qty', function($item) {
+        //     return $item->getSummary('actual_in_qty');
+        // })
+        // ->addColumn('price', function($item) {
+        //     return $item->getSummary('price');
+        // })
+        // ->addColumn('actual_out_value', function($item) {
+        //     return $item->getSummary('actual_out_value');
+        // })
+        // ->addColumn('actual_in_value', function($item) {
+        //     return $item->getSummary('actual_in_value');
+        // })
+        // ->addColumn('total_actual', function($item) {
+        //     return $item->getSummary('total_actual');
+        // })
+        // ->addColumn('target_qty', function($item) {
+        //     return $item->getSummary('target_qty');
+        // })
+        // ->addColumn('target_value', function($item) {
+        //     return $item->getSummary('target_value');
+        // })
         ->make(true);
+    }
+
+    public function salesMtcDataSalesAlt(SummaryFilters $filters){
+
+        $data = MtcReportTemplate::filter($filters);
+        
+        $dt = Datatables::of($data);
+
+        foreach (\App\MtcReportTemplate::first()->generateColumns() as $column) {
+            $dt->addColumn($column, function($item) use ($column) {
+                return $item->getSummary($column);
+            });
+        }
+
+        return $dt->make(true);        
     }
 
     public function salesMtcDataTarget(SummaryFilters $filters){
@@ -400,7 +417,7 @@ class ReportController extends Controller
             [ 'id' => 2, 'name' => 'John' ],
         ]);
 
-        $data = SellInSummary::where('id', '!=', 0);
+        $data = MtcReportTemplate::where('id', '!=', 0);
 
         $sql = $data->toSql();
         $bindings = $data->getBindings();
@@ -410,13 +427,46 @@ class ReportController extends Controller
 
         $data3 = collect(DB::select($sql, $bindings));
 
-        return (new FastExcel($this->reportHelper->mapForExportSalesNew($data3)))->download('file.xlsx');
+        return $this->reportHelper->exportSalesMtc($data);
+
+        // return (new FastExcel($this->reportHelper->mapForExportSalesMtc($data)))->download('file.xlsx');
 
         // return redirect()->back();
 
     }
 
     public function export(Request $request, SummaryFilters $filters){
+
+        // $req = new Request($request->all());
+        // return response()->json(asset('..\storage')); 
+        // $excel = $this->reportHelper->exporting($request);
+
+        $result = DB::transaction(function () use ($request) {
+
+            try{
+                
+                // JOB TRACING AND QUEUE
+                $trace = JobTrace::create([
+                        'id_user' => Auth::user()->id,
+                        'date' => Carbon::now(),
+                        'title' => $this->reportHelper->getTitle($request),
+                        'status' => 'PROCESSING',
+                    ]);
+
+                dispatch(new ExportJob($trace, $request->all(), Auth::user()));
+                return 'Export succeed, please go to download page';       
+            }catch(\Exception $e){
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+
+        });
+
+        return response()->json(['message' => $result]);
+
+    }
+
+    public function exportOld(Request $request, SummaryFilters $filters){
 
         // $list = collect([
         //     [ 'id' => 1, 'name' => 'Jane' ],
@@ -438,6 +488,8 @@ class ReportController extends Controller
         // return response()->json(SellInSummary::filter($filterA)->get());
 
         // $filename = 'Philips Retail Report Sell Thru ' . Carbon::now()->format('d-m-Y');
+
+        // return $this->reportHelper->exportSalesMtc($filters);
 
         $data = SellInSummary::filter($filters);
 

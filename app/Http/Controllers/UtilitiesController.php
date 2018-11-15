@@ -8,48 +8,76 @@ use Yajra\Datatables\Datatables;
 use Auth;
 use DB;
 use Carbon\Carbon;
-use App\Jobs\ExportJob;
-
+use App\Filters\JobTraceFilters;
 
 class UtilitiesController extends Controller
 {
     //
     public function reportDownloadIndex(){
-    	return view('utilities.report_download');
+    	return view('utilities.export_trace');
     }
 
-    public function reportDownloadData(){
-    	$data = JobTrace::where('id_company', Auth::user()->id_company);
+    public function reportDownloadData(JobTraceFilters $filters){
+    	$data = JobTrace::filter($filters);
+
+        // return response()->json($data->get());
 
         return Datatables::of($data)
-        ->addColumn('action', function ($item) {
-            $data = array(
-                'id'            => $item->id,
-                'qty'           => $item->quantity
-            );
+            ->addColumn('request_by', function ($item) {
+                return @$item->user->name;
+            })
+            ->editColumn('status', function ($item) {
+                switch ($item->status) {
+                    case 'PROCESSING':
+                        return "<label style='cursor: default;' class='btn btn-sm btn-primary'>PROCESSING</label>";
+                        break;
 
-            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('sellin.delete', $item->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
-            ";
-        })->make(true);
+                    case 'DONE':
+                        return "<label style='cursor: default;' class='btn btn-sm btn-success'>DONE</label>";
+                        break;
+
+                    case 'FAILED':
+                        return "<label style='cursor: default;' class='btn btn-sm btn-danger'>FAILED</label>";
+                        break;
+                }
+            })
+            ->addColumn('action', function ($item) {
+                $mode = 0;
+                $action = '';
+                if(Auth::user()->role->level == 'MasterAdmin'){
+                    $mode += 1;
+                    $action .= "<button onclick='editModal(".json_encode(['type' => 'edit', 'id' => $item->id, 'text' => $item->explanation]).")' class='btn btn-sm btn-warning btn-square' title='Add Explanation'><i class='si si-pencil'></i></button>";
+                }
+                if($item->explanation != null || $item->explanation != ''){
+                    $mode += 1;
+                    $action .= " <button onclick='editModal(".json_encode(['type' => 'show', 'id' => $item->id, 'text' => $item->explanation]).")' class='btn btn-sm btn-primary btn-square' title='See Explanation'><i class='si si-speech'></i></button>";
+                }
+                if($item->status == 'DONE' && ($item->results != '' || $item->results != null)){
+                    $mode += 1;
+                    $action .= " <a target='_blank' href='".$item->results."' class='btn btn-sm btn-success btn-square' title='Download File'><i class='si si-cloud-download'></i></a>";
+                }
+                if($mode == 0){
+                    return '-';
+                }
+                return $action;
+            })
+            ->rawColumns(['status', 'action'])
+            ->make(true);
     }
 
-    public function reportDownloadExport(Request $request){
+    public function reportDownloadAddExplanation(Request $request, $id){
+        
+        $trace = JobTrace::where('id', $id)->first();
 
-    	// JOB TRACING AND QUEUE
-    	$trace = JobTrace::create([
-                'id_company' => 1,
-                'id_user' => 1,
-                'date' => Carbon::now(),
-                'title' => $request->title.' '.Carbon::now()->format('d-m-Y H:i:s'),
-                'status' => 'PROCESSING',            
+        if($trace) $trace->update($request->all());
+
+        return redirect()->back()
+            ->with([
+                'type' => 'success',
+                'title' => 'Sukses!<br/>',
+                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil update explanation!'
             ]);
 
-    	dispatch(new ExportJob($trace, $request->all(), Auth::user()));
-    	return $request->all();
     }
 
-    public function reportDownloadExportAll(Request $request){
-    	return $request->all();
-    }
 }

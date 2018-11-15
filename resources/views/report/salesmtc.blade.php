@@ -66,78 +66,35 @@
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
           </h3>
-          <div class="block-option">
-            <a class="button" href="{{ route('sellin.export') }}">TES</a>
+          <div class="block-option">            
             <button id="exportAll" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
           </div>
         </div>
 
-        <div class="col-lg-12">
-            <div class="block">
-                <ul class="nav nav-tabs nav-tabs-alt js-tabs-enabled" data-toggle="tabs" role="tablist" style="cursor: pointer;">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="onTarget">Sales On Target</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="offTarget">Sales Off Target</a>
-                    </li>
-                </ul>
-                <div class="block-content tab-content">
-                    <div class="tab-pane active" id="tabOnTarget" role="tabpanel">
-                        <table class="table table-striped table-vcenter js-dataTable-full" id="onTargetTable">
-                          <thead>          
-                            <th>Periode</th>
-                            <th>Region</th>
-                            <th>Jawa / Non Jawa</th>
-                            <th>Jabatan</th>
-                            <th>Nama</th>
-                            <th>Area</th>
-                            <th>Sub Area</th>
-                            <th>Outlet</th>
-                            <th>Account</th>
-                            <th>Category</th>
-                            <th>Product Line</th>
-                            <th>Product Name</th>
-                            <th>Actual Out Qty</th>
-                            <th>Actual In Qty</th>
-                            <th>Price</th>
-                            <th>Actual Out Value</th>
-                            <th>Actual In Value</th>
-                            <th>Total Actual</th>
-                            <th>Target Qty</th>
-                            <th>Target Value</th>
-                          </thead>
-                        </table>
-                    </div>
-                    <div class="tab-pane" id="tabOffTarget" role="tabpanel">
-                        <table class="table table-striped table-vcenter js-dataTable-full" id="offTargetTable">
-                          <thead>          
-                            <th>Periode</th>
-                            <th>Region</th>
-                            <th>Jawa / Non Jawa</th>
-                            <th>Jabatan</th>
-                            <th>Nama</th>
-                            <th>Area</th>
-                            <th>Sub Area</th>
-                            <th>Outlet</th>
-                            <th>Account</th>
-                            <th>Category</th>
-                            <th>Product Line</th>
-                            <th>Product Name</th>
-                            <th>Actual Out Qty</th>
-                            <th>Actual In Qty</th>
-                            <th>Price</th>
-                            <th>Actual Out Value</th>
-                            <th>Actual In Value</th>
-                            <th>Total Actual</th>
-                            <th>Target Qty</th>
-                            <th>Target Value</th>
-                          </thead>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <table class="table table-striped table-vcenter js-dataTable-full" id="onTargetTable">
+          <thead>          
+            <th>Periode</th>
+            <th>Region</th>
+            <th>Jawa / Non Jawa</th>
+            <th>Jabatan</th>
+            <th>Nama</th>
+            <th>Area</th>
+            <th>Sub Area</th>
+            <th>Outlet</th>
+            <th>Account</th>
+            <th>Category</th>
+            <th>Product Line</th>
+            <th>Product Name</th>
+            <th>Actual Out Qty</th>
+            <th>Actual In Qty</th>
+            <th>Price</th>
+            <th>Actual Out Value</th>
+            <th>Actual In Value</th>
+            <th>Total Actual</th>
+            <th>Target Qty</th>
+            <th>Target Value</th>
+          </thead>
+        </table>
 
       </div>
     </div>
@@ -179,9 +136,8 @@
 
         var table = 'onTargetTable';
         var filterId = ['#filterRegion', '#filterArea', '#filterSubArea', '#filterStore', '#filterEmployee'];
-        var url = "{!! route('salesmtc.data.sales') !!}";
-        var url_target = "{!! route('salesmtc.data.target') !!}";
-        var order = [ [0, 'desc'] ];
+        var url = "{!! route('salesmtc.data') !!}";
+        var order = [ [0, 'desc']];
         var columnDefs = [{"className": "dt-center", "targets": [0]}];
         var tableColumns = [
                 { data: 'periode', name: 'periode'},
@@ -336,6 +292,7 @@
             "columns": tableColumns,
             "columnDefs": columnDefs,
             "order": order,
+            "ordering": false
           });
 
           // TABLE BY TARGET
@@ -391,7 +348,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '../export' + "?" + $("#filterForm").serialize() + '&model=Sell In',
+                url: 'export' + "?" + $("#filterForm").serialize() + "&model=Sales MTC",
                 dataType: 'json',
                 beforeSend: function()
                 {   
@@ -402,14 +359,9 @@
                 success: function (data) {
                     
                     console.log(data);
-                    // element.removeAttr('disabled');
-                    // icon.attr('class', thisClass);
-                    // var a = document.createElement("a");
-                    // a.href = data.file; 
-                    // a.download = data.name;
-                    // document.body.appendChild(a);
-                    // a.click();
-                    // a.remove();
+                    element.removeAttr('disabled');
+                    icon.attr('class', thisClass);
+                    alert(data.message);
                     
                 },
                 error: function(xhr, textStatus, errorThrown){
@@ -424,20 +376,6 @@
 
 
     });
-
-    $("#offTarget").click(function() {
-      $('#onTarget').removeClass('active');
-      $('#offTarget').addClass('active');
-      $('#tabOnTarget').removeClass('active');
-      $('#tabOffTarget').addClass('active');
-    })
-
-    $("#onTarget").click(function() {
-      $('#onTarget').addClass('active');
-      $('#offTarget').removeClass('active');
-      $('#tabOnTarget').addClass('active');
-      $('#tabOffTarget').removeClass('active');
-    })
 
   </script>
 @endsection

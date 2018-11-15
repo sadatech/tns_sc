@@ -6,6 +6,151 @@ function showFilter() {
     console.log(this.filters);
 }
 
+function triggerResetWithoutWidth (arrayOfData) {
+    console.log('reset')
+    var data = arrayOfData[0];
+    var table = arrayOfData[1];
+    var element = arrayOfData[2];
+    var newElement = $('#'+arrayOfData[1]);
+    // console.log(newElement)
+    var url = arrayOfData[3];
+    var tableColumns = arrayOfData[4];
+    var columnDefs = arrayOfData[5];
+    var order = arrayOfData[6];
+
+    data.map((id) => {
+        $(id).val('').trigger('change');
+    });
+
+    this.filters = {};
+    if(typeof arrayOfData[8] !== 'undefined') {
+        this.filters['date_range'] = moment().format('YYYY-MM-DD')+'|'+moment().format('YYYY-MM-DD');
+    }
+
+     // Datatable setup
+
+    if($.fn.dataTable.isDataTable('#'+table)){
+        newElement.DataTable().clear();
+        newElement.DataTable().destroy();
+    }
+
+    // swal({
+    //   title: "Please Wait!",
+    //   text: "Data in Process, Relax!",
+    //   icon: "success",
+    //   showCancelButton: false,
+    //   showConfirmButton: false
+    // });
+    
+    newElement.dataTable({
+        "fnCreatedRow": function (nRow, data) {
+            $(nRow).attr('class', data.id);
+        },
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            error: function (data) {
+              swal("Error!", "Failed to load Data!", "error");
+            },
+
+            dataSrc: function(result){
+                this.data = result.data;
+                return result.data;
+            },
+        },
+        // scrollY:        "300px",
+        scrollX:        true,
+        scrollCollapse: true,
+        "bFilter": false,
+        "rowId": "id",
+        "columns": tableColumns,
+        "columnDefs": columnDefs,
+        "order": order,
+        "autoWidth" : false,
+    });
+
+    swal("Reset Filter Done", "Please check the results", "success");
+}
+
+// Filtering data without search box
+function filteringReportWithoutWidth(arrayOfData) {
+    // console.log('filter');
+    // console.log(arrayOfData);
+    var table = arrayOfData[0];
+    var element = arrayOfData[1];
+    var newElement = $('#'+arrayOfData[0]);
+    var url = arrayOfData[2];
+    var tableColumns = arrayOfData[3];
+    var columnDefs = arrayOfData[4];
+    var order = arrayOfData[5];
+    var filter = [];
+
+    this.moreParams = [];
+    this.moreParamsPost  = {};
+    // console.log('filters:');
+    // console.log(this.filters);
+    for (filter in this.filters) {
+        this.moreParams.push(filter + '=' + this.filters[filter]);
+        this.moreParamsPost[filter] = this.filters[filter];
+    }
+    var self = this;
+    // console.log('moreParamsPost:');
+    // console.log(self.moreParamsPost);
+    $(document).ready(function () {
+        // console.log(self.moreParamsPost);
+        // console.log(element);
+        // console.log(newElement);
+        if($.fn.dataTable.isDataTable('#'+table)){
+            // console.log('isDataTable');
+            newElement.DataTable().clear();
+            newElement.DataTable().destroy();
+        }
+
+        // swal({
+        //   title: "Please Wait!",
+        //   text: "Data in Process, Relax!",
+        //   icon: "success",
+        //   showCancelButton: false,
+        //   showConfirmButton: false
+        // });
+
+        newElement.dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: url + "?" + getParam(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+
+                dataSrc: function(result){
+                    this.data = result.data;
+                    return result.data;
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter": false,
+            "rowId": "id",
+            "columns": tableColumns,
+            "columnDefs": columnDefs,
+            "order": order,
+            "autoWidth": false
+        });
+        
+
+        swal("Set Filter Done", "Please check the results", "success");
+    })
+}
+
 // Reset all filter for search without search box
 function triggerResetWithoutSearch (arrayOfData) {
     console.log('reset')
@@ -70,6 +215,7 @@ function triggerResetWithoutSearch (arrayOfData) {
         "columns": tableColumns,
         "columnDefs": columnDefs,
         "order": order,
+        "ordering": false
     });
 
     swal("Reset Filter Done", "Please check the results", "success");
@@ -143,6 +289,7 @@ function filteringReportWithoutSearch(arrayOfData) {
             "columns": tableColumns,
             "columnDefs": columnDefs,
             "order": order,
+            "ordering": false
         });
         
 

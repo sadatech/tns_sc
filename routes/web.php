@@ -495,7 +495,7 @@ Route::prefix('company')->group(function () {
 });
 
 
-// ***************** REPORTING ***********************
+// ***************** REPORTING (START) ***********************
 
 Route::prefix('report')->group(function () {
 	Route::prefix('sales')->group(function () {
@@ -555,18 +555,12 @@ Route::prefix('report')->group(function () {
 
 	Route::prefix('salesmtc')->group(function () {
 		Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');
-		Route::post('/data_sales', 'ReportController@salesMtcDataSales')->name('salesmtc.data.sales')->middleware('auth');
-		Route::post('/data_target', 'ReportController@salesMtcDataTarget')->name('salesmtc.data.target')->middleware('auth');
-
-		Route::get('/tes', 'ReportController@tes')->name('salesmtc.export')->middleware('auth');
+		Route::post('/data', 'ReportController@salesMtcDataSalesAlt')->name('salesmtc.data')->middleware('auth');
 	});
 
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
 	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');
-
-	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
-
 
 	Route::prefix('smd')->group(function () {
 		Route::get('/', function(){
@@ -595,7 +589,7 @@ Route::prefix('report')->group(function () {
 
 });
 
-// ***************** REPORTING ***********************
+// ***************** REPORTING (END) ***********************
 
 /**
 *	Welcome Pages
@@ -610,6 +604,11 @@ Route::prefix('welcome')->group(function () {
 */
 Route::prefix('utility')->group(function () {
 	Route::get('/getCity', 'DashboardController@getCity')->name('getCity');
+	Route::prefix('export-download')->group(function () {
+		Route::get('/', 'UtilitiesController@reportDownloadIndex')->name('export-download')->middleware('auth');
+		Route::post('/data', 'UtilitiesController@reportDownloadData')->name('export-download.data')->middleware('auth');
+		Route::post('/explain/{param}', 'UtilitiesController@reportDownloadAddExplanation')->name('export-download.explain')->middleware('auth');
+	});	
 });
 
 /**
