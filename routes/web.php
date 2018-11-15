@@ -554,7 +554,11 @@ Route::prefix('report')->group(function () {
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
 
-	Route::prefix('smd')->group(function () {
+	Route::prefix('attendance')->group(function(){
+		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
+	});
+Route::prefix('smd')->group(function () {
 		Route::get('/', function(){
 			return view('report.smd');
 		})->name('report.smd.pasar')->middleware('auth');
@@ -563,7 +567,9 @@ Route::prefix('report')->group(function () {
 		})->name('report.attendance.smd')->middleware('auth');
 		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+
 	});
+
 
 	Route::prefix('sales')->group(function () {
 		Route::get('/', function(){
