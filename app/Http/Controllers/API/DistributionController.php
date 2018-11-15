@@ -88,6 +88,9 @@ class DistributionController extends Controller
 		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
 			$res['msg'] = "Token Absent.";
 		}
-		return response()->json($res);
+
+		$code = $res['code'];
+		unset($res['code']);
+		return response()->json($res, $code);
 	}
 }

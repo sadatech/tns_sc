@@ -131,8 +131,13 @@ class OutletController extends Controller
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
 			} else {
-				if ($id == 1) {
-					$outlet = Outlet::where('active', 1)->whereHas('employeePasar', function($query) use ($user) {
+				if ($id == 1 || $id == 2) {
+					if ($id == 1) {
+						$activeStatus = 'aktif';
+					}else{
+						$activeStatus = 'tidak aktif';
+					}
+					$outlet = Outlet::where('active', $id)->whereHas('employeePasar', function($query) use ($user) {
 						return $query->where('id_employee', $user->id);
 					})->get();
 					$code = 200;
@@ -155,32 +160,9 @@ class OutletController extends Controller
 						$res['outlet'] = $listOutlet;
 					} else {
 						$res['success'] = false;
-						$res['msg'] = "Kamu tidak mempunyai outlet aktif.";
+						$res['msg'] = "Kamu tidak mempunyai outlet $activeStatus.";
 					}
-				} else if ($id == 2) {
-					$outlet = Outlet::where('active', 2)->whereHas('employeePasar', function($query) use ($user) {
-						return $query->where('id_employee', $user->id);
-					})->get();
-					if ($outlet->count() < 1) {
-						$res['success'] = false;
-						$res['msg'] = "Kamu tidak mempunyai outlet tidak aktif.";
-						$code = 200;
-					} else {
-						$res['success'] = true;
-						foreach ($outlet->get(['outlets.*']) as $data) {
-							$listOutlet[] = array(
-								'id' 		=> $data->id,
-								'name' 		=> $data->name,
-								'code' 		=> $data->customer_code,
-								'phone' 	=> $data->phone,
-								'id_pasar' 	=> $data->employeePasar->pasar->id,
-								'pasar' 	=> $data->employeePasar->pasar->name,
-								'address' 	=> $data->employeePasar->pasar->address,
-							);
-						}
-						$res['outlet'] = $listOutlet;
-						$code = 200;
-					}
+
 				} else {
 					$res['success'] = false;
 					$res['msg'] = "Type outlet tidak diketahui.";
@@ -316,7 +298,7 @@ class OutletController extends Controller
 				$res['msg'] = "User not found.";
 			} else {
 				$code 	= 200;
-				$attId 	= Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->first();
+				$attId 	= Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->orderBy('created_at', 'DESC')->first();
 				if (isset($attId->id)) {
 					$attendance = AttendanceOutlet::where(['id_attendance' => $attId->id])->first();
 					if (!empty($attendance)) {
@@ -376,13 +358,13 @@ class OutletController extends Controller
 						if ($status == 'true') {
 							$update = Outlet::where("id", $id)
 							->update([
-								'active'	=> 2,
+								'active'	=> false,
 							]);
 							$disableStatus = 'disable';
 						} else {
 							$update = Outlet::where("id", $id)
 							->update([
-								'active'	=> 1,
+								'active'	=> true,
 							]);
 							$disableStatus = 'enable';
 						}
