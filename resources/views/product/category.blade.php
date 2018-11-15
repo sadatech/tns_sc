@@ -151,6 +151,33 @@
     $('#category').DataTable({
       processing: true,
       serverSide: true,
+      drawCallback: function(){
+        $('.js-swal-delete').on('click', function(){
+          var url = $(this).data("url");
+          swal({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this data!',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d26a5c',
+            confirmButtonText: 'Yes, delete it!',
+            html: false,
+            preConfirm: function() {
+                return new Promise(function (resolve) {
+                    setTimeout(function () {
+                        resolve();
+                    }, 50);
+                });
+            }
+          }).then(function(result){
+            if (result.value) {
+                window.location = url;
+            } else if (result.dismiss === 'cancel') {
+                swal('Cancelled', 'Your data is safe :)', 'error');
+            }
+          });
+        });
+      },
       // scrollY: "300px",
       ajax: '{!! route('category.data') !!}',
       columns: [

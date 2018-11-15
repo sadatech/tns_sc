@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Pasar;
 use App\SubArea;
 use App\Area;
+use App\EmployeePasar;
 use App\Region;
 use DB;
 use Auth;
@@ -136,14 +137,26 @@ class PasarController extends Controller
 
     public function delete($id)
     {
-        $dataPasar = Pasar::find($id);
-            $dataPasar->delete();
-            return redirect()->back()
-            ->with([
-                'type'      => 'success',
-                'title'     => 'Sukses!<br/>',
-                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-            ]);
+        {
+			$dataPasar = Pasar::find($id);
+			$emp = EmployeePasar::where(['id_pasar' => $dataPasar->id])->count();
+			if (!$emp < 1) {
+				return redirect()->back()
+				->with([
+					'type'    => 'danger',
+					'title'   => 'Gagal!<br/>',
+					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di Employee Pasar!'
+				]);
+			} else {
+				$dataPasar->delete();
+				return redirect()->back()
+				->with([
+					'type'      => 'success',
+					'title'     => 'Sukses!<br/>',
+					'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+			   ]);
+			}
+		}
     }
 
     public function importXLS(Request $request)
@@ -181,7 +194,7 @@ class PasarController extends Controller
                             Pasar::create([
                                 'name'              => $row->pasar,
                                 'id_subarea'        => $id_subarea,
-                                'longitude'         => (isset($row->longitude)? $row->longitude : "-"),
+                                'longitude'         => (isset($row->longitude) ? $row->longitude : "-"),
                                 'latitude'          => (isset($row->latitude) ? $row->latitude : "-"),
                                 'address'           => $row->address
                             ])->id;
@@ -213,19 +226,19 @@ class PasarController extends Controller
 
     public function findSub($data)
     {
-        $dataSub = Subarea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
-        if ($dataSub->count() < 1 ) {
-
+        $dataSub1 = SubArea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['subarea_name']))."'");
+        if ($dataSub1->count() < 1 ) {
+            
             $dataSub['area_name']  = $data['area_name'];
             $dataSub['region_name']  = $data['region_name'];
             $id_area = $this->findArea($dataSub);
-            $subarea = Subarea::create([
+            $subarea = SubArea::create([
               'name'        => $data['subarea_name'],
               'id_area'     => $id_area
           ]);
             $id_subarea = $subarea->id;
         }else{
-            $id_subarea = $dataSub->first()->id;
+            $id_subarea = $dataSub1->first()->id;
         }
         return $id_subarea;
     }
@@ -267,26 +280,35 @@ class PasarController extends Controller
     
     public function exportXLS()
     {
-        $pasar = Pasar::orderBy('created_at', 'DESC')->get();
-        $data = array();
-        foreach ($pasar as $val) {
-            $data[] = array(
-                'Pasar'             => $val->name,
-                'Address'           => $val->address,
-                'Longitude'         => (isset($val->longitude) ? $val->longitude : "-"),
-                'Latitude'          => (isset($val->latitude) ? $val->latitude : "-"),
-                'Subarea'           => $val->subarea->name,
-                'Area'              => $val->subarea->area->name,
-                'Region'            => $val->subarea->area->region->name
-            );
+        $pasar = Pasar::orderBy('created_at', 'DESC');
+        if ($pasar->count() > 0) {
+            $data = array();
+            foreach ($pasar->get() as $val) {
+                $data[] = array(
+                    'Pasar'             => $val->name,
+                    'Address'           => $val->address,
+                    'Longitude'         => (isset($val->longitude) ? $val->longitude : "-"),
+                    'Latitude'          => (isset($val->latitude) ? $val->latitude : "-"),
+                    'Subarea'           => $val->subarea->name,
+                    'Area'              => $val->subarea->area->name,
+                    'Region'            => $val->subarea->area->region->name
+                );
+            }
+            $filename = "Market_".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('Market', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
         }
-        $filename = "Market_".Carbon::now().".xlsx";
-        return Excel::create($filename, function($excel) use ($data) {
-            $excel->sheet('Market', function($sheet) use ($data)
-            {
-                $sheet->fromArray($data);
-            });
-        })->download();
     }
 
 }

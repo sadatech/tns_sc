@@ -20,7 +20,7 @@
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover" id="employeetable">
                     <thead>
-                        <th class="text-center" width="245px">Action</th>
+                        <th class="text-center" width="350px">Action</th>
                         <th width="200px">NIK</th>
                         <th width="200px">Name</th>
                         <th width="200px">No. KTP</th>
@@ -176,6 +176,7 @@
     $(function() {
         $('#employeetable').DataTable({
             processing: true,
+            scrollX: true,
             scrollY: "300px",
             drawCallback: function(){
                 $('.popup-image').magnificPopup({
@@ -210,7 +211,7 @@
             ajax: '{!! route('employee.data.dc') !!}',
             serverSide: true,
             columns: [
-            { data: 'action', name: 'action' },
+                { data: 'action', name: 'action' },
             { data: 'nik', name: 'nik' },
             { data: 'name', name: 'name' },
             { data: 'ktp', name: 'ktp' },

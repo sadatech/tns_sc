@@ -25,11 +25,11 @@
                         <th width="200px">Optional Name</th>
                         <th width="200px">Sub Area</th>
                         <th width="200px">Account</th>
-                        <th>Distributor</th>
                         <th width="200px">Sales Tiers</th>
                         <th>Store Panel</th>
                         <th>Coverage</th>
                         <th>Is Vito</th>
+                        <th>Is Jawa</th>
                         <th>Delivery</th>
                         <th>Longitude</th>
                         <th>Latitude</th>
@@ -54,12 +54,11 @@
           </div>
         </div>
       </div>
-      <h1>comingsoon</h1>
-      <!-- <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('store.importXLS') }}">
+      <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('store.importXLS') }}">
         {{ csrf_field() }}
         <div class="block-content">
           <div class="form-group">
-            <a href="{{ route('subarea.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+            <a href="{{ route('store.exampleSheet') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
           </div>
           <div class="block-content">
             <h5> Sample Data :</h5>
@@ -76,6 +75,7 @@
                         <td><b>Timezone</b></td>
                         <td><b>Sales Tier</b></td>
                         <td><b>Is Vito</b></td>
+                        <td><b>Is Jawa</b></td>
                         <td><b>Store Panel</b></td>
                         <td><b>Coverage</b></td>
                         <td><b>Delivery</b></td>
@@ -88,11 +88,12 @@
                         <td>26932 Arno Rapids Apt. 771</td>
                         <td>13.607672</td>
                         <td>151.669133</td>
-                        <td>Merritt</td>
-                        <td>South Brody</td>
-                        <td>WIT</td>
-                        <td>Tier-1</td>
-                        <td>Vito</td>
+                        <td>id_account</td>
+                        <td>id_subarea</td>
+                        <td>id_timezone</td>
+                        <td>id_salestier</td>
+                        <td>Vito / Non Vito</td>
+                        <td>Jawa / Non Jawa</td>
                         <td>No</td>
                         <td>Direct</td>
                         <td>Direct</td>
@@ -112,7 +113,7 @@
           </button>
           <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
         </div>
-      </form> -->
+      </form>
     </div>
   </div>
 </div>  
@@ -197,11 +198,11 @@
             { data: 'name2', name: 'name2' },
             { data: 'subarea', name: 'subarea' },
             { data: 'account', name: 'account' },
-            { data: 'distributor', name: 'distributor' },
             { data: 'sales', name: 'sales' },
             { data: 'store_panel', name: 'store_panel' },
             { data: 'coverage', name: 'coverage' },
             { data: 'is_vito', name: 'is_vito' },
+            { data: 'is_jawa', name: 'is_jawa' },
             { data: 'delivery', name: 'delivery' },
             { data: 'longitude', name: 'longitude' },
             { data: 'latitude', name: 'latitude' },
