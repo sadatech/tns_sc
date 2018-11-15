@@ -361,7 +361,12 @@
                     console.log(data);
                     element.removeAttr('disabled');
                     icon.attr('class', thisClass);
-                    alert(data.message);
+                    
+                    if(data.result){
+                      swal("Berhasil melakukan request", "Silahkan cek di halaman 'Download Export File'", "success");
+                    }else{
+                      swal("Gagal melakukan request", "Silahkan dicoba kembali", "error");
+                    }
                     
                 },
                 error: function(xhr, textStatus, errorThrown){
