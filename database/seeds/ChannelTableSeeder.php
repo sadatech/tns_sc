@@ -8,6 +8,9 @@ class ChannelTableSeeder extends Seeder
 {
     public function run()
     {
+        DB::table('channels')->insert([
+            ['name' => 'GTC']
+        ]);
         $faker = Faker::create();
         foreach(range(0,99) as $i){
             DB::table('channels')->insert([

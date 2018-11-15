@@ -11,56 +11,89 @@ use Carbon\Carbon;
 use App\StockMdHeader as MDHeader;
 use App\StockMdDetail as MDDetail;
 use App\SkuUnit;
+use Exception;
 
 class StockController extends Controller
 {
+	public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
+
 	public function store(Request $request)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
 			} else {
+				$code = 200;
 				try {
-					DB::beginTransaction();
 					$data = json_decode($request->getContent());
+					DB::beginTransaction();
 					$date = Carbon::parse($data->date);
-					$header = MDHeader::create([
-						'id_employee' => $user->id,
-						'id_pasar' => $data->pasar,
-						'stockist' => $data->stockist,
-						'date' => $date,
-						'week' => $date->weekOfMonth,
-					]);
-					if (isset($header->id)) {
+					$checkStock = MDHeader::where([
+						'id_employee' 	=> $user->id,
+						'id_pasar' 		=> $data->pasar,
+						'stockist' 		=> $data->stockist,
+						'date' 			=> $date,
+					])->first();
+
+					if (!$checkStock) {
+						$header = MDHeader::create([
+							'id_employee' 	=> $user->id,
+							'id_pasar' 		=> $data->pasar,
+							'stockist' 		=> $data->stockist,
+							'date' 			=> $date,
+							'week' 			=> $date->weekOfMonth,
+						]);
+						$headerId = $header->id;
+					}else{
+						$headerId = $checkStock->id;
+					}
+
+					if (isset($headerId)) {
 						foreach ($data->product as $product) {
-							$detail = MDDetail::create([
-								'id_stock' => $header->id,
-								'id_product' => $product->id,
-								'id_satuan' => $product->satuan,
-							]);
-							if (!isset($detail->id)) {
-								throw new Exception("Error Processing Request", 1);
+							$checkDetail = MDDetail::where([
+								'id_stock' 		=> $headerId,
+								'id_product' 	=> $product->id,
+							])->first();
+							if (!$checkDetail) {
+								$detail = MDDetail::create([
+									'id_stock' 		=> $headerId,
+									'id_product' 	=> $product->id,
+									'oos' 			=> $product->oos,
+								]);
+								if (!isset($detail->id)) {
+									throw new Exception("Error Processing Request", 1);
+
+								}
+							}else{
+								$checkDetail->oos = $product->oos;
+								$checkDetail->save();
 							}
 						}
 						DB::commit();
 						$res['success'] = true;
 						$res['msg'] = "Berhasil menambah stock.";
-						$code = 200;
 					} else {
 						DB::rollback();
 						$res['success'] = false;
 						$res['msg'] = "Gagal menambah stock.";
-						$code = 200;
 					}
 				} catch (Exception $e) {
 					DB::rollback();
 					$res['success'] = false;
 					$res['msg'] = "Gagal menambah stock.";
-					$code = 200;
 				}	
 			}
+		} catch (\Illuminate\Database\QueryException $e) {
+			throw new Exception("Error", 1);
+		} catch (Exception $e) {
+			DB::rollback();
+			$res['success'] = false;
+			$res['msg'] = "Gagal menambah stock.";
+			$code = 200;
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			$res['msg'] = "Token Expired.";
 			$code = $e->getStatusCode();

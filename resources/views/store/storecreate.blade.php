@@ -69,14 +69,14 @@
                 </div>
             </div>
             <div class="block-content">
-                <h5><b>Distributor, Account, Area, and Type</b></h5>
+                <h5><b>Account, Area, and Type</b></h5>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Distributor</label>
-                        <select class="js-select2 custom-select" name="distributor[]" multiple required>
-                            @foreach ($distributor as $dis)
-                            <option value="{{ $dis->id }}">{{ $dis->name }}</option>
-                            @endforeach
+                      <div class="form-group col-md-6">
+                        <label>Is Jawa</label>
+                        <select class="js-select2 custom-select" name="is_jawa" required>
+                            <option value="" disabled selected>Choose Jawa / Non Jawa</option>
+                            <option value="Jawa">JAWA</option>
+                            <option value="Non Jawa">NON JAWA</option>
                         </select>
                     </div>
                      <div class="form-group col-md-6">

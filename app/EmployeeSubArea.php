@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class EmployeeSubArea extends Model
 {
     protected $fillable = [
-        'id_employee', 'id_subarea'
+        'id_employee', 'id_subarea', 'isTl'
     ];
 
     public function employee()

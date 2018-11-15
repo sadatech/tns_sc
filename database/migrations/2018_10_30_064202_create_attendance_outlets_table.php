@@ -22,7 +22,7 @@ class CreateAttendanceOutletsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('id_outlet')->references('id')->on('stores')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_outlet')->references('id')->on('outlets')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_attendance')->references('id')->on('attendances')->onUpdate('cascade')->onDelete('cascade');
         });
     }

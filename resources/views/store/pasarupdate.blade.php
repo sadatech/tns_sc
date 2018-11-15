@@ -70,7 +70,7 @@
                 <button type="submit" class="btn btn-alt-success">
                     <i class="fa fa-save"></i> Save
                 </button>
-                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-alt-secondary"><a href="{{ route('pasar') }}">Back</a></button>
             </div>
         </form>
     </div>

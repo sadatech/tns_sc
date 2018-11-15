@@ -73,7 +73,7 @@
 </div>
 
 {{-- MODAL ADD TARGET --}}
-@include('product._form_target', ['id' => 'tambahModal', 'action' => route('target.add')])
+@include('product._form_target', ['id' => 'tambahModal', 'action' => route('mtc.add')])
 @endsection
 
 @section('css')
@@ -95,7 +95,7 @@
   <script type="text/javascript">
     function editModal(json) {
       $('#editModal').modal('show');
-      $('#editModalForm').attr('action', "{{ url('/product/target/update') }}/"+json.id);
+      $('#editModalForm').attr('action', "{{ url('/target/mtc/update') }}/"+json.id);
       $('#editQuantity').val(json.quantity)
       console.log(json);
     }
@@ -149,7 +149,7 @@
                     });
                   });
               },
-              ajax: '{!! route('target.data') !!}',
+              ajax: '{!! route('mtc.data') !!}',
               columns: [
 	              { data: 'id', name: 'id' },
                 { data: 'employee.name', name: 'employee.name'},
