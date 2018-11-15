@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Cbd;
 use App\Outlet;
 use App\EmployeePasar;
 use App\AttendanceOutlet;
@@ -15,10 +16,14 @@ use DB;
 
 class OutletController extends Controller
 {
+	public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
+
 	public function store(Request $request)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
@@ -49,7 +54,9 @@ class OutletController extends Controller
 							'customer_code'		=> $data['code'],
 							'name'				=> $data['name'],
 							'phone'				=> $data['phone'],
-							'active'			=> true,
+							'address'			=> $data['address'],
+							'new_ro'			=> ($data['new_ro'] == 'yes' ? Carbon::today()->toDateString() : '' ),
+							'active'			=> 1,
 						]);
 						if ($insert->id) {
 							$res['success'] = true;
@@ -80,16 +87,52 @@ class OutletController extends Controller
 		return response()->json($res, $code);
 	}
 
+	public function update(Request $request, $id)
+	{
+		try {
+			if (!$user = JWTAuth::parseToken()->authenticate()) {
+				$res['msg'] = "User not found.";
+				$code = $e->getStatusCode();
+			} else {
+				$data = $request->all();
+				$update = Outlet::where('id',$id)->update([
+					'customer_code'		=> $data['code'],
+					'name'				=> $data['name'],
+					'phone'				=> $data['phone'],
+					'address'			=> $data['address'],
+				]);
+				if ($update) {
+					$res['success'] = true;
+					$res['msg'] = "Success update outlets.";
+					$code = 200;
+				} else {
+					$res['success'] = false;
+					$res['msg'] = "Failed to update outlets.";
+					$code = 200;
+				}
+			}
+		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			$res['msg'] = "Token Expired.";
+			$code = $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			$res['msg'] = "Token Invalid.";
+			$code = $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+			$res['msg'] = "Token Absent.";
+			$code = $e->getStatusCode();
+		}
+		return response()->json($res, $code);
+	}
+
 	public function list($id = 1)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
 			} else {
 				if ($id == 1) {
-					$outlet = Outlet::where('active', true)->with(['employeePasar' => function($query) use ($user) {
+					$outlet = Outlet::where('active', 1)->with(['employeePasar' => function($query) use ($user) {
 						$query->where([
 							'id_employee' => $user->id
 						]);
@@ -102,39 +145,41 @@ class OutletController extends Controller
 						$res['success'] = true;
 						foreach ($outlet->get(['outlets.*']) as $data) {
 							$listOutlet[] = array(
-								'id' => $data->id,
-								'name' => $data->name,
-								'code' => $data->customer_code,
-								'phone' => $data->phone,
-								'id_pasar' => $data->employeePasar->pasar->id,
-								'pasar' => $data->employeePasar->pasar->name,
-								'address' => $data->employeePasar->pasar->address,
+								'id' 		=> $data->id,
+								'name' 		=> $data->name,
+								'code' 		=> $data->customer_code,
+								'phone' 	=> $data->phone,
+								'address'	=> $data->address,
+								'new_ro'	=> $data->new_ro,
+								'id_pasar' 	=> $data->employeePasar->pasar->id,
+								'pasar' 	=> $data->employeePasar->pasar->name,
+								'address' 	=> $data->employeePasar->pasar->address,
 							);
 						}
 						$res['outlet'] = $listOutlet;
 						$code = 200;
 					}
 				} else if ($id == 2) {
-					$outlet = Outlet::where('active', false)->with(['employeePasar' => function($query) use ($user) {
+					$outlet = Outlet::where('active', 2)->with(['employeePasar' => function($query) use ($user) {
 						$query->where([
 							'id_employee' => $user->id
 						]);
-					}])->get();
+					}]);
 					if ($outlet->count() < 1) {
 						$res['success'] = false;
 						$res['msg'] = "Kamu tidak mempunyai outlet tidak aktif.";
 						$code = 200;
 					} else {
 						$res['success'] = true;
-						foreach ($outlet->get(['outlets.*'])->with('pasar') as $data) {
+						foreach ($outlet->get(['outlets.*']) as $data) {
 							$listOutlet[] = array(
-								'id' => $data->id,
-								'name' => $data->name,
-								'code' => $data->customer_code,
-								'phone' => $data->phone,
-								'id_pasar' => $data->employeePasar->pasar->id,
-								'pasar' => $data->employeePasar->pasar->name,
-								'address' => $data->employeePasar->pasar->address,
+								'id' 		=> $data->id,
+								'name' 		=> $data->name,
+								'code' 		=> $data->customer_code,
+								'phone' 	=> $data->phone,
+								'id_pasar' 	=> $data->employeePasar->pasar->id,
+								'pasar' 	=> $data->employeePasar->pasar->name,
+								'address' 	=> $data->employeePasar->pasar->address,
 							);
 						}
 						$res['outlet'] = $listOutlet;
@@ -162,7 +207,6 @@ class OutletController extends Controller
 	public function checkin(Request $request)
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
@@ -224,7 +268,6 @@ class OutletController extends Controller
 	public function checkout()
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
@@ -273,36 +316,34 @@ class OutletController extends Controller
 	public function status()
 	{
 		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 			} else {
-				$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->first();
+				$code 	= 200;
+				$attId 	= Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->first();
 				if (isset($attId->id)) {
 					$attendance = AttendanceOutlet::where(['id_attendance' => $attId->id])->first();
 					if (!empty($attendance)) {
 						if ($attendance->checkout == null) {
 							$res['success'] = true;
-							$res['msg'] = "Kamu belum checkout di outlet sebelumnya.";
-							$res['id'] = (isset($attendance->id_outlet) ? $attendance->id_outlet : null);
-							$res['name'] = (isset($attendance->outlet->name) ? $attendance->outlet->name : null);
-							$res['time'] = $attendance->checkin;
-							$code = 200;
+							$res['msg'] 	= "Kamu belum checkout di outlet sebelumnya.";
+							$res['id'] 		= (isset($attendance->id_outlet) ? $attendance->id_outlet : null);
+							$res['name'] 	= (isset($attendance->outlet->name) ? $attendance->outlet->name : null);
+							$res['time'] 	= $attendance->checkin;
+
+							$cbd = Cbd::where('id_outlet',$attendance->id_outlet)->where('id_employee',$user->id)->whereDate('date', '=', Carbon::today()->toDateString())->count();
+							$res['cbd'] 	= ($cbd > 0 ? 'true' : 'false');
 						} else {
 							$res['success'] = false;
 							$res['msg'] = "Sudah melakukan checkout.";
-							$code = 200;
 						}
 					} else {
 						$res['success'] = false;
 						$res['msg'] = "Belum melakukan check-in.";
-						$code = 200;
 					}
 				} else {
 					$res['success'] = false;
 					$res['msg'] = "Belum melakukan check-in.";
-					$code = 200;
-
 				}
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -313,6 +354,58 @@ class OutletController extends Controller
 			$res['msg'] = "Token Invalid.";
 			$code = $e->getStatusCode();
 
+		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+			$res['msg'] = "Token Absent.";
+			$code = $e->getStatusCode();
+		}
+		return response()->json($res, $code);
+	}
+
+	public function disable($id, $status)
+	{
+		try {
+			if (!$user = JWTAuth::parseToken()->authenticate()) {
+				$res['msg'] = "User not found.";
+				$code = $e->getStatusCode();
+			} else {
+				$code = 200;
+				if (empty($id)) {
+					$res['success'] = false;
+					$res['msg'] = "Please select store.";
+				} else if( empty($status) ) {
+					$res['success'] = false;
+					$res['msg'] = "Please set store status.";
+				} else {
+					DB::transaction(function() use ($id, $status, &$res){
+						if ($status == 'true') {
+							$update = Outlet::where("id", $id)
+							->update([
+								'active'	=> 2,
+							]);
+							$disableStatus = 'disable';
+						} else {
+							$update = Outlet::where("id", $id)
+							->update([
+								'active'	=> 1,
+							]);
+							$disableStatus = 'enable';
+						}
+						if ($update) {
+							$res['success'] = true;
+							$res['msg'] = "Success $disableStatus outlets.";
+						}else{
+							$res['success'] = false;
+							$res['msg'] = "Fail $disableStatus outlets.";
+						}
+					});
+				}
+			}	
+		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			$res['msg'] = "Token Expired.";
+			$code = $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			$res['msg'] = "Token Invalid.";
+			$code = $e->getStatusCode();
 		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
 			$res['msg'] = "Token Absent.";
 			$code = $e->getStatusCode();

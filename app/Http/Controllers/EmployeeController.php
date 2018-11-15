@@ -5,14 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Input;
 use DB;
 use Auth;
 use File;
 use Excel;
+use Validator;
 use Carbon\Carbon;
 use App\Position;
 use App\Agency;
 use App\SubArea;
+use App\Area;
+use App\Region;
+use App\Account;
+use App\Channel;
+use App\SalesTiers;
 use App\Store;
 use App\Timezone;
 use App\Employee;
@@ -454,7 +461,8 @@ class EmployeeController extends Controller
 				'Bank' 		    => (isset($val->bank) ? $val->bank : "-"),
 				'Join Date'		=> $val->joinAt,
 				'Agency'		=> $val->agency->name,
-				'Gender'		=> $val->education,
+				'Gender'		=> $val->gender,
+				'Education'		=> $val->education,
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
 				'Status'		=> (isset($val->status) ? $val->status : "-"),
@@ -469,4 +477,267 @@ class EmployeeController extends Controller
 			});
 		})->download();
 	}
+
+	public function import(Request $request)
+    {
+        $this->validate($request, [
+            'file'      => 'required'
+        ]);
+        $transaction = DB::transaction(function () use ($request) {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+            if($request->hasFile('file')){
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
+                {
+                   
+                    foreach($results as $row)
+                    {
+						$rowRules = [
+							'nik' 		=> 'required|numeric|unique:employees',
+							'name'		=> 'required',	
+							'phone'		=> 'unique:employees',
+							'email'		=> 'unique:employees',
+							'password'	=> 'required',
+							'agency'	=> 'required'
+						];
+                        $validator = Validator($row->toArray(), $rowRules);
+                        if ($validator->fails()) {
+                            return redirect()->back()
+                            ->withErrors($validator)
+                            ->withInput();
+                        } else {
+							// $check = Employee::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
+							// ->where(['nik' => $row->nik, 'isResign' => false])
+							// ->whereIn('id_position', [1,2,6])
+							// ->count();
+
+							// if ($check < 1) {
+								$dataAgency['agency']   = $row['agency'];
+								$id_agency = $this->findAgen($dataAgency);
+								
+								$getPosisi 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
+								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
+                            	$insert = Employee::create([
+									'nik'              	=> $row['nik'],
+									'name'				=> $row['name'],    
+									'ktp'				=> (isset($row->ktp) ? $row->ktp : ""),
+									'phone'   			=> (isset($row['phone']) ? $row['phone'] : ""),
+									'email'   			=> (isset($row['email']) ? $row['email'] : ""),
+									'id_timezone'		=> ($getTimezone ? $getTimezone : 1),
+									'rekening'			=> (isset($row->rekening) ? $row->rekening : ""),
+									'bank' 				=> (isset($row->bank) ? $row->bank : ""),
+									'joinAt'			=> Carbon::now(),
+									'id_agency'			=> $id_agency,
+									'gender'			=> ($row->gender ? $row->gender : "Perempuan"),
+									'education'			=> ($row->education ? $row->education : "SLTA"),
+									'birthdate'			=> Carbon::now(),
+									'password'			=> bcrypt($row['password']),
+									'id_position'		=> ($getPosisi ? $getPosisi : 1),
+									'status'			=> (isset($row->status) ? $row->status : "")	
+                            	]);
+                            		if ($insert->status != "")  {
+										$dataStore = array();
+										$listStore = explode(",", $row->store);
+										foreach ($listStore as $store) {
+											$dataStore[] = array(
+												'id_store'    			=> $this->findStore(
+													$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
+													$row->timezonestore, $row->salestier
+												),
+												'id_employee'          	=> $insert->id
+											);
+										}
+										// dd($store);
+										DB::table('employee_stores')->insert($dataStore);
+									}
+								// }return false;
+                            };
+                        }
+                },false);
+            }
+            return 'success';
+        });
+
+        if ($transaction == 'success') {
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
+            ]);
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+            ]);
+        }
+	}
+	
+	public function findStore($data, $subarea, $area, $region, $account, $channel, $timezonestore, $salestier)
+    {
+        $dataPasar = Store::whereRaw("TRIM(UPPER(name1)) = '". trim(strtoupper($data))."'");
+        if ($dataPasar->count() == 0) {
+
+			$dataSub['subarea_name']   	= $subarea;
+			$dataSub['area_name']   	= $area;
+			$dataSub['region_name']   	= $region;
+			$id_subarea = $this->findSub($dataSub);
+
+			$dataAcc['account']   	= $account;
+			$dataAcc['channel']   	= $channel;
+			$id_account = $this->findAcc($dataAcc);
+
+			$dataSales['sales']   	= $salestier;
+			$id_sales = $this->findSales($dataSales);
+
+			$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($timezonestore))."'")->first()->id;
+            $pasar = Store::create([
+                'name1'       	=> $data,
+				'name2'       	=> "-",
+				'address'		=> "-",
+				'longitude'		=> "",
+				'latitude'		=> "",
+				'delivery'		=> "default delivery",
+				'is_jawa'		=> "default is_jawa",
+				'is_vito'		=> "default is_vito",
+				'coverage'		=> "default coverage",
+				'store_panel'	=> "default store_panel",
+				'id_subarea'	=> $id_subarea,
+				'id_account'	=> $id_account,
+				'id_salestier'	=> $id_sales,
+				'id_timezone'	=> ($getTimezone ? $getTimezone : 1)
+
+            ]);
+            if ($pasar) {
+                $id_pasar = $pasar->id;
+            }
+        } else {
+            $id_pasar = $dataPasar->first()->id;
+        }
+        return $id_pasar;
+    }
+
+	
+	public function findAgen($data)
+    {
+        $dataAgency = Agency::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['agency']))."'")->get();
+        if ($dataAgency != null) {
+            $agency = Agency::create([
+              'name'        => $data['agency']
+          ]);
+            $id_agency = $agency->id;
+        } else {
+            $id_agency = $dataAgency->first()->id;
+        }
+        return $id_agency;
+	}
+
+	public function findSales($data)
+    {
+        $dataAgency = SalesTiers::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['sales']))."'")->get();
+        if ($dataAgency != null) {
+            $agency = SalesTiers::create([
+              'name'        => $data['sales']
+          ]);
+            $id_sales = $agency->id;
+        } else {
+            $id_sales = $dataAgency->first()->id;
+		}
+		return $id_sales;
+	}
+
+	public function findAcc($data)
+    {
+        $dataArea = Account::where('name','like','%'.trim($data['account']).'%');
+        if ($dataArea->count() == 0) {
+
+			$dataAccount = $data;
+			$id_channel = $this->findChannel($dataAccount);
+            $area = Account::create([
+              'name'        => $data['account'],
+              'id_channel'   => $id_channel,
+          ]);
+            $id_account = $area->id;
+        }else{
+            $id_account = $dataArea->first()->id;
+        }
+        return $id_account;
+    }
+
+    public function findChannel($data)
+    {
+        $dataRegion = Channel::where('name','like','%'.trim($data['channel']).'%');
+        if ($dataRegion->count() == 0) {
+
+            $region = Channel::create([
+              'name'        => $data['channel'],
+          ]);
+            $id_region = $region->id;
+        }else{
+            $id_region = $dataRegion->first()->id;
+        }
+        return $id_region;
+    }
+       
+	
+	public function findSub($data)
+    {
+        $dataSub = SubArea::where('name','like','%'.trim($data['subarea_name']).'%')->get();
+        if ($dataSub != null) {
+
+			$dataArea = $data;
+			$id_area = $this->findArea($dataArea);
+            $subarea = SubArea::create([
+              'name'        => $data['subarea_name'],
+              'id_area'     => $id_area
+          ]);
+            $id_subarea = $subarea->id;
+        }else{
+            $id_subarea = $dataSub->first()->id;
+        }
+        return $id_subarea;
+    }
+
+    public function findArea($data)
+    {
+        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
+        if ($dataArea->count() == 0) {
+
+			$dataRegion = $data;
+			$id_region = $this->findRegion($dataRegion);
+            $area = Area::create([
+              'name'        => $data['area_name'],
+              'id_region'   => $id_region,
+          ]);
+            $id_area = $area->id;
+        }else{
+            $id_area = $dataArea->first()->id;
+        }
+        return $id_area;
+    }
+
+    public function findRegion($data)
+    {
+        $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
+        if ($dataRegion->count() == 0) {
+
+            $region = Region::create([
+              'name'        => $data['region_name'],
+          ]);
+            $id_region = $region->id;
+        }else{
+            $id_region = $dataRegion->first()->id;
+        }
+        return $id_region;
+    }
 }

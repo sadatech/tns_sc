@@ -11,11 +11,13 @@ use Auth;
 use File;
 use Excel;
 use App\Area;
+use App\Position;
 use App\Region;
 use App\Outlet;
 use App\Pasar;
 use Carbon\Carbon;
 use App\Agency;
+use App\Timezone;
 use App\SubArea;
 use App\Employee;
 use App\EmployeePasar;
@@ -127,7 +129,7 @@ class PasarController extends Controller
 				'Birthdate'		=> $val->birthdate,
 				'Position'		=> $val->position->name,
 				'Pasar'			=> (isset($pasarList) ? rtrim(implode(',', $pasarList), ',') : "-"),
-				'Outlet'			=> (isset($outletList) ? rtrim(implode(',', $outletList), ',') : "-"),
+				'Outlet'		=> (isset($outletList) ? rtrim(implode(',', $outletList), ',') : "-"),
 			);
 		}
 		$filename = "employeePasar_".Carbon::now().".xlsx";
@@ -162,45 +164,50 @@ class PasarController extends Controller
                     foreach($results as $row)
                     {
 						echo "$row<hr>";
-						$dataSub['subarea_name']   	= $row->subarea;
-						$dataSub['area_name']   	= $row->area;
-						$dataSub['region_name']   	= $row->region;
-						$id_subarea = $this->findSub($dataSub);
-
                         $dataAgency['agency_name']   = $row->agency;
                         $id_agency = $this->findAgen($dataAgency);
 
-                        $insert = Employee::create([
-                            'foto_ktp' 			=> "default.png",
-							'foto_tabungan'		=> "default.png",
-							'foto_profile' 		=> "default.png",
-                            'name'             	=> $row->name,
-							'nik'              	=> $row->nik,
-							'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
-							'phone'				=> (isset($row->phone) ? $row->phone : "-"),
-							'email'				=> (isset($row->email) ? $row->email : "-"),
-							'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
-							'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
-							'birthdate'			=> Carbon::now(),
-							'id_agency'			=> $id_agency,
-                            'id_position'       => 4,
-                            'joinAt'            => Carbon::now(),
-                            'gender'            => $row->gender,
-                            'education'         => $row->education,
-                            'password'          => bcrypt($row->password),
-                            'id_timezone'       => 1
-                        ]);
-                        if ($insert) {
-                            $dataPasar = array();
-                            $listPasar = explode(",", $row->pasar);
-                            foreach ($listPasar as $market) {
-                                $dataPasar[] = array(
-                                    'id_pasar'    			=> $this->findPasar($market),
-                                    'id_employee'          	=> $insert->id,
-                                );
-                            }
-                            DB::table('employee_pasars')->insert($dataPasar);
-                        }
+						$data2 = Employee::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
+						->where(['nik' => $row->nik, 'isResign' => false])
+						->whereIn('id_position', [3,4])
+						->count();
+						// dd($data2);
+						if ($data2 < 1) {
+							$getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
+							$getPosition 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
+                        	$insert = Employee::create([
+                            	'foto_ktp' 			=> "default.png",
+								'foto_tabungan'		=> "default.png",
+                            	'name'             	=> $row->name,
+								'nik'              	=> $row->nik,
+								'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
+								'phone'				=> (isset($row->phone) ? $row->phone : "-"),
+								'email'				=> (isset($row->email) ? $row->email : "-"),
+								'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
+								'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
+								'birthdate'			=> Carbon::now(),
+								'id_agency'			=> $id_agency,
+                            	'id_position'       => ($getPosition ? $getPosition : 4),
+                            	'joinAt'            => Carbon::now(),
+                            	'gender'            => $row->gender,
+                            	'education'         => $row->education,
+                            	'password'          => bcrypt($row->password),
+                            	'id_timezone'       => ($getZone ? $getZone : 1),
+							]);
+							if ($insert) {
+								$dataPasar = array();
+								$listPasar = explode(",", $row->pasar);
+								foreach ($listPasar as $market) {
+									$dataPasar[] = array(
+										'id_pasar'    			=> $this->findPasar($market, $row->subarea, $row->area, $row->region),
+										'id_employee'          	=> $insert->id,
+									);
+								}
+								DB::table('employee_pasars')->insert($dataPasar);
+							}
+						} else {
+							return false;
+						}
                     }
                 },false);
             }
@@ -224,10 +231,15 @@ class PasarController extends Controller
         }
 	}
 
-	public function findPasar($data)
+	public function findPasar($data, $subarea, $area, $region)
     {
         $dataPasar = Pasar::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
         if ($dataPasar->count() == 0) {
+
+			$dataSub['subarea_name']   	= $subarea;
+			$dataSub['area_name']   	= $area;
+			$dataSub['region_name']   	= $region;
+			$id_subarea = $this->findSub($dataSub);
             $pasar = Pasar::create([
                 'name'       	=> $data,
 				'address'       => "-",

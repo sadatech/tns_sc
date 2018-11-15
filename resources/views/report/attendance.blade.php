@@ -101,7 +101,7 @@
               '<li>' +
                   '<i class="list-timeline-icon fa fa-building bg-info"></i>' +
                   '<div class="list-timeline-content">' +
-                      '<p class="font-w600" id="name"><b>Store : '+  v.store.name1 +'</b></p>' +
+                      '<h4 class="font-w600" id="name"><b>Store : '+  v.store.name1 +'</b></h4>' +
                       '<p">Place : '+  v.place.name +'</p>' +
                       '<p>Checkin  : '+ v.checkin +'</p>' +
                       '<p>Checkout :'+  v.checkout +'</p>' +
