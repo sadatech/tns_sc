@@ -22,18 +22,19 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+          <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal" title="Unduh Data"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+            <a href="{{ route('target.smd.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="promoTable">
           <thead>
             <th class="text-center" style="width: 70px;"></th>
             <th>Employee Name</th>
-            <th>Pasar</th>
-            <th>Value</th>
-            <th>Value PF</th>
-            <th>Release Month</th>
+            <th>Hk</th>
+            <th>Release Date</th>
+            <th>Sales Value</th>
+            <th>EC</th>
+            <th>CBD</th>
             <th class="text-center" style="width: 15%;"> Action</th>
           </thead>
         </table>
@@ -46,8 +47,8 @@
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-edit"></i> Update Target</h3>
+        <div class="block-header bg-gd-sun p-10">
+          <h3 class="block-title"><i class="fa fa-edit"></i> Update Target SMD</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -69,24 +70,32 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label>Pasar</label>
-              <select class= "js-edit form-control" id="PasarInput" style="width: 100%"  name="pasar" >
-                @foreach($pasar as $data)
-                <option value="{{ $data->id }}">{{ $data->name }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="form-group col-md-6">
               <label>Release Date</label>
-              <input class="js-datepicker form-control" type="date" id="rilisInput" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+              <input class="js-datepicker form-control" type="text" id="rilisInput" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
             </div>
             <div class="form-group col-md-6">
-              <label>Value</label>
-              <input class="form-control" type="text" id="valueInput" name="value" required>
+              <label>HK</label>
+              <input class="JustAngka form-control" type="text" id="hkInput" name="hk" required>
             </div>
             <div class="form-group col-md-6">
-              <label>Value Focus</label>
-              <input class="form-control" type="text" id="valuepfInput" name="valuepf" required>
+              <label >Sales Value</label>
+              <div class="input-group-append">
+                <span class="input-group-text">Rp</span>
+                <div class="input-group">
+                  <input type="text" class="JustAngka form-control" name="value" id="valueInput" required>
+                  <div class="input-group-append">
+                    <span class="input-group-text">.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>EC</label>
+              <input class="JustAngka form-control" type="text" id="ecInput" name="ec" required>
+            </div>
+            <div class="form-group col-md-6">
+              <label>CBD</label>
+              <input class="JustAngka form-control" type="text" id="cbdInput" name="cbd" required>
             </div>
           </div>
           <div class="modal-footer">
@@ -105,8 +114,8 @@
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Target</h3>
+        <div class="block-header bg-gd-sun p-10">
+          <h3 class="block-title"><i class="fa fa-plus"></i> Add Target SMD</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -128,25 +137,32 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label>Pasar</label>
-              <select class="js-select2 form-control" style="width: 100%" name="pasar">
-                <option disabled selected>Choose your Pasar</option>
-                @foreach($pasar as $data)
-                <option value="{{ $data->id }}">{{ $data->name }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="form-group col-md-6">
               <label>Release</label>
-              <input class="js-datepicker form-control" type="date" id="releaseInput" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
+              <input class="js-datepicker form-control" type="text" name="rilis" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
             </div>
             <div class="form-group col-md-6">
-              <label>Value</label>
-              <input class="form-control" type="text" id="valueInput" name="value" required>
+              <label>HK</label>
+              <input class="JustAngka form-control" type="text" name="hk" placeholder="Input HK" required>
             </div>
             <div class="form-group col-md-6">
-              <label>Value Focus</label>
-              <input class="form-control" type="text" id="valuepfInput" name="valuepf" required>
+              <label >Sales Value</label>
+              <div class="input-group-append">
+                <span class="input-group-text">Rp</span>
+                <div class="input-group">
+                  <input type="text" class="JustAngka form-control" name="value" placeholder="" required>
+                  <div class="input-group-append">
+                    <span class="input-group-text">.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>EC</label>
+              <input class="JustAngka form-control" type="text" name="ec" placeholder="Input EC"required>
+            </div>
+            <div class="form-group col-md-6">
+              <label>CBD</label>
+              <input class="JustAngka form-control" type="text" name="cbd" placeholder="Input CBD" required>
             </div>
           </div>
           <div class="modal-footer">
@@ -155,10 +171,70 @@
             </button>
             <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
           </div>
-        </form>
-      </div>
+      </form>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary p-10">
+          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Account</h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form action="{{ route('account.import') }}" method="post" enctype="multipart/form-data">
+        {!! csrf_field() !!}
+        <div class="block-content">
+          <div class="form-group">
+              <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <h5> Sample Data :</h5>
+          <table class="table table-bordered table-vcenter">
+            <thead>
+              <tr>
+                  <td><b>account</b></td>
+                  <td><b>channel</b></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                  <td>Name Account 1</td>
+                  <td>Name Channel 1</td>
+              </tr>
+              <tr>
+                  <td>Name Account 1</td>
+                  <td>Name Channel 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="block-content">
+          <div class="form-group">
+          <label>Upload Your Data Account:</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Save
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('css')
@@ -182,11 +258,11 @@
     $('#editModal').modal('show');
     $('#editForm').attr('action', "{{ url('/target/smd/update') }}/"+json.id);
     $('#EmployeeInput').val(json.employee).trigger('change');
-    $('#PasarInput').val(json.pasar).trigger('change');
     $('#rilisInput').val(json.rilis);
     $('#valueInput').val(json.value);
-    $('#valuepfInput').val(json.valuepf);
-          // console.log(json);
+    $('#hkInput').val(json.hk);
+    $('#ecInput').val(json.ec);
+    $('#cbdInput').val(json.cbd);
         }
         @if(session('type'))
         $(document).ready(function() {
@@ -209,7 +285,6 @@
         $(function() {
           $('#promoTable').DataTable({
             processing: true,
-            serverside: true,
             drawCallback: function(){
               $('.js-swal-delete').on('click', function(){
                 var url = $(this).data("url");
@@ -238,16 +313,29 @@
               });
             },
             ajax: '{!! route('target.smd.data') !!}',
+            scrollY: "300px",
             columns: [
             { data: 'id', name: 'id' },
             { data: 'employee.name', name: 'employee.name'},
-            { data: 'pasar.name', name: 'pasar.name' },
-            { data: 'value', name: 'value' },
-            { data: 'value_pf', name: 'value_pf' },
+            { data: 'hk', name: 'hk' },
             { data: 'rilis', name: 'rilis' },
-            { data: 'action', name: 'action' },
+            { data: 'value_sales', name: 'value_sales' },
+            { data: 'ec', name: 'ec' },
+            { data: 'cbd', name: 'cbd' },
+            { data: 'action', name: 'action' }
             ]
           });
+        });
+        $(".JustAngka").keydown(function (e) {
+          if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
+            (e.keyCode >= 35 && e.keyCode <= 40)) 
+            {
+                return;
+            }
+          if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+          }
         });
         $(".js-select2").select2({ 
           dropdownParent: $("#tambahModal")

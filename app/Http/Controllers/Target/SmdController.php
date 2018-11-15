@@ -7,32 +7,36 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\TargetGtc;
 use App\Employee;
-use App\Brand;
-use App\Pasar;
+use Carbon\Carbon;
+use DB;
 use Auth;
+use File;
+use Excel;
 
 class SmdController extends Controller
 {
     public function baca()
     {
-        $data['employee']   = Employee::where('id_position', 4)->get();
-        $data['pasar']      = Pasar::get();
-        return view('target.smd',$data);
+        $data['employee']      = Employee::where(['isResign' => false])
+        ->whereIn('id_position', [3,4])
+        ->get();
+        return view('target.smd', $data);
     }
 
     public function data()
     {
-        $target = TargetGtc::with(['pasar','employee'])
+        $target = TargetGtc::with('employee')
         ->select('target_gtcs.*');
         return Datatables::of($target)
         ->addColumn('action', function ($target) {
             $data = array(
                 'id'            => $target->id,
                 'employee'      => $target->employee->id,
-                'pasar'         => $target->pasar->id,
-                'value'         => $target->value,
-                'valuepf'       => $target->value_pf,
-                'rilis'         => $target->rilis
+                'value'         => $target->value_sales,
+                'hk'            => $target->hk,
+                'ec'            => $target->ec,
+                'rilis'         => $target->rilis,
+                'cbd'           => $target->cbd
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('target.smd.delete', $target->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -44,10 +48,11 @@ class SmdController extends Controller
         $data=$request->all();
         $limit=[
             'employee'      => 'required|numeric',
-            'pasar'         => 'required|numeric',
-            'rilis'         => 'required',
+            'ec'            => 'required|numeric',
+            'hk'            => 'required|numeric',
+            'cbd'           => 'required',
             'value'         => 'required',
-            'valuepf'      => 'required'
+            'rilis'         => 'required|date'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -57,10 +62,12 @@ class SmdController extends Controller
         } else {
             TargetGtc::create([
                 'id_employee'   => $request->input('employee'),
-                'id_pasar'      => $request->input('pasar'),
                 'rilis'         => $request->input('rilis'),
-                'value'         => $request->input('value'),
-                'value_pf'      => $request->input('valuepf'),
+                'hk'            => $request->input('hk'),
+                'ec'            => $request->input('ec'),
+                'cbd'           => $request->input('cbd'),
+                'value_sales'   => $request->input('value')
+
             ]);
             return redirect()->back()
             ->with([
@@ -73,25 +80,42 @@ class SmdController extends Controller
 
     public function update(Request $request, $id) 
     {
-        $target = TargetGtc::find($id);
-        $target->id_pasar      = $request->get('pasar');
-        $target->id_employee   = $request->get('employee');
-        $target->rilis         = $request->get('rilis');
-        $target->value         = $request->get('value');
-        $target->value_pf      = $request->get('valuepf');
-        if ($target->save()) {
-            return redirect()->back()->with([
-                'type'    => 'success',
-                'title'   => 'Sukses!<br/>',
-                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah target!'
-            ]);
+        $data=$request->all();
+        $limit=[
+            'employee'      => 'required|numeric',
+            'ec'            => 'required|numeric',
+            'hk'            => 'required|numeric',
+            'cbd'           => 'required|numeric',
+            'value'         => 'required',
+            'rilis'         => 'required|date'
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
         } else {
-            return redirect()->route('employee')
-            ->with([
-                'type'      => 'danger',
-                'title'     => 'Terjadi Kesalahan!<br/>',
-                'message'   => '<i class="em em-thinking_face mr-2"></i>Gagal mengupdate data!'
-            ]);
+            $target = TargetGtc::find($id);
+            $target->id_employee    = $request->get('employee');
+            $target->rilis          = $request->get('rilis');
+            $target->value_sales    = $request->get('value');
+            $target->hk             = $request->get('hk');
+            $target->ec             = $request->get('ec');
+            $target->cbd            = $request->get('cbd');
+            if ($target->save()) {
+                return redirect()->back()->with([
+                    'type'    => 'success',
+                    'title'   => 'Sukses!<br/>',
+                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah target!'
+                ]);
+            } else {
+                return redirect()->route('employee')
+                ->with([
+                    'type'      => 'danger',
+                    'title'     => 'Terjadi Kesalahan!<br/>',
+                    'message'   => '<i class="em em-thinking_face mr-2"></i>Gagal mengupdate data!'
+                ]);
+            }
         }
     }
 
@@ -111,6 +135,38 @@ class SmdController extends Controller
                 'type'      => 'danger',
                 'title'     => 'Terjadi Kesalahan!<br/>',
                 'message'   => '<i class="em em-thinking_face mr-2"></i>Gagal menghapus data!'
+            ]);
+        }
+    }
+
+    public function export()
+	{
+        $x = TargetGtc::orderBy('created_at', 'DESC');
+        if ($x->count() > 0) {
+		    foreach ($x->get() as $val) {
+		    	$data[] = array(
+		    		'Employee'		=> $val->employee->name,
+                    'HK'	        => $val->hk,
+                    'ReleaseDate'	=> $val->rilis,
+                    'SalesValue'    => $val->value_sales,
+                    'EC'            => $val->ec,
+                    'CBD'           => $val->cbd
+		    	);
+            }
+        
+		    $filename = "TargetGtc_".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('TargetGtc', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
             ]);
         }
     }

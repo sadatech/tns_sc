@@ -339,7 +339,7 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'ProductFokusController@update')->name('fokus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusController@delete')->name('fokus.delete')->middleware('auth');
 		Route::get('/export', 'ProductFokusController@export')->name('fokus.export')->middleware('auth');
-		Route::post('/import', 'ProductFokusController@import')->name('fokus.import')->middleware('auth');
+		Route::post('/import', 'ProductFokusController@importXLS')->name('fokus.import')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/ProductFokusImport.xlsx'));
@@ -384,6 +384,7 @@ Route::prefix('target')->group(function () {
 	Route::prefix('smd')->group(function () {
 		Route::get('/', 'Target\SmdController@baca')->name('target.smd')->middleware('auth');
 		Route::get('/data', 'Target\SmdController@data')->name('target.smd.data')->middleware('auth');
+		Route::get('/export', 'Target\SmdController@export')->name('target.smd.export')->middleware('auth');
 		Route::post('/create', 'Target\SmdController@store')->name('target.smd.add')->middleware('auth');
 		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
 		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
@@ -561,10 +562,28 @@ Route::prefix('smd')->group(function () {
 		Route::get('/', function(){
 			return view('report.smd');
 		})->name('report.smd.pasar')->middleware('auth');
+		Route::get('/attendance', function(){
+			return view('report.attendance-smd');
+		})->name('report.attendance.smd')->middleware('auth');
+		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 
 	});
-	
+
+
+	Route::prefix('sales')->group(function () {
+		Route::get('/', function(){
+			return view('report.sales');
+		})->name('report.sales.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
+	});
+
+	Route::prefix('distributorPf')->group(function () {
+		Route::get('/', function(){
+			return view('report.distpf');
+		})->name('report.dist.pf')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
+	});
 });
 
 // ***************** REPORTING ***********************

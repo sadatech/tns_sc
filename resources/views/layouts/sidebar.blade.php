@@ -230,6 +230,17 @@
                     <li>
                         <a class="{{ request()->is('report/smd') ? 'active' : '' }}" href="{{ route('report.smd.pasar') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">MD Pasar</span></a>
                     </li>
+                    {{-- SALES--}}
+                    <li>
+                        <a class="{{ request()->is('report/sales') ? 'active' : '' }}" href="{{ route('report.sales.pasar') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Sales MD Pasar</span></a>
+                    </li>  
+                    <li>
+                        <a class="{{ request()->is('report/smd/attendance') ? 'active' : '' }}" href="{{ route('report.attendance.smd') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance SMD</span></a>
+                    </li>
+                    {{-- Dist PF--}}
+                    <li>
+                        <a class="{{ request()->is('report/distributorPf') ? 'active' : '' }}" href="{{ route('report.dist.pf') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Distributor PF</span></a>
+                    </li>  
                     {{-- Stock In Hand--}}
                     <li>
                         <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>

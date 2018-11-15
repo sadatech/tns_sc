@@ -210,7 +210,7 @@
               ajax: '{!! route('fokus.data') !!}',
               columns: [
 	              { data: 'id', name: 'id' },
-                { data: 'product.name', name: 'product.name'},
+                { data: 'fokusproduct', name: 'fokusproduct'},
                 { data: 'fokus', name: 'fokus' },
 	              { data: 'fokusarea', name: 'fokusarea' },
                 { data: 'from', name: 'from' },

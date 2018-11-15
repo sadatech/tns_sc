@@ -142,9 +142,29 @@ class TargetController extends Controller
 
     public function update(Request $request, $id) 
     {
-        $product = Target::findOrFail($id);
-        $product->fill($request->all());
-        $product->save();
+        DB::transaction(function () use ($data, $user, &$res) {
+            $product = Target::findOrFail($id);
+            $product->fill($request->all());
+            $product->save();
+
+            $date   = Carbon::parse($request->rilis);
+            $reportTemplate = MtcReportTemplate::where([
+                'id_employee'   => $request->id_employee,
+                'id_store'      => $request->id_store,
+                'id_product'    => $request->id_product
+            ])
+            ->whereYear('date',$date->year)
+            ->whereMonth('date',$date->month)
+            ->get();
+            if ($reportTemplate->count() <= 0) {
+                MtcReportTemplate::create([
+                    'id_employee'   => $request->id_employee,
+                    'id_store'      => $request->id_store,
+                    'id_product'    => $request->id_product,
+                    'date'          => $date
+                ]);
+            }
+        });
         return redirect()->back()->with([
           'type'    => 'success',
           'title'   => 'Sukses!<br/>',

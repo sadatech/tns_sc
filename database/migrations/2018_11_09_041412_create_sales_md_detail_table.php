@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateStockMdDetailsTable extends Migration
+class CreateSalesMdDetailTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,21 @@ class CreateStockMdDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('stock_md_details', function (Blueprint $table) {
+        Schema::create('sales_md_details', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('id_stock')->unsigned();
+            $table->integer('id_sales')->unsigned();
             $table->integer('id_product')->unsigned();
-            $table->tinyInteger('oos');
+            $table->integer('qty');
+            $table->integer('qty_actual');
+            $table->string('satuan');
+            $table->tinyInteger('is_pf');
+            $table->tinyInteger('is_target');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('id_stock')->references('id')->on('stock_md_headers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_sales')->references('id')->on('sales_mds')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
+   
         });
     }
 
@@ -33,6 +38,6 @@ class CreateStockMdDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stock_md_details');
+        Schema::dropIfExists('sales_md_details');
     }
 }

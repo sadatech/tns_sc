@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAttendanceOutletsTable extends Migration
+class CreateSalesMdTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,19 @@ class CreateAttendanceOutletsTable extends Migration
      */
     public function up()
     {
-        Schema::create('attendance_outlets', function (Blueprint $table) {
+        Schema::create('sales_mds', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('id_attendance')->unsigned();
-            $table->integer('id_outlet')->unsigned()->nullable();
-            $table->datetime('checkin');
-            $table->datetime('checkout')->nullable();
+            $table->integer('id_outlet')->unsigned();
+            $table->integer('id_employee')->unsigned();
+            $table->date('date');
+            $table->integer('week');
+            $table->string('type');
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('id_outlet')->references('id')->on('outlets')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('id_attendance')->references('id')->on('attendances')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_employee')->references('id')->on('employees')->onUpdate('cascade')->onDelete('cascade');
+      
         });
     }
 
@@ -34,6 +36,6 @@ class CreateAttendanceOutletsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('attendance_outlets');
+        Schema::dropIfExists('sales_mds');
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateStockMdDetailsTable extends Migration
+class CreateFokusProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,15 @@ class CreateStockMdDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('stock_md_details', function (Blueprint $table) {
+        Schema::create('fokus_products', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('id_stock')->unsigned();
             $table->integer('id_product')->unsigned();
-            $table->tinyInteger('oos');
+            $table->integer('id_pf')->unsigned();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('id_stock')->references('id')->on('stock_md_headers')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_pf')->references('id')->on('product_fokuses')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -33,6 +32,6 @@ class CreateStockMdDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stock_md_details');
+        Schema::dropIfExists('fokus_products');
     }
 }
