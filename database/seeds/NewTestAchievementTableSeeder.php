@@ -287,8 +287,8 @@ class NewTestAchievementTableSeeder extends Seeder
                     DetailSales::create([
                         'id_sales' => $sales->id,
                         'id_product' => $k,
-                        'qty' => rand(1, 10),
-                        'qty_actual' => rand(20, 100),
+                        'qty_actual' => rand(1, 10),
+                        'qty' => rand(20, 100),
                         'satuan' => $satuan[rand(0,1)],
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),

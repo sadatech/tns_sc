@@ -32,6 +32,11 @@ use App\Filters\EmployeeFilters;
 class EmployeeController extends Controller
 {
 	public function getDataWithFilters(EmployeeFilters $filters){
+		$data = Employee::filter($filters)->where('isResign', 0)->get();
+		return $data;
+	}
+
+	public function getDataWithFiltersForReport(EmployeeFilters $filters){
 		$data = Employee::filter($filters)->get();
 		return $data;
 	}
