@@ -556,13 +556,16 @@ Route::prefix('report')->group(function () {
 
 	Route::prefix('smd')->group(function () {
 		Route::get('/', function(){
-			return view('report.smd');
+			$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+			$data['product'] = \App\Product::whereIn('id', $getId)->get();
+			return view('report.smd', $data);
 		})->name('report.smd.pasar')->middleware('auth');
+		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+
 		Route::get('/attendance', function(){
 			return view('report.attendance-smd');
 		})->name('report.attendance.smd')->middleware('auth');
 		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
-		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 	});
 
 	Route::prefix('sales')->group(function () {
