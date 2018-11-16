@@ -12,6 +12,8 @@ use App\FokusChannel;
 use App\FokusProduct;
 use App\FokusArea;
 use App\ProductFokus;
+use App\Product;
+use Exception;
 use DB;
 use Auth;
 use File;
@@ -227,7 +229,6 @@ class ProductFokusController extends Controller
     public function importXLS(Request $request)
     {
         try {
-           
             $file = Input::file('file')->getClientOriginalName();
             $filename = pathinfo($file, PATHINFO_FILENAME);
             $extension = pathinfo($file, PATHINFO_EXTENSION);
@@ -241,63 +242,52 @@ class ProductFokusController extends Controller
                 $ext = '';
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
                     try {
+                        DB::beginTransaction();
                         if (!empty($results->all())) {
                             foreach($results as $row)
                             {
-                                // $rowRules = [
-                                //     'sku'   => 'required',
-                                //     'channel'   => 'required'
-                                // ];
-                                // $validator = Validator($row->toArray(), $rowRules);
-                                // if ($validator->fails()) {
-                                //     return redirect()->back()
-                                //     ->withErrors($validator)
-                                //     ->withInput();
-                                // } else {
-                                    $fokus = ProductFokus::updateOrCreate([
-                                        'from'  => Carbon::now(),
-                                        'to'    => Carbon::now() 
-                                    ]);
-                                    if (!empty($fokus)) {
-                                        $dataProduct = array();
-                                        $listProduct = explode(",", $row->sku);
-                                            foreach ($listProduct as $sku) {
-                                                $dataProduct[] = array(
-                                                    'id_product'    		=> \App\Product::where(['name' => $sku])->first()->id,
-                                                    'id_pf'          	    => $fokus->id,
-                                                );
-                                            }
-                                        DB::table('fokus_products')->insert($dataProduct);
-                                        $dataChannel = array();
-                                        $listChannel = explode(",", $row->channel);
-                                            foreach ($listChannel as $channel) {
-                                                    $dataChannel[] = array(
-                                                    'id_channel'    	=> $this->findChannel($channel),
-                                                    'id_pf'          	=> $fokus->id
-                                                );
-                                            }
-                                            DB::table('fokus_channels')->insert($dataChannel);
-                                        $dataArea = array();
-                                        $listArea = explode(",", (isset($row->area) ? $row->area : ""));
-                                        foreach ($listArea as $area) {
-                                            $dataArea[] = array(
-                                                'id_area'    	    => \App\Area::where('name', $area)->first()->id,
-                                                'id_pf'          	=> $fokus->id
-                                            );
+                                $fokus = ProductFokus::create([
+                                    'from'  => Carbon::now(),
+                                    'to'    => Carbon::now() 
+                                ]);
+                                if (!isset($fokus->id)) {
+                                    
+                                } else {
+                                    $listProduct = explode(",", $row->sku);
+                                    // dd($listProduct);
+                                    foreach ($listProduct as $key => $product) {
+                                        $getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($product))."'")->first();
+                                        if (isset($getSku->id)) {
+                                            FokusProduct::create([
+                                                'id_pf'         => $fokus->id,
+                                                'id_product'    => $getSku->id
+                                            ]);
                                         }
-                                        DB::table('fokus_areas')->insert($dataArea);
-                                    } else {
-                                        return false;
                                     }
-                                    if (!isset($fokus->id)) {
-                                        throw new Exception("Error Processing Request", 1);
+                                    $listChannel = explode(",", $row->channel);
+                                    foreach ($listChannel as $channel) {
+                                        FokusChannel::create([
+                                            'id_channel'    => $this->findChannel($channel),
+                                            'id_pf'         => $fokus->id
+                                        ]);
                                     }
-                                // }
+                                    $listArea = explode(",", $row->area);
+                                    foreach ($listArea as $area) {
+                                        $getArea = \App\Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($area))."'")->first();
+                                        if (isset($getArea->id)) {
+                                            FokusArea::create([
+                                                'id_area'            => $getArea->id,
+                                                'id_pf'              => $fokus->id
+                                            ]);
+                                        }
+                                    }
+                                    // dd($listArea);
+                                    // dd($getArea);
+                                }
                             }
                             DB::commit();
                         } else {
                             throw new Exception("Error Processing Request", 1);
-                            
                         }
                     } catch (Exception $e) {
                         DB::rollback();

@@ -27,6 +27,10 @@ class Store extends Model
     {
         return $this->hasMany('App\StoreDistributor', 'id_store');
     }
+    public function storeDistributor()
+    {
+        return $this->hasMany('App\StoreDistributor', 'id_store');
+    }
     public function rejoin()
     {
         return $this->hasMany('App\Rejoin', 'id_store');
@@ -62,5 +66,13 @@ class Store extends Model
     public function scopeFilter($query, QueryFilters $filters)
     {
         return $filters->apply($query);
+    }
+    public function getDistributorCode()
+    {
+        return implode(', ', $this->storeDistributor->pluck('distributor.code')->toArray());
+    }
+    public function getDistributorName()
+    {
+        return implode(', ', $this->storeDistributor->pluck('distributor.name')->toArray());
     }
 }
