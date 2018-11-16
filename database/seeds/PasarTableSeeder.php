@@ -6,6 +6,7 @@ use Carbon\Carbon;
 
 class PasarTableSeeder extends Seeder
 {
+
     public function run()
     {
         $faker = Faker::create();

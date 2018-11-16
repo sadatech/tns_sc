@@ -155,7 +155,9 @@ class PromoActivityController extends Controller
         ->addColumn('images', function($promoDetail) {
 
             return "
-            <a href=".asset('uploads/promo/'.$promoDetail->promo->image1)." class='btn btn-sm btn-info btn-square popup-image'><i class='si si-picture mr-2'></i> Image Product</a>";
+            <a href=".asset('uploads/promo/'.$promoDetail->promo->image1)." class='btn btn-sm btn-info btn-square popup-image'><i class='si si-picture' ></i> Product 1</a> 
+            <a href=".asset('uploads/promo/'.$promoDetail->promo->image2)." class='btn btn-sm btn-info btn-square popup-image'><i class='si si-picture'></i> Product 2</a> 
+            <a href=".asset('uploads/promo/'.$promoDetail->promo->image3)." class='btn btn-sm btn-info btn-square popup-image'><i class='si si-picture'></i> Produck 3</a>";
         })
         ->addColumn('store', function($promoDetail) {
         return $promoDetail->promo->store->name1;
