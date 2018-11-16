@@ -553,6 +553,8 @@ Route::prefix('report')->group(function () {
 
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
+	Route::get('/achievement/{date?}', 'ReportController@getAchievement')->name('achievement')->middleware('auth');
+
 
 	Route::prefix('smd')->group(function () {
 		Route::get('/', function(){

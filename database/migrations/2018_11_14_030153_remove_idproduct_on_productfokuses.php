@@ -14,6 +14,7 @@ class RemoveIdproductOnProductfokuses extends Migration
     public function up()
     {
         Schema::table('product_fokuses', function (Blueprint $table) {
+            $table->dropForeign(['id_product']);
             $table->dropColumn(['id_product']);
         });
     }
