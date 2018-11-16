@@ -560,6 +560,8 @@ Route::prefix('report')->group(function () {
 
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
+	Route::get('/achievement/{date?}', 'ReportController@getAchievement')->name('achievement')->middleware('auth');
+	
 	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');
 
 	Route::prefix('attendance')->group(function(){

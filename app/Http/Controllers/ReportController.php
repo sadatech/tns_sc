@@ -41,6 +41,7 @@ use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Product;
+use App\DetailSales;
 
 
 class ReportController extends Controller
@@ -1131,6 +1132,27 @@ class ReportController extends Controller
             'active' => true
         ])->whereRaw("DATE(created_at) > '".$date."'");
         return $ro->count();
+    }
+
+    public function getAchievement($date = '')
+    {
+        $sales = DetailSales::whereHas('sales', function($query)
+        {
+            return $query->whereMonth('date', Carbon::now()->month);
+        })->limit(50)->get();
+        return $sales;
+        // $data = array();
+        // $id = 1;
+        // foreach ($sales as $value) {
+        //     $data[] = array(
+        //         'id' => $id++,
+        //         'nama' => $sales->employee->name,
+        //         'pasar' => $sales->outlet->employeePasar->pasar->name,
+        //         'tanggal' => $sales->date,
+        //         'outlet' => $sales->outlet->name,
+        //     );
+        // }
+        // return Datatables::of(collect($data))->make(true);
     }
 
 }
