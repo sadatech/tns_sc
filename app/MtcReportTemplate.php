@@ -40,7 +40,7 @@ class MtcReportTemplate extends Model
     public function getActualQty($param){
         $str = 
         "
-            SELECT SUM(detail_sales.qty_actual) as result
+            SELECT SUM(detail_sales.qty) as result
             FROM detail_sales
             JOIN sales ON sales.id = detail_sales.id_sales
             WHERE sales.id_store = ".$this->id_store."
@@ -72,7 +72,7 @@ class MtcReportTemplate extends Model
         $str = 
         "
             SELECT SUM(
-                IF(sales.`type` = '".$param."', detail_sales.qty_actual, 0) *
+                IF(sales.`type` = '".$param."', detail_sales.qty, 0) *
                 IFNULL(
                     (
                      SELECT `prices`.price FROM `prices` 

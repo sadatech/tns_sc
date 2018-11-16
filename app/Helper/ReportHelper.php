@@ -118,6 +118,10 @@ class ReportHelper
 
     }
 
+    public function generateColumnSalesMtc(){
+        return ['periode', 'region', 'is_jawa', 'jabatan', 'employee_name', 'area', 'sub_area', 'store_name', 'account', 'category', 'product_line', 'product_name', 'actual_out_qty', 'actual_in_qty', 'price', 'actual_out_value', 'actual_in_value', 'total_actual', 'target_qty', 'target_value'];
+    }
+
     /**
      * MAPPING
      */
