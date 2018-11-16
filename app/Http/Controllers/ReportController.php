@@ -16,6 +16,7 @@ use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
 use Auth;
 use DB;
+use Excel;
 use App\StoreDistributor;
 use App\Employee;
 use App\EmployeePasar;
@@ -540,10 +541,10 @@ class ReportController extends Controller
         foreach ($sales as $value) {
             $data[] = array(
                 'id' => $id++,
-                'nama' => $sales->employee->name,
-                'pasar' => $sales->outlet->employeePasar->pasar->name,
-                'tanggal' => $sales->date,
-                'outlet' => $sales->outlet->name,
+                'nama' => $value->employee->name,
+                'pasar' => $value->outlet->employeePasar->pasar->name,
+                'tanggal' => $value->date,
+                'outlet' => $value->outlet->name,
             );
         }
         return Datatables::of(collect($data))->make(true);
@@ -593,5 +594,40 @@ class ReportController extends Controller
             'active' => true
         ])->whereRaw("DATE(created_at) > '".$date."'");
         return $ro->count();
+    }
+
+    public function exportSmdDist()
+    {
+        
+    }
+
+    public function exportMdPasar()
+    {
+        $sales = SalesMD::whereMonth('date', Carbon::now()->month);
+        if ($sales->count() > 0) {
+		    foreach ($sales->get() as $val) {
+		    	$data[] = array(
+                    'Employee'  => $val->employee->name,
+                    'Pasar'     => $val->outlet->employeePasar->pasar->name,
+                    'Tanggal'   => $val->date,
+                    'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
+		    	);
+            }
+        
+		    $filename = "ReportSalesMD".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('SalesMdPasar', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
     }
 }

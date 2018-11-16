@@ -388,6 +388,7 @@ Route::prefix('target')->group(function () {
 		Route::post('/create', 'Target\SmdController@store')->name('target.smd.add')->middleware('auth');
 		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
 		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
+		Route::post('/import', 'Target\SmdController@importXLS')->name('target.smd.import')->middleware('auth');
 	});
 
 	Route::prefix('spg')->group(function () {
@@ -563,6 +564,7 @@ Route::prefix('report')->group(function () {
 		})->name('report.attendance.smd')->middleware('auth');
 		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+	
 	});
 
 	Route::prefix('sales')->group(function () {
@@ -570,6 +572,7 @@ Route::prefix('report')->group(function () {
 			return view('report.sales');
 		})->name('report.sales.pasar')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
+		Route::get('/export', 'ReportController@exportMdPasar')->name('export.sales.smd')->middleware('auth');
 	});
 
 	Route::prefix('distributorPf')->group(function () {
