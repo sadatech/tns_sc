@@ -12,7 +12,7 @@ class Agency extends Model
 
     public function employees()
     {
-    	return $this->hasMany('App\Employees', 'id_agency');
+    	return $this->hasMany('App\Employee', 'id_agency');
     }
 
 }

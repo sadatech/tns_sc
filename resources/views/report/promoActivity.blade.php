@@ -30,7 +30,7 @@
                         <th width="200px">Description</th>
                         <th width="200px">Start Promo</th>
                         <th width="200px">End Promo</th>
-                        <th width="200px">Images</th>
+                        <th width="300px">Images</th>
                     </thead>
                 </table>
             </div> 
