@@ -23,11 +23,12 @@ class PkController extends Controller
 		$check = $this->authCheck();
 		$code = 200;
 		if ($check['success'] == true) {
-			$data 	= ProductKnowledge::get();
+			$data 	= ProductKnowledge::orderBy('id','desc')->get();
 			if ($data->count() > 0) {
 				$res['success'] = true;
 				$res['product_knowledge'] = $data;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "Gagal mengambil Product Knowledge.";
 			}
 		}else{

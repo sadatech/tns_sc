@@ -17,13 +17,12 @@ class CreateStockMdDetailsTable extends Migration
             $table->increments('id');
             $table->integer('id_stock')->unsigned();
             $table->integer('id_product')->unsigned();
-            $table->integer('id_satuan')->unsigned();
+            $table->tinyInteger('oos');
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('id_stock')->references('id')->on('stock_md_headers')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_product')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('id_satuan')->references('id')->on('sku_units')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
