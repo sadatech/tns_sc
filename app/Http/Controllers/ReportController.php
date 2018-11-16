@@ -19,6 +19,7 @@ use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
 use Auth;
 use DB;
+use Excel;
 use App\StoreDistributor;
 use App\Employee;
 use App\EmployeePasar;
@@ -26,7 +27,6 @@ use App\Distributor;
 use App\Filters\SummaryFilters;
 use App\Helper\ReportHelper as ReportHelper;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Sales;
 use App\DetailSales;
@@ -1067,10 +1067,10 @@ class ReportController extends Controller
         foreach ($sales as $value) {
             $data[] = array(
                 'id' => $id++,
-                'nama' => $sales->employee->name,
-                'pasar' => $sales->outlet->employeePasar->pasar->name,
-                'tanggal' => $sales->date,
-                'outlet' => $sales->outlet->name,
+                'nama' => $value->employee->name,
+                'pasar' => $value->outlet->employeePasar->pasar->name,
+                'tanggal' => $value->date,
+                'outlet' => $value->outlet->name,
             );
         }
         return Datatables::of(collect($data))->make(true);
@@ -1131,6 +1131,122 @@ class ReportController extends Controller
             'active' => true
         ])->whereRaw("DATE(created_at) > '".$date."'");
         return $ro->count();
+    }
+
+    public function exportSmdDist()
+    {
+        $dist = Distribution::whereMonth('date',Carbon::now()->month);
+        if ($dist->count() > 0) {
+		    foreach ($dist->get() as $val) {
+		    	$data[] = array(
+                    'Employee'  => $val->employee->name,
+                    'Pasar'     => $val->outlet->employeePasar->pasar->name,
+                    'Tanggal'   => $val->date,
+                    'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
+		    	);
+            }
+        
+		    $filename = "ReportDistPf".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('ReportDistPf', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportAttandance()
+    {
+        $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month);
+        if ($employee->count() > 0) {
+		    foreach ($employee->get() as $val) {
+		    	$data[] = array(
+                    'region' => $val->outlet->employeePasar->pasar->name,
+                    'area' => $val->outlet->employeePasar->pasar->subarea->area->name,
+                    'subarea' => $val->outlet->employeePasar->pasar->subarea->name,
+                    'nama' => $val->attendance->employee->name,
+                    'jabatan' => $val->attendance->employee->position->name,
+                    'pasar' => $val->outlet->employeePasar->pasar->name,
+                    'outlet' => $val->outlet->name,
+                    'tanggal' => Carbon::parse($val->checkin)->day,
+                    'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
+                    'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+		    	);
+            }
+        
+		    $filename = "AttandanceReport".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('AttandanceReport', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportMdPasar()
+    {
+        $sales = SalesMD::whereMonth('date', Carbon::now()->month);
+        if ($sales->count() > 0) {
+		    foreach ($sales->get() as $val) {
+		    	$data[] = array(
+                    'Employee'  => $val->employee->name,
+                    'Pasar'     => $val->outlet->employeePasar->pasar->name,
+                    'Tanggal'   => $val->date,
+                    'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
+		    	);
+            }
+        
+		    $filename = "ReportSalesMD".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('SalesMdPasar', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+    public function getAchievement($date = '')
+    {
+        $sales = DetailSales::whereHas('sales', function($query)
+        {
+            return $query->whereMonth('date', Carbon::now()->month);
+        })->limit(50)->get();
+        return $sales;
+        // $data = array();
+        // $id = 1;
+        // foreach ($sales as $value) {
+        //     $data[] = array(
+        //         'id' => $id++,
+        //         'nama' => $sales->employee->name,
+        //         'pasar' => $sales->outlet->employeePasar->pasar->name,
+        //         'tanggal' => $sales->date,
+        //         'outlet' => $sales->outlet->name,
+        //     );
+        // }
+        // return Datatables::of(collect($data))->make(true);
     }
 
 }
