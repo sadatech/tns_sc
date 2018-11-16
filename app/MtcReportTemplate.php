@@ -128,7 +128,7 @@ class MtcReportTemplate extends Model
                 break;
 
             case 'jabatan':
-                return (@$this->employee->position->level == 'mdmtc') ? 'MD' : @$this->employee;
+                return (@$this->employee->position->level == 'mdmtc') ? 'MD' : @$this->employee->status;
                 break;
 
             case 'employee_name':
