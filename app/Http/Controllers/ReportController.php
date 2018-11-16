@@ -394,7 +394,7 @@ class ReportController extends Controller
         
         $dt = Datatables::of($data);
 
-        foreach ($this->reportHelper->generateColumns() as $column) {
+        foreach ($this->reportHelper->generateColumnSalesMtc() as $column) {
             $dt->addColumn($column, function($item) use ($column) {
                 return $item->getSummary($column);
             });
