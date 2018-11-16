@@ -65,6 +65,11 @@ Route::prefix('sales-md')->group(function () {
 	Route::get('/list/{date?}', 'API\SalesMdController@list')->name('api.sales-md.list');
 });
 
+Route::prefix('sales-spg-pasar')->group(function () {
+	Route::post('/add', 'API\SalesSpgPasarController@store')->name('api.sales-spg-pasar.add');
+	Route::get('/list/{date?}', 'API\SalesSpgPasarController@list')->name('api.sales-spg-pasar.list');
+});
+
 Route::prefix('promo')->group(function () {
 	Route::post('/add', 'API\PromoController@store')->name('api.promo.add');
 });

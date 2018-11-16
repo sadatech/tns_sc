@@ -37,9 +37,9 @@ use App\Attendance;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
+use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
-use App\SalesMD;
 use App\Product;
 
 
@@ -394,7 +394,7 @@ class ReportController extends Controller
         
         $dt = Datatables::of($data);
 
-        foreach (\App\MtcReportTemplate::first()->generateColumns() as $column) {
+        foreach ($this->reportHelper->generateColumnSalesMtc() as $column) {
             $dt->addColumn($column, function($item) use ($column) {
                 return $item->getSummary($column);
             });
@@ -809,21 +809,166 @@ class ReportController extends Controller
         $id = 1;
         for ($i=1; $i <= Carbon::now()->day ; $i++) {
             foreach ($employeePasar->get() as $data) {
-                $report[] = array(
-                    'id' => $id++,
-                    'area' => $data->pasar->subarea->area->name,
-                    'nama' => $data->employee->name,
-                    'jabatan' => $data->employee->position->name,
-                    'pasar' =>   $data->pasar->name,
-                    'stockist' => $this->getStockist($data, $i),
-                    'bulan' => Carbon::now()->month,
-                    'tanggal' => $i,
-                    'call' => $this->getCall($data, $i),
-                    'ro' => $this->getRo($data, $i),
-                );
+                if ($data->employee->position->level == 'mdgtc') {
+                    $report[] = array(
+                        'id' => $id++,
+                        'id_ep' => $data->id,
+                        'id_emp' => $data->employee->id,
+                        'id_pasar' => $data->pasar->id,
+                        'area' => $data->pasar->subarea->area->name,
+                        'nama' => $data->employee->name,
+                        'jabatan' => $data->employee->position->name,
+                        'pasar' =>   $data->pasar->name,
+                        'stockist' => $this->getStockist($data, $i),
+                        'bulan' => Carbon::now()->month,
+                        'tanggal' => $i,
+                        'call' => $this->getCall($data, $i),
+                        'ro' => $this->getRo($data, $i),
+                        'cbd' => $this->getCbd($data, $i),
+                    );
+                }
             }
         }
-        return Datatables::of(collect($report))->make(true);
+        $dt = Datatables::of(collect($report));
+        foreach (\App\SubCategory::get() as $cat) {
+            $dt->addColumn('cat-'.$cat->id, function($report) use ($cat){
+                $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+                $getVal = DB::table('distribution_details')
+                ->join('products', 'distribution_details.id_product', '=', 'products.id')
+                ->join('distributions', 'distribution_details.id_distribution', '=', 'distributions.id')
+                ->whereDate('distribution_details.created_at', '=', Carbon::parse($date))
+                ->where([
+                    'products.id_subcategory' => $cat->id,
+                    'distributions.id_employee' => $report['id_emp']
+                ])->count();
+                return $getVal;
+            });
+        }
+        foreach (\App\Product::get() as $product) {
+            $dt->addColumn('product-'.$product->id, function($report) use ($product){
+                // $date = Carbon::now()->format('Y')."-".$report['bulan']."-16";
+                $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+                $getOos = DB::table('stock_md_headers')
+                ->join('stock_md_details', 'stock_md_headers.id', '=', 'stock_md_details.id_stock')
+                ->where([
+                    'stock_md_headers.id_employee' => $report['id_emp'],
+                    'stock_md_headers.id_pasar' => $report['id_pasar'],
+                    'stock_md_headers.date' => $date,
+                    'stock_md_details.id_product' => $product->id
+                ])->first();
+                return (isset($getOos->oos) ? $getOos->oos : "-");
+            });
+        }
+        $dt->addColumn('ec', function($report){
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            return SalesMD::whereDate('date', $date)->count();
+        });
+        $dt->addColumn('vpf', function($report) {
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            // $date = Carbon::now()->format('Y')."-".$report['bulan']."-15";
+            $sale = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 1,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            // dd($report);
+            // dd($sale);
+            $getVal = array();
+            foreach ($sale as $data) {
+                $getVal[] = $data->price*$data->qty_actual;
+            }
+            return "Rp.".(array_sum($getVal) == 0 ? "-" : array_sum($getVal));
+        });
+        $dt->addColumn('vnpf', function($report) {
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            // $date = Carbon::now()->format('Y')."-".$report['bulan']."-15";
+            $sale = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 0,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            // dd($report);
+            // dd($sale);
+            $getVal = array();
+            foreach ($sale as $data) {
+                $getVal[] = $data->price*$data->qty_actual;
+            }
+            return "Rp.".(array_sum($getVal) == 0 ? "-" : array_sum($getVal));
+        });
+        $dt->addColumn('vt', function($report) {
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            $vpf = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 1,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            $vnpf = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 0,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            // dd($report);
+            // dd($sale);
+            $getVpf = array();
+            $getVnpf = array();
+            foreach ($vpf as $data) {
+                $getVpf[] = $data->price*$data->qty_actual;
+            }
+            foreach ($vnpf as $data) {
+                $getVnpf[] = $data->price*$data->qty_actual;
+            }
+            $total = array_sum($getVpf)+array_sum($getVnpf);
+            return "Rp.".($total == 0 ? "-" : $total);
+        });
+        return $dt->make(true);
     }
 
     public function SMDattendance()
@@ -929,6 +1074,17 @@ class ReportController extends Controller
             );
         }
         return Datatables::of(collect($data))->make(true);
+    }
+
+
+    public function getCbd($data, $day)
+    {
+        $date = Carbon::now()->format('Y-m-').$day;
+        $cbd = \App\Cbd::where([
+            'id_employee' => $data['id_employee'],
+            'date' => $date
+        ])->count();
+        return $cbd;
     }
 
     public function getStockist($data, $day)
@@ -1072,4 +1228,25 @@ class ReportController extends Controller
             ]);
         }
     }
+    public function getAchievement($date = '')
+    {
+        $sales = DetailSales::whereHas('sales', function($query)
+        {
+            return $query->whereMonth('date', Carbon::now()->month);
+        })->limit(50)->get();
+        return $sales;
+        // $data = array();
+        // $id = 1;
+        // foreach ($sales as $value) {
+        //     $data[] = array(
+        //         'id' => $id++,
+        //         'nama' => $sales->employee->name,
+        //         'pasar' => $sales->outlet->employeePasar->pasar->name,
+        //         'tanggal' => $sales->date,
+        //         'outlet' => $sales->outlet->name,
+        //     );
+        // }
+        // return Datatables::of(collect($data))->make(true);
+    }
+
 }

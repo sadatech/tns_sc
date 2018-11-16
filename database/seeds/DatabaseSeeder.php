@@ -24,32 +24,19 @@ class DatabaseSeeder extends Seeder
         $this->call(PasarTableSeeder::class);
         $this->call(StoreTableSeeder::class);
         $this->call(AgencyTableSeeder::class);
-<<<<<<< HEAD
-        $this->call(EmployeeTableSeeder::class);
-        $this->call(EmployeeStoreTableSeeder::class);
-=======
-        // $this->call(EmployeeTableSeeder::class);//ini
+
+        // $this->call(EmployeeTableSeeder::class);
         // $this->call(EmployeeStoreTableSeeder::class);
->>>>>>> ed450911fa1fd5b0cb037b160326e6470abe56d0
+
         $this->call(PlaceTableSeeder::class);
         $this->call(BrandTableSeeder::class);
         $this->call(CategoryTableSeeder::class);
         $this->call(SubCategoryTableSeeder::class);
-<<<<<<< HEAD
-        $this->call(ProductTableSeeder::class);
 
-        // $this->call(MeasurementUnitTableSeeder::class);
-        // $this->call(ProductMeasureTableSeeder::class);
+        // $this->call(ProductTableSeeder::class);
 
-        $this->call(PriceTableSeeder::class);
-        // $this->call(SalesTableSeeder::class);
-
-=======
-        // $this->call(ProductTableSeeder::class);//ini
-        // $this->call(MeasurementUnitTableSeeder::class);
-        // $this->call(ProductMeasureTableSeeder::class);
+        // $this->call(PriceTableSeeder::class);
 
         $this->call(NewTestAchievementTableSeeder::class);
->>>>>>> ed450911fa1fd5b0cb037b160326e6470abe56d0
     }
 }

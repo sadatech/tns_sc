@@ -29,4 +29,11 @@ class AttendanceDetail extends Model
     {
         return $this->belongsTo('App\Place', 'id_place');
     }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['store_name1'] = $this->store->name1;
+        $array['store_name2'] = $this->store->name2;
+        return $array;
+    }
 }
