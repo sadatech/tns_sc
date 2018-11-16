@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\DetailIn;
 use App\SellIn;
+use App\SellInSummary;
+use App\SalesMtcSummary;
+use App\MtcReportTemplate;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Collection;
 use App\Category;
@@ -20,26 +23,154 @@ use App\StoreDistributor;
 use App\Employee;
 use App\EmployeePasar;
 use App\Distributor;
+use App\Filters\SummaryFilters;
+use App\Helper\ReportHelper as ReportHelper;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use Rap2hpoutre\FastExcel\FastExcel;
+use App\Sales;
+use App\DetailSales;
+use App\Target;
 use App\StockMdHeader as StockMD;
 use App\Outlet;
 use App\Attendance;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
-use App\SalesMD;
+use App\SalesMd as SalesMD;
+use App\JobTrace;
+use App\Jobs\ExportJob;
 use App\Product;
 use App\DetailSales;
 
+
 class ReportController extends Controller
 {
+    protected $reportHelper;
+
+    public function __construct(ReportHelper $reportHelper)
+    {
+        $this->reportHelper = $reportHelper;
+    }
+
     // *********** SELL IN ****************** //
 
 	public function sellInIndex(){
 		return view('report.sellin');
 	}
 
-	public function sellInData(){
+    public function sellInData(SummaryFilters $filters){
+
+        $data = SellInSummary::where('id', '>', 0);
+
+        return Datatables::of($data)
+            ->addColumn('action', function ($item) {
+                $data = array(
+                    'id'            => $item->id,
+                    'qty'           => $item->qty
+                );
+
+                return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
+                <button data-url=".route('sellin.delete', $item->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+                ";
+            })->make(true);
+
+    }
+
+    public function sellInDataRaw(Request $request){
+
+        $data = DetailIn::where('deleted_at', null);
+
+        return Datatables::of($data)
+        ->addColumn('week', function($item) {
+            return $item->sellin->week;
+        })        
+        ->addColumn('distributor_code', function($item) {
+            return $item->sellin->store->getDistributorCode();
+        })
+        ->addColumn('distributor_name', function($item) {
+            return $item->sellin->store->getDistributorName();
+        })
+        ->addColumn('region', function($item) {
+            return $item->sellin->store->subarea->area->region->name;
+        })
+        ->addColumn('area', function($item) {
+            return $item->sellin->store->subarea->area->name;
+        })
+        ->addColumn('sub_area', function($item) {
+            return $item->sellin->store->subarea->name;
+        })
+        ->addColumn('account', function($item) {
+            return $item->sellin->store->account->name;
+        })
+        ->addColumn('channel', function($item) {
+            return $item->sellin->store->account->channel->name;
+        })
+        ->addColumn('store_name_1', function($item) {
+            return $item->sellin->store->name1;
+        })
+        ->addColumn('store_name_2', function($item) {
+            return $item->sellin->store->name2;
+        })
+        ->addColumn('nik', function($item) {
+            return $item->sellin->employee->nik;
+        })
+        ->addColumn('employee_name', function($item) {
+            return $item->sellin->employee->name;
+        })
+        ->addColumn('date', function($item) {
+            return $item->sellin->date;
+        })
+        ->addColumn('product_name', function($item) {
+            return $item->product->name;
+        })
+        ->addColumn('category', function($item) {
+            // return $item->product->category->name;
+        })
+        ->addColumn('unit_price', function($item) {
+            // return $item->product->getPrice(
+            //                             $item->sellin->date,
+            //                             $item->sellin->store->type,
+            //                             ($item->company->typePrice == 2) ? 3 : 1
+            //                            );
+        })
+        ->addColumn('value', function($item) {
+            // return  $item->product->getPrice(
+                    //                     $item->sellin->date,
+                    //                     $item->sellin->store->type,
+                    //                     ($item->company->typePrice == 2) ? 3 : 1
+                    //                    )
+                    // *
+                    // $item->isTarget()['target'];
+        })
+        ->addColumn('value_pf', function($item) {
+            // return  $item->product->getPrice(
+            //                             $item->sellin->date,
+            //                             $item->sellin->store->type,
+            //                             ($item->company->typePrice == 2) ? 3 : 1
+            //                            )
+            //         *
+            //         $item->isTarget()['target_pf']
+            //         *
+            //         $item->isPf();
+        })
+        ->addColumn('spv_name', function($item) {
+            // return $item->sellin->employee->getSpvName();
+        })
+        ->addColumn('action', function ($item) {
+            $data = array(
+                'id'            => $item->id,
+                'qty'           => $item->qty
+            );
+
+            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
+            <button data-url=".route('sellin.delete', $item->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
+            ";
+        })->make(true);
+
+    }
+
+	public function sellInDataOld(){
 
 		$str =  "
                 SELECT d.id, h.week, reg.name as region, ar.name as area, sar.name as sub_area, acc.name as account, cha.name as channel, str.name1 as store_name_1, str.name2 as store_name_2, emp.nik, emp.name as employee_name, h.date, pro.name as product_name, cat.name as category, d.qty as quantity, d.price as unit_price, (d.qty * d.price) as value, (d.qty * d.price * d.is_pf) as value_pf, spv.name as spv_name, str.id as storeId
@@ -183,7 +314,258 @@ class ReportController extends Controller
     // *********** SELL OUT ****************** //
 
 
+    // *********** SALES MTC ****************** //
+
+    public function salesMtcIndex(){
+        return view('report.salesmtc');
+    }
+
+    public function salesMtcDataSales(SummaryFilters $filters){
+
+        // $data = new SalesMtcSummary('sales_mtc_summary_by_sales');
+        $data = SalesMtcSummary::filter($filters);
+        
+        return Datatables::of($data)
+        // ->addColumn('periode', function($item) {
+        //     return $item->getSummary('periode');
+        // })
+        // ->addColumn('region', function($item) {
+        //     return $item->getSummary('region');
+        // })
+        // ->addColumn('is_jawa', function($item) {
+        //     return $item->getSummary('is_jawa');
+        // })
+        // ->addColumn('jabatan', function($item) {
+        //     return $item->getSummary('jabatan');
+        // })
+        // ->addColumn('employee_name', function($item) {
+        //     return $item->getSummary('employee_name');
+        // })
+        // ->addColumn('area', function($item) {
+        //     return $item->getSummary('area');
+        // })
+        // ->addColumn('sub_area', function($item) {
+        //     return $item->getSummary('sub_area');
+        // })
+        // ->addColumn('store_name', function($item) {
+        //     return $item->getSummary('store_name');
+        // })
+        // ->addColumn('account', function($item) {
+        //     return $item->getSummary('account');
+        // })
+        // ->addColumn('category', function($item) {
+        //     return $item->getSummary('category');
+        // })
+        // ->addColumn('product_line', function($item) {
+        //     return $item->getSummary('product_line');
+        // })
+        // ->addColumn('product_name', function($item) {
+        //     return $item->getSummary('product_name');
+        // })
+        // ->addColumn('actual_out_qty', function($item) {
+        //     return $item->getSummary('actual_out_qty');
+        // })
+        // ->addColumn('actual_in_qty', function($item) {
+        //     return $item->getSummary('actual_in_qty');
+        // })
+        // ->addColumn('price', function($item) {
+        //     return $item->getSummary('price');
+        // })
+        // ->addColumn('actual_out_value', function($item) {
+        //     return $item->getSummary('actual_out_value');
+        // })
+        // ->addColumn('actual_in_value', function($item) {
+        //     return $item->getSummary('actual_in_value');
+        // })
+        // ->addColumn('total_actual', function($item) {
+        //     return $item->getSummary('total_actual');
+        // })
+        // ->addColumn('target_qty', function($item) {
+        //     return $item->getSummary('target_qty');
+        // })
+        // ->addColumn('target_value', function($item) {
+        //     return $item->getSummary('target_value');
+        // })
+        ->make(true);
+    }
+
+    public function salesMtcDataSalesAlt(SummaryFilters $filters){
+
+        $data = MtcReportTemplate::filter($filters);
+        
+        $dt = Datatables::of($data);
+
+        foreach ($this->reportHelper->generateColumnSalesMtc() as $column) {
+            $dt->addColumn($column, function($item) use ($column) {
+                return $item->getSummary($column);
+            });
+        }
+
+        return $dt->make(true);        
+    }
+
+    public function salesMtcDataTarget(SummaryFilters $filters){
+        return Datatables::of(SalesMtcSummary('sales_mtc_summary_by_target')->filter($filters))->make(true);
+    }
+
+
     // *********** STOCK ****************** //
+
+
+    // *********** EXPORTING ****************** //
+
+    public function tes(){
+
+        $list = collect([
+            [ 'id' => 1, 'name' => 'Jane' ],
+            [ 'id' => 2, 'name' => 'John' ],
+        ]);
+
+        $data = MtcReportTemplate::where('id', '!=', 0);
+
+        $sql = $data->toSql();
+        $bindings = $data->getBindings();
+
+        $sql = $data->toSql();
+        $bindings = $data->getBindings();
+
+        $data3 = collect(DB::select($sql, $bindings));
+
+        return $this->reportHelper->exportSalesMtc($data);
+
+        // return (new FastExcel($this->reportHelper->mapForExportSalesMtc($data)))->download('file.xlsx');
+
+        // return redirect()->back();
+
+    }
+
+    public function export(Request $request, SummaryFilters $filters){
+
+        // $req = new Request($request->all());
+        // return response()->json(asset('..\storage')); 
+        // $excel = $this->reportHelper->exporting($request);
+
+        $result = DB::transaction(function () use ($request) {
+
+            try{
+                
+                // JOB TRACING AND QUEUE
+                $trace = JobTrace::create([
+                        'id_user' => Auth::user()->id,
+                        'date' => Carbon::now(),
+                        'title' => $this->reportHelper->getTitle($request),
+                        'status' => 'PROCESSING',
+                    ]);
+
+                dispatch(new ExportJob($trace, $request->all(), Auth::user()));
+                return true;
+                return 'Export succeed, please go to download page';       
+            }catch(\Exception $e){
+                DB::rollback();
+                return false;
+                return 'Export request failed '.$e->getMessage();
+            }
+
+        });
+
+        return response()->json(['result' => $result]);
+
+    }
+
+    public function exportOld(Request $request, SummaryFilters $filters){
+
+        // $list = collect([
+        //     [ 'id' => 1, 'name' => 'Jane' ],
+        //     [ 'id' => 2, 'name' => 'John' ],
+        // ]);
+
+        // (new FastExcel($list))->export('file.xlsx');
+
+        // return;
+
+        // return response()->json(['name' => 'New.xlsx', 'file' => 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'.base64_encode($excel)]);
+
+        // return response()->json($request->all());
+
+        // return response()->json($this->reportHelper->getModel($request));
+
+        // $filterA = new SummaryFilters($request);
+
+        // return response()->json(SellInSummary::filter($filterA)->get());
+
+        // $filename = 'Philips Retail Report Sell Thru ' . Carbon::now()->format('d-m-Y');
+
+        // return $this->reportHelper->exportSalesMtc($filters);
+
+        $data = SellInSummary::filter($filters);
+
+        $sql = $data->toSql();
+        $bindings = $data->getBindings();
+
+        // $data2 = DB::select($data)->setBindings($bindings);
+
+        // $data2 = SellInSummary::select(DB::raw($data->toSql()), $bindings);
+
+        $data3 = collect(DB::select($sql, $bindings));
+
+        $dataNew = DB::select($sql, $bindings);
+
+        $data4 = SellInSummary::filter($filters)->get();
+
+        $arr = json_decode(json_encode($data3), TRUE);
+
+        // return response()->json($arr);
+
+        // return response()->json($data->limit(20)->get());
+
+        // $data = $this->reportHelper->getModel($request);
+
+        $filename = 'TEST REPORT '.rand(1000, 10000);
+        // $data = SellInSummary::filter(new SummaryFilters($request));
+
+        $excel = Excel::create($filename, function($excel) use ($arr) {
+
+            // Set the title
+            $excel->setTitle('Report Sell Thru');
+
+            // Chain the setters
+            $excel->setCreator('Philips')
+                  ->setCompany('Philips');
+
+            // Call them separately
+            $excel->setDescription('Sell Thru Data Reporting');
+
+            $excel->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+            $excel->sheet('SELL THRU', function ($sheet) use ($arr) {
+                $sheet->setAutoFilter('A1:S1');
+                $sheet->setHeight(1, 25);
+                // $sheet->fromModel($this->reportHelper->mapForExportSalesNew($data3), null, 'A1', true, true);
+                // $sheet->fromArray([['AAAA', 'BBBB', 'CCCC'],['AAAA', 'BBBB', 'CCCC']], null, 'A2', true, true);
+                $sheet->fromArray($arr, null, 'A1', true, true);
+                $sheet->row(1, function ($row) {
+                    $row->setBackground('#82abde');
+                });
+                $sheet->cells('A1:S1', function ($cells) {
+                    $cells->setFontWeight('bold');
+                });
+                $sheet->setBorder('A1:S1', 'thin');
+            });
+
+
+        })->string('xlsx');
+
+        // $model = $this->reportHelper->getModel($request);
+        // $excel = $this->reportHelper->exporting($model);
+
+        // return response()->json(['name' => $model['filename'].'.xlsx', 'file' => 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'.base64_encode($excel)]);
+
+        return response()->json(['name' => $filename.'.xlsx', 'file' => 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'.base64_encode($excel)]);
+
+    }
 
     // *********** PRICE SASA VS COMPETITOR ****************** //
 
@@ -414,8 +796,8 @@ class ReportController extends Controller
 
         return Datatables::of($datas)->make(true);
         return response()->json($datas);
-    }
 
+    }
 
     // ************ SMD PASAR ************ //
     public function SMDpasar()
@@ -428,21 +810,166 @@ class ReportController extends Controller
         $id = 1;
         for ($i=1; $i <= Carbon::now()->day ; $i++) {
             foreach ($employeePasar->get() as $data) {
-                $report[] = array(
-                    'id' => $id++,
-                    'area' => $data->pasar->subarea->area->name,
-                    'nama' => $data->employee->name,
-                    'jabatan' => $data->employee->position->name,
-                    'pasar' =>   $data->pasar->name,
-                    'stockist' => $this->getStockist($data, $i),
-                    'bulan' => Carbon::now()->month,
-                    'tanggal' => $i,
-                    'call' => $this->getCall($data, $i),
-                    'ro' => $this->getRo($data, $i),
-                );
+                if ($data->employee->position->level == 'mdgtc') {
+                    $report[] = array(
+                        'id' => $id++,
+                        'id_ep' => $data->id,
+                        'id_emp' => $data->employee->id,
+                        'id_pasar' => $data->pasar->id,
+                        'area' => $data->pasar->subarea->area->name,
+                        'nama' => $data->employee->name,
+                        'jabatan' => $data->employee->position->name,
+                        'pasar' =>   $data->pasar->name,
+                        'stockist' => $this->getStockist($data, $i),
+                        'bulan' => Carbon::now()->month,
+                        'tanggal' => $i,
+                        'call' => $this->getCall($data, $i),
+                        'ro' => $this->getRo($data, $i),
+                        'cbd' => $this->getCbd($data, $i),
+                    );
+                }
             }
         }
-        return Datatables::of(collect($report))->make(true);
+        $dt = Datatables::of(collect($report));
+        foreach (\App\SubCategory::get() as $cat) {
+            $dt->addColumn('cat-'.$cat->id, function($report) use ($cat){
+                $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+                $getVal = DB::table('distribution_details')
+                ->join('products', 'distribution_details.id_product', '=', 'products.id')
+                ->join('distributions', 'distribution_details.id_distribution', '=', 'distributions.id')
+                ->whereDate('distribution_details.created_at', '=', Carbon::parse($date))
+                ->where([
+                    'products.id_subcategory' => $cat->id,
+                    'distributions.id_employee' => $report['id_emp']
+                ])->count();
+                return $getVal;
+            });
+        }
+        foreach (\App\Product::get() as $product) {
+            $dt->addColumn('product-'.$product->id, function($report) use ($product){
+                // $date = Carbon::now()->format('Y')."-".$report['bulan']."-16";
+                $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+                $getOos = DB::table('stock_md_headers')
+                ->join('stock_md_details', 'stock_md_headers.id', '=', 'stock_md_details.id_stock')
+                ->where([
+                    'stock_md_headers.id_employee' => $report['id_emp'],
+                    'stock_md_headers.id_pasar' => $report['id_pasar'],
+                    'stock_md_headers.date' => $date,
+                    'stock_md_details.id_product' => $product->id
+                ])->first();
+                return (isset($getOos->oos) ? $getOos->oos : "-");
+            });
+        }
+        $dt->addColumn('ec', function($report){
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            return SalesMD::whereDate('date', $date)->count();
+        });
+        $dt->addColumn('vpf', function($report) {
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            // $date = Carbon::now()->format('Y')."-".$report['bulan']."-15";
+            $sale = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 1,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            // dd($report);
+            // dd($sale);
+            $getVal = array();
+            foreach ($sale as $data) {
+                $getVal[] = $data->price*$data->qty_actual;
+            }
+            return "Rp.".(array_sum($getVal) == 0 ? "-" : array_sum($getVal));
+        });
+        $dt->addColumn('vnpf', function($report) {
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            // $date = Carbon::now()->format('Y')."-".$report['bulan']."-15";
+            $sale = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 0,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            // dd($report);
+            // dd($sale);
+            $getVal = array();
+            foreach ($sale as $data) {
+                $getVal[] = $data->price*$data->qty_actual;
+            }
+            return "Rp.".(array_sum($getVal) == 0 ? "-" : array_sum($getVal));
+        });
+        $dt->addColumn('vt', function($report) {
+            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            $vpf = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 1,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            $vnpf = DB::table('sales_mds')
+            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+            ->join('prices', 'products.id', '=', 'prices.id_product')
+            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->where([
+                'sales_md_details.is_pf' => 0,
+                // 'sales_mds.id_employee' => 101
+                'sales_mds.id_employee' => $report['id_emp']
+            ])
+            ->where('prices.rilis', '<=', $date)
+            ->get([
+                'sales_mds.id_outlet',
+                'sales_md_details.qty_actual',
+                'sales_md_details.id_product',
+                'prices.price',
+            ]);
+            // dd($report);
+            // dd($sale);
+            $getVpf = array();
+            $getVnpf = array();
+            foreach ($vpf as $data) {
+                $getVpf[] = $data->price*$data->qty_actual;
+            }
+            foreach ($vnpf as $data) {
+                $getVnpf[] = $data->price*$data->qty_actual;
+            }
+            $total = array_sum($getVpf)+array_sum($getVnpf);
+            return "Rp.".($total == 0 ? "-" : $total);
+        });
+        return $dt->make(true);
     }
 
     public function SMDattendance()
@@ -550,6 +1077,17 @@ class ReportController extends Controller
         return Datatables::of(collect($data))->make(true);
     }
 
+
+    public function getCbd($data, $day)
+    {
+        $date = Carbon::now()->format('Y-m-').$day;
+        $cbd = \App\Cbd::where([
+            'id_employee' => $data['id_employee'],
+            'date' => $date
+        ])->count();
+        return $cbd;
+    }
+
     public function getStockist($data, $day)
     {
         $date = Carbon::now()->format('Y-m-').$day;
@@ -616,4 +1154,5 @@ class ReportController extends Controller
         // }
         // return Datatables::of(collect($data))->make(true);
     }
+
 }
