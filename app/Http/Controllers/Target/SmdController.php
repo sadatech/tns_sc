@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Target;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\Input;
 use App\TargetGtc;
 use App\Employee;
 use Carbon\Carbon;
+use Exception;
 use DB;
 use Auth;
 use File;
@@ -167,6 +169,86 @@ class SmdController extends Controller
                     'type'   => 'danger',
                     'title'  => 'Gagal Unduh!<br/>',
                     'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function importXLS(Request $request)
+    {
+        try {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+
+            if($request->hasFile('file')) {
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
+                    try {
+                        DB::beginTransaction();
+                        if (!empty($results->all())) {
+                            foreach($results as $row)
+                            {
+                                $rowRules = [
+                                    'employee'  => 'required',
+                                    'hk'		=> 'required|numeric',	
+                                    'value'		=> 'required|numeric',
+                                    'ecpf'		=> 'required|numeric',
+                                    'cbd'	    => 'required|numeric'
+                                ];
+                                $validator = Validator($row->toArray(), $rowRules);
+                                if ($validator->fails()) {
+                                    return redirect()->back()
+                                    ->withErrors($validator)
+                                    ->withInput();
+                                } else {
+                                     TargetGtc::create([
+                                        'id_employee'   => \App\Employee::where('name', $row['employee'])->first()->id,
+                                        'hk'            => $row['hk'],
+                                        'rilis'         => Carbon::now(),
+                                        'value_sales'   => $row['value'],
+                                        'ec'            => $row['ecpf'],
+                                        'cbd'           => $row['cbd']
+
+                                    ]);
+                                }
+                            }
+                            DB::commit();
+                        } else {
+                            throw new Exception("Error Processing Request", 1);
+                        }
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return redirect()->back()->with([
+                            'type' => 'danger',
+                            'title' => 'Gagal!<br/>',
+                            'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah Target SMD Pasar!'
+                        ]);
+                    }
+                }, false);
+                return redirect()->back()->with([
+                    'type' => 'success',
+                    'title' => 'Sukses!<br/>',
+                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Target SMD Pasar!'
+                ]);
+            } else {
+                DB::rollback();
+                return redirect()->back()->with([
+                    'type' => 'danger',
+                    'title' => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>File harus di isi!'
+                ]);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with([
+                'type' => 'danger',
+                'title' => 'Gagal!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
             ]);
         }
     }
