@@ -71,7 +71,7 @@ class CreateViewSalesMtcSummary extends Migration
                     ) AS price,
                     IFNULL(
                         (
-                            SELECT SUM(detail_sales.qty_actual)
+                            SELECT SUM(detail_sales.qty)
                             FROM detail_sales
                             JOIN sales ON sales.id = detail_sales.id_sales
                             WHERE sales.id_store = mtc_report_templates.id_store
@@ -84,7 +84,7 @@ class CreateViewSalesMtcSummary extends Migration
                     , 0) AS actual_out_qty,
                     IFNULL(
                         (
-                            SELECT SUM(detail_sales.qty_actual)
+                            SELECT SUM(detail_sales.qty)
                             FROM detail_sales
                             JOIN sales ON sales.id = detail_sales.id_sales
                             WHERE sales.id_store = mtc_report_templates.id_store
@@ -98,7 +98,7 @@ class CreateViewSalesMtcSummary extends Migration
                     IFNULL(
                         (
                             SELECT SUM(
-                                IF(sales.`type` = 'Sell Out', detail_sales.qty_actual, 0) *
+                                IF(sales.`type` = 'Sell Out', detail_sales.qty, 0) *
                                 IFNULL(
                                     (
                                      SELECT `prices`.price FROM `prices` 
@@ -123,7 +123,7 @@ class CreateViewSalesMtcSummary extends Migration
                     IFNULL(
                         (
                             SELECT SUM(
-                                IF(sales.`type` = 'Sell In', detail_sales.qty_actual, 0) *
+                                IF(sales.`type` = 'Sell In', detail_sales.qty, 0) *
                                 IFNULL(
                                     (
                                      SELECT `prices`.price FROM `prices` 
@@ -150,7 +150,7 @@ class CreateViewSalesMtcSummary extends Migration
                             IFNULL(
                                 (
                                     SELECT SUM(
-                                        IF(sales.`type` = 'Sell In', detail_sales.qty_actual, 0) *
+                                        IF(sales.`type` = 'Sell In', detail_sales.qty, 0) *
                                         IFNULL(
                                             (
                                              SELECT `prices`.price FROM `prices` 
@@ -176,7 +176,7 @@ class CreateViewSalesMtcSummary extends Migration
                             IFNULL(
                                 (
                                     SELECT SUM(
-                                        IF(sales.`type` = 'Sell Out', detail_sales.qty_actual, 0) *
+                                        IF(sales.`type` = 'Sell Out', detail_sales.qty, 0) *
                                         IFNULL(
                                             (
                                              SELECT `prices`.price FROM `prices` 

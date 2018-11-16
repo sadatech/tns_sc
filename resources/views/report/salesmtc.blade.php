@@ -260,7 +260,7 @@
             }
           }));
 
-          $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
+          $('#filterEmployee').select2(setOptions('{{ route("employee-select2-for-report") }}', 'Select Employee', function (params) {
             return filterData('employee', params.term);
           }, function (data, params) {
             return {
