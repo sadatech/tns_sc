@@ -495,21 +495,23 @@ Route::prefix('company')->group(function () {
 });
 
 
-// ***************** REPORTING ***********************
+// ***************** REPORTING (START) ***********************
 
 Route::prefix('report')->group(function () {
 	Route::prefix('sales')->group(function () {
 		Route::prefix('sellin')->group(function () {
 			Route::get('/', 'ReportController@sellInIndex')->name('sellin')->middleware('auth');
-			Route::get('/data', 'ReportController@sellInData')->name('sellin.data')->middleware('auth');
+			Route::post('/data', 'ReportController@sellInData')->name('sellin.data')->middleware('auth');
 			Route::post('/edit/{id}', 'ReportController@sellInUpdate')->name('sellin.edit')->middleware('auth');
 			Route::get('/delete/{id}', 'ReportController@sellInDelete')->name('sellin.delete')->middleware('auth');
 			Route::post('/add', 'ReportController@sellInAdd')->name('sellin.add')->middleware('auth');
-			Route::post('/import', 'ImportQueueController@ImportSellIn')->name('sellin.import')->middleware('auth');
+			Route::post('/import', 'ImportQueueController@ImportSellIn')->name('sellin.import')->middleware('auth');			
 			Route::get('/download-template', function()
 			{
 				return response()->download(public_path('assets/SellinImport.xlsx'));
 			})->name('SellIn.download-template')->middleware('auth');
+
+			Route::get('/tes', 'ReportController@tes')->name('sellin.export')->middleware('auth');
 		});
 		
 		Route::get('/sellout', 'DashboardController@dashboard')->name('sellout')->middleware('auth');
@@ -551,10 +553,20 @@ Route::prefix('report')->group(function () {
 		})->name('SellIn.download-template')->middleware('auth');
 	});
 
+	Route::prefix('salesmtc')->group(function () {
+		Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');
+		Route::post('/data', 'ReportController@salesMtcDataSalesAlt')->name('salesmtc.data')->middleware('auth');
+	});
+
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
+	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');
 
-	Route::prefix('smd')->group(function () {
+	Route::prefix('attendance')->group(function(){
+		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
+	});
+Route::prefix('smd')->group(function () {
 		Route::get('/', function(){
 			$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
 			$data['product'] = \App\Product::whereIn('id', $getId)->get();
@@ -567,6 +579,7 @@ Route::prefix('report')->group(function () {
 		})->name('report.attendance.smd')->middleware('auth');
 		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
 	});
+
 
 	Route::prefix('sales')->group(function () {
 		Route::get('/', function(){
@@ -581,9 +594,10 @@ Route::prefix('report')->group(function () {
 		})->name('report.dist.pf')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
 	});
+
 });
 
-// ***************** REPORTING ***********************
+// ***************** REPORTING (END) ***********************
 
 /**
 *	Welcome Pages
@@ -598,6 +612,11 @@ Route::prefix('welcome')->group(function () {
 */
 Route::prefix('utility')->group(function () {
 	Route::get('/getCity', 'DashboardController@getCity')->name('getCity');
+	Route::prefix('export-download')->group(function () {
+		Route::get('/', 'UtilitiesController@reportDownloadIndex')->name('export-download')->middleware('auth');
+		Route::post('/data', 'UtilitiesController@reportDownloadData')->name('export-download.data')->middleware('auth');
+		Route::post('/explain/{param}', 'UtilitiesController@reportDownloadAddExplanation')->name('export-download.explain')->middleware('auth');
+	});	
 });
 
 /**
@@ -606,6 +625,7 @@ Route::prefix('utility')->group(function () {
 Route::prefix('select2')->group(function () {
 	Route::post('/region-select2', 'RegionController@getDataWithFilters')->name('region-select2');
 	Route::post('/area-select2', 'AreaController@getDataWithFilters')->name('area-select2');
+	Route::post('/sub-area-select2', 'SubareaController@getDataWithFilters')->name('sub-area-select2');
 	Route::post('/employee-select2', 'EmployeeController@getDataWithFilters')->name('employee-select2');
 	Route::post('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
