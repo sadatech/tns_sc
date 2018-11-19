@@ -41,8 +41,6 @@ use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Product;
-use App\DetailSales;
-
 
 class ReportController extends Controller
 {
