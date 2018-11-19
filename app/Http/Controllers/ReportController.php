@@ -1134,6 +1134,13 @@ class ReportController extends Controller
 
     public function getAchievement($date = '')
     {
+        $str = 
+        "
+             SELECT * FROM sales_mtc_summary
+             WHERE date between '2018-11-01' and '2018-11-30'
+        ";
+
+        return DB::select($str);
         $sales = DetailSales::whereHas('sales', function($query)
         {
             return $query->whereMonth('date', Carbon::now()->month);
