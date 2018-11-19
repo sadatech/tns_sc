@@ -211,7 +211,7 @@
             ajax: '{!! route('employee.data.dc') !!}',
             serverSide: true,
             columns: [
-                { data: 'action', name: 'action' },
+            { data: 'action', name: 'action' },
             { data: 'nik', name: 'nik' },
             { data: 'name', name: 'name' },
             { data: 'ktp', name: 'ktp' },

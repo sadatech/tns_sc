@@ -60,7 +60,6 @@ class PlandcController extends Controller
     {
         $this->validate($request, [
             'employee'  => 'required',
-            'date'      => 'required',
             'file'      => 'required'
         ]);
         $transaction = DB::transaction(function () use ($request) {
@@ -75,23 +74,21 @@ class PlandcController extends Controller
                 $file = $request->file('file')->getRealPath();
                 $ext = '';
                 
-                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
+                Excel::filter('chunk')
+                ->selectSheetsByIndex(1)
+                ->load($file)
+                ->formatDates(true)
+                ->chunk(250, function($results) use ($request)
                 {
-                    
-                    foreach($results as $row)
+                    foreach($results as $row)   
                     {
                         $rowRules = [
                             'lokasi' => 'required',
+                            'date'   => 'required'
                         ];
-                        $customMessages = [
-                            'required' => 'Row Lokasi Tidak Boleh Kosong!'
-                        ];
-                        
-                        $validator = Validator($row->toArray(), $rowRules, $customMessages);
+                        $validator = Validator::make($row->toArray(), $rowRules);
                         if ($validator->fails()) {
-                            return redirect()->back()
-                            ->withErrors($validator)
-                            ->withInput();
+                            continue;
                         } else {
                             // $data1 = Employee::where(['id' => $request->input('employee')])->first();
                             // $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($row['lokasi']))."'");
@@ -99,7 +96,7 @@ class PlandcController extends Controller
                             // if($check->count() < 1 ) {
                             // dd($check);
                             $insert = PlanDc::create([
-                                'date'              => $request->input('date'),
+                                'date'              => \PHPExcel_Style_NumberFormat::toFormattedString($row['date'], 'YYYY-MM-DD'),
                                 'lokasi'            => $row['lokasi'],
                                 'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
                                 'channel'           => (isset($row->channel) ? $row->channel : "-")
@@ -108,22 +105,15 @@ class PlandcController extends Controller
                                 {
                                     $dataStore = array();
                                     foreach ($request->input('employee') as $distributor) {
-                                            $dataStore[] = array(
-                                                'id_employee'    => $distributor,
-                                                'id_plandc'      => $insert->id,
-                                            );
-                                        // } else {
-                                        //     break;
-                                        //     return false;
-                                        // }
+                                        $dataStore[] = array(
+                                            'id_employee'    => $distributor,
+                                            'id_plandc'      => $insert->id,
+                                        );
                                     }
                                     DB::table('plan_employees')->insert($dataStore); 
                                 }
-                            // } return false;
-                                }
                             }
-                    // }
-                // }
+                        }
                 },false);
             }
             return 'success';

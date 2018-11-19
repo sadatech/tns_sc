@@ -86,24 +86,26 @@ class ProductController extends Controller
 				} else {
 					$today 	= Carbon::today()->toDateString();
 					$area 	= Pasar::find($id_pasar)->first()->subarea->id_area;
-					$pf 	= ProductFokus::with('Fokus.channel')->
-					whereHas('Fokus', function($query)
+					
+					$pf 	= ProductFokus::with(['fokusproduct.product'])
+					->whereHas('Fokus.channel', function($query)
 					{
-						return $query->whereHas('channel', function($query2)
-						{
-							return $query2->where('name','GTC');
-						});
+						return $query->where('name','GTC');
 					})->whereRaw("'$today' BETWEEN product_fokuses.from and product_fokuses.to")->get();
 
 					$product= [];
 					foreach ($pf as $key => $value) {
 						$areas__ = FokusArea::where('id_pf',$value->id)->get();
 						if ($areas__->count() == 0) {
-							$product[] = $value->product;
+							foreach ($value->fokusproduct as $value2) {
+								$product[] = $value2->product;
+							}
 						}else{
 							foreach ($areas__ as $key2 => $value2) {
 								if ($value2->id_area == $area) {
-									$product[] = $value->product;
+									foreach ($value->fokusproduct as $value3) {
+										$product[] = $value3->product;
+									}
 								}
 							}
 						}

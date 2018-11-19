@@ -6,9 +6,9 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\SalesMd;
-use App\SalesMdDetail;
-use App\Outlet;
+use App\SalesSpgPasar;
+use App\SalesSpgPasarDetail;
+use App\Pasar;
 use App\ProductFokus;
 use App\Target;
 use DB;
@@ -16,7 +16,7 @@ use JWTAuth;
 use Config;
 use Carbon\Carbon;
 
-class SalesMdController extends Controller
+class SalesSpgPasarController extends Controller
 {
 	public function __construct()
 	{
@@ -27,8 +27,8 @@ class SalesMdController extends Controller
 	{
 		$data = json_decode($request->getContent());
 
-		if (empty($data->outlet) || empty($data->product) || empty($data->type) ) {
-			$res['msg']	= "Please select Outlet and Product.";
+		if (empty($data->pasar) || empty($data->product) || empty($data->type) ) {
+			$res['msg']	= "Please select Pasar and Product.";
 			$res['code']= 200;
 		}else
 		try {
@@ -38,7 +38,8 @@ class SalesMdController extends Controller
 			} else {
 				DB::transaction(function () use ($data, $user, &$res) {
 					$date 	= Carbon::parse($data->date);
-					$res 	= $this->sales($date, $user, $data->outlet, $data->product, $data->type);
+					$date2 	= Carbon::parse($data->date);
+					$res 	= $this->sales($date, $date2, $user, $data->pasar, $data->product, $data->type);
 				});
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -65,14 +66,14 @@ class SalesMdController extends Controller
 				$res['msg'] 	= "User not found.";
 				$code 			= 200;
 			} else {
-				$list = SalesMd::where([
+				$list = SalesSpgPasar::where([
 					'id_employee' => $user->id,
 				])->orderBy('created_at', 'desc')->get();
 				if ($list) {
 					$history = array();
 					$productList = array();
 					foreach ($list as $data) {
-						$product = SalesMdDetail::where('id_sales', $data->id)->get();
+						$product = SalesSpgPasarDetail::where('id_sales', $data->id)->get();
 						foreach ($product as $value) {
 							$productList[] = array(
 								'id' 		=> $value->id,
@@ -83,7 +84,7 @@ class SalesMdController extends Controller
 						}
 						$history = array(
 							'id' 		=> $data->id,
-							'outlet' 	=> $data->outlet->name,
+							'pasar' 	=> $data->pasar->name,
 							'date' 		=> $data->date,
 							'week' 		=> $data->week,
 							'products' 	=> $productList
@@ -111,26 +112,26 @@ class SalesMdController extends Controller
 		return response()->json($res, $code);	
 	}
 
-	public function sales($date, $user, $request_outlet, $request_product, $type)
+	public function sales($date, $date2, $user, $request_pasar, $request_product, $type)
 	{
-		$checkSales = SalesMd::where([
+		$checkSales = SalesSpgPasar::where([
 			'id_employee'	=> $user->id,
-			'id_outlet'		=> $request_outlet,
-			'date'			=> $date,
+			'id_pasar'		=> $request_pasar,
+			'date'			=> $date2,
 			'type'			=> $type,
 		])->first();
 
-		$outlet = Outlet::where([
-			'id' => $request_outlet,
+		$pasar = Pasar::where([
+			'id' => $request_pasar,
 		])->first();
 
-		if ($outlet) {
+		if ($pasar) {
 			$res['code'] = 200;
 			if (!$checkSales) {
-				$sales = SalesMd::create([
+				$sales = SalesSpgPasar::create([
 					'id_employee'	=> $user->id,
-					'id_outlet'		=> $request_outlet,
-					'date'			=> $date,
+					'id_pasar'		=> $request_pasar,
+					'date'			=> $date2,
 					'week'			=> $date->weekOfMonth,
 					'type'			=> $type,
 				]);
@@ -139,33 +140,18 @@ class SalesMdController extends Controller
 				$sales_id = $checkSales->id;
 			}
 			foreach ($request_product as $product) {
-				$checkSalesDetail = SalesMdDetail::where([
+				$checkSalesDetail = SalesSpgPasarDetail::where([
 					'id_sales'		=> $sales_id,
 					'id_product'	=> $product->id,
 					'satuan'		=> $product->satuan,
 				])->first();
 				if (!$checkSalesDetail) {
-					
-					$pf = ProductFokus::with('Fokus.channel')->
-						whereHas('fokusproduct', function($query) use ($product)
-						{
-							return $query->where('id_product', $product->id);
-						})
-						->whereHas('Fokus.channel', function($query)
-						{
-							return $query->where('name','GTC');
-						})->whereRaw("'$date' BETWEEN product_fokuses.from and product_fokuses.to")
-						->get();
-
-						$isPf = ($pf->count() > 0 ? 1 : 0);
-
-					SalesMdDetail::create([
+					SalesSpgPasarDetail::create([
 						'id_sales'		=> $sales_id,
 						'id_product'	=> $product->id,
 						'qty'			=> $product->qty,
 						'qty_actual'	=> $product->qty_actual,
 						'satuan'		=> $product->satuan,
-						'is_pf'			=> $isPf,
 					]);
 				}else{
 					$checkSalesDetail->qty 			+= $product->qty;
