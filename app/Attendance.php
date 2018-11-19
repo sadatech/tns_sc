@@ -19,6 +19,7 @@ class Attendance extends Model
     {
         return $this->hasMany('App\AttendanceDetail', 'id_attendance');
     }
+  
     public function attendanceOutlet()
     {
         return $this->hasMany('App\AttendanceOutlet', 'id_attendance');
