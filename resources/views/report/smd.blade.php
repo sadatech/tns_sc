@@ -30,6 +30,17 @@
               <th>Tanggal</th>
               <th>CALL</th>
               <th>RO</th>
+              @foreach (\App\SubCategory::get() as $cat)
+              <th>{{ $cat->name }}</th>
+              @endforeach
+              <th>EC</th>
+              <th>Value Product Focus</th>
+              <th width="300px">Value Non Product Focus</th>
+              <th>Value Total</th>
+              <th>CBD</th>
+              @foreach ($product as $pro)
+              <th>{{ $pro->name }}</th>
+              @endforeach
             </tr>
           </thead>
         </table>
@@ -61,7 +72,6 @@ table.table thead tr th {
   $(function() {
     var table = $('#category').DataTable({
       processing: true,
-      serverSide: true,
       scrollX: true,
       scrollY: "300px",
       ajax: '{!! route('data.smd.pasar') !!}',
@@ -75,7 +85,18 @@ table.table thead tr th {
       { data: 'bulan', name: 'bulan' },
       { data: 'tanggal', name: 'tanggal' },
       { data: 'call', name: 'call' },
-      { data: 'ro', name: 'ro' }
+      { data: 'ro', name: 'ro' },
+      @foreach (\App\SubCategory::get() as $cat)
+      { data: 'cat-{{ $cat->id }}' },
+      @endforeach
+      { data: 'ec' },
+      { data: 'vpf' },
+      { data: 'vnpf' },
+      { data: 'vt' },
+      { data: 'cbd' },
+      @foreach ($product as $pro)
+      { data: 'product-{{ $pro->id }}' },
+      @endforeach
       ]
     });
   });

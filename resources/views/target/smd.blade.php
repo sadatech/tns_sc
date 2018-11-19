@@ -33,7 +33,7 @@
             <th>Hk</th>
             <th>Release Date</th>
             <th>Sales Value</th>
-            <th>EC</th>
+            <th>EC PF</th>
             <th>CBD</th>
             <th class="text-center" style="width: 15%;"> Action</th>
           </thead>
@@ -42,6 +42,66 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-gd-sun p-10">
+          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Target SMD Pasar</h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form action="{{ route('target.smd.import') }}" method="post" enctype="multipart/form-data">
+        {!! csrf_field() !!}
+        <div class="block-content">
+          <div class="form-group">
+              <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <h5> Sample Data :</h5>
+          <table class="table table-bordered table-vcenter">
+            <thead>
+              <tr>
+                  <td><b>account</b></td>
+                  <td><b>channel</b></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                  <td>Name Account 1</td>
+                  <td>Name Channel 1</td>
+              </tr>
+              <tr>
+                  <td>Name Account 1</td>
+                  <td>Name Channel 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="block-content">
+          <div class="form-group">
+          <label>Upload Your Data Target SMD Pasar:</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Save
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 
 
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
@@ -176,65 +236,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-    <div class="modal-content">
-      <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-primary p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Account</h3>
-          <div class="block-options">
-            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-              <i class="si si-close"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <form action="{{ route('account.import') }}" method="post" enctype="multipart/form-data">
-        {!! csrf_field() !!}
-        <div class="block-content">
-          <div class="form-group">
-              <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
-          </div>
-          <h5> Sample Data :</h5>
-          <table class="table table-bordered table-vcenter">
-            <thead>
-              <tr>
-                  <td><b>account</b></td>
-                  <td><b>channel</b></td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
-              </tr>
-              <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="block-content">
-          <div class="form-group">
-          <label>Upload Your Data Account:</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                <label class="custom-file-label">Choose file Excel</label>
-                <code> *Type File Excel</code>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Save
-          </button>
-          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 @endsection
 
 @section('css')

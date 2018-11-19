@@ -7,7 +7,7 @@ class ProductTableSeeder extends Seeder
 {
     public function run()
     {
-        for ($i=1; $i < 11; $i++) { 
+        for ($i=1; $i < 51; $i++) { 
             Product::create([
                 'name' => 'Product ' . $i,
                 'id_subcategory' => rand(1, 10),

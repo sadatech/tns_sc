@@ -1,8 +1,300 @@
 var filters = {};
 var data = {};
+var results = [];
 
 function showFilter() {
     console.log(this.filters);
+}
+
+function triggerResetWithoutWidth (arrayOfData) {
+    console.log('reset')
+    var data = arrayOfData[0];
+    var table = arrayOfData[1];
+    var element = arrayOfData[2];
+    var newElement = $('#'+arrayOfData[1]);
+    // console.log(newElement)
+    var url = arrayOfData[3];
+    var tableColumns = arrayOfData[4];
+    var columnDefs = arrayOfData[5];
+    var order = arrayOfData[6];
+
+    data.map((id) => {
+        $(id).val('').trigger('change');
+    });
+
+    this.filters = {};
+    if(typeof arrayOfData[8] !== 'undefined') {
+        this.filters['date_range'] = moment().format('YYYY-MM-DD')+'|'+moment().format('YYYY-MM-DD');
+    }
+
+     // Datatable setup
+
+    if($.fn.dataTable.isDataTable('#'+table)){
+        newElement.DataTable().clear();
+        newElement.DataTable().destroy();
+    }
+
+    // swal({
+    //   title: "Please Wait!",
+    //   text: "Data in Process, Relax!",
+    //   icon: "success",
+    //   showCancelButton: false,
+    //   showConfirmButton: false
+    // });
+    
+    newElement.dataTable({
+        "fnCreatedRow": function (nRow, data) {
+            $(nRow).attr('class', data.id);
+        },
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            error: function (data) {
+              swal("Error!", "Failed to load Data!", "error");
+            },
+
+            dataSrc: function(result){
+                this.data = result.data;
+                return result.data;
+            },
+        },
+        // scrollY:        "300px",
+        scrollX:        true,
+        scrollCollapse: true,
+        "bFilter": false,
+        "rowId": "id",
+        "columns": tableColumns,
+        "columnDefs": columnDefs,
+        "order": order,
+        "autoWidth" : false,
+    });
+
+    swal("Reset Filter Done", "Please check the results", "success");
+}
+
+// Filtering data without search box
+function filteringReportWithoutWidth(arrayOfData) {
+    // console.log('filter');
+    // console.log(arrayOfData);
+    var table = arrayOfData[0];
+    var element = arrayOfData[1];
+    var newElement = $('#'+arrayOfData[0]);
+    var url = arrayOfData[2];
+    var tableColumns = arrayOfData[3];
+    var columnDefs = arrayOfData[4];
+    var order = arrayOfData[5];
+    var filter = [];
+
+    this.moreParams = [];
+    this.moreParamsPost  = {};
+    // console.log('filters:');
+    // console.log(this.filters);
+    for (filter in this.filters) {
+        this.moreParams.push(filter + '=' + this.filters[filter]);
+        this.moreParamsPost[filter] = this.filters[filter];
+    }
+    var self = this;
+    // console.log('moreParamsPost:');
+    // console.log(self.moreParamsPost);
+    $(document).ready(function () {
+        // console.log(self.moreParamsPost);
+        // console.log(element);
+        // console.log(newElement);
+        if($.fn.dataTable.isDataTable('#'+table)){
+            // console.log('isDataTable');
+            newElement.DataTable().clear();
+            newElement.DataTable().destroy();
+        }
+
+        // swal({
+        //   title: "Please Wait!",
+        //   text: "Data in Process, Relax!",
+        //   icon: "success",
+        //   showCancelButton: false,
+        //   showConfirmButton: false
+        // });
+
+        newElement.dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: url + "?" + getParam(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+
+                dataSrc: function(result){
+                    this.data = result.data;
+                    return result.data;
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter": false,
+            "rowId": "id",
+            "columns": tableColumns,
+            "columnDefs": columnDefs,
+            "order": order,
+            "autoWidth": false
+        });
+        
+
+        swal("Set Filter Done", "Please check the results", "success");
+    })
+}
+
+// Reset all filter for search without search box
+function triggerResetWithoutSearch (arrayOfData) {
+    console.log('reset')
+    var data = arrayOfData[0];
+    var table = arrayOfData[1];
+    var element = arrayOfData[2];
+    var newElement = $('#'+arrayOfData[1]);
+    // console.log(newElement)
+    var url = arrayOfData[3];
+    var tableColumns = arrayOfData[4];
+    var columnDefs = arrayOfData[5];
+    var order = arrayOfData[6];
+
+    data.map((id) => {
+        $(id).val('').trigger('change');
+    });
+
+    this.filters = {};
+    if(typeof arrayOfData[8] !== 'undefined') {
+        this.filters['date_range'] = moment().format('YYYY-MM-DD')+'|'+moment().format('YYYY-MM-DD');
+    }
+
+     // Datatable setup
+
+    if($.fn.dataTable.isDataTable('#'+table)){
+        newElement.DataTable().clear();
+        newElement.DataTable().destroy();
+    }
+
+    // swal({
+    //   title: "Please Wait!",
+    //   text: "Data in Process, Relax!",
+    //   icon: "success",
+    //   showCancelButton: false,
+    //   showConfirmButton: false
+    // });
+    
+    newElement.dataTable({
+        "fnCreatedRow": function (nRow, data) {
+            $(nRow).attr('class', data.id);
+        },
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: url + "?" + $("#filterForm").serialize(),
+            type: 'POST',
+            dataType: 'json',
+            error: function (data) {
+              swal("Error!", "Failed to load Data!", "error");
+            },
+
+            dataSrc: function(result){
+                this.data = result.data;
+                return result.data;
+            },
+        },
+        // scrollY:        "300px",
+        scrollX:        true,
+        scrollCollapse: true,
+        "bFilter": false,
+        "rowId": "id",
+        "columns": tableColumns,
+        "columnDefs": columnDefs,
+        "order": order,
+        "ordering": false
+    });
+
+    swal("Reset Filter Done", "Please check the results", "success");
+}
+
+// Filtering data without search box
+function filteringReportWithoutSearch(arrayOfData) {
+    // console.log('filter');
+    // console.log(arrayOfData);
+    var table = arrayOfData[0];
+    var element = arrayOfData[1];
+    var newElement = $('#'+arrayOfData[0]);
+    var url = arrayOfData[2];
+    var tableColumns = arrayOfData[3];
+    var columnDefs = arrayOfData[4];
+    var order = arrayOfData[5];
+    var filter = [];
+
+    this.moreParams = [];
+    this.moreParamsPost  = {};
+    // console.log('filters:');
+    // console.log(this.filters);
+    for (filter in this.filters) {
+        this.moreParams.push(filter + '=' + this.filters[filter]);
+        this.moreParamsPost[filter] = this.filters[filter];
+    }
+    var self = this;
+    // console.log('moreParamsPost:');
+    // console.log(self.moreParamsPost);
+    $(document).ready(function () {
+        // console.log(self.moreParamsPost);
+        // console.log(element);
+        // console.log(newElement);
+        if($.fn.dataTable.isDataTable('#'+table)){
+            // console.log('isDataTable');
+            newElement.DataTable().clear();
+            newElement.DataTable().destroy();
+        }
+
+        // swal({
+        //   title: "Please Wait!",
+        //   text: "Data in Process, Relax!",
+        //   icon: "success",
+        //   showCancelButton: false,
+        //   showConfirmButton: false
+        // });
+
+        newElement.dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: url + "?" + $("#filterForm").serialize(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+
+                dataSrc: function(result){
+                    this.data = result.data;
+                    return result.data;
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter": false,
+            "rowId": "id",
+            "columns": tableColumns,
+            "columnDefs": columnDefs,
+            "order": order,
+            "ordering": false
+        });
+        
+
+        swal("Set Filter Done", "Please check the results", "success");
+    })
 }
 
 // Reset all filter for search
@@ -63,8 +355,7 @@ function triggerReset (arrayOfData) {
         "order": order,
     });
 
-    // swal("Reset Filter Done", "Please check the results", "success");
-    alertify.success('Ok');
+    swal("Reset Filter Done", "Please check the results", "success");
 }
 
 // Set the selected value to key in filter
@@ -75,7 +366,7 @@ function selected (key, val) {
 
 // Filtering data
 function filteringReport(arrayOfData) {
-    // console.log('filter')
+    // console.log('filter');
     // console.log(arrayOfData);
     var table = arrayOfData[0];
     var element = arrayOfData[1];
@@ -84,6 +375,7 @@ function filteringReport(arrayOfData) {
     var tableColumns = arrayOfData[3];
     var columnDefs = arrayOfData[4];
     var order = arrayOfData[5];
+    var filter = [];
 
     this.moreParams = [];
     this.moreParamsPost  = {};
@@ -113,40 +405,22 @@ function filteringReport(arrayOfData) {
         //   showCancelButton: false,
         //   showConfirmButton: false
         // });
-        
+
         newElement.dataTable({
-            "fnCreatedRow": function( nRow, data ) {
+            "fnCreatedRow": function (nRow, data) {
                 $(nRow).attr('class', data.id);
             },
             "processing": true,
             "serverSide": true,
             "ajax": {
-                url: url,
-                data: self.moreParamsPost,
+                url: url + "?" + $("#filterForm").serialize(),
                 type: 'POST',
                 dataType: 'json',
-                dataSrc: function(result){
-                    // console.log(result)
-                    if(typeof arrayOfData[6] !== 'undefined') {
-                        // export option exist
-
-                        var count = result.data.length;
-
-                        if(count > 0){
-                            $(arrayOfData[6]).removeAttr('disabled');
-                        }else{
-                            $(arrayOfData[6]).attr('disabled','disabled');
-                        }
-                    }
-
-                    data = result.data;
-                    return result.data;
-                },
+                
                 error: function (data) {
                   swal("Error!", "Failed to load Data!", "error");
                 },
             },
-            // scrollY:        "300px",
             scrollX:        true,
             scrollCollapse: true,
             "rowId": "id",
@@ -154,9 +428,9 @@ function filteringReport(arrayOfData) {
             "columnDefs": columnDefs,
             "order": order,
         });
+        
 
-        // swal("Set Filter Done", "Please check the results", "success");
-        alertify.success('Ok');
+        swal("Set Filter Done", "Please check the results", "success");
     })
 }
 
