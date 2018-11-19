@@ -568,7 +568,7 @@ Route::prefix('report')->group(function () {
 	Route::prefix('attendance')->group(function(){
 		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
 		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
-		// Route::get('/export', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
 	});
 Route::prefix('smd')->group(function () {
 		Route::get('/', function(){

@@ -211,7 +211,7 @@
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- ATTENDANCE --}}
                      <li>
-                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance</span></a>
+                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance MTC</span></a>
                     </li>  
                     {{-- SALES --}}
                     <li>
