@@ -14,8 +14,7 @@
                         <a href="{{ route('tambah.faq') }}" class="btn btn-primary btn-square" title="Add Data Store"><i class="fa fa-plus mr-2"></i>Add Data</a>
                     </h3> -->
                     <div class="block-option">
-                    <!--     <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                        <a href="{{route('pa.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a> -->
+                        <a href="{{route('attendance.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
 
@@ -57,9 +56,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-alt-success" data-dismiss="modal">
-                    <i class="fa fa-check"></i> Perfect
-                </button>
             </div>
         </div>
     </div>
@@ -99,9 +95,9 @@
         $.each(json.attandaceDetail, function(k, v){
           $('#attendance-detail').append(
               '<li>' +
-                  '<i class="list-timeline-icon fa fa-building bg-info"></i>' +
+                  '<i class="list-timeline-icon fa fa-building bg-info fa-2x"></i>' +
                   '<div class="list-timeline-content">' +
-                      '<h4 class="font-w600" id="name"><b>Store : '+  v.store.name1 +'</b></h4>' +
+                      '<h4 class="font-w600" id="name"><b>'+  v.store.name1 +'</b></h4>' +
                       '<p">Place : '+  v.place.name +'</p>' +
                       '<p>Checkin  : '+ v.checkin +'</p>' +
                       '<p>Checkout :'+  v.checkout +'</p>' +
