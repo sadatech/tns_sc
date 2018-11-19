@@ -72,7 +72,6 @@ table.table thead tr th {
   $(function() {
     var table = $('#category').DataTable({
       processing: true,
-      serverSide: true,
       scrollX: true,
       scrollY: "300px",
       ajax: '{!! route('data.smd.pasar') !!}',

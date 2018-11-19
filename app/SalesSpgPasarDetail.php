@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SalesMdDetail extends Model
+class SalesSpgPasarDetail extends Model
 {
     protected $fillable = [
         'id_sales', 'id_product', 'qty', 'qty_actual', 'satuan', 'is_pf'
@@ -12,7 +12,7 @@ class SalesMdDetail extends Model
 
     public function sales()
     {
-        return $this->belongsTo('App\SalesMd', 'id_sales');
+        return $this->belongsTo('App\SalesSpgPasar', 'id_sales');
     }
 
     public function product()
