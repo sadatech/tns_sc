@@ -42,7 +42,6 @@ use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Product;
 
-
 class ReportController extends Controller
 {
     protected $reportHelper;
