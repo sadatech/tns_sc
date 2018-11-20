@@ -95,11 +95,7 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label>Date</label>
-                        <input class="js-datepicker form-control" type="text" name="date" data-week-start="1" data-autoclose="true" data-today-highlight="true" data-date-format="yyyy-mm-dd" placeholder="yyyy-mm-dd" required>
-                    </div>
+                    </div>  
                     <div class="form-group col-md-12">
                         <label>Upload Your Data Plan DC:</label>
                         <div class="custom-file">

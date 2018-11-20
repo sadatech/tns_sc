@@ -9,6 +9,13 @@ class AttendanceOutlet extends Model
     protected $fillable = [
         'id_attendance', 'id_employee', 'id_outlet','checkin','checkout'
     ];
+    
+    // protected $appends = ['outlet_name'];
+
+    // public function getOutletNameAttribute()
+    // {
+    //     return $this->outlet->name;
+    // }
 
     public function employee()
     {
@@ -23,5 +30,11 @@ class AttendanceOutlet extends Model
     public function outlet()
     {
         return $this->belongsTo('App\Outlet', 'id_outlet');
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['outlet_name'] = $this->outlet->name;
+        return $array;
     }
 }

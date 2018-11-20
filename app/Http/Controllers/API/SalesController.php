@@ -39,7 +39,8 @@ class SalesController extends Controller
 				$res['code']= 200;
 			} else {
 				DB::transaction(function () use ($data, $user, &$res) {
-					$date 	= Carbon::parse($data->date);
+					$tempDate = Carbon::parse($data->date);
+					$date 	= Carbon::create($tempDate->year, $tempDate->month, $tempDate->daysInMonth);
 					$res 	= $this->sales($date, $user, $data->store, $data->product, $data->type);
 				});
 			}
@@ -116,7 +117,7 @@ class SalesController extends Controller
 
 	public function sales($date, $user, $request_store, $request_product, $type)
 	{
-		$checkSales = Sales::where('week', $date->weekOfMonth)->where('type', $type)->first();
+		$checkSales = Sales::whereDate('date', $date)->where('type', $type)->first();
 		$store = Store::where([
 			'id' => $request_store,
 		])->first();
@@ -166,7 +167,7 @@ class SalesController extends Controller
 					'id_employee' 	=> $user->id,
 					'id_store' 		=> $request_store,
 					'id_product' 	=> $product->id,
-					'date' 			=> $date
+					'date' 			=> $date;
 				]);
 			}
 
