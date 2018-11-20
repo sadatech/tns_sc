@@ -215,7 +215,7 @@ Route::prefix('employee')->group(function () {
 		})->name('dc.download-template')->middleware('auth');
 		Route::get('/employee/download-template', function()
 		{
-		return response()->download(public_path('assets/EmployeeImport.xlsx'));
+			return response()->download(public_path('assets/EmployeeImport.xlsx'));
 		})->name('employee.download-template')->middleware('auth');
 		
 	});
@@ -420,13 +420,13 @@ Route::prefix('planDc')->group(function () {
 /*
 	Setting PF
 */
-Route::prefix('pf')->group(function () {
-	Route::get('/', 'PfController@read')->name('pf')->middleware('auth');
-	Route::get('/data', 'PfController@data')->name('pf.data')->middleware('auth');
-	Route::post('/create', 'PfController@store')->name('pf.add')->middleware('auth');
-	Route::put('/update/{id}', 'PfController@update')->name('pf.update')->middleware('auth');
-	Route::get('/delete/{id}', 'PfController@delete')->name('pf.delete')->middleware('auth');
-});
+	Route::prefix('pf')->group(function () {
+		Route::get('/', 'PfController@read')->name('pf')->middleware('auth');
+		Route::get('/data', 'PfController@data')->name('pf.data')->middleware('auth');
+		Route::post('/create', 'PfController@store')->name('pf.add')->middleware('auth');
+		Route::put('/update/{id}', 'PfController@update')->name('pf.update')->middleware('auth');
+		Route::get('/delete/{id}', 'PfController@delete')->name('pf.delete')->middleware('auth');
+	});
 /*
 	USERS
 */
@@ -562,15 +562,16 @@ Route::prefix('report')->group(function () {
 	Route::get('/stock', 'DashboardController@dashboard')->name('stock')->middleware('auth');
 
 	Route::get('/achievement/{date?}', 'ReportController@getAchievement')->name('achievement')->middleware('auth');
-	
+
 	Route::post('/export', 'ReportController@export')->name('report.export')->middleware('auth');
 
 	Route::prefix('attendance')->group(function(){
 		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
 		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
-		// Route::get('/export', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
 	});
-Route::prefix('smd')->group(function () {
+	
+	Route::prefix('smd')->group(function () {
 		Route::get('/', function(){
 			$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
 			$data['product'] = \App\Product::whereIn('id', $getId)->get();
