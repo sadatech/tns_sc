@@ -14,7 +14,6 @@ use App\DisplayShare;
 use App\DetailDisplayShare;
 use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
-use App\Employee;
 use App\EmployeeStore;
 use App\Store;
 use App\EmployeeSubArea;
@@ -25,7 +24,6 @@ use App\StoreDistributor;
 use App\Employee;
 use App\EmployeePasar;
 use App\Distributor;
-use Carbon\Carbon;
 use App\StockMdHeader as StockMD;
 use App\Outlet;
 use App\Attendance;
@@ -214,8 +212,8 @@ class ReportController extends Controller
 
         $data = new Collection();
         foreach ($areas as $area) {
-                $item['test0'] = $area->id;
-                $item['test1'] = $area->name;
+                $item['id'] = $area->id;
+                $item['area'] = $area->name;
                 $x = 2;
             foreach ($categories as $category) {
                 $totalProduct = DB::select(
@@ -253,7 +251,7 @@ class ReportController extends Controller
                 }else{
                     $total = round($totalProductAvailability / $totalProduct, 2) * 100; 
                 }
-                $item['test'.$x] = $total;
+                $item['item_'.$category->name] = $total;
                 $x++;
             }
                 $data->push($item);
@@ -269,8 +267,8 @@ class ReportController extends Controller
 
         $data = new Collection();
         foreach ($accounts as $account) {
-                $item['test0'] = $account->id;
-                $item['test1'] = $account->name;
+                $item['id'] = $account->id;
+                $item['area'] = $account->name;
                 $x = 2;
             foreach ($categories as $category) {
                 $totalProduct = DB::select(
@@ -306,7 +304,7 @@ class ReportController extends Controller
                 }else{
                     $total = round($totalProductAvailability / $totalProduct, 2) * 100; 
                 }
-                $item['test'.$x] = $total;
+                $item['item_'.$category->name] = $total;
                 $x++;
             }
                 $data->push($item);
@@ -318,7 +316,11 @@ class ReportController extends Controller
     // *********** DISPLAY SHARE ****************** //
 
     public function displayShareIndex(){
-        return view('report.display_share');
+
+        $data['categories'] = Category::get();
+        $data['areas'] = Area::get();
+
+        return view('report.display-share-raw', $data);
     }
 
     public function displayShareSpgData(){
@@ -361,6 +363,10 @@ class ReportController extends Controller
         return response()->json($datas);
     }
 
+
+    public function displayShareAch(){
+        return view('report.display-share-ach');
+    }
 
     public function displayShareReportAreaData(){
 
@@ -428,20 +434,12 @@ class ReportController extends Controller
             }
 
             if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['achTB'] = round($data['hitTargetTB'] / 1 * 100, 2).'%';
-                }else{
-                    $data['achTB'] = round($data['hitTargetTB'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['achTB'] = 0;
             }else{
                 $data['achTB'] = round($data['hitTargetTB'] / $data['store_panel_cover'] * 100, 2).'%';
             
             }if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['achPF'] = round($data['hitTargetPF'] / 1 * 100, 2).'%';
-                }else{
-                    $data['achPF'] = round($data['hitTargetPF'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['achPF'] = 0;
             }else{
                 $data['achPF'] = round($data['hitTargetPF'] / $data['store_panel_cover'] * 100, 2).'%';
             }
@@ -522,20 +520,12 @@ class ReportController extends Controller
             }
 
             if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['achTB'] = round($data['hitTargetTB'] / 1 * 100, 2).'%';
-                }else{
-                    $data['achTB'] = round($data['hitTargetTB'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['achTB'] = 0;
             }else{
                 $data['achTB'] = round($data['hitTargetTB'] / $data['store_panel_cover'] * 100, 2).'%';
             
             }if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['achPF'] = round($data['hitTargetPF'] / 1 * 100, 2).'%';
-                }else{
-                    $data['achPF'] = round($data['hitTargetPF'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['achPF'] = 0;
             }else{
                 $data['achPF'] = round($data['hitTargetPF'] / $data['store_panel_cover'] * 100, 2).'%';
             }
@@ -618,20 +608,12 @@ class ReportController extends Controller
             }
 
             if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['achTB'] = round($data['hitTargetTB'] / 1 * 100, 2).'%';
-                }else{
-                    $data['achTB'] = round($data['hitTargetTB'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['achTB'] = 0;
             }else{
                 $data['achTB'] = round($data['hitTargetTB'] / $data['store_panel_cover'] * 100, 2).'%';
             
             }if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['achPF'] = round($data['hitTargetPF'] / 1 * 100, 2).'%';
-                }else{
-                    $data['achPF'] = round($data['hitTargetPF'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['achPF'] = 0;
             }else{
                 $data['achPF'] = round($data['hitTargetPF'] / $data['store_panel_cover'] * 100, 2).'%';
             }
@@ -711,8 +693,8 @@ class ReportController extends Controller
     }
 
 
-    public function additionalDisplayReportIndex(){
-        return view('report.additional-display');
+    public function additionalDisplayAch(){
+        return view('report.additional-display-ach');
     }
 
     public function additionalDisplayReportAreaData(){
@@ -741,10 +723,7 @@ class ReportController extends Controller
                                 ->count();
 
             if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['ach'] = round($data['actual'] / 1 * 100, 2).'%';
-                }
-                $data['ach'] = round($data['actual'] / $data['store_cover'] * 100, 2).'%';
+                    $data['ach'] = 0;
             }else{
                 $data['ach'] = round($data['actual'] / $data['store_panel_cover'] * 100, 2).'%';
             }
@@ -789,11 +768,7 @@ class ReportController extends Controller
                                 ->count();
 
             if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['ach'] = round($data['actual'] / 1 * 100, 2).'%';
-                }else{
-                    $data['ach'] = round($data['actual'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['ach'] = 0;
             }else{
                 $data['ach'] = round($data['actual'] / $data['store_panel_cover'] * 100, 2).'%';
             }
@@ -838,11 +813,7 @@ class ReportController extends Controller
                                 ->count();
 
             if ($data['store_panel_cover'] == 0) {
-                if ($data['store_cover'] == 0) {
-                    $data['ach'] = round($data['actual'] / 1 * 100, 2).'%';
-                }else{
-                    $data['ach'] = round($data['actual'] / $data['store_cover'] * 100, 2).'%';
-                }
+                    $data['ach'] = 0;
             }else{
                 $data['ach'] = round($data['actual'] / $data['store_panel_cover'] * 100, 2).'%';
             }
