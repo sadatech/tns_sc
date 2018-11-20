@@ -20,6 +20,7 @@ use App\DetailAdditionalDisplay;
 use App\EmployeeStore;
 use App\Store;
 use App\EmployeeSubArea;
+use App\Brand;
 use Auth;
 use DB;
 use Excel;
@@ -699,49 +700,67 @@ class ReportController extends Controller
     public function displayShareIndex(){
 
         $data['categories'] = Category::get();
-        $data['areas'] = Area::get();
+        $data['brands'] = Brand::get();
+        $data['jml_brand'] = Brand::get()->count();
+        // return response()->json($data);
 
         return view('report.display-share-raw', $data);
     }
 
     public function displayShareSpgData(){
 
+        $categories = Category::get();
+        $brands = Brand::get();
+
         $datas = DisplayShare::where('display_shares.deleted_at', null)
                 ->join("stores", "display_shares.id_store", "=", "stores.id")
+                ->join('sub_areas', 'stores.id_subarea', 'sub_areas.id')
+                ->join('areas', 'sub_areas.id_area', 'areas.id')
+                ->join('regions', 'areas.id_region', 'regions.id')
+                ->join('accounts', 'stores.id_account', 'accounts.id')
+                ->leftjoin('employee_sub_areas', 'stores.id', 'employee_sub_areas.id_subarea')
+                ->leftjoin('employees as empl_tl', 'employee_sub_areas.id_employee', 'empl_tl.id')
                 ->join("employees", "display_shares.id_employee", "=", "employees.id")
+                ->leftjoin("detail_display_shares", "display_shares.id", "=", "detail_display_shares.id_display_share")
+                ->groupby('display_shares.id_store')
                 ->select(
                     'display_shares.*',
                     'stores.name1 as store_name',
-                    'employees.name as emp_name')
+                    'employees.name as emp_name',
+                    'regions.name as region_name',
+                    'areas.name as area_name',
+                    'empl_tl.name as tl_name',
+                    'employees.status as jabatan',
+                    'accounts.name as account_name'
+                    )
                 ->get();
             
-            $x = 0;
         foreach($datas as $data)
         {
-            $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
-                                            ->join('categories','detail_display_shares.id_category','categories.id')
-                                            ->join('brands','detail_display_shares.id_brand','brands.id')
-                                            ->select(
-                                                'detail_display_shares.*',
-                                                'categories.name as category_name',
-                                                'brands.name as brand_name')->get();
-            foreach ($detail_data as $detail) {
-                $data[$detail->category_name.'-'.$detail->brand_name.'-tier'] = $detail->tier;
-                $data[$detail->category_name.'-'.$detail->brand_name.'-depth'] = $detail->depth;
-            // if (condition) {
-            //     # code...
-            // }
-                $x++;
-                $data['x']=$x;
+            foreach ($categories as $category) {
+                    $data[$category->id.'_total_tier'] = 0;
+                    $data[$category->id.'_total_depth'] = 0;
+                foreach ($brands as $brand) {
+                    $data[$category->id.'_'.$brand->id.'_tier'] = '-';
+                    $data[$category->id.'_'.$brand->id.'_depth'] = '-';
+                    $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
+                                                    ->where('detail_display_shares.id_category',$category->id)
+                                                    ->where('detail_display_shares.id_brand',$brand->id)
+                                                    ->first();
+
+                    $data[$category->id.'_'.$brand->id.'_tier'] = $detail_data->tier;
+                    $data[$category->id.'_'.$brand->id.'_depth'] = $detail_data->depth;
+
+                    $data[$category->id.'_total_tier'] += $detail_data->tier;
+                    $data[$category->id.'_total_depth'] += $detail_data->depth;
+
+                }
             }
 
         }    
 
-        $categories = Category::get();
-        $areas = Area::get();
-
-        // return Datatables::of($data)->make(true);
-        return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+        // return response()->json($datas);
     }
 
 
