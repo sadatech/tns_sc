@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Yajra\Datatables\Datatables;
+use App\MtcReportTemplate;
 
 class TargetController extends Controller
 {
@@ -41,7 +42,7 @@ class TargetController extends Controller
     }
 
     public function store(Request $request)
-    {
+    {        
         try {
             $data = $request->all();
             if (($validator = Target::validate($data))->fails()){
@@ -61,9 +62,11 @@ class TargetController extends Controller
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
                     try {
                         if (!empty($results->all())) {
+                            $mY = explode('/', $request->rilis);
                             foreach($results as $row) {
                                 $target = Target::updateOrCreate([
-                                    'rilis' => Carbon::parse("01/".$request->rilis),
+                                    // 'rilis' => Carbon::parse("01/".$request->rilis),
+                                    'rilis' => Carbon::create($mY[1], $mY[0], 1),
                                     'id_employee' => $request->id_employee,
                                     'id_store' => $row->id_store,
                                     'id_product' => \App\Product::where('name', $row->product_name)->first()->id,
@@ -72,6 +75,24 @@ class TargetController extends Controller
                                 ]);
                                 if (!isset($target->id)) {
                                     throw new Exception("Error Processing Request", 1);
+                                }
+
+                                $date   = Carbon::parse($target->rilis);
+                                $reportTemplate = MtcReportTemplate::where([
+                                    'id_employee'   => $target->id_employee,
+                                    'id_store'      => $target->id_store,
+                                    'id_product'    => $target->id_product
+                                ])
+                                ->whereYear('date',$date->year)
+                                ->whereMonth('date',$date->month)
+                                ->get();
+                                if ($reportTemplate->count() <= 0) {
+                                    MtcReportTemplate::create([
+                                        'id_employee'   => $target->id_employee,
+                                        'id_store'      => $target->id_store,
+                                        'id_product'    => $target->id_product,
+                                        'date'          => Carbon::create($mY[1], $mY[0], Carbon::now()->daysInMonth),
+                                    ]);
                                 }
                             }
                             DB::commit();
@@ -147,23 +168,24 @@ class TargetController extends Controller
             $product->fill($request->all());
             $product->save();
 
-            $date   = Carbon::parse($request->rilis);
-            $reportTemplate = MtcReportTemplate::where([
-                'id_employee'   => $request->id_employee,
-                'id_store'      => $request->id_store,
-                'id_product'    => $request->id_product
-            ])
-            ->whereYear('date',$date->year)
-            ->whereMonth('date',$date->month)
-            ->get();
-            if ($reportTemplate->count() <= 0) {
-                MtcReportTemplate::create([
-                    'id_employee'   => $request->id_employee,
-                    'id_store'      => $request->id_store,
-                    'id_product'    => $request->id_product,
-                    'date'          => $date
-                ]);
-            }
+            // $date   = Carbon::parse($request->rilis);
+            // $reportTemplate = MtcReportTemplate::where([
+            //     'id_employee'   => $request->id_employee,
+            //     'id_store'      => $request->id_store,
+            //     'id_product'    => $request->id_product
+            // ])
+            // ->whereYear('date',$date->year)
+            // ->whereMonth('date',$date->month)
+            // ->get();
+            // if ($reportTemplate->count() <= 0) {
+            //     MtcReportTemplate::create([
+            //         'id_employee'   => $request->id_employee,
+            //         'id_store'      => $request->id_store,
+            //         'id_product'    => $request->id_product,
+            //         'date'          => $date
+            //     ]);
+            // }
+
         });
         return redirect()->back()->with([
           'type'    => 'success',

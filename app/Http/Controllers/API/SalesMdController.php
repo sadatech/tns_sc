@@ -38,8 +38,7 @@ class SalesMdController extends Controller
 			} else {
 				DB::transaction(function () use ($data, $user, &$res) {
 					$date 	= Carbon::parse($data->date);
-					$date2 	= Carbon::parse($data->date);
-					$res 	= $this->sales($date, $date2, $user, $data->outlet, $data->product, $data->type);
+					$res 	= $this->sales($date, $user, $data->outlet, $data->product, $data->type);
 				});
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -112,12 +111,12 @@ class SalesMdController extends Controller
 		return response()->json($res, $code);	
 	}
 
-	public function sales($date, $date2, $user, $request_outlet, $request_product, $type)
+	public function sales($date, $user, $request_outlet, $request_product, $type)
 	{
 		$checkSales = SalesMd::where([
 			'id_employee'	=> $user->id,
 			'id_outlet'		=> $request_outlet,
-			'date'			=> $date2,
+			'date'			=> $date,
 			'type'			=> $type,
 		])->first();
 
@@ -131,7 +130,7 @@ class SalesMdController extends Controller
 				$sales = SalesMd::create([
 					'id_employee'	=> $user->id,
 					'id_outlet'		=> $request_outlet,
-					'date'			=> $date2,
+					'date'			=> $date,
 					'week'			=> $date->weekOfMonth,
 					'type'			=> $type,
 				]);
@@ -146,12 +145,27 @@ class SalesMdController extends Controller
 					'satuan'		=> $product->satuan,
 				])->first();
 				if (!$checkSalesDetail) {
+					
+					$pf = ProductFokus::with('Fokus.channel')->
+						whereHas('fokusproduct', function($query) use ($product)
+						{
+							return $query->where('id_product', $product->id);
+						})
+						->whereHas('Fokus.channel', function($query)
+						{
+							return $query->where('name','GTC');
+						})->whereRaw("'$date' BETWEEN product_fokuses.from and product_fokuses.to")
+						->get();
+
+						$isPf = ($pf->count() > 0 ? 1 : 0);
+
 					SalesMdDetail::create([
 						'id_sales'		=> $sales_id,
 						'id_product'	=> $product->id,
 						'qty'			=> $product->qty,
 						'qty_actual'	=> $product->qty_actual,
 						'satuan'		=> $product->satuan,
+						'is_pf'			=> $isPf,
 					]);
 				}else{
 					$checkSalesDetail->qty 			+= $product->qty;

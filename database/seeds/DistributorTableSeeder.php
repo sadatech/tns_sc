@@ -9,7 +9,7 @@ class DistributorTableSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        foreach(range(0,99) as $i){
+        foreach(range(1,20) as $i){
             DB::table('distributors')->insert([
                 'name'          => $faker->firstName,
                 'code'          => rand(1000,9999),
