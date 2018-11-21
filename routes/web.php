@@ -389,6 +389,10 @@ Route::prefix('target')->group(function () {
 		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
 		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
 		Route::post('/import', 'Target\SmdController@importXLS')->name('target.smd.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/TargetSmdImport.xlsx'));
+		})->name('targetsmd.download-template')->middleware('auth');
 	});
 
 	Route::prefix('spg')->group(function () {

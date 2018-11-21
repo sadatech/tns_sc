@@ -497,7 +497,7 @@ class EmployeeController extends Controller
 			})->download();
 		} else {
 			return redirect()->back()
-			>with([
+			->with([
 				'type'   => 'danger',
 				'title'  => 'Gagal Unduh!<br/>',
 				'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
