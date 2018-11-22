@@ -79,6 +79,7 @@ class HistoryController extends Controller
 				$res['success'] = true;
 				$res['attendance'] = $dataArr;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "Attendance not Found.";
 			}
 		}else{
@@ -139,6 +140,7 @@ class HistoryController extends Controller
 				$res['success'] = true;
 				$res['sales'] = $dataArr;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "Sales not Found.";
 			}
 		}else{
@@ -237,6 +239,7 @@ class HistoryController extends Controller
 				$res['success'] = true;
 				$res['stockist'] = $dataArr;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "Stockist not Found.";
 			}
 		}else{
@@ -285,6 +288,7 @@ class HistoryController extends Controller
 				$res['success'] = true;
 				$res['distribution'] = $dataArr;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "Distribution not Found.";
 			}
 		}else{
@@ -319,6 +323,7 @@ class HistoryController extends Controller
 				$res['success'] = true;
 				$res['cbd'] = $data;
 			} else {
+				$res['success'] = false;
 				$res['msg'] 	= "CBD not Found.";
 			}
 		}else{

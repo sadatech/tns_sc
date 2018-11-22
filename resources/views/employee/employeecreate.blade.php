@@ -176,7 +176,7 @@
                         </select>
                     </div>
                     <div class="custom-control custom-checkbox custom-control-inline mt-20" id="tl">
-                        <input class="custom-control-input" type="checkbox" name="tl" id="example-inline-checkbox2">
+                        <input class="custom-control-input" type="checkbox" name="tl" value="false" id="example-inline-checkbox2">
                         <label class="custom-control-label" for="example-inline-checkbox2">TL Demo Cooking</label>
                     </div>
                 </div>
@@ -280,7 +280,7 @@
                 <button type="submit" class="btn btn-alt-success">
                     <i class="fa fa-save"></i> Save
                 </button>
-                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Close</a>
             </div>
         </form>            
     </div>
@@ -295,12 +295,14 @@
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script type="text/javascript">
-$("#example-inline-checkbox2").change(function() {
-    if ($(this).Attr("checked")) {
-        $('#example-inline-checkbox2').val(1);
-    } else {
-        $('#example-inline-checkbox2').val(0);
-    }
+$('#checkbox-value').text($('#example-inline-checkbox2').val());
+
+$("#example-inline-checkbox2").on('change', function() {
+  if ($(this).is(':checked')) {
+    $(this).attr('value', 'true');
+  } else {
+    $(this).attr('value', 'false');
+  }
 });
 
     var url = document.referrer;
@@ -399,6 +401,7 @@ $("#example-inline-checkbox2").change(function() {
             $('#pasarMobile').hide();
             $('#subareaInput').val(null);
             $('#status').val(null);
+            $('#subareaInput').val(null);
         } else if (select == "{{ App\Position::where(['level' => 'spggtc'])->first()->id }}") {
             $('#pasarMobile').show();
             $('#status').hide();
@@ -426,6 +429,7 @@ $("#example-inline-checkbox2").change(function() {
             $('#pasarMobile').hide();
             $('#status').val(null);
         } else if (select == "{{ App\Position::where(['level' => 'tlmtc'])->first()->id }}") {
+            $('#subarea').show();
             $('#status').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();

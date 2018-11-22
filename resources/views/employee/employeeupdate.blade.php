@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Add Employee")
+@section('title', "Update Employee")
 @section('content')
 <div class="content">
     @if($errors->any())
@@ -176,6 +176,10 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="custom-control custom-checkbox custom-control-inline mt-20" id="tl">
+                        <input class="custom-control-input" type="checkbox" name="tl" id="example-inline-checkbox2">
+                        <label class="custom-control-label" for="example-inline-checkbox2">TL Demo Cooking</label>
+                    </div>
                 </div>
 
                 <div class="row">
@@ -292,6 +296,14 @@
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script type="text/javascript">
+
+    $("#example-inline-checkbox2").change(function() {
+        if ($(this).Attr("checked")) {
+            $('#example-inline-checkbox2').val(1);
+        } else {
+            $('#example-inline-checkbox2').val(0);
+        }
+    });
     var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
     var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;
 
@@ -307,6 +319,7 @@
     if (position == {{ App\Position::where(['level' => 'mdmtc'])->first()->id }}) {
         $('#status').show();
         $('#subarea').hide();
+        $('#tl').hide();
         $('#pasarMobile').hide();
         $('#subareaInput').val(null);
         $('#status').val(null);
@@ -343,6 +356,7 @@
         $('#status').show();
         $('#subarea').hide();
         $('#pasarMobile').hide();
+        $('#tl').hide();
         $('#subareaInput').val(null);
         $('#status').val(null);
     } else if (position == {{ App\Position::where(['level' => 'spggtc'])->first()->id }}) {
@@ -353,6 +367,7 @@
         $('#pasarMobile').show();
         $('#status').hide();
         $('#subarea').hide();
+        $('#tl').hide();
         $('#subareaInput').val(null);
         $('#status').val(null);
         $('#storeStay').hide();
@@ -364,28 +379,43 @@
       });
         $('#pasarMobile').show();
         $('#status').hide();
+        $('#tl').hide();
         $('#subarea').hide();
         $('#subareaInput').val(null);
         $('#status').val(null);
         $('#storeStay').hide();
         $('#storeMobile').hide();
     } else if (position == {{ App\Position::where(['level' => 'dc'])->first()->id }}) {
+        var selectedArea2 = {!! $area_selected !!};
+        var getIdArea2 = selectedArea2[0].subarea_item.split("|")[0];
+        $('#subareaInput').val(getIdArea2).trigger("change");
+        $('#subarea').show();
+        $('#tl').show();
+        $('#status').hide();
+        $('#storeStay').hide();
+        $('#storeMobile').hide();
+        $('#pasarMobile').hide();
+        $('#status').val(null);
+        if({!! $isTl !!} == 1) {
+            $('#example-inline-checkbox2').prop("checked", true);
+        }
+    } else if (position == {{ App\Position::where(['level' => 'tlmtc'])->first()->id }}) {
+        var selectedArea = {!! $area_selected !!};
+        var getIdArea = selectedArea[0].subarea_item.split("|")[0];
+        $('#subareaInput').val(getIdArea).trigger("change");
         $('#subarea').show();
         $('#status').hide();
         $('#storeStay').hide();
         $('#storeMobile').hide();
         $('#pasarMobile').hide();
         $('#status').val(null);
-    } else if (position == {{ App\Position::where(['level' => 'tlmtc'])->first()->id }}) {
-        $('#status').hide();
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-        $('#status').val(null);
+        $('#tl').hide();
     } else {
         $('#status').hide();
         $('#storeStay').hide();
         $('#storeMobile').hide();
         $('#status').val(null);
+        $('#tl').hide();
             // $('#pasarMobile').hide();
             // $('#subarea').hide();
             // $('#status').hide();
@@ -438,12 +468,14 @@
             if (select == "{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}") {
                 $('#status').show();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#pasarMobile').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
             } else if (select == "{{ App\Position::where(['level' => 'spgmtc'])->first()->id }}") {
                 $('#status').show();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#pasarMobile').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
@@ -451,6 +483,7 @@
                 $('#pasarMobile').show();
                 $('#status').hide();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
                 $('#storeStay').hide();
@@ -459,12 +492,14 @@
                 $('#pasarMobile').show();
                 $('#status').hide();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
                 $('#storeStay').hide();
                 $('#storeMobile').hide();
             } else if (select == "{{ App\Position::where(['level' => 'dc'])->first()->id }}") {
                 $('#subarea').show();
+                $('#tl').show();
                 $('#status').hide();
                 $('#storeStay').hide();
                 $('#storeMobile').hide();
