@@ -13,15 +13,18 @@ class PositionTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('positions')->insert([
-            ['name' => 'SPG',           'level'=>'spgmtc'],
-            ['name' => 'MD',            'level'=>'mdmtc'],
-            ['name' => 'SPG Pasar',     'level'=>'spggtc'],
-            ['name' => 'MD Pasar',      'level'=>'mdgtc'],
-            ['name' => 'Demo Cooking',  'level'=>'dc'],
-            ['name' => 'TL MTC',        'level'=>'tlmtc'],
-            ['name' => 'TL GTC',        'level'=>'tlgtc'],
-        ]);
+        $exists = Position::where('deleted_at',null)->count();
+        if ($exists <= 0) {
+            DB::table('positions')->insert([
+                ['name' => 'SPG',           'level'=>'spgmtc'],
+                ['name' => 'MD',            'level'=>'mdmtc'],
+                ['name' => 'SPG Pasar',     'level'=>'spggtc'],
+                ['name' => 'MD Pasar',      'level'=>'mdgtc'],
+                ['name' => 'Demo Cooking',  'level'=>'dc'],
+                ['name' => 'TL MTC',        'level'=>'tlmtc'],
+                ['name' => 'TL GTC',        'level'=>'tlgtc'],
+            ]);
+        }
     	// $exists = Position::where('deleted_at',null)->count();
     	// if ($exists <= 0) {
 	    //     DB::table('positions')->insert([

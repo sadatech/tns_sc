@@ -39,7 +39,7 @@ class SalesSpgPasarController extends Controller
 				DB::transaction(function () use ($data, $user, &$res) {
 					$date 	= Carbon::parse($data->date);
 					$date2 	= Carbon::parse($data->date);
-					$res 	= $this->sales($date, $date2, $user, $data->pasar, $data->product, $data->type);
+					$res 	= $this->sales($date, $date2, $user, $data->pasar, $data->product, $data->type, $data->name, $data->phone);
 				});
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -86,6 +86,8 @@ class SalesSpgPasarController extends Controller
 							'id' 		=> $data->id,
 							'pasar' 	=> $data->pasar->name,
 							'date' 		=> $data->date,
+							'name' 		=> $data->name,
+							'phone' 	=> $data->phone,
 							'week' 		=> $data->week,
 							'products' 	=> $productList
 						);
@@ -112,7 +114,7 @@ class SalesSpgPasarController extends Controller
 		return response()->json($res, $code);	
 	}
 
-	public function sales($date, $date2, $user, $request_pasar, $request_product, $type)
+	public function sales($date, $date2, $user, $request_pasar, $request_product, $type, $name, $phone)
 	{
 		$checkSales = SalesSpgPasar::where([
 			'id_employee'	=> $user->id,
@@ -134,6 +136,8 @@ class SalesSpgPasarController extends Controller
 					'date'			=> $date2,
 					'week'			=> $date->weekOfMonth,
 					'type'			=> $type,
+					'name' 			=> $name,
+					'phone' 		=> $phone,
 				]);
 				$sales_id = $sales->id;
 			} else {

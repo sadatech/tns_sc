@@ -209,6 +209,18 @@
                     </li> 
 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT GTC</span></li>
+                    {{-- ATTENDANCE --}}
+                     <li>
+                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance MTC</span></a>
+                    </li>  
+                    {{-- SALES --}}
+                    <li>
+                        <a class="{{ request()->is('report/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Sales MTC</span></a>
+                    </li>
+                    {{-- PROMO--}}
+                    <li>
+                        <a class="{{ request()->is('report/promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Promo Activity</span></a>
+                    </li>
                     {{-- MD Pasar--}}
                     <li>
                         <a class="{{ request()->is('report/smd') ? 'active' : '' }}" href="{{ route('report.smd.pasar') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">MD Pasar</span></a>
@@ -241,6 +253,24 @@
                     {{-- Stock In Hand--}}
                     <li>
                         <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>
+                    </li>  
+                    {{-- Display Share--}}
+                    <li>
+                        <a class="{{ request()->is('report/display_share') ? 'active' : '' }}" href="{{ route('display_share') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Display Share</span></a>
+                    </li>  
+                    <li>
+                        <a class="{{ request()->is('report/display_share/ach') ? 'active' : '' }}" href="{{ route('display_share.ach') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Ach Display Share</span></a>
+                    </li>  
+                    {{-- Additional Display--}}
+                    <li>
+                        <a class="{{ request()->is('report/additional_display') ? 'active' : '' }}" href="{{ route('additional_display') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Additional Display</span></a>
+                    </li>  
+                    <li>
+                        <a class="{{ request()->is('report/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Ach Additional Display</span></a>
+                    </li>  
+                    {{-- Availability Display--}}
+                    <li>
+                        <a class="{{ request()->is('report/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Availability Display</span></a>
                     </li>  
                 </ul>
         </div>
