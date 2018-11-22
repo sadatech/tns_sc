@@ -591,6 +591,25 @@ Route::prefix('report')->group(function () {
 		})->name('report.smd.pasar')->middleware('auth');
 		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 
+		Route::prefix('distributorPf')->group(function () {
+			Route::get('/', function(){
+				return view('report.distpf');
+			})->name('report.dist.pf')->middleware('auth');
+			Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
+			Route::get('/export', 'ReportController@exportSmdDist')->name('export.distpf.smd')->middleware('auth');
+		});
+
+		Route::prefix('stockist')->group(function () {
+			Route::get('/', function(){
+				return view('report.stockist');
+			})->name('report.stockist')->middleware('auth');
+		});
+		Route::prefix('summary')->group(function () {
+			Route::get('/', function(){
+				return view('report.summary');
+			})->name('report.summary')->middleware('auth');
+		});
+
 		Route::get('/attendance', function(){
 			return view('report.attendance-smd');
 		})->name('report.attendance.smd')->middleware('auth');
@@ -607,15 +626,6 @@ Route::prefix('report')->group(function () {
 		Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
 		Route::get('/export', 'ReportController@exportMdPasar')->name('export.sales.smd')->middleware('auth');
 	});
-
-	Route::prefix('distributorPf')->group(function () {
-		Route::get('/', function(){
-			return view('report.distpf');
-		})->name('report.dist.pf')->middleware('auth');
-		Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
-		Route::get('/export', 'ReportController@exportSmdDist')->name('export.distpf.smd')->middleware('auth');
-	});
-
 });
 
 // ***************** REPORTING (END) ***********************

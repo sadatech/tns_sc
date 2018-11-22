@@ -107,10 +107,10 @@
                                 <a class="{{ request()->is('employee/agency') ? 'active' : '' }}" href="{{ route('agency') }}">Agency</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">Employee</a>
+                                <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">MTC</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">MD & SPG</a>
+                                <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">GTC</a>
                             </li>
                             <li>
                                 <a class="{{ request()->is('employee/summary/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
@@ -207,12 +207,56 @@
                     <li>
                         <a class="{{ request()->is('utility/export-download') ? 'active' : '' }}" href="{{ route('export-download') }}"><i class="si si-cloud-download"></i><span class="sidebar-mini-hide">Download Export(s)</span></a>
                     </li> 
+                    {{-- REPORT --}}
+                    <li class="{{ request()->is('report/*') ? 'open' : '' }}">
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-users"></i><span class="sidebar-mini-hide">Report(s)</span></a>
+                        <ul>
+                            <li class="{{ request()->is('smd/*') ? 'open' : '' }}">
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SMD</span></a>
+                                <ul>
+                                    {{-- ATTENDANCE SMD --}}
+                                    <li>
+                                        <a class="{{ request()->is('attendance') ? 'active' : '' }}" href="{{ route('report.attendance.smd') }}"><span class="sidebar-mini-hide">Attendance SMD</span></a>
+                                    </li>
+                                    {{-- STOCKIST --}}
+                                    <li>
+                                        <a class="{{ request()->is('stockist') ? 'active' : '' }}" href="{{ route('report.stockist') }}"><span class="sidebar-mini-hide">Stockist</span></a>
+                                    </li>
+                                    {{-- Dist PF--}}
+                                    <li>
+                                        <a class="{{ request()->is('distributorPf') ? 'active' : '' }}" href="{{ route('report.dist.pf') }}"><span class="sidebar-mini-hide">Distribusi PF</span></a>
+                                    </li> 
+                                    {{-- SALES--}}
+                                    <li>
+                                        <a class="{{ request()->is('report/sales') ? 'active' : '' }}" href="{{ route('report.sales.pasar') }}"><span class="sidebar-mini-hide">Sales</span></a>
+                                    </li> 
+                                    {{-- SUMMARY REPORT --}}
+                                    <li>
+                                        <a class="{{ request()->is('summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Stockist</span></a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li class="{{ request()->is('smd/*') ? 'open' : '' }}">
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SPG</span></a>
+                                <ul>
+                        
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li class="{{ request()->is('smd/*') ? 'open' : '' }}">
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Demo</span></a>
+                                <ul>
+                        
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT GTC</span></li>
-                    {{-- ATTENDANCE --}}
-                     <li>
-                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance MTC</span></a>
-                    </li>  
+                   
                     {{-- SALES --}}
                     <li>
                         <a class="{{ request()->is('report/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Sales MTC</span></a>
@@ -225,18 +269,12 @@
                     <li>
                         <a class="{{ request()->is('report/smd') ? 'active' : '' }}" href="{{ route('report.smd.pasar') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">MD Pasar</span></a>
                     </li>
-                    {{-- SALES--}}
-                    <li>
-                        <a class="{{ request()->is('report/sales') ? 'active' : '' }}" href="{{ route('report.sales.pasar') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Sales MD Pasar</span></a>
-                    </li> 
+                   
                     {{-- ATTENDANCE SMD --}}
                     <li>
                         <a class="{{ request()->is('report/smd/attendance') ? 'active' : '' }}" href="{{ route('report.attendance.smd') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance SMD</span></a>
                     </li>
-                    {{-- Dist PF--}}
-                    <li>
-                        <a class="{{ request()->is('report/distributorPf') ? 'active' : '' }}" href="{{ route('report.dist.pf') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Distributor PF</span></a>
-                    </li>  
+                    
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT MTC</span></li>
                     {{-- ATTENDANCE --}}
                      <li>
