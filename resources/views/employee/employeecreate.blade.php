@@ -280,7 +280,7 @@
                 <button type="submit" class="btn btn-alt-success">
                     <i class="fa fa-save"></i> Save
                 </button>
-                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Close</a>
             </div>
         </form>            
     </div>
@@ -399,6 +399,7 @@ $("#example-inline-checkbox2").change(function() {
             $('#pasarMobile').hide();
             $('#subareaInput').val(null);
             $('#status').val(null);
+            $('#subareaInput').val(null);
         } else if (select == "{{ App\Position::where(['level' => 'spggtc'])->first()->id }}") {
             $('#pasarMobile').show();
             $('#status').hide();
@@ -426,6 +427,7 @@ $("#example-inline-checkbox2").change(function() {
             $('#pasarMobile').hide();
             $('#status').val(null);
         } else if (select == "{{ App\Position::where(['level' => 'tlmtc'])->first()->id }}") {
+            $('#subarea').show();
             $('#status').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();
