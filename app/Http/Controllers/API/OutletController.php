@@ -46,7 +46,7 @@ class OutletController extends Controller
 						// 		'name'				=> $data->name,
 						// 		'phone'				=> $data->phone,
 						// 		'active'			=> true,
-						// 	);
+			 			// 	);
 						// }
 						// $insert = DB::table('outlets')->insert($outlets);
 						$insert = Outlet::create([

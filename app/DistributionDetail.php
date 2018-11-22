@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DistributionDetail extends Model
 {
     protected $fillable = [
-        'id_distribution', 'id_product', 'value'
+        'id_distribution', 'id_product', 'qty', 'qty_actual', 'satuan'
     ];
 
     public function product()
