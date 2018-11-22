@@ -46,7 +46,7 @@ class OutletController extends Controller
 						// 		'name'				=> $data->name,
 						// 		'phone'				=> $data->phone,
 						// 		'active'			=> true,
-						// 	);
+			 			// 	);
 						// }
 						// $insert = DB::table('outlets')->insert($outlets);
 						$insert = Outlet::create([
@@ -124,20 +124,20 @@ class OutletController extends Controller
 		return response()->json($res, $code);
 	}
 
-	public function list($id = 1)
+	public function list($active = 1)
 	{
 		try {
 			if (!$user = JWTAuth::parseToken()->authenticate()) {
 				$res['msg'] = "User not found.";
 				$code = $e->getStatusCode();
 			} else {
-				if ($id == 1 || $id == 2) {
-					if ($id == 1) {
-						$activeStatus = 'aktif';
+				if ($active == 1 || $active == 2) {
+					if ($active == 1) {
+						$activeStatus = "aktif";
 					}else{
-						$activeStatus = 'tidak aktif';
+						$activeStatus = "tidak aktif";
 					}
-					$outlet = Outlet::where('active', $id)->whereHas('employeePasar', function($query) use ($user) {
+					$outlet = Outlet::where('active', $active)->whereHas('employeePasar', function($query) use ($user) {
 						return $query->where('id_employee', $user->id);
 					})->get();
 					$code = 200;
@@ -358,13 +358,13 @@ class OutletController extends Controller
 						if ($status == 'true') {
 							$update = Outlet::where("id", $id)
 							->update([
-								'active'	=> false,
+								'active'	=> 2,
 							]);
 							$disableStatus = 'disable';
 						} else {
 							$update = Outlet::where("id", $id)
 							->update([
-								'active'	=> true,
+								'active'	=> 1,
 							]);
 							$disableStatus = 'enable';
 						}

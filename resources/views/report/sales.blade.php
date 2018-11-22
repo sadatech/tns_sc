@@ -64,6 +64,8 @@ table.table thead tr th {
     var table = $('#category').DataTable({
       processing: true,
       serverSide: true,
+      stateSave: true,
+      paging: true,
       scrollX: true,
       scrollY: "300px",
       ajax: '{!! route('data.sales.smd') !!}',

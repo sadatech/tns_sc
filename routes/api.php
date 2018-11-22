@@ -25,9 +25,9 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('attendance')->group(function () {
-	Route::post('/checkin', 'API\AttendanceController@absen')->name('api.checkin');
-	Route::post('/checkout', 'API\AttendanceController@checkout')->name('api.checkout');
-	Route::get('/status', 'API\AttendanceController@status')->name('api.status');
+	Route::post('/checkin/{type?}', 'API\AttendanceController@absen')->name('api.checkin');
+	Route::post('/checkout/{type?}', 'API\AttendanceController@checkout')->name('api.checkout');
+	Route::get('/status/{type?}', 'API\AttendanceController@status')->name('api.status');
 });
 
 Route::prefix('store')->group(function () {
@@ -68,6 +68,11 @@ Route::prefix('sales-md')->group(function () {
 Route::prefix('sales-spg-pasar')->group(function () {
 	Route::post('/add', 'API\SalesSpgPasarController@store')->name('api.sales-spg-pasar.add');
 	Route::get('/list/{date?}', 'API\SalesSpgPasarController@list')->name('api.sales-spg-pasar.list');
+});
+
+Route::prefix('sales-recap')->group(function () {
+	Route::post('/add', 'API\SalesRecapController@store')->name('api.sales-recap.add');
+	Route::get('/list/{date?}', 'API\SalesRecapController@list')->name('api.sales-recap.list');
 });
 
 Route::prefix('promo')->group(function () {
@@ -131,6 +136,7 @@ Route::prefix('outlet')->group(function () {
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
 	Route::get('/sales/{type}/{date?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
+	Route::get('/sales-recap/{date?}', 'API\HistoryController@salesRecapHistory')->name('api.sales-recap-history.list');
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
 	Route::get('/distribution/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
 	Route::get('/cbd/{date?}', 'API\HistoryController@cbdHistory')->name('api.cbd-history.list');

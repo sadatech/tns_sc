@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Sales Report - Availability")
+@section('title', "Sales Report - Additional Display Ach")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Availability <small>Report</small></h2>
+  <h2 class="content-heading pt-10"> Additional Display Ach <small>Report</small></h2>
   @if($errors->any())
     <div class="alert alert-danger">
       <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -23,33 +23,64 @@
             <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
           </div>
         </div>
+        <center><h3>Area/TL</h3></center>
 
-        <center><h3>AREA</h3></center>
         <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableArea">
         <thead>
-          <th class="text-center" style="width: 70px;">no</th>
-          <th>AREA</th>
-          @foreach ($categories as $category)
-          <th>{{ $category->name }}</th>
-          @endforeach
+          <tr>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">PERFORMANCE AREA/TL</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">JML. STORE COVERAGE</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">JLM. STORE PANEL</th>
+            <th colspan="2" style="vertical-align: middle; text-align: center;">Additional Display</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center; width: 200px;">Area</th>
+          </tr>
+          <tr>
+            <th style="vertical-align: middle; text-align: center;">Actual</th>
+            <th style="vertical-align: middle; text-align: center;">% Ach.</th>
+          </tr>
+
         </thead>
         </table>
 
-        <div class="block-header p-0 mb-20">
-        </div>
-        <center><h3>ACCOUNT</h3></center>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableAccount">
+        <center><h3>SPG</h3></center>
+
+        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableSpg">
         <thead>
-          <th class="text-center" style="width: 70px;">no</th>
-          <th>ACCOUNT</th>
-          @foreach ($categories as $category)
-          <th>{{ $category->name }}</th>
-          @endforeach
+          <tr>
+                <th rowspan="2" style="vertical-align: middle; text-align: center;">PERFORMANCE SPG</th>
+                <th rowspan="2" style="vertical-align: middle; text-align: center;">JML. STORE COVERAGE</th>
+                <th rowspan="2" style="vertical-align: middle; text-align: center;">JLM. STORE PANEL</th>
+                <th colspan="2" style="vertical-align: middle; text-align: center;">Additional Display</th>
+                <th rowspan="2" style="vertical-align: middle; text-align: center; width: 200px;">NAMA STORE</th>
+          </tr>
+          <tr>
+          <th style="vertical-align: middle; text-align: center;">Actual</th>
+          <th style="vertical-align: middle; text-align: center;">% Ach.</th>
+          </tr>
+        </thead>
+        </table>
+
+        <center><h3>MD</h3></center>
+
+        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableMd">
+        <thead>
+          <tr>
+                <th rowspan="2" style="vertical-align: middle; text-align: center;">PERFORMANCE MD</th>
+                <th rowspan="2" style="vertical-align: middle; text-align: center;">JML. STORE COVERAGE</th>
+                <th rowspan="2" style="vertical-align: middle; text-align: center;">JLM. STORE PANEL</th>
+                <th colspan="2" style="vertical-align: middle; text-align: center;">Additional Display</th>
+                <th rowspan="2" style="vertical-align: middle; text-align: center; width: 200px;">JML STORE</th>
+          </tr>
+          <tr>
+          <th style="vertical-align: middle; text-align: center;">Actual</th>
+          <th style="vertical-align: middle; text-align: center;">% Ach.</th>
+          </tr>
         </thead>
         </table>
 
       </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -147,33 +178,54 @@
           $('#reportTableArea').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('availability.dataArea') !!}',
+              ajax: '{!! route('additional_display.reportDataArea') !!}',
               columns: [
-                { data: 'id', name: 'id'},
-                { data: 'area', name: 'area'},
-                @foreach($categories as $category)
-                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
-                @endforeach
+                { data: 'name', name: 'name'},
+                { data: 'store_cover', name: 'store_cover'},
+                { data: 'store_panel_cover', name: 'store_panel_cover'},
+                { data: 'actual', name: 'actual'},
+                { data: 'ach', name: 'ach'},
+                { data: 'location', name: 'location'},
               ],
               "scrollX":        true, 
               "scrollCollapse": true,
+              "columnDefs" : [{"className": "text-center", "targets" : [1,2,3,4,5]}],
           });
       });
-
       $(function() {
-          $('#reportTableAccount').DataTable({
+          $('#reportTableSpg').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('availability.dataAccount') !!}',
+              ajax: '{!! route('additional_display.reportDataSpg') !!}',
               columns: [
-                { data: 'id', name: 'id'},
-                { data: 'area', name: 'area'},
-                @foreach($categories as $category)
-                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
-                @endforeach
+                { data: 'name', name: 'name'},
+                { data: 'store_cover', name: 'store_cover'},
+                { data: 'store_panel_cover', name: 'store_panel_cover'},
+                { data: 'actual', name: 'actual'},
+                { data: 'ach', name: 'ach'},
+                { data: 'location', name: 'location'},
               ],
               "scrollX":        true, 
               "scrollCollapse": true,
+              "columnDefs" : [{"className": "text-center", "targets" : [1,2,3,4]}],
+          });
+      });
+      $(function() {
+          $('#reportTableMd').DataTable({
+              processing: true,
+              serverSide: true,
+              ajax: '{!! route('additional_display.reportDataMd') !!}',
+              columns: [
+                { data: 'name', name: 'name'},
+                { data: 'store_cover', name: 'store_cover'},
+                { data: 'store_panel_cover', name: 'store_panel_cover'},
+                { data: 'actual', name: 'actual'},
+                { data: 'ach', name: 'ach'},
+                { data: 'location', name: 'location'},
+              ],
+              "scrollX":        true, 
+              "scrollCollapse": true,
+              "columnDefs" : [{"className": "text-center", "targets" : [1,2,3,4,5]}],
           });
       });
 

@@ -20,8 +20,9 @@ class StockMdHeader extends Model
         return $this->belongsTo('App\Pasar', 'id_pasar');
     }
 
-    public function stockDetail()
-    {
-    	return $this->hasMany('App\StockMdDetail', 'id_stock');
+    public function toArray(){
+        $array = parent::toArray();
+        $array['pasar_name'] = $this->pasar->name;
+        return $array;
     }
 }
