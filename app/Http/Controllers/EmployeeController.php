@@ -67,7 +67,9 @@ class EmployeeController extends Controller
 		$data['subarea'] 	= SubArea::get();
 		$data['store_selected'] = json_encode(EmployeeStore::where(['employee_stores.id_employee' => $id])->join('stores','stores.id','employee_stores.id_store')->select(DB::raw("concat(stores.id,'|',stores.name1) as stores_item"))->get()->toArray());
 		$data['pasar_selected'] = json_encode(EmployeePasar::where(['employee_pasars.id_employee' => $id])->join('pasars','pasars.id','employee_pasars.id_pasar')->select(DB::raw("concat(pasars.id,'|',pasars.name) as pasars_item"))->get()->toArray());
-		$data['area_selected'] =json_encode(EmployeeSubArea::where(['employee_sub_areas.id_employee' => $id])->join('sub_areas','sub_areas.id','employee_sub_areas.id_subarea')->select(DB::raw("concat(sub_areas.id,'|',sub_areas.name) as subarea_item"))->get()->toArray());
+		$data['area_selected'] = json_encode(EmployeeSubArea::where(['employee_sub_areas.id_employee' => $id])->join('sub_areas','sub_areas.id','employee_sub_areas.id_subarea')->select(DB::raw("concat(sub_areas.id,'|',sub_areas.name,'|') as subarea_item"))->get()->toArray());
+		$data['isTl'] = (isset(EmployeeSubArea::where('id_employee', $id)->first()->isTl) ? EmployeeSubArea::where('id_employee', $id)->first()->isTl : 0);
+		// dd($data);
 		if ($data['emp']->isResign) {
 			return redirect()->route('employee');
 		} else {
