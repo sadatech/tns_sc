@@ -176,7 +176,7 @@
                         </select>
                     </div>
                     <div class="custom-control custom-checkbox custom-control-inline mt-20" id="tl">
-                        <input class="custom-control-input" type="checkbox" name="tl" id="example-inline-checkbox2">
+                        <input class="custom-control-input" type="checkbox" name="tl" value="false" id="example-inline-checkbox2">
                         <label class="custom-control-label" for="example-inline-checkbox2">TL Demo Cooking</label>
                     </div>
                 </div>
@@ -295,12 +295,14 @@
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script type="text/javascript">
-$("#example-inline-checkbox2").change(function() {
-    if ($(this).Attr("checked")) {
-        $('#example-inline-checkbox2').val(1);
-    } else {
-        $('#example-inline-checkbox2').val(0);
-    }
+$('#checkbox-value').text($('#example-inline-checkbox2').val());
+
+$("#example-inline-checkbox2").on('change', function() {
+  if ($(this).is(':checked')) {
+    $(this).attr('value', 'true');
+  } else {
+    $(this).attr('value', 'false');
+  }
 });
 
     var url = document.referrer;

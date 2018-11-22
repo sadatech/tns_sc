@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Add Employee")
+@section('title', "Update Employee")
 @section('content')
 <div class="content">
     @if($errors->any())
@@ -176,8 +176,6 @@
                             @endforeach
                         </select>
                     </div>
-
-
                     <div class="custom-control custom-checkbox custom-control-inline mt-20" id="tl">
                         <input class="custom-control-input" type="checkbox" name="tl" id="example-inline-checkbox2">
                         <label class="custom-control-label" for="example-inline-checkbox2">TL Demo Cooking</label>
@@ -470,12 +468,14 @@
             if (select == "{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}") {
                 $('#status').show();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#pasarMobile').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
             } else if (select == "{{ App\Position::where(['level' => 'spgmtc'])->first()->id }}") {
                 $('#status').show();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#pasarMobile').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
@@ -483,6 +483,7 @@
                 $('#pasarMobile').show();
                 $('#status').hide();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
                 $('#storeStay').hide();
@@ -491,12 +492,14 @@
                 $('#pasarMobile').show();
                 $('#status').hide();
                 $('#subarea').hide();
+                $('#tl').hide();
                 $('#subareaInput').val(null);
                 $('#status').val(null);
                 $('#storeStay').hide();
                 $('#storeMobile').hide();
             } else if (select == "{{ App\Position::where(['level' => 'dc'])->first()->id }}") {
                 $('#subarea').show();
+                $('#tl').show();
                 $('#status').hide();
                 $('#storeStay').hide();
                 $('#storeMobile').hide();
