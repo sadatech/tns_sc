@@ -147,7 +147,7 @@
                 "</tr>");
         }else{
             console.log("Data Already Exist! data: "+employeeSplit[1]);
-            notif('Warning',': Please the select Store first','warning');
+            notif('Warning',': Please the select Employee first','warning');
         }
     }
 
