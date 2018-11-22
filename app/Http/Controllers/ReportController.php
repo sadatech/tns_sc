@@ -17,6 +17,10 @@ use App\DisplayShare;
 use App\DetailDisplayShare;
 use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
+use App\EmployeeStore;
+use App\Store;
+use App\EmployeeSubArea;
+use App\Brand;
 use Auth;
 use DB;
 use Excel;
@@ -590,8 +594,8 @@ class ReportController extends Controller
 
         $data = new Collection();
         foreach ($areas as $area) {
-                $item['test0'] = $area->id;
-                $item['test1'] = $area->name;
+                $item['id'] = $area->id;
+                $item['area'] = $area->name;
                 $x = 2;
             foreach ($categories as $category) {
                 $totalProduct = DB::select(
@@ -629,7 +633,7 @@ class ReportController extends Controller
                 }else{
                     $total = round($totalProductAvailability / $totalProduct, 2) * 100; 
                 }
-                $item['test'.$x] = $total;
+                $item['item_'.$category->name] = $total;
                 $x++;
             }
                 $data->push($item);
@@ -645,8 +649,8 @@ class ReportController extends Controller
 
         $data = new Collection();
         foreach ($accounts as $account) {
-                $item['test0'] = $account->id;
-                $item['test1'] = $account->name;
+                $item['id'] = $account->id;
+                $item['area'] = $account->name;
                 $x = 2;
             foreach ($categories as $category) {
                 $totalProduct = DB::select(
@@ -682,7 +686,7 @@ class ReportController extends Controller
                 }else{
                     $total = round($totalProductAvailability / $totalProduct, 2) * 100; 
                 }
-                $item['test'.$x] = $total;
+                $item['item_'.$category->name] = $total;
                 $x++;
             }
                 $data->push($item);
@@ -694,48 +698,340 @@ class ReportController extends Controller
     // *********** DISPLAY SHARE ****************** //
 
     public function displayShareIndex(){
-        return view('report.display_share');
+
+        $data['categories'] = Category::get();
+        $data['brands'] = Brand::get();
+        $data['jml_brand'] = Brand::get()->count();
+        // return response()->json($data);
+
+        return view('report.display-share-raw', $data);
     }
 
     public function displayShareSpgData(){
 
+        $categories = Category::get();
+        $brands = Brand::get();
+
         $datas = DisplayShare::where('display_shares.deleted_at', null)
                 ->join("stores", "display_shares.id_store", "=", "stores.id")
+                ->join('sub_areas', 'stores.id_subarea', 'sub_areas.id')
+                ->join('areas', 'sub_areas.id_area', 'areas.id')
+                ->join('regions', 'areas.id_region', 'regions.id')
+                ->join('accounts', 'stores.id_account', 'accounts.id')
+                ->leftjoin('employee_sub_areas', 'stores.id', 'employee_sub_areas.id_subarea')
+                ->leftjoin('employees as empl_tl', 'employee_sub_areas.id_employee', 'empl_tl.id')
                 ->join("employees", "display_shares.id_employee", "=", "employees.id")
+                ->leftjoin("detail_display_shares", "display_shares.id", "=", "detail_display_shares.id_display_share")
+                ->groupby('display_shares.id_store')
                 ->select(
                     'display_shares.*',
                     'stores.name1 as store_name',
-                    'employees.name as emp_name')
+                    'employees.name as emp_name',
+                    'regions.name as region_name',
+                    'areas.name as area_name',
+                    'empl_tl.name as tl_name',
+                    'employees.status as jabatan',
+                    'accounts.name as account_name'
+                    )
                 ->get();
             
-            $x = 0;
         foreach($datas as $data)
         {
-            $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
-                                            ->join('categories','detail_display_shares.id_category','categories.id')
-                                            ->join('brands','detail_display_shares.id_brand','brands.id')
-                                            ->select(
-                                                'detail_display_shares.*',
-                                                'categories.name as category_name',
-                                                'brands.name as brand_name')->get();
-            foreach ($detail_data as $detail) {
-                $data[$detail->category_name.'-'.$detail->brand_name.'-tier'] = $detail->tier;
-                $data[$detail->category_name.'-'.$detail->brand_name.'-depth'] = $detail->depth;
-            // if (condition) {
-            //     # code...
-            // }
-                $x++;
-                $data['x']=$x;
+            foreach ($categories as $category) {
+                    $data[$category->id.'_total_tier'] = 0;
+                    $data[$category->id.'_total_depth'] = 0;
+                foreach ($brands as $brand) {
+                    $data[$category->id.'_'.$brand->id.'_tier'] = '-';
+                    $data[$category->id.'_'.$brand->id.'_depth'] = '-';
+                    $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
+                                                    ->where('detail_display_shares.id_category',$category->id)
+                                                    ->where('detail_display_shares.id_brand',$brand->id)
+                                                    ->first();
+
+                    $data[$category->id.'_'.$brand->id.'_tier'] = $detail_data->tier;
+                    $data[$category->id.'_'.$brand->id.'_depth'] = $detail_data->depth;
+
+                    $data[$category->id.'_total_tier'] += $detail_data->tier;
+                    $data[$category->id.'_total_depth'] += $detail_data->depth;
+
+                }
             }
 
         }    
 
-        $categories = Category::get();
-        $areas = Area::get();
-
-        // return Datatables::of($data)->make(true);
-        return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+        // return response()->json($datas);
     }
+
+
+    public function displayShareAch(){
+        return view('report.display-share-ach');
+    }
+
+    public function displayShareReportAreaData(){
+
+        $mount = Carbon::now();
+
+        $datas = Employee::where('id_position','6')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->select('employees.id','employees.name', 'employee_sub_areas.id_subarea as id_sub_area')->get();
+
+        foreach ($datas as $data) {
+
+            $data['store_cover'] = Store::where('id_subarea',$data->id_sub_area)->count();
+
+            $data['store_panel_cover'] = Store::where('id_subarea',$data->id_sub_area)
+                                ->where('stores.store_panel','!=','No')
+                                ->count();
+
+            $dataActuals = Store::where('stores.id_subarea',$data->id_sub_area)
+                                ->join('display_shares','stores.id','display_shares.id_store')
+                                ->whereMonth('display_shares.date', $mount->format('m'))
+                                ->whereYear('display_shares.date', $mount->format('Y'))
+                                ->groupby('display_shares.id_store')
+                                ->pluck('display_shares.id');
+            $categoryTB = 1;
+            $categoryPF = 2;
+            $persenTB = 40;
+            $persenPF = 40;
+            $data['hitTargetTB'] = 0;
+            $data['hitTargetPF'] = 0;
+
+
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                $actualTB = clone $actualDS;
+                $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
+                $actualTB = $actualTB->where('id_category',$categoryTB)->first();
+                $data['tierTB'] = $actualTB->tier;
+                $data['tierSumTB'] = $actualTotal;
+
+                if ($data['tierSumTB'] == 0) {
+                    $data['hitTargetTB'] += 0;
+                }else{
+                    $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
+                    if ($nilaiActual >= $persenTB) {
+                    $data['hitTargetTB'] += 1;
+                    } else
+                    $data['hitTargetTB'] += 0;
+                }
+
+                $actualPF = clone $actualDS;
+                $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
+                $actualPF = $actualPF->where('id_category',$categoryPF)->first();
+                $data['tierPF'] = $actualPF->tier;
+                $data['tierSumPF'] = $actualTotal;
+
+                if ($data['tierSumPF'] == 0) {
+                    $data['hitTargetPF'] += 0;
+                }else{
+                    $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
+                    if ($nilaiActual >= $persenPF) {
+                    $data['hitTargetPF'] += 1;
+                    } else
+                    $data['hitTargetPF'] += 0;
+                }
+            }
+
+            if ($data['store_panel_cover'] == 0) {
+                    $data['achTB'] = 0;
+            }else{
+                $data['achTB'] = round($data['hitTargetTB'] / $data['store_panel_cover'] * 100, 2).'%';
+            
+            }if ($data['store_panel_cover'] == 0) {
+                    $data['achPF'] = 0;
+            }else{
+                $data['achPF'] = round($data['hitTargetPF'] / $data['store_panel_cover'] * 100, 2).'%';
+            }
+
+            $location = EmployeeSubArea::where('employee_sub_areas.id_employee',$data->id)
+                                ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                                ->pluck('sub_areas.name')->toArray();
+            $data['location'] = implode(", ",$location);
+        }
+        // return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+
+        // return Datatables::of(collect(DB::select($datas)))
+        // ->make(true);
+    }
+
+    public function displayShareReportSpgData(){
+
+        $mount = Carbon::now();
+        $datas = Employee::where('id_position','1')
+                        ->select('employees.id','employees.name')->get();
+        foreach ($datas as $data) {
+
+            $data['store_cover'] = EmployeeStore::where('id_employee',$data->id)->count();
+
+            $data['store_panel_cover'] = EmployeeStore::where('id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->where('stores.store_panel','!=','No')
+                                ->count();
+
+            $dataActuals = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('display_shares','employee_stores.id_store','display_shares.id_store')
+                                ->whereMonth('display_shares.date', $mount->format('m'))
+                                ->whereYear('display_shares.date', $mount->format('Y'))
+                                ->groupby('display_shares.id_store')
+                                ->pluck('display_shares.id');
+            $categoryTB = 1;
+            $categoryPF = 2;
+            $persenTB = 40;
+            $persenPF = 40;
+            $data['hitTargetTB'] = 0;
+            $data['hitTargetPF'] = 0;
+
+
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                $actualTB = clone $actualDS;
+                $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
+                $actualTB = $actualTB->where('id_category',$categoryTB)->first();
+                $data['tierTB'] = $actualTB->tier;
+                $data['tierSumTB'] = $actualTotal;
+
+                if ($data['tierSumTB'] == 0) {
+                    $data['hitTargetTB'] += 0;
+                }else{
+                    $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
+                    if ($nilaiActual >= $persenTB) {
+                    $data['hitTargetTB'] += 1;
+                    } else
+                    $data['hitTargetTB'] += 0;
+                }
+
+                $actualPF = clone $actualDS;
+                $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
+                $actualPF = $actualPF->where('id_category',$categoryPF)->first();
+                $data['tierPF'] = $actualPF->tier;
+                $data['tierSumPF'] = $actualTotal;
+
+                if ($data['tierSumPF'] == 0) {
+                    $data['hitTargetPF'] += 0;
+                }else{
+                    $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
+                    if ($nilaiActual >= $persenPF) {
+                    $data['hitTargetPF'] += 1;
+                    } else
+                    $data['hitTargetPF'] += 0;
+                }
+            }
+
+            if ($data['store_panel_cover'] == 0) {
+                    $data['achTB'] = 0;
+            }else{
+                $data['achTB'] = round($data['hitTargetTB'] / $data['store_panel_cover'] * 100, 2).'%';
+            
+            }if ($data['store_panel_cover'] == 0) {
+                    $data['achPF'] = 0;
+            }else{
+                $data['achPF'] = round($data['hitTargetPF'] / $data['store_panel_cover'] * 100, 2).'%';
+            }
+
+            $location = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->pluck('stores.name1')->toArray();
+            $data['location'] = implode(", ",$location);
+        }
+        // return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+
+        // return Datatables::of(collect(DB::select($datas)))
+        // ->make(true);
+    }
+
+    public function displayShareReportMdData(){
+
+        $mount = Carbon::now();
+
+        $datas = Employee::where('id_position','2')
+                        ->select('employees.id','employees.name')->get();
+
+        foreach ($datas as $data) {
+
+            $data['store_cover'] = EmployeeStore::where('id_employee',$data->id)->count();
+
+            $data['store_panel_cover'] = EmployeeStore::where('id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->where('stores.store_panel','!=','No')
+                                ->count();
+
+            $dataActuals = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('display_shares','employee_stores.id_store','display_shares.id_store')
+                                ->whereMonth('display_shares.date', $mount->format('m'))
+                                ->whereYear('display_shares.date', $mount->format('Y'))
+                                ->groupby('display_shares.id_store')
+                                ->pluck('display_shares.id');
+            $categoryTB = 1;
+            $categoryPF = 2;
+            $persenTB = 40;
+            $persenPF = 40;
+            $data['hitTargetTB'] = 0;
+            $data['hitTargetPF'] = 0;
+
+
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                $actualTB = clone $actualDS;
+                $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
+                $actualTB = $actualTB->where('id_category',$categoryTB)->first();
+                $data['tierTB'] = $actualTB->tier;
+                $data['tierSumTB'] = $actualTotal;
+
+                if ($data['tierSumTB'] == 0) {
+                    $data['hitTargetTB'] += 0;
+                }else{
+                    $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
+                    if ($nilaiActual >= $persenTB) {
+                    $data['hitTargetTB'] += 1;
+                    } else
+                    $data['hitTargetTB'] += 0;
+                }
+
+                $actualPF = clone $actualDS;
+                $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
+                $actualPF = $actualPF->where('id_category',$categoryPF)->first();
+                $data['tierPF'] = $actualPF->tier;
+                $data['tierSumPF'] = $actualTotal;
+
+                if ($data['tierSumPF'] == 0) {
+                    $data['hitTargetPF'] += 0;
+                }else{
+                    $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
+                    if ($nilaiActual >= $persenPF) {
+                    $data['hitTargetPF'] += 1;
+                    } else
+                    $data['hitTargetPF'] += 0;
+                }
+            }
+
+            if ($data['store_panel_cover'] == 0) {
+                    $data['achTB'] = 0;
+            }else{
+                $data['achTB'] = round($data['hitTargetTB'] / $data['store_panel_cover'] * 100, 2).'%';
+            
+            }if ($data['store_panel_cover'] == 0) {
+                    $data['achPF'] = 0;
+            }else{
+                $data['achPF'] = round($data['hitTargetPF'] / $data['store_panel_cover'] * 100, 2).'%';
+            }
+
+            $location = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->count() .' STORE';
+            $data['location'] = $location;
+        }
+        // return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+
+        // return Datatables::of(collect(DB::select($datas)))
+        // ->make(true);
+    }
+
+    // *********** ADDITIONAL DISPLAY ****************** //
+
 
     public function additionalDisplayIndex(){
         return view('report.additional-display');
@@ -796,6 +1092,146 @@ class ReportController extends Controller
         return response()->json($datas);
 
     }
+
+    public function additionalDisplayAch(){
+        return view('report.additional-display-ach');
+    }
+
+    public function additionalDisplayReportAreaData(){
+
+        $mount = Carbon::now();
+
+        $datas = Employee::where('id_position','6')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        // ->groupby('employees.id')
+                        ->select('employees.id','employees.name', 'employee_sub_areas.id_subarea as id_sub_area')->get();
+
+        foreach ($datas as $data) {
+
+            $data['store_cover'] = Store::where('id_subarea',$data->id_sub_area)->count();
+
+            $data['store_panel_cover'] = Store::where('id_subarea',$data->id_sub_area)
+                                ->where('stores.store_panel','!=','No')
+                                ->count();
+
+            $data['actual'] = Store::where('stores.id_subarea',$data->id_sub_area)
+                                ->join('additional_displays','stores.id','additional_displays.id_store')
+                                ->whereMonth('additional_displays.date', $mount->format('m'))
+                                ->whereYear('additional_displays.date', $mount->format('Y'))
+                                ->groupby('additional_displays.id_store')
+                                ->get()
+                                ->count();
+
+            if ($data['store_panel_cover'] == 0) {
+                    $data['ach'] = 0;
+            }else{
+                $data['ach'] = round($data['actual'] / $data['store_panel_cover'] * 100, 2).'%';
+            }
+
+            $location = EmployeeSubArea::where('employee_sub_areas.id_employee',$data->id)
+                                ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                                ->pluck('sub_areas.name')->toArray();
+            $data['location'] = implode(", ",$location);
+
+        }
+        // return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+
+        // return Datatables::of(collect(DB::select($datas)))
+        // ->make(true);
+
+    }
+
+    public function additionalDisplayReportSpgData(){
+
+        $mount = Carbon::now();
+
+        $datas = Employee::where('id_position','1')
+                        // ->rightjoin('employee_stores','employees.id','employee_stores.id_employee')
+                        // ->groupby('employees.id')
+                        ->select('employees.id','employees.name')->get();
+        foreach ($datas as $data) {
+
+            $data['store_cover'] = EmployeeStore::where('id_employee',$data->id)->count();
+
+            $data['store_panel_cover'] = EmployeeStore::where('id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->where('stores.store_panel','!=','No')
+                                ->count();
+
+            $data['actual'] = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('additional_displays','employee_stores.id_store','additional_displays.id_store')
+                                ->whereMonth('additional_displays.date', $mount->format('m'))
+                                ->whereYear('additional_displays.date', $mount->format('Y'))
+                                ->groupby('additional_displays.id_store')
+                                ->get()
+                                ->count();
+
+            if ($data['store_panel_cover'] == 0) {
+                    $data['ach'] = 0;
+            }else{
+                $data['ach'] = round($data['actual'] / $data['store_panel_cover'] * 100, 2).'%';
+            }
+
+            $location = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->pluck('stores.name1')->toArray();
+            $data['location'] = implode(", ",$location);
+        }
+        // return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+
+        // return Datatables::of(collect(DB::select($datas)))
+        // ->make(true);
+
+    }
+
+
+    public function additionalDisplayReportMdData(){
+        $mount = Carbon::now();
+
+        $datas = Employee::where('id_position','2')
+                        // ->rightjoin('employee_stores','employees.id','employee_stores.id_employee')
+                        // ->groupby('employees.id')
+                        ->select('employees.id','employees.name')->get();
+
+        foreach ($datas as $data) {
+
+            $data['store_cover'] = EmployeeStore::where('id_employee',$data->id)->count();
+
+            $data['store_panel_cover'] = EmployeeStore::where('id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->where('stores.store_panel','!=','No')
+                                ->count();
+
+            $data['actual'] = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('additional_displays','employee_stores.id_store','additional_displays.id_store')
+                                ->whereMonth('additional_displays.date', $mount->format('m'))
+                                ->whereYear('additional_displays.date', $mount->format('Y'))
+                                ->groupby('additional_displays.id_store')
+                                ->get()
+                                ->count();
+
+            if ($data['store_panel_cover'] == 0) {
+                    $data['ach'] = 0;
+            }else{
+                $data['ach'] = round($data['actual'] / $data['store_panel_cover'] * 100, 2).'%';
+            }
+
+            $location = EmployeeStore::where('employee_stores.id_employee',$data->id)
+                                ->join('stores','employee_stores.id_store','stores.id')
+                                ->count() .' STORE';
+            $data['location'] = $location;
+        }
+        // return response()->json($datas);
+        return Datatables::of($datas)->make(true);
+
+        // return Datatables::of(collect(DB::select($datas)))
+        // ->make(true);
+
+    }
+
+
 
     // ************ SMD PASAR ************ //
     public function SMDpasar()

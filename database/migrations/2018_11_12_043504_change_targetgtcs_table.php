@@ -34,8 +34,8 @@ class ChangeTargetgtcsTable extends Migration
     public function down()
     {
         Schema::table('target_gtcs', function($table) {
-            $table->dropColumn(['value']);
-            $table->dropColumn(['value_pf']);
+            $table->integer(['value']);
+            $table->integer(['value_pf']);
             $table->integer('id_pasar')->unsigned()->after('id_employee');
             $table->foreign('id_pasar')->references('id')->on('pasars')->onUpdate('cascade')->onDelete('cascade');
         });
