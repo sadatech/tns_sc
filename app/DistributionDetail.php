@@ -19,4 +19,10 @@ class DistributionDetail extends Model
     {
     	return $this->belongsTo('App\Distribution', 'id_distribution');
     }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['product_name'] = $this->product->name;
+        return $array;
+    }
 }
