@@ -381,9 +381,14 @@
         $('#pasarMobile').hide();
         $('#status').val(null);
     } else if (position == {{ App\Position::where(['level' => 'tlmtc'])->first()->id }}) {
+        var selectedArea = {!! $area_selected !!};
+        var getIdArea = selectedArea[0].subarea_item.split("|")[0];
+        $('#subareaInput').val(getIdArea).trigger("change");
+        $('#subarea').show();
         $('#status').hide();
         $('#storeStay').hide();
         $('#storeMobile').hide();
+        $('#pasarMobile').hide();
         $('#status').val(null);
     } else {
         $('#status').hide();
