@@ -20,4 +20,10 @@ class SalesSpgPasarDetail extends Model
         return $this->belongsTo('App\Product', 'id_product');
     }
 
+    public function toArray(){
+        $array = parent::toArray();
+        $array['product_name'] = $this->product->name;
+        return $array;
+    }
+
 }

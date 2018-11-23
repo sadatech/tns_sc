@@ -167,7 +167,7 @@ class SalesController extends Controller
 					'id_employee' 	=> $user->id,
 					'id_store' 		=> $request_store,
 					'id_product' 	=> $product->id,
-					'date' 			=> $date;
+					'date' 			=> $date
 				]);
 			}
 
