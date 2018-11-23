@@ -156,13 +156,13 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Agency</label>
-                        <select class="js-select form-control form-control-lg" style="width: 100%" name="agency" required>
-                            <option value="" disabled selected>Choose your Agency</option>
-                            @foreach($agency as $option)
-                                <option value="{{ $option->id }}" {{ (collect(old('agency'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
-                            @endforeach
-                        </select>
+                        <label class="col-md-12 col-sm-12" style="padding: 0">Agency</label>
+                        <div class="input-group mb-3 col-sm-12 col-md-12" style="padding: 0">
+                            <div class="col-sm-12" style="padding: 0">
+                                <select class="form-control" style="width: 100%" name="agency" id="agencySelect" required>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -248,7 +248,7 @@
                                 <h3 class="block-title">Pasar Terpilih</h3>
                                 <span id="selectedStoreDefault" style="color: #ffeb5e;padding-top: 5px;">Tolong tambahkan pasar.</span>
                                 <div class="block-options">
-                                    <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Cari Pasar..">
+                                    <input type="text" id="myInput2" class="form-control" onkeyup="searchFunction()" placeholder="Cari Pasar..">
                                 </div>
                             </div>
                             <div class="block-content" style="padding: 0; width: 100%;">
@@ -294,6 +294,25 @@
 @section('script')
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+$.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $('#agencySelect').select2(setOptions('{{ route("agency-select2") }}', 'Choose your Agency', function (params) {
+        return filterData('name', params.term);
+    }, function (data, params) {
+        return {
+            results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+            })
+        }
+    }));
+});
+</script>
 <script type="text/javascript">
 $('#checkbox-value').text($('#example-inline-checkbox2').val());
 
@@ -557,6 +576,26 @@ $("#example-inline-checkbox2").on('change', function() {
     }
     function searchFunction() {
         var input, filter, table, tr, a, i;
+        input = document.getElementById("myInput2");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("selectedPasarTableBody");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            console.log(a)
+            a = tr[i].getElementsByTagName("span")[0];
+            if(a != null){
+                a= a.innerHTML;
+                if (a.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function searchFunction() {
+        var input, filter, table, tr, a, i;
         input = document.getElementById("myInput");
         filter = input.value.toUpperCase();
         table = document.getElementById("selectedStoreTableBody");
@@ -574,6 +613,7 @@ $("#example-inline-checkbox2").on('change', function() {
             }
         }
     }
+
     function notif(title = 'default title<br/>', message = '<i class="em em-confetti_ball mr-2"></i>default message', type = 'success') {
         $.notify(
         {
