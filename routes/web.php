@@ -601,11 +601,12 @@ Route::prefix('report/gtc')->group(function () {
 *	SMD MTC REPORT
 */
 	Route::prefix('spg')->group(function () {
-		Route::prefix('attendance')->group(function () {
-			Route::get('/', function(){
-				return view('report.spg');
-			})->name('report.attendance.spg')->middleware('auth');
-		});
+		Route::get('/attendance', function(){
+			return view('report.spg.attendance');
+		})->name('report.attendance.spg')->middleware('auth');
+		Route::get('/sales', function(){
+			return view('report.spg.sales');
+		})->name('report.sales.spg')->middleware('auth');
 	});
 	
 
