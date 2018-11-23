@@ -45,6 +45,8 @@ use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Product;
+use App\SalesSpgPasar;
+use App\SalesSpgPasarDetail;
 
 class ReportController extends Controller
 {
@@ -1511,7 +1513,6 @@ class ReportController extends Controller
         return Datatables::of(collect($data))->make(true);
     }
 
-
     public function getCbd($data, $day)
     {
         $date = Carbon::now()->format('Y-m-').$day;
@@ -1663,6 +1664,7 @@ class ReportController extends Controller
             ]);
         }
     }
+
     public function getAchievement($date = '')
     {
         $str = 
@@ -1691,4 +1693,11 @@ class ReportController extends Controller
         // return Datatables::of(collect($data))->make(true);
     }
 
+
+    // ************ SPG PASAR ************ //
+    public function SPGsales()
+    {
+        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+    }
 }

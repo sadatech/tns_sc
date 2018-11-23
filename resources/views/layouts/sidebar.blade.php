@@ -209,10 +209,11 @@
                     </li> 
                     
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT</span></li>
-                    {{-- REPORT --}}
+                    {{-- REPORT GTC --}}
                     <li class="{{ request()->is('report/gtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">GTC</span></a>
                         <ul>
+                            {{-- SMD PASAR --}}
                             <li class="{{ request()->is('report/gtc/smd/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SMD Pasar</span></a>
                                 <ul>
@@ -232,77 +233,90 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/sales') ? 'active' : '' }}" href="{{ route('report.sales.pasar') }}"><span class="sidebar-mini-hide">Sales</span></a>
                                     </li> 
-                                    {{-- SALES MTC --}}
-                                    <li>
-                                        <a class="{{ request()->is('report/gtc/smd/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
-                                    </li>
                                     {{-- SUMMARY REPORT--}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Summary</span></a>
                                     </li>
                                     {{-- Achievement--}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/smd/achievement') ? 'active' : '' }}" href="{{ route('report.achievement') }}"><span class="sidebar-mini-hide">Achievement</span></a>
+                                        <a class="{{ request()->is('report/gtc/achievement') ? 'active' : '' }}" href="{{ route('report.achievement') }}"><span class="sidebar-mini-hide">Achievement</span></a>
                                     </li>
-                                    {{-- Display Share--}}
-                                    <li>
-                                        <a class="{{ request()->is('report/mtc/display_share') ? 'active' : '' }}" href="{{ route('display_share') }}"><span class="sidebar-mini-hide">Display Share</span></a>
-                                    </li>  
-                                    <li>
-                                        <a class="{{ request()->is('report/mtc/display_share/ach') ? 'active' : '' }}" href="{{ route('display_share.ach') }}"><span class="sidebar-mini-hide">Ach Display Share</span></a>
-                                    </li>  
-                                    {{-- Additional Display--}}
-                                    <li>
-                                        <a class="{{ request()->is('report/mtc/additional_display') ? 'active' : '' }}" href="{{ route('additional_display') }}"><span class="sidebar-mini-hide">Additional Display</span></a>
-                                    </li>  
-                                    <li>
-                                        <a class="{{ request()->is('report/mtc/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><span class="sidebar-mini-hide">Ach Additional Display</span></a>
-                                    </li>  
-                                    {{-- Availability Display--}}
-                                    <li>
-                                        <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability Display</span></a>
-                                    </li>  
                                 </ul>
                             </li>
                         </ul>
                         <ul>
-                            <li class="{{ request()->is('report/spg/*') ? 'open' : '' }}">
+                            {{-- SPG PASAR --}}
+                            <li class="{{ request()->is('report/gtc/spg/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SPG Pasar</span></a>
                                 <ul>
                                     {{-- ATTENDANCE SPG --}}
                                     <li>
-                                        <a class="{{ request()->is('report/spg/attendanceSPG') ? 'active' : '' }}" href="{{ route('report.attendance.spg') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                                        <a class="{{ request()->is('report/gtc/spg/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
                                     </li>
-                                   
+
+                                    {{-- Achievement SPG --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/spg/achievement') ? 'active' : '' }}" href="{{ route('report.achievement.spg') }}"><span class="sidebar-mini-hide">Achievement</span></a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
                         <ul>
-                            <li class="{{ request()->is('report/demo/*') ? 'open' : '' }}">
+                            {{-- Demo Cooking --}}
+                            <li class="{{ request()->is('report/gtc/demo/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Demo Cooking</span></a>
                                 <ul>
                                     {{-- Plan Kunjungan --}}
                                     <li>
-                                        <a class="{{ request()->is('report/demo/kunjungan') ? 'active' : '' }}" href="{{ route('report.demo.kunjungan') }}"><span class="sidebar-mini-hide">Plan Kunjungan</span></a>
+                                        <a class="{{ request()->is('report/gtc/demo/kunjungan') ? 'active' : '' }}" href="{{ route('report.demo.kunjungan') }}"><span class="sidebar-mini-hide">Plan Kunjungan</span></a>
                                     </li>
                                     {{-- Sampling --}}
                                     <li>
-                                        <a class="{{ request()->is('report/demo/sampling') ? 'active' : '' }}" href="{{ route('report.demo.sampling') }}"><span class="sidebar-mini-hide">Sampling</span></a>
+                                        <a class="{{ request()->is('report/gtc/demo/sampling') ? 'active' : '' }}" href="{{ route('report.demo.sampling') }}"><span class="sidebar-mini-hide">Sampling</span></a>
                                     </li>
                                     {{-- Sales DC --}}
                                     <li>
-                                        <a class="{{ request()->is('report/demo/salesDC') ? 'active' : '' }}" href="{{ route('report.demo.salesDC') }}"><span class="sidebar-mini-hide">Sales DC</span></a>
+                                        <a class="{{ request()->is('report/gtc/demo/salesDC') ? 'active' : '' }}" href="{{ route('report.demo.salesDC') }}"><span class="sidebar-mini-hide">Sales DC</span></a>
                                     </li>
                                     {{-- Activity --}}
                                     <li>
-                                        <a class="{{ request()->is('report/demo/activity') ? 'active' : '' }}" href="{{ route('report.demo.activity') }}"><span class="sidebar-mini-hide">Activity</span></a>
+                                        <a class="{{ request()->is('report/gtc/demo/activity') ? 'active' : '' }}" href="{{ route('report.demo.activity') }}"><span class="sidebar-mini-hide">Activity</span></a>
                                     </li>
                                     {{-- Cash Advance --}}
                                     <li>
-                                        <a class="{{ request()->is('report/demo/cashAdvnace') ? 'active' : '' }}" href="{{ route('report.demo.cashAdvance') }}"><span class="sidebar-mini-hide">Cash Advance</span></a>
+                                        <a class="{{ request()->is('report/gtc/demo/cashAdvance') ? 'active' : '' }}" href="{{ route('report.demo.cashAdvance') }}"><span class="sidebar-mini-hide">Cash Advance</span></a>
                                     </li>
                                 </ul>
                             </li>
+                        </ul>
+                    </li>
+
+                    {{-- REPORT MTC --}}
+                    <li class="{{ request()->is('report/mtc*') ? 'open' : '' }}">
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">MTC</span></a>
+                        <ul>
+                            {{-- SALES MTC --}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
+                            </li>
+                            {{-- Display Share--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/display_share') ? 'active' : '' }}" href="{{ route('display_share') }}"><span class="sidebar-mini-hide">Display Share</span></a>
+                            </li>  
+                            <li>
+                                <a class="{{ request()->is('report/mtc/display_share/ach') ? 'active' : '' }}" href="{{ route('display_share.ach') }}"><span class="sidebar-mini-hide">Ach Display Share</span></a>
+                            </li>  
+                            {{-- Additional Display--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/additional_display') ? 'active' : '' }}" href="{{ route('additional_display') }}"><span class="sidebar-mini-hide">Additional Display</span></a>
+                            </li>  
+                            <li>
+                                <a class="{{ request()->is('report/mtc/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><span class="sidebar-mini-hide">Ach Additional Display</span></a>
+                            </li>  
+                            {{-- Availability Display--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability Display</span></a>
+                            </li>  
                         </ul>
                     </li>
 
