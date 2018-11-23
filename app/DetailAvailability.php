@@ -15,7 +15,14 @@ class DetailAvailability extends Model
     public function availability(){
     	return $this->belongsTo(Availability::class);
     }
+    
     public function product(){
     	return $this->belongsTo(Product::class);
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['product_name'] = $this->product->name;
+        return $array;
     }
 }

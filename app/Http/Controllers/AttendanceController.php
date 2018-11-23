@@ -11,9 +11,11 @@ use App\Attendance;
 use App\AttendanceDetail;
 use App\Employee;
 use App\AttendanceOutlet;
-use Excel;
 use Auth;
-
+use Rap2hpoutre\FastExcel\FastExcel;
+use Box\Spout\Writer\Style\Color;
+use File;
+use Excel;
 
 class AttendanceController extends Controller
 {
@@ -80,7 +82,8 @@ class AttendanceController extends Controller
             $attendance = Attendance::where('id_employee', $employee->id)->get();
             for($i=1; $i <= $maxMonth; $i++){    
                 // if($i <= $day){
-                $attendance__ = Attendance::where('id_employee', $employee->id)->whereYear('date',$year)->whereMonth('date',$month)->whereDay('date',$i)->get();
+               if ($attendance->count() > 0) {
+                    $attendance__ = Attendance::where('id_employee', $employee->id)->whereYear('date',$year)->whereMonth('date',$month)->whereDay('date',$i)->get();
                 if ($attendance__->count() > 0) {
                     # code...
                     foreach ($attendance__ as $key) {
@@ -125,6 +128,11 @@ class AttendanceController extends Controller
                     array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i</button>");
 
                 } 
+               }else{
+                    return "<button class='btn btn-sm btn-secondary btn-square' style='width:200px;height:40px'><i class='fa fa-warning
+'></i> Belum ada absen </button>";
+
+                } 
             }
             return implode(' ', $array);
         })
@@ -132,59 +140,70 @@ class AttendanceController extends Controller
         ->make(true);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function exportXLS()
     {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+     Excel::create('AttendanceMTC-Report_'.Carbon::now(), function($excel){
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+        $excel->sheet('Attendance Report MTC', function($sheet){
+            $sheet->cells('A1:G1', function($cells) {
+                $cells->setFontWeight('bold');
+                $cells->setAlignment('center');
+                $cells->setBackground('#74fd84');
+            });
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+            $sheet->row(1, ['Employee','Keterangan','Store','Place','Checkin','Checkout','Date']);
+            $employee = Employee::all()->pluck('id');
+            $array = [];
+            $month = Carbon::parse()->format('m');
+            $day = Carbon::now()->format('d');
+            $year = Carbon::parse()->format('Y');
+            $maxMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+            
+            $attendance = Attendance::whereIn('id_employee', $employee)->get();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+              for($i=1; $i <= $maxMonth; $i++){    
+                // if($i <= $day){
+                $attendance__ = Attendance::whereIn('id_employee', $employee)->whereYear('date',$year)->whereMonth('date',$month)->whereDay('date',$i)->get();
+                if ($attendance__->count() > 0) {
+                    # code...
+                    foreach ($attendance__ as $key) {
+                        $attDate = date("d",strtotime($key->date));
+                        // if($i==$attDate){
+                            $attendanceCollection = collect();
+                            foreach ($key->attendanceDetail as $attdDetail) {
+                               $sheet->appendRow([
+                                    $attdDetail->attendance->employee->name, 
+                                    $attdDetail->attendance->keterangan, 
+                                    $attdDetail->store->name1, 
+                                    $attdDetail->place->name, 
+                                    $attdDetail->checkin, 
+                                    $attdDetail->checkout, 
+                                    $attdDetail->attendance->date, 
+                                ]);
+                                $attendanceCollection->push($attdDetail);
+
+                                } 
+                        }
+                }
+            }
+        });
+        // $excel->sheet('Timezone List', function($sheet) {
+        //     $sheet->cells('A1:G1', function($cells) {
+        //         $cells->setFontWeight('bold');
+        //         $cells->setAlignment('center');
+        //     });
+        //     $sheet->row(1, ['ID TIMEZONE', 'NAME', 'TIMEZONE']);
+        //     $oke=Timezone::orderBy('created_at','DESC')->get();
+        //     foreach ($oke as $ok) {
+        //         $sheet->appendRow([
+        //             $ok->id, 
+        //             $ok->name,
+        //             $ok->timezone,
+        //         ]);
+        //     }
+        // });
+    })->export('xlsx');
+     return ;
     }
 }

@@ -208,10 +208,10 @@
                         <a class="{{ request()->is('utility/export-download') ? 'active' : '' }}" href="{{ route('export-download') }}"><i class="si si-cloud-download"></i><span class="sidebar-mini-hide">Download Export(s)</span></a>
                     </li> 
 
-                    <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">REPORT</span></li>
+                    <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT GTC</span></li>
                     {{-- ATTENDANCE --}}
                      <li>
-                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance</span></a>
+                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance MTC</span></a>
                     </li>  
                     {{-- SALES --}}
                     <li>
@@ -228,7 +228,8 @@
                     {{-- SALES--}}
                     <li>
                         <a class="{{ request()->is('report/sales') ? 'active' : '' }}" href="{{ route('report.sales.pasar') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Sales MD Pasar</span></a>
-                    </li>  
+                    </li> 
+                    {{-- ATTENDANCE SMD --}}
                     <li>
                         <a class="{{ request()->is('report/smd/attendance') ? 'active' : '' }}" href="{{ route('report.attendance.smd') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance SMD</span></a>
                     </li>
@@ -236,9 +237,40 @@
                     <li>
                         <a class="{{ request()->is('report/distributorPf') ? 'active' : '' }}" href="{{ route('report.dist.pf') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Distributor PF</span></a>
                     </li>  
+                    <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT MTC</span></li>
+                    {{-- ATTENDANCE --}}
+                     <li>
+                        <a class="{{ request()->is('report/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Attendance</span></a>
+                    </li>  
+                    {{-- SALES --}}
+                    <li>
+                        <a class="{{ request()->is('report/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Sales MTC</span></a>
+                    </li>
+                    {{-- PROMO--}}
+                    <li>
+                        <a class="{{ request()->is('report/promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><i class="si si-tag"></i><span class="sidebar-mini-hide">Promo Activity</span></a>
+                    </li>
                     {{-- Stock In Hand--}}
                     <li>
                         <a class="{{ request()->is('report/stock') ? 'active' : '' }}" href="{{ route('stock') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Stock In Hand</span></a>
+                    </li>  
+                    {{-- Display Share--}}
+                    <li>
+                        <a class="{{ request()->is('report/display_share') ? 'active' : '' }}" href="{{ route('display_share') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Display Share</span></a>
+                    </li>  
+                    <li>
+                        <a class="{{ request()->is('report/display_share/ach') ? 'active' : '' }}" href="{{ route('display_share.ach') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Ach Display Share</span></a>
+                    </li>  
+                    {{-- Additional Display--}}
+                    <li>
+                        <a class="{{ request()->is('report/additional_display') ? 'active' : '' }}" href="{{ route('additional_display') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Additional Display</span></a>
+                    </li>  
+                    <li>
+                        <a class="{{ request()->is('report/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Ach Additional Display</span></a>
+                    </li>  
+                    {{-- Availability Display--}}
+                    <li>
+                        <a class="{{ request()->is('report/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><i class="si si-handbag"></i><span class="sidebar-mini-hide">Availability Display</span></a>
                     </li>  
                 </ul>
         </div>

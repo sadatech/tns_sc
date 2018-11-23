@@ -389,6 +389,10 @@ Route::prefix('target')->group(function () {
 		Route::put('/update/{id}', 'Target\SmdController@update')->name('target.smd.update')->middleware('auth');
 		Route::get('/delete/{id}', 'Target\SmdController@delete')->name('target.smd.delete')->middleware('auth');
 		Route::post('/import', 'Target\SmdController@importXLS')->name('target.smd.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/TargetSmdImport.xlsx'));
+		})->name('targetsmd.download-template')->middleware('auth');
 	});
 
 	Route::prefix('spg')->group(function () {
@@ -532,8 +536,12 @@ Route::prefix('report')->group(function () {
 
 	Route::prefix('display_share')->group(function () {
 		Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
-			// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
+		// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
 		Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
+		Route::get('/ach', 'ReportController@displayShareAch')->name('display_share.ach')->middleware('auth');
+		Route::get('/reportDataArea', 'ReportController@displayShareReportAreaData')->name('display_share.reportDataArea')->middleware('auth');
+		Route::get('/reportDataSpg', 'ReportController@displayShareReportSpgData')->name('display_share.reportDataSpg')->middleware('auth');
+		Route::get('/reportDataMd', 'ReportController@displayShareReportMdData')->name('display_share.reportDataMd')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
 		Route::get('/download-template', function()
@@ -546,6 +554,10 @@ Route::prefix('report')->group(function () {
 		Route::get('/', 'ReportController@additionalDisplayIndex')->name('additional_display')->middleware('auth');
 		Route::get('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
 		Route::get('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
+		Route::get('/ach', 'ReportController@additionalDisplayAch')->name('additional_display.ach')->middleware('auth');
+		Route::get('/reportDataArea', 'ReportController@additionalDisplayReportAreaData')->name('additional_display.reportDataArea')->middleware('auth');
+		Route::get('/reportDataSpg', 'ReportController@additionalDisplayReportSpgData')->name('additional_display.reportDataSpg')->middleware('auth');
+		Route::get('/reportDataMd', 'ReportController@additionalDisplayReportMdData')->name('additional_display.reportDataMd')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@additionalDisplayUpdate')->name('additional_display.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportadditionalDisplay')->name('additional_display.import')->middleware('auth');
 		Route::get('/download-template', function()
@@ -568,7 +580,7 @@ Route::prefix('report')->group(function () {
 	Route::prefix('attendance')->group(function(){
 		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
 		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
-		// Route::get('/export', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
 	});
 	
 	Route::prefix('smd')->group(function () {
