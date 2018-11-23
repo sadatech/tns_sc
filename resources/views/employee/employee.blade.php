@@ -203,8 +203,9 @@
         $('#viewModal').modal('show');
         $('#employeeID').val(json.id);
         $('#storeGet').html(json.store);
-        
     }
+</script>
+<script type="text/javascript">
     @if(session('type'))
     $(document).ready(function() {
         $.notify({
@@ -226,6 +227,7 @@
     $(function() {
         $('#employeetable').DataTable({
             processing: true,
+            scrollX: true,
             scrollY: "300px",
             drawCallback: function(){
                 $('.popup-image').magnificPopup({
@@ -259,22 +261,22 @@
             },
             ajax: '{!! route('employee.data') !!}',
             columns: [
-            { data: 'action', name: 'action' },
-            { data: 'nik', name: 'nik' },
-            { data: 'name', name: 'name' },
-            { data: 'ktp', name: 'ktp' },
-            { data: 'employeeStore', name: 'employeeStore' },
-            { data: 'phone', name: 'phone' },
-            { data: 'email', name: 'email' },
-            { data: 'rekening', name: 'rekening' },
-            { data: 'bank', name: 'bank' },
-            { data: 'status', name: 'status' },
-            { data: 'joinAt', name: 'joinAt' },
-            { data: 'agency', name: 'agency' },
-            { data: 'gender', name: 'gender' },
-            { data: 'education', name: 'education' },
-            { data: 'birthdate', name: 'birthdate' },
-            { data: 'position', name: 'position' },
+            { data: 'action'},
+            { data: 'nik'},
+            { data: 'name'},
+            { data: 'ktp'},
+            { data: 'employeeStore'},
+            { data: 'phone'},
+            { data: 'email'},
+            { data: 'rekening'},
+            { data: 'bank'},
+            { data: 'joinAt'},
+            { data: 'agency'},
+            { data: 'gender'},
+            { data: 'education'},
+            { data: 'birthdate'},
+            { data: 'timezone'},
+            { data: 'position'}
             ]
         });
     });
