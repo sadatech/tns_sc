@@ -22,27 +22,19 @@ class ProductController extends Controller
 
 	public function list(Request $request)
 	{
-		// return response()->json(Product::get()->toArray());
 		try {
 			$res['success'] = false;
 			if (JWTAuth::getToken() != null) {
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					if (!empty($request->input('subcategory'))) {
-						$where = [
-							'id_brand' 			=> $request->input('brand'),
-							'id_subcategory' 	=> $request->input('subcategory')
-						];
-					}else{
-						$where = [
-							'id_brand' 			=> $request->input('brand')
-						];
-					}
-					$product 	= Product::where($where)->get();
+					$product = Product::whereIdBrand($request->input('brand'));
+					$product->when(!empty($request->input('subcategory')), function ($q) use ($request){
+						return $q->whereIdSubcategory($request->input('subcategory'));
+					});
 					if ($product->count() > 0) {
 						$dataArr = array();
-						foreach ($product as $key => $pro) {
+						foreach ($product->get() as $key => $pro) {
 							$dataArr[] = array(
 								'id' 			=> $pro->id,
 								'name' 			=> $pro->name,

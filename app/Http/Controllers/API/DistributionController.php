@@ -60,7 +60,9 @@ class DistributionController extends Controller
 										DistributionDetail::create([
 											'id_distribution'	=> $distributionId,
 											'id_product'		=> $product->id,
-											'value'				=> $product->value,
+											'qty'				=> $product->qty,
+											'qty_actual'		=> $product->qty_actual,
+											'satuan'			=> $product->satuan,
 										]);
 									}else{
 										$detail->value = $product->value;
