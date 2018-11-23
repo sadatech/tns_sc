@@ -502,56 +502,113 @@ Route::prefix('company')->group(function () {
 
 // ***************** REPORTING (START) ***********************
 
-Route::prefix('report/gtc')->group(function () {
-/**
-*	SMD MTC REPORT
-*/
-	Route::prefix('smd')->group(function () {
+Route::prefix('report')->group(function () {
+	//GTC REPORT
+	Route::prefix('gtc')->group(function () {
+		// SMD REPORT
+		Route::prefix('smd')->group(function () {
 
-		Route::get('attendanceSMD', function(){
-			return view('report.attendance-smd');
-		})->name('report.attendance.smd')->middleware('auth');
-		Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
-		Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
-		Route::get('/attendance/export', 'ReportController@exportAttandance')->name('export.attendance.smd.pasar')->middleware('auth');
+			Route::get('attendanceSMD', function(){
+				return view('report.attendance-smd');
+			})->name('report.attendance.smd')->middleware('auth');
+			Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
+			Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+			Route::get('/attendance/export', 'ReportController@exportAttandance')->name('export.attendance.smd.pasar')->middleware('auth');
 
-		Route::prefix('attendance')->group(function(){
-			Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
-			Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
-			Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
+			Route::prefix('stockist')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.stockist');
+				})->name('report.stockist')->middleware('auth');
+			});
+
+			Route::prefix('sales')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.sales');
+				})->name('report.sales.pasar')->middleware('auth');
+				Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
+				Route::get('/export', 'ReportController@exportMdPasar')->name('export.sales.smd')->middleware('auth');
+				});
+
+			Route::prefix('achievement')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.achievement');
+				})->name('report.achievement')->middleware('auth');
+			});
+
+			Route::prefix('distributorPf')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.distpf');
+				})->name('report.dist.pf')->middleware('auth');
+				Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSmdDist')->name('export.distpf.smd')->middleware('auth');
+			});
+
+			Route::prefix('summary')->group(function () {
+				Route::get('/', function(){
+					return view('report.summary');
+				})->name('report.summary')->middleware('auth');
+			});
+
 		});
 
-		Route::prefix('stockist')->group(function () {
+		// SPG PASAR
+		Route::prefix('spg')->group(function () {
+			Route::prefix('attendance')->group(function(){
+				Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
+				Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
+				Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
+			});
+
+			Route::prefix('achievement')->group(function () {
+				Route::get('/', function(){
+					return view('report.spg.achievement');
+				})->name('report.achievement.spg')->middleware('auth');
+			});
+		});
+
+		// Demo Cooking Report
+		Route::prefix('demo')->group(function () {
+			Route::prefix('kunjungan')->group(function () {
 			Route::get('/', function(){
-				return view('report.smd.stockist');
-			})->name('report.stockist')->middleware('auth');
-		});
+				return view('report.democooking.kunjungan');
+			})->name('report.demo.kunjungan')->middleware('auth');
+			});
 
-		Route::prefix('achievement')->group(function () {
+			Route::prefix('sampling')->group(function () {
 			Route::get('/', function(){
-				return view('report.smd.achievement');
-			})->name('report.achievement')->middleware('auth');
-		});
+				return view('report.democooking.sampling');
+			})->name('report.demo.sampling')->middleware('auth');
+			});
 
-		Route::prefix('distributorPf')->group(function () {
+			Route::prefix('salesDC')->group(function () {
 			Route::get('/', function(){
-				return view('report.smd.distpf');
-			})->name('report.dist.pf')->middleware('auth');
-			Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
-			Route::get('/export', 'ReportController@exportSmdDist')->name('export.distpf.smd')->middleware('auth');
+				return view('report.democooking.salesDC');
+			})->name('report.demo.salesDC')->middleware('auth');
+			});
+
+			Route::prefix('activity')->group(function () {
+			Route::get('/', function(){
+				return view('report.democooking.activity');
+			})->name('report.demo.activity')->middleware('auth');
+			});
+
+			Route::prefix('cashAdvance')->group(function () {
+			Route::get('/', function(){
+				return view('report.democooking.cash');
+			})->name('report.demo.cashAdvance')->middleware('auth');
+			});
+
 		});
+	});
+
+	Route::prefix('mtc')->group(function () {
 
 		Route::prefix('salesmtc')->group(function () {
 			Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');
 			Route::post('/data', 'ReportController@salesMtcDataSalesAlt')->name('salesmtc.data')->middleware('auth');
 		});
 
-		Route::prefix('summary')->group(function () {
-			Route::get('/', function(){
-				return view('report.summary');
-			})->name('report.summary')->middleware('auth');
-		});
-
+		
 		Route::prefix('availability')->group(function () {
 			Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
 			Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
@@ -595,56 +652,9 @@ Route::prefix('report/gtc')->group(function () {
 				return response()->download(public_path('assets/SellinImport.xlsx'));
 			})->name('SellIn.download-template')->middleware('auth');
 		});
-	});
 
-/**
-*	SMD MTC REPORT
-*/
-	Route::prefix('spg')->group(function () {
-		Route::prefix('attendance')->group(function () {
-			Route::get('/', function(){
-				return view('report.spg');
-			})->name('report.attendance.spg')->middleware('auth');
-		});
 	});
 	
-
-/**
-*	Demo Cooking REPORT
-*/
-	Route::prefix('demo')->group(function () {
-
-		Route::prefix('kunjungan')->group(function () {
-			Route::get('/', function(){
-				return view('report.democooking.kunjungan');
-			})->name('report.demo.kunjungan')->middleware('auth');
-		});
-
-		Route::prefix('sampling')->group(function () {
-			Route::get('/', function(){
-				return view('report.democooking.sampling');
-			})->name('report.demo.sampling')->middleware('auth');
-		});
-
-		Route::prefix('salesDC')->group(function () {
-			Route::get('/', function(){
-				return view('report.democooking.salesDC');
-			})->name('report.demo.salesDC')->middleware('auth');
-		});
-
-		Route::prefix('activity')->group(function () {
-			Route::get('/', function(){
-				return view('report.democooking.activity');
-			})->name('report.demo.activity')->middleware('auth');
-		});
-
-		Route::prefix('cashAdvance')->group(function () {
-			Route::get('/', function(){
-				return view('report.democooking.cash');
-			})->name('report.demo.cashAdvance')->middleware('auth');
-		});
-
-	});
 
 		Route::prefix('sales')->group(function () {
 		Route::prefix('sellin')->group(function () {
@@ -681,20 +691,8 @@ Route::prefix('report/gtc')->group(function () {
 				return view('report.smd', $data);
 			})->name('report.smd.pasar')->middleware('auth');
 			Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
-
-
-
 		
-
-
-		Route::prefix('sales')->group(function () {
-		Route::get('/', function(){
-			return view('report.sales');
-		})->name('report.sales.pasar')->middleware('auth');
-		Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
-		Route::get('/export', 'ReportController@exportMdPasar')->name('export.sales.smd')->middleware('auth');
 		});
-});
 
 // ***************** REPORTING (END) ***********************
 
