@@ -1,7 +1,8 @@
 <?php
 
-use App\SubCategory;
 use Illuminate\Database\Seeder;
+use App\SubCategory;
+use Carbon\Carbon;
 
 class SubCategoryTableSeeder extends Seeder
 {
