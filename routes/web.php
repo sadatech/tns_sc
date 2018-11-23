@@ -722,6 +722,7 @@ Route::prefix('utility')->group(function () {
 Route::prefix('select2')->group(function () {
 	Route::post('/region-select2', 'RegionController@getDataWithFilters')->name('region-select2');
 	Route::post('/area-select2', 'AreaController@getDataWithFilters')->name('area-select2');
+	Route::post('/agency-select2', 'AgencyController@getDataWithFilters')->name('agency-select2');
 	Route::post('/sub-area-select2', 'SubareaController@getDataWithFilters')->name('sub-area-select2');
 	Route::post('/employee-select2', 'EmployeeController@getDataWithFilters')->name('employee-select2');
 	Route::post('/employee-select2-for-report', 'EmployeeController@getDataWithFiltersForReport')->name('employee-select2-for-report');
