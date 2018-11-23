@@ -238,9 +238,9 @@
                                         <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Summary</span></a>
                                     </li>
                                     {{-- Achievement--}}
-                                    <li>
+                                    {{-- <li>
                                         <a class="{{ request()->is('report/gtc/achievement') ? 'active' : '' }}" href="{{ route('report.achievement') }}"><span class="sidebar-mini-hide">Achievement</span></a>
-                                    </li>
+                                    </li> --}}
                                 </ul>
                             </li>
                         </ul>
@@ -252,6 +252,10 @@
                                     {{-- ATTENDANCE SPG --}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/spg/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                                    </li>
+                                    {{-- SALES SPG --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/spg/sales') ? 'active' : '' }}" href="{{ route('report.sales.spg') }}"><span class="sidebar-mini-hide">Sales</span></a>
                                     </li>
 
                                     {{-- Achievement SPG --}}

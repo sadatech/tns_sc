@@ -564,6 +564,13 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.achievement');
 				})->name('report.achievement.spg')->middleware('auth');
 			});
+
+			Route::prefix('sales')->group(function () {
+				Route::get('/', function(){
+					return view('report.spg.sales');
+				})->name('report.sales.spg')->middleware('auth');
+				Route::get('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
+			});
 		});
 
 		// Demo Cooking Report
