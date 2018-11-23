@@ -26,9 +26,9 @@
             <table class="table table-striped table-vcenter js-dataTable-full" id="classtable">
             <thead>
                 <th class="text-center" style="width: 70px;"></th>
-                <th class="text-center">Code</th>
-                <th class="text-center" width="200px">Name</th>
-                <th class="text-center" style="width: 15%;"> Action</th>
+                <th>Code</th>
+                <th width="200px">Distributor</th>
+                <th style="width: 15%;"> Action</th>
             </thead>
             </table>
         </div>  
