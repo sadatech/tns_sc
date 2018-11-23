@@ -2,7 +2,7 @@
 @section('title', "Report Achievement SPG")
 @section('content')
 <div class="content">
-    <h2 class="content-heading pt-10">Attendance<small>Report</small></h2>
+    <h2 class="content-heading pt-10">Achievement<small>Report</small></h2>
     @if($errors->any())
     <div class="alert alert-danger">
         <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
