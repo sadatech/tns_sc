@@ -270,12 +270,12 @@
             { data: 'email'},
             { data: 'rekening'},
             { data: 'bank'},
+            { data: 'status'},
             { data: 'joinAt'},
             { data: 'agency'},
             { data: 'gender'},
             { data: 'education'},
             { data: 'birthdate'},
-            { data: 'timezone'},
             { data: 'position'}
             ]
         });
