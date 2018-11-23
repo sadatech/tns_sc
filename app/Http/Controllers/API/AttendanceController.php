@@ -9,6 +9,7 @@ use App\Attendance;
 use App\AttendanceDetail;
 use App\AttendanceOutlet;
 use App\AttendancePasar;
+use App\Cbd;
 use Carbon\Carbon;
 use JWTFactory;
 use JWTAuth;
