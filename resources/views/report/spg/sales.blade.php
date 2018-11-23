@@ -29,7 +29,8 @@
             <tr>
                 <th colspan="3">SPG</th>
                 <th></th>
-                <th colspan="2">Kostumer</th>
+                <th colspan="2">Costumer</th>
+                <th>Detail</th>
             </tr>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
@@ -38,6 +39,7 @@
               <th>Tanggal</th>
               <th>Name</th>
               <th>Phone</th>
+              <th>Product</th>
             </tr>
           </thead>
         </table>
@@ -72,14 +74,15 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.distpf.smd') !!}',
+      ajax: '{!! route('spg.pasar.sales.data') !!}',
       columns: [
       { data: 'id', name:'' },
-      { data: 'nama', name:'Nama' },
+      { data: 'nama_spg', name:'Nama' },
       { data: 'pasar', name:'Pasar' },
       { data: 'tanggal', name:'Tanggal' },
-      { data: 'outlet', name:'Outlet' },
-      { data: 'outlet', name:'Outlet' },
+      { data: 'nama', name:'Outlet' },
+      { data: 'phone', name:'Phone' },
+      { data: 'action', name:'Product' },
       ]
     });
   });

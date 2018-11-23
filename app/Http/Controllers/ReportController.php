@@ -1699,5 +1699,38 @@ class ReportController extends Controller
     {
         $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month)->get();
         $data = array();
+        $product = array();
+        $id = 1;
+        foreach ($sales as $key => $value) {
+            $detail = SalesSpgPasarDetail::where('id_sales',1)->get();
+            foreach ($detail as $keys => $det) {
+                // $product[$key][] = $det->product->name;
+                $product[$key][$keys] = "<tr>";
+                $product[$key][$keys] .= "<td>".$det->product->name."</td>";
+                $product[$key][$keys] .= "<td>".$det->qty."</td>";
+                $product[$key][$keys] .= "<td>".$det->qty_actual."</td>";
+                $product[$key][$keys] .= "<td>".$det->satuan."</td>";
+                $product[$key][$keys] .= "</tr>";
+            }
+            // dd($product);
+            $data[] = array(
+                'id' => $id++,
+                'nama_spg' => $value->employee->name,
+                'pasar' => $value->pasar->name,
+                'tanggal' => $value->date,
+                'nama' => $value->name,
+                'phone' => $value->phone,
+                'list' => implode('', $product[$key]),
+            );
+        }
+        return Datatables::of(collect($data))
+        ->addColumn('action', function ($data) {
+            $html = "<table class='table table-bordered'>";
+            $html .= "<tr><th>Nama</th><th>Quantity</th><th>Actual Quantity</th><th>Satuan</th></tr>";
+            $html .= $data['list'];
+            $html .= "</table>";
+            return $html;
+        })->make(true);
+        // return Datatables::of(collect($data))->make(true);
     }
 }
