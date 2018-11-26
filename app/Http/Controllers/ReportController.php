@@ -1513,6 +1513,39 @@ class ReportController extends Controller
         return Datatables::of(collect($data))->make(true);
     }
 
+    public function SMDstockist()
+    {
+        $stock = StockMD::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $id = 1;
+        foreach ($stock as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'id_stock' => $val->id,
+                'name' => $val->employee->name,
+                'pasar' => $val->pasar->name,
+                'tanggal' => $val->date,
+                'week' => $val->week,
+                'stockist' => $val->stockist
+            );
+        }
+
+        $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+
+        $dt = Datatables::of(collect($data));
+        foreach ($product as $pdct) {
+            $dt->addColumn('product-'.$pdct->id, function($stock) use ($pdct) {
+                $oos = \App\StockMdDetail::where([
+                    'id_stock' => $stock['id_stock'],
+                    'id_product' => $pdct->id
+                ])->first();
+                return (isset($oos['oos']) ? $oos['oos'] : "-");
+            });
+        }
+        return $dt->make(true);
+    }
+
     public function getCbd($data, $day)
     {
         $date = Carbon::now()->format('Y-m-').$day;
