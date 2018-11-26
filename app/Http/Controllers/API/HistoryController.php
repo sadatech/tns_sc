@@ -228,7 +228,8 @@ class HistoryController extends Controller
 						'id' 			=> $head->id,
 						'id_employee' 	=> $head->id_employee,
 						'date' 			=> $head->date,
-						'keterangan' 	=> $head->keterangan,
+						'stockist' 		=> $head->stockist,
+						'pasar' 		=> $head->pasar->name,
 						'detail' 		=> $detail,
 					);
 				}
