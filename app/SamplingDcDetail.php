@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SamplingDcDetail extends Model
 {
     protected $fillable = [
-        'id_sampling', 'id_product', 'qty', 'qty_actual', 'satuan', 'is_pf', 'is_target'
+        'id_sales', 'id_product', 'qty', 'qty_actual', 'satuan', 'is_pf', 'is_target'
     ];
 
     public function sampling()

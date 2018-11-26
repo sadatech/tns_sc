@@ -106,6 +106,10 @@ class HistoryController extends Controller
 				$header = SalesMd::query();
 			}else if (strtoupper($type) == 'GTC-SPG') {
 				$header = SalesSpgPasar::query();
+			}else if (strtoupper($type) == 'GTC-DC') {
+				$header = SalesDc::query();
+			}else if (strtoupper($type) == 'GTC-SAMPLING') {
+				$header = SamplingDc::query();
 			}
 
 			$header->when($date == '', function ($q){
@@ -126,7 +130,12 @@ class HistoryController extends Controller
 						$detail = SalesMdDetail::query();
 					}else if (strtoupper($type) == 'GTC-SPG') {
 						$detail = SalesSpgPasar::query();
+					}else if (strtoupper($type) == 'GTC-DC') {
+						$detail = SalesDc::query();
+					}else if (strtoupper($type) == 'GTC-SAMPLING') {
+						$detail = SamplingDc::query();
 					}
+
 					$detail->where('id_sales',$head->id);
 					$dataArr[] = array(
 						'id' 			=> $head->id,
