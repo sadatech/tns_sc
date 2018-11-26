@@ -18,6 +18,11 @@ use Config;
 class AttendanceController extends Controller
 {
 	use ApiAuthHelper;
+	
+	public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
 
 	public function absen(Request $request, $type = 'MTC')
 	{
