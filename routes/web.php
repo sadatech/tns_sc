@@ -532,8 +532,11 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('stockist')->group(function () {
 				Route::get('/', function(){
-					return view('report.smd.stockist');
+					$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.smd.stockist', $data);
 				})->name('report.stockist')->middleware('auth');
+				Route::get('/data', 'ReportController@SMDstockist')->name('data.smd.stockist')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
