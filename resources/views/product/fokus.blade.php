@@ -63,22 +63,12 @@
                     </div>
                     <div class="block-content">
                         <h5> Sample Data :</h5>
-                        <table class="table table-bordered table-responsive table-vcenter">
+                        <table class="table table-bordered table-vcenter">
                             <thead>
                                 <tr>
                                     <td><b>SKU</b></td>
                                     <td><b>Channel</b></td>
                                     <td><b>Area</b></td>
-                                    <td><b>Region</b></td>
-                                    <td><b>Month From</b></td>
-                                    <td><b>Month To</b></td>
-                                    <td><b>Code</b></td>
-                                    <td><b>Panel</b></td>
-                                    <td><b>Carton</b></td>
-                                    <td><b>Pack</b></td>
-                                    <td><b>Subcategory</b></td>
-                                    <td><b>Category</b></td>
-                                    <td><b>Type</b></td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -86,31 +76,11 @@
                                     <td>SKU 1</td>
                                     <td>Channel1, Channel2, Channel3</td>
                                     <td>Area1, Area2</td>
-                                    <td>Region 1</td>
-                                    <td>Month From</td>
-                                    <td>Month To</td>
-                                    <td>Code</td>
-                                    <td>Panel</td>
-                                    <td>Carton</td>
-                                    <td>Pack</td>
-                                    <td>Subcategory 2</td>
-                                    <td>Category 2</td>
-                                    <td>Type 1</td>
                                 </tr>
                                 <tr>
                                     <td>SKU 2</td>
                                     <td>Channel1</td>
                                     <td></td>
-                                    <td>Region</td>
-                                    <td>Month From</td>
-                                    <td>Month To</td>
-                                    <td>Code</td>
-                                    <td>Panel</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>Subcategory 2</td>
-                                    <td>Category 2</td>
-                                    <td>Type 2</td>
                                 </tr>
                             </tbody>
                         </table>
