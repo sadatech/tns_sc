@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Report Sales SPG")
+@section('title', "Report Recap SPG")
 @section('content')
 <div class="content">
   <h2 class="content-heading pt-10">Recap <small>Report</small></h2>
@@ -73,7 +73,7 @@ table.table thead tr th {
           { data: 'id' },
           { data: 'name' },
           { data: 'outlet' },
-          { data: 'tanggal' },
+          { data: 'date' },
           { data: 'total_buyer' },
           { data: 'total_sales' },
           { data: 'total_value' },
