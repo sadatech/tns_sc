@@ -75,6 +75,11 @@ Route::prefix('sales-recap')->group(function () {
 	Route::get('/list/{date?}', 'API\SalesRecapController@list')->name('api.sales-recap.list');
 });
 
+Route::prefix('sales-dc')->group(function () {
+	Route::post('/add/{type?}', 'API\SalesDcController@store')->name('api.sales-dc.add');
+	// Route::get('/list/{date?}', 'API\SalesDcController@history')->name('api.sales-dc.list');
+});
+
 Route::prefix('promo')->group(function () {
 	Route::post('/add', 'API\PromoController@store')->name('api.promo.add');
 });
@@ -85,6 +90,14 @@ Route::prefix('dataprice')->group(function () {
 
 Route::prefix('availability')->group(function () {
 	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
+});
+
+Route::prefix('display-share')->group(function () {
+	Route::post('/add', 'API\DisplayShareController@store')->name('api.display-share.add');
+});
+
+Route::prefix('additional-display')->group(function () {
+	Route::post('/add', 'API\AdditionalDisplayController@store')->name('api.additional-display.add');
 });
 
 Route::prefix('cbd')->group(function () {

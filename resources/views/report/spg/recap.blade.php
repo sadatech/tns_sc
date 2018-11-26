@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Distributor PF")
+@section('title', "Report Recap SPG")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Distributor PF <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Recap <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -28,13 +28,12 @@
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama SMD</th>
-              <th>Pasar</th>
-              <th>Tanggal</th>
+              <th>Nama</th>
               <th>Outlet</th>
-              @foreach ($product as $pro)
-              <th>{{ $pro->name }}</th>
-              @endforeach
+              <th>Tanggal</th>
+              <th>Total Buyer</th>
+              <th>Total Sales</th>
+              <th>Total Value</th>
             </tr>
           </thead>
         </table>
@@ -69,16 +68,15 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.distpf.smd') !!}',
+      ajax: '{!! route('spg.pasar.recap.data') !!}',
       columns: [
-      { data: 'id', name:'' },
-      { data: 'nama', name:'Nama' },
-      { data: 'pasar', name:'Pasar' },
-      { data: 'tanggal', name:'Tanggal' },
-      { data: 'outlet', name:'Outlet' },
-      @foreach ($product as $pro)
-      { data: 'product-{{ $pro->id }}' },
-      @endforeach
+          { data: 'id' },
+          { data: 'name' },
+          { data: 'outlet' },
+          { data: 'date' },
+          { data: 'total_buyer' },
+          { data: 'total_sales' },
+          { data: 'total_value' },
       ]
     });
   });

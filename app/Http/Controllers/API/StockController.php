@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Components\traits\ApiAuthHelper;
 use DB;
 use JWTAuth;
 use Config;
@@ -15,6 +16,9 @@ use Exception;
 
 class StockController extends Controller
 {
+
+	use ApiAuthHelper;
+
 	public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
@@ -22,88 +26,79 @@ class StockController extends Controller
 
 	public function store(Request $request)
 	{
-		try {
-			if (!$user = JWTAuth::parseToken()->authenticate()) {
-				$res['msg'] = "User not found.";
-				$code = $e->getStatusCode();
-			} else {
-				$code = 200;
-				try {
-					$data = json_decode($request->getContent());
-					DB::beginTransaction();
-					$date = Carbon::parse($data->date);
-					$checkStock = MDHeader::where([
+		$check = $this->authCheck();
+
+		if ($check['success'] == true) {
+			
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			try {
+				$data = json_decode($request->getContent());
+				DB::beginTransaction();
+				$date = Carbon::parse($data->date);
+				$checkStock = MDHeader::where([
+					'id_employee' 	=> $user->id,
+					'id_pasar' 		=> $data->pasar,
+					'stockist' 		=> $data->stockist,
+					'date' 			=> $date,
+				])->first();
+
+				if (!$checkStock) {
+					$header = MDHeader::create([
 						'id_employee' 	=> $user->id,
 						'id_pasar' 		=> $data->pasar,
 						'stockist' 		=> $data->stockist,
 						'date' 			=> $date,
-					])->first();
+						'week' 			=> $date->weekOfMonth,
+					]);
+					$headerId = $header->id;
+				}else{
+					$headerId = $checkStock->id;
+				}
 
-					if (!$checkStock) {
-						$header = MDHeader::create([
-							'id_employee' 	=> $user->id,
-							'id_pasar' 		=> $data->pasar,
-							'stockist' 		=> $data->stockist,
-							'date' 			=> $date,
-							'week' 			=> $date->weekOfMonth,
-						]);
-						$headerId = $header->id;
-					}else{
-						$headerId = $checkStock->id;
-					}
-
-					if (isset($headerId)) {
-						foreach ($data->product as $product) {
-							$checkDetail = MDDetail::where([
+				if (isset($headerId)) {
+					foreach ($data->product as $product) {
+						$checkDetail = MDDetail::where([
+							'id_stock' 		=> $headerId,
+							'id_product' 	=> $product->id,
+						])->first();
+						if (!$checkDetail) {
+							$detail = MDDetail::create([
 								'id_stock' 		=> $headerId,
 								'id_product' 	=> $product->id,
-							])->first();
-							if (!$checkDetail) {
-								$detail = MDDetail::create([
-									'id_stock' 		=> $headerId,
-									'id_product' 	=> $product->id,
-									'oos' 			=> $product->oos,
-								]);
-								if (!isset($detail->id)) {
-									throw new Exception("Error Processing Request", 1);
+								'oos' 			=> $product->oos,
+							]);
+							if (!isset($detail->id)) {
+								throw new Exception("Error Processing Request", 1);
 
-								}
-							}else{
-								$checkDetail->oos = $product->oos;
-								$checkDetail->save();
 							}
+						}else{
+							$checkDetail->oos = $product->oos;
+							$checkDetail->save();
 						}
-						DB::commit();
-						$res['success'] = true;
-						$res['msg'] = "Berhasil menambah stock.";
-					} else {
-						DB::rollback();
-						$res['success'] = false;
-						$res['msg'] = "Gagal menambah stock.";
 					}
-				} catch (Exception $e) {
+					DB::commit();
+					$res['success'] = true;
+					$res['msg'] = "Berhasil menambah stock.";
+				} else {
 					DB::rollback();
 					$res['success'] = false;
 					$res['msg'] = "Gagal menambah stock.";
-				}	
+				}
+			} catch (Exception $e) {
+				DB::rollback();
+				$res['success'] = false;
+				$res['msg'] = "Gagal menambah stock.";
 			}
-		} catch (\Illuminate\Database\QueryException $e) {
-			throw new Exception("Error", 1);
-		} catch (Exception $e) {
-			DB::rollback();
-			$res['success'] = false;
-			$res['msg'] = "Gagal menambah stock.";
-			$code = 200;
-		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-			$res['msg'] = "Token Expired.";
-			$code = $e->getStatusCode();
-		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-			$res['msg'] = "Token Invalid.";
-			$code = $e->getStatusCode();
-		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-			$res['msg'] = "Token Absent.";
-			$code = $e->getStatusCode();
+
+		}else{
+			$res = $check;
 		}
+
+		$code = $res['code'];
+		unset($res['code']);
+		
 		return response()->json($res, $code);
 	}
 }

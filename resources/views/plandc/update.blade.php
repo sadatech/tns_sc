@@ -73,15 +73,15 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12">
-                                <label>Lokasi</label>
-                                <textarea type="text" class="form-control" name="lokasi" required>{{ $plan->lokasi }}</textarea>
+                                <label>Plan</label>
+                                <textarea type="text" class="form-control" name="plan" required>{{ $plan->plan }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-alt-success">
                                 <i class="fa fa-save"></i> Save
                             </button>
-                            <button type="submit" class="btn btn-alt-secondary"><a href="{{ route('planDc') }}">Back</a></button>
+                            <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Back</a>
                         </div>
                     </div>
                 </form>       
@@ -89,6 +89,11 @@
         </div>     
     </div>
 </div>
+@endsection
+
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 @endsection
 
 @section('script')
@@ -147,7 +152,7 @@
                 "</tr>");
         }else{
             console.log("Data Already Exist! data: "+employeeSplit[1]);
-            notif('Warning',': Please the select Employee first','warning');
+            notif('Warning',': Please the select Employee DC first','warning');
         }
     }
 

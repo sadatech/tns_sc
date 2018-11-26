@@ -9,7 +9,7 @@ class Availability extends Model
     protected $table = 'availability';
 
     protected $fillable = [
-        'id_store', 'id_employee', 'date'
+        'id_store', 'id_employee', 'date', 'week'
     ];
     
     public function detail_availability(){
