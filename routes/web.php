@@ -360,6 +360,21 @@ Route::prefix('product')->group(function () {
 			return response()->download(public_path('assets/FokusMDImport.xlsx'));
 		})->name('fokusMD.download-template')->middleware('auth');
 	});
+
+	//Fokus Spg Pages
+	Route::prefix('fokusSpg')->group(function () {
+		Route::get('/', 'ProductFokusSpgController@baca')->name('fokusSpg')->middleware('auth');
+		Route::get('/data', 'ProductFokusSpgController@data')->name('fokusSpg.data')->middleware('auth');
+		Route::post('/create', 'ProductFokusSpgController@store')->name('fokusSpg.add')->middleware('auth');
+		Route::post('/import', 'ProductFokusSpgController@import')->name('fokusSpg.import')->middleware('auth');
+		Route::get('/export', 'ProductFokusSpgController@export')->name('fokusSpg.export')->middleware('auth');
+		Route::put('/update/{id}', 'ProductFokusSpgController@update')->name('fokusSpg.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductFokusSpgController@delete')->name('fokusSpg.delete')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/FokusSpgImport.xlsx'));
+		})->name('fokusSpg.download-template')->middleware('auth');
+	});
 });
 
 // Master Target
@@ -736,6 +751,7 @@ Route::prefix('utility')->group(function () {
 Route::prefix('select2')->group(function () {
 	Route::post('/region-select2', 'RegionController@getDataWithFilters')->name('region-select2');
 	Route::post('/area-select2', 'AreaController@getDataWithFilters')->name('area-select2');
+	Route::post('/agency-select2', 'AgencyController@getDataWithFilters')->name('agency-select2');
 	Route::post('/sub-area-select2', 'SubareaController@getDataWithFilters')->name('sub-area-select2');
 	Route::post('/employee-select2', 'EmployeeController@getDataWithFilters')->name('employee-select2');
 	Route::post('/employee-select2-for-report', 'EmployeeController@getDataWithFiltersForReport')->name('employee-select2-for-report');

@@ -29,10 +29,10 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="product">
         <thead>
           <th style="width: 70px;"></th>
+          <th>Product</th>
           <th>Brand</th>
           <th>Sub Category</th>
           <th>SKU</th>
-          <th>Panel</th>
           <th style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -68,22 +68,23 @@
                         @endforeach
                       </select>
                     </div>
-                    {{ 
-                        Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(['id_brand', 1]), [
-                            'labelText' => 'Sasa Product',
-                            'required' => '',
-                            'id' => 'add' . 'Product',
-                            'placeholder' => 'Choose your Product'
-                        ])
-                    }}
                     <div class="form-group">
-                      <label>Sub Category Product</label>
-                      <select class="js-select2 form-control" style="width: 100%" name="subcategory">
-                      <option disabled selected>Choose your Sub Category</option>
-                        @foreach($subcategory as $data)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                        @endforeach
-                      </select>
+                        <label>SASA Product</label>
+                        <select class="js-select2 form-control" style="width: 100%" name="product" >
+                        <option disabled selected>Choose your Sasa Product</option>
+                            @foreach(App\Product::where('id_brand',1)->get() as $data)
+                                <option value="{{ $data->id }}">{{ $data->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sub Category Product</label>
+                        <select class="js-select2 form-control" style="width: 100%" name="subcategory">
+                        <option disabled selected>Choose your Sub Category</option>
+                            @foreach($subcategory as $data)
+                                <option value="{{ $data->id }}">{{ $data->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="form-group">
                       <label>SKU Product</label>
@@ -142,14 +143,16 @@
                             </select>
                         </div>
                     </div>
-                    {{ 
-                        Form::select2Input('id_product', old('id_product'), App\Product::toDropDownData(['id_brand', 1]), [
-                            'labelText' => 'Sasa Product',
-                            'required' => '',
-                            'id' => 'edit' . 'Product',
-                            'placeholder' => 'Choose your Product'
-                        ])
-                    }}
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label>Product</label>
+                            <select class="js-edit form-control" id="productinput" style="width: 100%" name="product" >
+                                @foreach(App\Product::where('id_brand',1)->get() as $data)
+                                    <option value="{{ $data->id }}">{{ $data->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label>Sub Category Product</label>
@@ -213,7 +216,7 @@
         $('#deskripsiInput').val(json.deskrispi);
         $('#brandinput').val(json.brand).trigger('change');
         $('#subcategoryinput').val(json.subcategory).trigger('change');
-        $('#panelinput').val(json.panel).trigger('change');
+        $('#productinput').val(json.product).trigger('change');
         // console.log(json);
     }
     @if(session('type'))
@@ -269,10 +272,10 @@
             ajax: '{!! route('product-competitor.data') !!}',
             columns: [
             { data: 'id', name: 'id' },
+            { data: 'product.name', name: 'product.name' },
             { data: 'brand', name: 'brand' },
             { data: 'subcategory', name: 'subcategory' },
             { data: 'name', name: 'name' },
-            { data: 'panel', name: 'panel' },
             { data: 'action', name: 'action' },
             ]
         });
