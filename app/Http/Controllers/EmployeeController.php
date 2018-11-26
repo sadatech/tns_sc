@@ -100,9 +100,11 @@ class EmployeeController extends Controller
 		];
 		$validator = Validator($data, $limit);
 		if ($validator->fails()){
-			return redirect()->back()
-			->withErrors($validator)
-			->withInput();
+			return response()->json([
+				'type' 		=> 'danger',
+				'title' 	=> 'Error!<br/>',
+				'message'	=> implode("<br>", $validator->messages()->all())
+			]);
 		} else {
 			$ktp = $data['foto_ktp'];
 			$foto_ktp = Str::random().time()."_".rand(1,99999).".".$ktp->getClientOriginalExtension();
@@ -159,8 +161,7 @@ class EmployeeController extends Controller
 							'id_store' 		=> $request->input('store'),
 							'id_employee' 	=> $insert->id,
 						]);
-						return redirect()->route('employee')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -174,8 +175,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_stores')->insert($dataStore);
-						return redirect()->route('employee')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -189,8 +189,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_pasars')->insert($dataPasar);
-						return redirect()->route('employee.pasar')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -212,8 +211,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_sub_areas')->insert($dataSubArea);
-						return redirect()->route('employee.dc')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -221,8 +219,7 @@ class EmployeeController extends Controller
 					}
 				}
 			} else {
-				return redirect()->route('employee')
-				->with([
+				return response()->json([
 					'type' 		=> 'danger',
 					'title' 	=> 'Terjadi Kesalahan!<br/>',
 					'message'	=> '<i class="em em-thinking_face mr-2"></i>Position tidak tersedia!'
