@@ -48,12 +48,13 @@ class AttendanceController extends Controller
 						'id_pasar' => $request->input('pasar')
 					]);			
 				}
-				$attendance->with(['attendance' => function($query) use ($user) {
+
+				$attendance->whereHas('attendance', function($query) use ($user) {
 					$query->where([
 						'id_employee' => $user->id,
 						'keterangan' => 'Check-in',
 					])->whereDate('date', '=', Carbon::today()->toDateString());
-				}]);
+				});
 
 				if ($attendance->count() > 0) {
 					$res['success'] = false;
