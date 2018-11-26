@@ -1486,7 +1486,6 @@ class ReportController extends Controller
         $dt = Datatables::of(collect($data));
         foreach (Product::get() as $pdct) {
             $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
-                // dd($pdct->id);
                 $distribution = DistributionDetail::where([
                     'id_distribution' => $dist['id'],
                     'id_product' => $pdct->id

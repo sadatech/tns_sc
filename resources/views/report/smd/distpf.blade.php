@@ -32,8 +32,8 @@
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Outlet</th>
-              @foreach(\App\Product::get() as $product)
-              <th>{{ $product->name }}</th>
+              @foreach ($product as $pro)
+              <th>{{ $pro->name }}</th>
               @endforeach
             </tr>
           </thead>
@@ -76,8 +76,8 @@ table.table thead tr th {
       { data: 'pasar', name:'Pasar' },
       { data: 'tanggal', name:'Tanggal' },
       { data: 'outlet', name:'Outlet' },
-      @foreach(\App\Product::get() as $product)
-      { data: 'product-{{ $product->id }}' },
+      @foreach ($product as $pro)
+      { data: 'product-{{ $pro->id }}' },
       @endforeach
       ]
     });
