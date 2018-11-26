@@ -11,11 +11,11 @@ use Excel;
 use App\Area;
 use App\Region;
 use App\Store;
+use App\Pasar;
 use Carbon\Carbon;
 use App\SubArea;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\Datatables\Datatables;
-use Box\Spout\Writer\Style\Color;
 use App\Filters\SubAreaFilters;
 
 class SubareaController extends Controller
@@ -129,12 +129,16 @@ class SubareaController extends Controller
             $store = Store::where([
                 'id_subarea' => $subarea->id
             ])->count();
-            if (!$store < 1) {
+            $pasar = Pasar::where([
+                'id_subarea' => $subarea->id
+            ])->count();
+            $jumlah = $store + $pasar;
+            if (!$jumlah < 1) {
                 return redirect()->back()
                 ->with([
                     'type'    => 'danger',
                     'title'   => 'Gagal!<br/>',
-                    'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain (area, region, dan store)!'
+                    'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain (area, region, pasar, dan store)!'
                 ]);
             } else {
                 $subarea->delete();

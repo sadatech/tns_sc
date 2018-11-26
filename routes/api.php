@@ -92,6 +92,14 @@ Route::prefix('availability')->group(function () {
 	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
 });
 
+Route::prefix('display-share')->group(function () {
+	Route::post('/add', 'API\DisplayShareController@store')->name('api.display-share.add');
+});
+
+Route::prefix('additional-display')->group(function () {
+	Route::post('/add', 'API\AdditionalDisplayController@store')->name('api.additional-display.add');
+});
+
 Route::prefix('cbd')->group(function () {
 	Route::get('/list', 'API\CbdController@list')->name('api.cbd.list');
 	Route::post('/add', 'API\CbdController@store')->name('api.cbd.add');

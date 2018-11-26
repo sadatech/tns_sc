@@ -105,7 +105,7 @@ class ProductFokusController extends Controller
         //     $this->alert['type'] = 'warning';
         //     $this->alert['title'] = 'Warning!<br/>';
         //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        // } else {
+        // } else {           
             DB::transaction(function () use($data) {
                 $productData = $data['product'];
                 unset($data['product']);
