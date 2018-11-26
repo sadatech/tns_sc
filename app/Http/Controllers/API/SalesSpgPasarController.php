@@ -42,8 +42,7 @@ class SalesSpgPasarController extends Controller
 				$res['code']= 200;
 			}else
 			DB::transaction(function () use ($data, $user, &$res) {
-				$date 	= Carbon::parse($data->date);
-				$res 	= $this->sales($date, $user, $data->pasar, $data->product, $data->type, $data->name, $data->phone);
+				$res 	= $this->sales($user, $data);
 			});
 		}else{
 			$res = $check;
@@ -106,10 +105,11 @@ class SalesSpgPasarController extends Controller
 		return response()->json($res, $code);	
 	}
 
-	public function sales($date, $user, $request_pasar, $request_product, $type, $name, $phone)
+	public function sales($user, $data)
 	{
+		$date 	= Carbon::parse($data->date);
 		$pasar = Pasar::where([
-			'id' => $request_pasar,
+			'id' => $data->pasar,
 		])->first();
 
 		if ($pasar) {
@@ -117,16 +117,16 @@ class SalesSpgPasarController extends Controller
 			
 			$sales = SalesSpgPasar::firstOrCreate([
 				'id_employee'	=> $user->id,
-				'id_pasar'		=> $request_pasar,
+				'id_pasar'		=> $data->pasar,
 				'date'			=> $date,
 				'week'			=> $date->weekOfMonth,
-				'type'			=> $type,
-				'name' 			=> $name,
-				'phone' 		=> $phone,
+				'type'			=> $data->type,
+				'name' 			=> $data->name ?? '',
+				'phone' 		=> $data->phone ?? '',
 			]);
 			$sales_id = $sales->id;
 			
-			foreach ($request_product as $product) {
+			foreach ($data->product as $product) {
 				$checkSalesDetail = SalesSpgPasarDetail::where([
 					'id_sales'		=> $sales_id,
 					'id_product'	=> $product->id,

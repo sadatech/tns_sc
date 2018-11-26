@@ -23,15 +23,14 @@
                         <a href="{{ route('plan.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </h3>
                 </div>
-                <table class="table table-striped table-vcenter js-dataTable-full" id="planTable">
+                <table class="table table-responsive table-striped table-vcenter js-dataTable-full" id="planTable">
                 <thead>
-                    <th class="text-center" style="width: 70px;"></th>
+                    <th style="width: 20%;"> Action</th>
                     <th style="width: 300px;">Employee</th>
-                    <th>Date</th>
-                    <th>Lokasi</th>
-                    <th>Stockist</th>
+                    <th style="width: 10%;">Date</th>
+                    <th style="width: 10%;">Plan</th>
+                    <th style="width: 10%;">Stockist</th>
                     <th>Channel</th>
-                    <th class="text-center" style="width: 15%;"> Action</th>
                 </thead>
                 </table>
             </div>
@@ -119,6 +118,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/magnific-popup/magnific-popup.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
@@ -134,67 +134,66 @@
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
-  @if(session('type'))
-  $(document).ready(function() {
-    $.notify({
-      title: '<strong>{!! session('title') !!}</strong>',
-      message: '{!! session('message') !!}'
-    }, {
-      type: '{!! session('type') !!}',
-      animate: {
-        enter: 'animated zoomInDown',
-        exit: 'animated zoomOutUp'
-      },
-      placement: {
-        from: 'top',
-        align: 'center'
-      }
-    });
-  });
-  @endif
-  $(function() {
-    $('#planTable').DataTable({
-      processing: true,
-      drawCallback: function(){
-        $('.js-swal-delete').on('click', function(){
-          var url = $(this).data("url");
-          swal({
-            title: 'Are you sure?',
-            text: 'You will not be able to recover this data!',
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d26a5c',
-            confirmButtonText: 'Yes, delete it!',
-            html: false,
-            preConfirm: function() {
-                return new Promise(function (resolve) {
-                    setTimeout(function () {
-                        resolve();
-                    }, 50);
-                });
+    @if(session('type'))
+    $(document).ready(function() {
+        $.notify({
+            title: '<strong>{!! session('title') !!}</strong>',
+            message: '{!! session('message') !!}'
+        }, {
+            type: '{!! session('type') !!}',
+            animate: {
+            enter: 'animated zoomInDown',
+            exit: 'animated zoomOutUp'
+            },
+            placement: {
+            from: 'top',
+            align: 'center'
             }
-          }).then(function(result){
-            if (result.value) {
-                window.location = url;
-            } else if (result.dismiss === 'cancel') {
-                swal('Cancelled', 'Your data is safe :)', 'error');
-            }
-          });
         });
-      },
-      ajax: '{!! route('plan.data') !!}',
-      scrollY: "300px",
-      columns: [
-      { data: 'id', name: 'plan_dcs.id' },
-      { data: 'planEmployee', name: 'planEmployee' },
-      { data: 'date', name: 'plan_dcs.date'},
-      { data: 'lokasi', name: 'plan_dcs.lokasi'},
-      { data: 'stocklist', name: 'plan_dcs.stocklist'},
-      { data: 'channel', name: 'plan_dcs.channel'},
-      { data: 'action', name: 'action' }
-      ]
     });
-  });
+    @endif
+    $(function() {
+        $('#planTable').DataTable({
+            processing: true,
+            drawCallback: function(){
+                $('.js-swal-delete').on('click', function(){
+                    var url = $(this).data("url");
+                    swal({
+                        title: 'Are you sure?',
+                        text: 'You will not be able to recover this data!',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d26a5c',
+                        confirmButtonText: 'Yes, delete it!',
+                        html: false,
+                        preConfirm: function() {
+                            return new Promise(function (resolve) {
+                                setTimeout(function () {
+                                    resolve();
+                                }, 50);
+                            });
+                        }
+                    }).then(function(result){
+                        if (result.value) {
+                            window.location = url;
+                        } else if (result.dismiss === 'cancel') {
+                            swal('Cancelled', 'Your data is safe :)', 'error');
+                        }
+                    });
+                });
+            },
+            ajax: '{!! route('plan.data') !!}',
+            scrollY: "300px",
+            columns: [
+            { data: 'action', name: 'action' },
+            { data: 'planEmployee', name: 'planEmployee' },
+            { data: 'date', name: 'plan_dcs.date'},
+            { data: 'plan', name: 'plan_dcs.plan'},
+            { data: 'stocklist', name: 'plan_dcs.stocklist'},
+            { data: 'channel', name: 'plan_dcs.channel'}
+            ]
+        });
+    });
   
   var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
  

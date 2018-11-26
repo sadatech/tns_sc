@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+use App\Filters\AgencyFilters;
 use App\Agency;
 use Auth;
 use App\Employee;
 
 class AgencyController extends Controller
 {
+    public function getDataWithFilters(AgencyFilters $filters)
+    {
+        $data = Agency::filter($filters)->get();
+        return $data;
+    }
+    
     public function baca()
     {
         return view('employee.agency');
@@ -29,7 +36,7 @@ class AgencyController extends Controller
     }
     
     public function store(Request $request)
-    {
+    {   
         Agency::create([
             'name'          => $request->input('name'),
         ]);

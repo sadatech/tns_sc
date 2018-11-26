@@ -23,6 +23,7 @@ class PositionTableSeeder extends Seeder
                 ['name' => 'Demo Cooking',  'level'=>'dc'],
                 ['name' => 'TL MTC',        'level'=>'tlmtc'],
                 ['name' => 'TL GTC',        'level'=>'tlgtc'],
+                ['name' => 'Motorik',       'level'=>'motoric']
             ]);
         }
     	// $exists = Position::where('deleted_at',null)->count();
