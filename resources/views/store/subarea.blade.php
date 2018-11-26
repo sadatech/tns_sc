@@ -29,17 +29,10 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="subtable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-<<<<<<< HEAD
           <th class="text-center">Name</th>
           <th class="text-center">Area</th>
           <th class="text-center">Region</th>          
           <th class="text-center" style="width: 15%;"> Action</th>
-=======
-          <th>Sub Area</th>
-          <th>Area</th>
-          <th>Region</th>
-          <th style="width: 15%;"> Action</th>
->>>>>>> 015594ae6d3b2d0b8a2be669e815645ea1a52ae9
         </thead>
         </table>
       </div>

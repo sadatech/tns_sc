@@ -28,12 +28,12 @@ class PfController extends Controller
             return \App\Category::where('id', $product->id_category2)->first()->name;
         })
         ->addColumn('action', function ($product) {
-            $category11 = Category::where('id', $product->id_category1)->first()->name;
-            $category22 = Category::where('id', $product->id_category2)->first()->name;
+            $category1 = Category::where('id', $product->id_category1)->first()->id;
+            $category2 = Category::where('id', $product->id_category2)->first()->id;
             $data = array(
                 'id'            => $product->id,
-                'category1'     => $category11,
-                'category2'     => $category22,
+                'category1'     => $category1,
+                'category2'     => $category2,
                 'from'          => $product->from,
                 'to'          	=> $product->to
             );
@@ -58,7 +58,7 @@ class PfController extends Controller
         if (Pf::hasActivePF($data)) {
             $this->alert['type'] = 'warning';
             $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Setting Produk fokus sudah ada!';
         } else {
             DB::transaction(function () use($data) {
                 $product = Pf::create($data);
