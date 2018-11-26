@@ -578,11 +578,11 @@ Route::prefix('report')->group(function () {
 		// SPG PASAR
 		Route::prefix('spg')->group(function () {
 			Route::prefix('attendance')->group(function(){
-				Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
-				Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
-				Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
+				Route::get('/', function(){
+					return view('report.spg.attendance');
+				})->name('report.spg.attendance')->middleware('auth');
+				Route::get('/data', 'ReportController@SPGattendance')->name('data.spg.attendance')->middleware('auth');
 			});
-
 			Route::prefix('achievement')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.achievement');
@@ -640,6 +640,13 @@ Route::prefix('report')->group(function () {
 	});
 
 Route::prefix('mtc')->group(function () {
+
+
+	Route::prefix('attendance')->group(function(){
+		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
+		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
+		Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
+	});
 
 	Route::prefix('salesmtc')->group(function () {
 		Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');

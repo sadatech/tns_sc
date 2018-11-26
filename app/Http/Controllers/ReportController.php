@@ -38,6 +38,7 @@ use App\Target;
 use App\StockMdHeader as StockMD;
 use App\Outlet;
 use App\Attendance;
+use App\AttendancePasar;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
@@ -1781,6 +1782,28 @@ class ReportController extends Controller
                 'total_buyer' => $val->total_buyer,
                 'total_sales' => $val->total_sales,
                 'total_value' => $val->total_value
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
+    }
+
+    public function SPGattendance()
+    {
+        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month)->get();
+        $data = array();
+        $absen = array();
+        $id = 1;
+        foreach ($employee as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'area' => $val->pasar->subarea->area->name,
+                'subarea' => $val->pasar->subarea->name,
+                'nama' => $val->attendance->employee->name,
+                'jabatan' => $val->attendance->employee->position->name,
+                'pasar' => $val->pasar->name,
+                'tanggal' => Carbon::parse($val->checkin)->day,
+                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
+                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
             );
         }
         return Datatables::of(collect($data))->make(true);
