@@ -36,7 +36,7 @@ class AttendanceController extends Controller
 					]);
 				}else if (strtoupper($type) == 'GTC-MD') {
 					$attendance = AttendanceOutlet::where([
-						'id_outlet' => 1
+						'id_outlet' => $request->input('outlet')
 					]);		
 				}else if (strtoupper($type) == 'GTC-SPG') {
 					$attendance = AttendancePasar::where([
