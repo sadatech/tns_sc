@@ -65,7 +65,8 @@ class DistributionController extends Controller
 											'satuan'			=> $product->satuan,
 										]);
 									}else{
-										$detail->value = $product->value;
+										$detail->qty = $product->qty;
+										$detail->qty_actual = $product->qty_actual;
 										$detail->save();
 									}
 								}
