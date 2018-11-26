@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SalesSpgPasarDetail extends Model
 {
     protected $fillable = [
-        'id_sales', 'id_product', 'qty', 'qty_actual', 'satuan', 'is_pf'
+        'id_sales', 'id_product', 'qty', 'qty_actual', 'satuan', 'is_pf', 'is_target'
     ];
 
     public function sales()
