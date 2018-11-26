@@ -251,7 +251,7 @@
                                 <ul>
                                     {{-- ATTENDANCE SPG --}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/spg/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                                        <a class="{{ request()->is('report/gtc/spg/attendance') ? 'active' : '' }}" href="{{ route('report.spg.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
                                     </li>
                                     {{-- SALES SPG --}}
                                     <li>
@@ -304,6 +304,10 @@
                     <li class="{{ request()->is('report/mtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">MTC</span></a>
                         <ul>
+                            {{-- ATTENDANCE MTC --}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/attendance') ? 'active' : '' }}" href="{{ route('attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                            </li>
                             {{-- SALES MTC --}}
                             <li>
                                 <a class="{{ request()->is('report/mtc/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
