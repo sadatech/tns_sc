@@ -306,7 +306,7 @@ $("#test").submit(function(e){
         type: 'POST',
         data: formData,
         success: function (data) {
-            alert("excel jelek")
+            window.location('{{ url()->previous() }}');
         },
         cache: false,
         contentType: false,
@@ -488,6 +488,13 @@ $("#example-inline-checkbox2").on('change', function() {
         } else if (select == "{{ App\Position::where(['level' => 'tlmtc'])->first()->id }}") {
             $('#subarea').show();
             $('#status').hide();
+            $('#storeStay').hide();
+            $('#storeMobile').hide();
+            $('#status').val(null);
+        } else if (select == "{{ App\Position::where(['level' => 'tlgtc'])->first()->id }}") {
+            $('#subarea').show();
+            $('#status').hide();
+            $('#pasarMobile').hide();
             $('#storeStay').hide();
             $('#storeMobile').hide();
             $('#status').val(null);

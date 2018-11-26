@@ -60,15 +60,13 @@ class ProductFokus extends Model
 
     public static function hasActivePF($data, $self_id = null)
     {
-        $Fchannel = FokusChannel::where(['id_channel' => $data['channel']])->count();
-        $Fproduct = FokusProduct::where('id_product', $data['product'])->count();
         $fokus = ProductFokus::where('id', '!=', $self_id)
+        ->join('channels', 'channels.id', '=', $data['channel'])
                                 ->where(function($query) use ($data){
                                     $query->whereBetween('from', [$data['from'], $data['to']]);
                                     $query->orWhereBetween('to', [$data['from'], $data['to']]);
                                 })->count();
-        $jumlah = $Fchannel && $Fproduct && $fokus;
-        return $jumlah > 0;
 
+        return $fokus > 0;
     }
 }
