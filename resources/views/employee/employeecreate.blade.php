@@ -492,6 +492,13 @@ $("#example-inline-checkbox2").on('change', function() {
             $('#storeStay').hide();
             $('#storeMobile').hide();
             $('#status').val(null);
+        } else if (select == "{{ App\Position::where(['level' => 'tlgtc'])->first()->id }}") {
+            $('#subarea').show();
+            $('#status').hide();
+            $('#pasarMobile').hide();
+            $('#storeStay').hide();
+            $('#storeMobile').hide();
+            $('#status').val(null);
         } else {
             $('#status').hide();
             $('#storeStay').hide();
