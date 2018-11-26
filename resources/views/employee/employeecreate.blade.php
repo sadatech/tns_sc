@@ -1,15 +1,11 @@
 @extends('layouts.app')
 @section('title', "Add Employee")
 @section('content')
-<div class="content">
-    @if($errors->any())
-    <div class="alert alert-danger">
+<div class="content" id="content">
+    <div id="alert" class="alert alert-danger">
         <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
-        @foreach ($errors->all() as $error)
-        <div> {{ $error }}</div>
-        @endforeach
+        <div id="error">ERROR GAN</div>
     </div>
-    @endif
     <div class="block block-fx-shadow">
         <div class="block block-themed block-transparent mb-0">
             <div class="block-header bg-gd-sun p-10">
@@ -296,17 +292,22 @@
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
-var request;
+$("#alert").hide();
 $("#test").submit(function(e){
     e.preventDefault();    
     var formData = new FormData(this);
-
     $.ajax({
         url: $(this).attr('action'),
         type: 'POST',
         data: formData,
         success: function (data) {
-            alert("excel jelek")
+            if (data.type == "danger") {
+                $("#alert").show();
+                $("#error").html(data.message);
+                $("html, body").animate({ scrollTop: 0 }, "slow"); 
+            } else {
+                window.location.replace('{{ url()->previous() }}');
+            }
         },
         cache: false,
         contentType: false,

@@ -20,67 +20,77 @@ class AdditionalDisplayController extends Controller
 
     public function store(Request $request){
 
-        $content = json_decode($request->getContent(),true);
+        // $content = json_decode($request->getContent(),true);
         $employee = JWTAuth::parseToken()->authenticate();
+        // return response()->json($content);
 
 
         // Check Display Share header
-        $additionalDisplayHeader = AdditionalDisplay::where('id_employee', $employee->id)->where('id_store', $content['id'])->where('date', date('Y-m-d'))->first();
+        $additionalDisplayHeader = AdditionalDisplay::where('id_employee', $employee->id)->where('id_store', $request['store'])->where('date', date('Y-m-d'))->first();
 
             if ($additionalDisplayHeader) { // If header exist (update and/or create detail)
 
-                try {
-                    DB::transaction(function () use ($content, $additionalDisplayHeader, $employee) {
+                // try {
+                    DB::transaction(function () use ($request, $additionalDisplayHeader, $employee) {
 
-                        if ($req['foto_additional'] != null)
+                        if ($request['foto_additional'] != null)
                         {
-                            $file_name = $additionalDisplayHeader->id . '-' .$content['foto_additional']->getClientOriginalExtension();
-                            $content['foto_additional']->move(
+                            $file_name = $additionalDisplayHeader->id . '.' .$request['foto_additional']->getClientOriginalExtension();
+                            $request['foto_additional']->move(
                                 public_path('images/report/AdditionalDisplay'),
-                                $content['foto_additional'] = $file_name
+                                $req['foto_additional'] = $file_name
                             );
                         }
                         DetailAdditionalDisplay::create([
                             'id_additional_display' => $additionalDisplayHeader->id,
-                            'id_jenis_display' => $content['id_jenis_display'],
+                            'id_jenis_display' => $request['jenis_display'],
                             'jumlah' => '1',
-                            'foto_additional' => $content['foto_additional'],
+                            'foto_additional' => $req['foto_additional'],
                         ]);
 
                     });
-                } catch (\Exception $e) {
-                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi'], 500);
-                }
+                // } catch (\Exception $e) {
+                //     return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 1'], 500);
+                // }
 
                 return response()->json(['status' => true, 'id_transaksi' => $additionalDisplayHeader->id, 'message' => 'Data berhasil di input']);
 
             } else { // If header didn't exist (create header & detail)
 
-                try {
-                    DB::transaction(function () use ($content, $employee) {
+                // try {
+                    DB::transaction(function () use ($request, $employee) {
 
                         // HEADER
                         $transaction = AdditionalDisplay::create([
-                                            'id_store' => $content['id_store'],
+                                            'id_store' => $request['store'],
                                             'id_employee' => $employee->id,
                                             'date' => Carbon::now(),
-                                            'week' => $content['week'],
+                                            'week' => $request['week'],
                                         ]);
 
+                        if ($request['foto_additional'] != null)
+                        {
+                            $file_name = $transaction->id . '.' .$request['foto_additional']->getClientOriginalExtension();
+                            $request['foto_additional']->move(
+                                public_path('images/report/AdditionalDisplay'),
+                                $req['foto_additional'] = $file_name
+                            );
+                        }
+                        
                         DetailAdditionalDisplay::create([
                             'id_additional_display' => $transaction->id,
-                            'id_jenis_display' => $content['id_jenis_display'],
+                            'id_jenis_display' => $request['jenis_display'],
                             'jumlah' => '1',
-                            'foto_additional' => $content['foto_additional'],
+                            'foto_additional' => $req['foto_additional'],
                         ]);
 
                     });
-                } catch (\Exception $e) {
-                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi'], 500);
-                }
+                // } catch (\Exception $e) {
+                //     return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 2'], 500);
+                // }
 
                 // Check sell in(Sell Thru) header after insert
-                $additionalDisplayHeaderAfter = AdditionalDisplay::where('id_employee', $employee->id)->where('id_store', $content['id'])->where('date', date('Y-m-d'))->first();
+                $additionalDisplayHeaderAfter = AdditionalDisplay::where('id_employee', $employee->id)->where('id_store', $request['store'])->where('date', date('Y-m-d'))->first();
 
                 return response()->json(['status' => true, 'id_transaksi' => $additionalDisplayHeaderAfter->id, 'message' => 'Data berhasil di input']);
 
