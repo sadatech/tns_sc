@@ -16,7 +16,7 @@
                 <h3 class="block-title"><i class="fa fa-user mr-2"></i>Employee Profile</h3>
             </div>
         </div>
-        <form action="{{ route('employee.add') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('employee.add') }}" enctype="multipart/form-data" method="post" id="test">
             {!! csrf_field() !!}
             <div class="block-content">
                 <div class="row">
@@ -87,7 +87,7 @@
                     <div class="form-group col-md-6">
                         <label>Foto KTP</label>
                         <div class="custom-file">
-                            <input type="file" name="foto_ktp" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp" required>
+                            <input type="file" name="foto_ktp" id="foto_ktp" class="custom-file-input" data-toggle="custom-file-input" accept=".jpg, .png, .jpeg, .bmp" required>
                             <label class="custom-file-label">Pilih Foto</label>
                         </div>
                     </div>
@@ -280,7 +280,7 @@
                 <button type="submit" class="btn btn-alt-success">
                     <i class="fa fa-save"></i> Save
                 </button>
-                <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Close</a>
+                <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Back</a>
             </div>
         </form>            
     </div>
@@ -296,6 +296,23 @@
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
+var request;
+$("#test").submit(function(e){
+    e.preventDefault();    
+    var formData = new FormData(this);
+
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: formData,
+        success: function (data) {
+            alert("excel jelek")
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+    });
+});
 $(document).ready(function() {
 $.ajaxSetup({
         headers: {
@@ -303,6 +320,16 @@ $.ajaxSetup({
         }
     });
     $('#agencySelect').select2(setOptions('{{ route("agency-select2") }}', 'Choose your Agency', function (params) {
+        return filterData('name', params.term);
+    }, function (data, params) {
+        return {
+            results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+            })
+        }
+    }));
+
+    $('#pasarS').select2(setOptions('{{ route("pasar-select2") }}', 'Choose your Pasar', function (params) {
         return filterData('name', params.term);
     }, function (data, params) {
         return {
@@ -328,6 +355,7 @@ $("#example-inline-checkbox2").on('change', function() {
     if (url.split("/")[5] == null) {
         $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
     } else if (url.split("/")[5] == "pasar") {
@@ -338,6 +366,7 @@ $("#example-inline-checkbox2").on('change', function() {
     } else if (url.split("/")[5] == "dc") {
         $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
@@ -431,6 +460,15 @@ $("#example-inline-checkbox2").on('change', function() {
             $('#storeStay').hide();
             $('#storeMobile').hide();
         } else if (select == "{{ App\Position::where(['level' => 'mdgtc'])->first()->id }}") {
+            $('#pasarMobile').show();
+            $('#status').hide();
+            $('#subarea').hide();
+            $('#tl').hide();
+            $('#subareaInput').val(null);
+            $('#status').val(null);
+            $('#storeStay').hide();
+            $('#storeMobile').hide();
+        } else if (select == "{{ App\Position::where(['level' => 'motoric'])->first()->id }}") {
             $('#pasarMobile').show();
             $('#status').hide();
             $('#subarea').hide();

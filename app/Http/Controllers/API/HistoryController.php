@@ -47,16 +47,16 @@ class HistoryController extends Controller
 			}else{
 				$hasDetail = 'attendanceOutlet';
 			}
-			$header = Attendance::whereHas($hasDetail, function($query) use ($date)
-			{
-				if ($date == '') {
-					$now 	= Carbon::now();
-					$year 	= $now->year;
-					$month 	= $now->month;
-					return $query->whereMonth('date', $month)->whereYear('date', $year);
-				}else
-				return $query->whereDate('date', $date);
-			})->where('id_employee', $user->id)->get();
+			$header = Attendance::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
@@ -113,8 +113,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			});
-			$header->when($date != '', function ($q) use ($date){
+			})->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
 			});
 
@@ -147,8 +146,8 @@ class HistoryController extends Controller
 			$res = $check;
 		}
 
-			$code = $res['code'];
-			unset($res['code']);
+		$code = $res['code'];
+		unset($res['code']);
 		
 		return response()->json($res);
 	}
@@ -162,15 +161,12 @@ class HistoryController extends Controller
 			$user = $check['user'];
 			$res['code'] = 200;
 			
-			$header = SalesRecap::query();
-
-			$header->when($date == '', function ($q){
+			$header = SalesRecap::when($date == '', function ($q){
 				$now 	= Carbon::now();
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			});
-			$header->when($date != '', function ($q) use ($date){
+			})->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
 			});
 
@@ -211,15 +207,15 @@ class HistoryController extends Controller
 			$user = $check['user'];
 			$res['code'] = 200;
 
-			$header = StockMdHeader::where('id_employee', $user->id)->whereHas('stockDetail', function($query) use ($date)
-			{
-				if ($date == '') {
-					$now 	= Carbon::now();
-					$year 	= $now->year;
-					$month 	= $now->month;
-					return $query->whereMonth('date', $month)->whereYear('date', $year);
-				}else
-				return $query->whereDate('date', $date);
+			$header = StockMdHeader::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->get();
 
 			if ($header->count() > 0) {
@@ -260,23 +256,23 @@ class HistoryController extends Controller
 			$user = $check['user'];
 			$res['code'] = 200;
 			
-			$header = Distribution::where('id_employee', $user->id)->whereHas('distributionDetail', function($query) use ($date)
-			{
-				if ($date == '') {
-					$now 	= Carbon::now();
-					$year 	= $now->year;
-					$month 	= $now->month;
-					return $query->whereMonth('date', $month)->whereYear('date', $year);
-				}else
-				return $query->whereDate('date', $date);
+			$header = Distribution::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
 				foreach ($header as $key => $head) {
-					
+
 					$detail = DistributionDetail::where('id_distribution',$head->id)->get();
-					
+
 					$dataArr[] = array(
 						'id' 			=> $head->id,
 						'id_employee' 	=> $head->id_employee,
@@ -291,34 +287,35 @@ class HistoryController extends Controller
 				$res['success'] = false;
 				$res['msg'] 	= "Distribution not Found.";
 			}
+
 		}else{
 			$res = $check;
 		}
 
 		$code = $res['code'];
 		unset($res['code']);
-		
+
 		return response()->json($res);
 	}
-	
+
 	public function cbdHistory($date = '')
 	{
 		$check = $this->authCheck();
 		if ($check['success'] == true) {
-			
+
 			$user = $check['user'];
 			$res['code'] = 200;
 
-			$data 	= Cbd::where(function($query) use ($date)
-			{
-				if ($date == '') {
-					$now 	= Carbon::now();
-					$year 	= $now->year;
-					$month 	= $now->month;
-					return $query->whereMonth('date', $month)->whereYear('date', $year);
-				}else
-				return $query->whereDate('date', $date);
+			$data 	= Cbd::when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->get();
+
 			if ($data->count() > 0) {
 				$res['success'] = true;
 				$res['cbd'] = $data;
@@ -332,7 +329,7 @@ class HistoryController extends Controller
 
 		$code = $res['code'];
 		unset($res['code']);
-		
+
 		return response()->json($res);
 	}
 }

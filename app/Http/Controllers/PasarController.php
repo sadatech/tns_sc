@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
+use App\Filters\PasarFilters;
 use Illuminate\Support\Facades\Input;
 use Carbon\Carbon;
 use App\Pasar;
@@ -18,6 +19,12 @@ use Excel;
 
 class PasarController extends Controller
 {
+    public function getDataWithFilters(PasarFilters $filters)
+    {
+        $data = Pasar::filter($filters)->get();
+        return $data;
+    }
+
     public function read()
     {
         return view('store.pasar');

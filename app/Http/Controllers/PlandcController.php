@@ -43,6 +43,7 @@ class PlandcController extends Controller
         ->addColumn('action', function ($plan) {
             return "<a href=".route('ubah.plan', $plan->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
             <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
+        
         })
         ->addColumn('planEmployee', function($plan) {
            
@@ -83,8 +84,8 @@ class PlandcController extends Controller
                     foreach($results as $row)   
                     {
                         $rowRules = [
-                            'lokasi' => 'required',
-                            'date'   => 'required'
+                            'date'   => 'required',
+                            'plan'   => 'required'
                         ];
                         $validator = Validator::make($row->toArray(), $rowRules);
                         if ($validator->fails()) {
@@ -97,7 +98,7 @@ class PlandcController extends Controller
                             // dd($check);
                             $insert = PlanDc::create([
                                 'date'              => \PHPExcel_Style_NumberFormat::toFormattedString($row['date'], 'YYYY-MM-DD'),
-                                'lokasi'            => $row['lokasi'],
+                                'plan'              => $row['plan'],
                                 'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
                                 'channel'           => (isset($row->channel) ? $row->channel : "-")
                             ]);
@@ -138,29 +139,38 @@ class PlandcController extends Controller
 
     public function exportXLS()
     {
-        $PlanDc = PlanDc::orderBy('created_at', 'DESC')->get();
-        $dataEmp = array();
-        foreach ($PlanDc as $val) {
-            $emp = PlanEmployee::where(['id_plandc'=>$val->id])->get();
-            $empList = array();
-            foreach ($emp as $dataEmp) {
-                $empList[] = $dataEmp->employee->name;
+        $PlanDc = PlanDc::orderBy('created_at', 'DESC');
+        if ($PlanDc->count() > 0) {
+            $dataEmp = array();
+            foreach ($PlanDc->get() as $val) {
+                $emp = PlanEmployee::where(['id_plandc'=>$val->id])->get();
+                $empList = array();
+                foreach ($emp as $dataEmp) {
+                    $empList[] = $dataEmp->employee->name;
+                }
+                $data[] = array(
+                    'Employee'          => rtrim(implode(',', $empList), ','),
+                    'Date'              => $val->date,
+                    'Plan'              => $val->plan,
+                    'Stocklist'         => (isset($val->stocklist) ? $val->stocklist : "-"),
+                    'Channel'           => (isset($val->channel) ? $val->channel : "-")
+                );
             }
-            $data[] = array(
-                'Employee'          => rtrim(implode(',', $empList), ','),
-                'Date'              => $val->date,
-                'Lokasi'            => $val->lokasi,
-                'Stocklist'         => (isset($val->stocklist) ? $val->stocklist : "-"),
-                'Channel'           => (isset($val->channel) ? $val->channel : "-")
-            );
+            $filename = "PlanDemoCooking_".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('Store', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
         }
-        $filename = "PlanDemoCooking_".Carbon::now().".xlsx";
-        return Excel::create($filename, function($excel) use ($data) {
-            $excel->sheet('Store', function($sheet) use ($data)
-            {
-                $sheet->fromArray($data);
-            });
-        })->download();
     }
 
     public function update(Request $request, $id) 
@@ -168,7 +178,8 @@ class PlandcController extends Controller
         $data=$request->all();
         $limit=[
             'date'           => 'required',
-            'lokasi'         => 'required',
+            'plan'           => 'required',
+            'actuual'        => 'required',
             'employee'       => 'required'
         ];
         $validator = Validator($data, $limit);
@@ -179,37 +190,36 @@ class PlandcController extends Controller
         } else {
            
             // $data1 = Employee::where(['id' => $request->input('employee')])->first();
-            $data2 = PlanDc::whereRaw("TRIM(UPPER(lokasi)) = '". trim(strtoupper($request->input('lokasi')))."'");
+            $data2 = PlanDc::whereRaw("TRIM(UPPER(plan)) = '". trim(strtoupper($request->input('plan')))."'");
             // $data3 = PlanEmployee::where(['id_employee' => $data1->id]);
             $store = Plandc::find($id);
-                if ($request->input('employee')) {
-                    foreach ($request->input('employee') as $emp) {
-                        PlanEmployee::where('id_plandc', $id)->delete();
-                        $dataEmp[] = array(
-                            'id_employee'       => $emp,
-                            'id_plandc'         => $id,
-                        );
-                    }
-                    DB::table('plan_employees')->insert($dataEmp);
-                    return redirect()->route('planDc')
-                    ->with([
-                    'type'    => 'success',
-                    'title'   => 'Sukses!<br/>',
-                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
-                ]);
+            if ($request->input('employee')) {
+                foreach ($request->input('employee') as $emp) {
+                    PlanEmployee::where('id_plandc', $id)->delete();
+                    $dataEmp[] = array(
+                        'id_employee'       => $emp,
+                        'id_plandc'         => $id,
+                    );
                 }
-                $store->date             = $request->input('date');
-                $store->lokasi           = $request->input('lokasi');
-                $store->stocklist        = $request->input('stocklist');
-                $store->channel          = $request->input('channel');
-                $store->save();
+                DB::table('plan_employees')->insert($dataEmp);
                 return redirect()->route('planDc')
                 ->with([
-                    'type'    => 'success',
-                    'title'   => 'Sukses!<br/>',
-                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
+                'type'    => 'success',
+                'title'   => 'Sukses!<br/>',
+                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
                 ]);
-                
+            }
+            $store->date             = $request->input('date');
+            $store->plan             = $request->input('plan');
+            $store->stocklist        = $request->input('stocklist');
+            $store->channel          = $request->input('channel');
+            $store->save();
+            return redirect()->route('planDc')
+            ->with([
+                'type'    => 'success',
+                'title'   => 'Sukses!<br/>',
+                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
+            ]);
         }
     }
 
