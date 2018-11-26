@@ -22,10 +22,10 @@ class DisplayShareController extends Controller
 
         $content = json_decode($request->getContent(),true);
         $employee = JWTAuth::parseToken()->authenticate();
-
+        // return response()->json($content);
 
         // Check Display Share header
-        $displayShareHeader = DisplayShare::where('id_employee', $employee->id)->where('id_store', $content['id'])->where('date', date('Y-m-d'))->first();
+        $displayShareHeader = DisplayShare::where('id_employee', $employee->id)->where('id_store', $content['store'])->where('date', date('Y-m-d'))->first();
 
             if ($displayShareHeader) { // If header exist (update and/or create detail)
 
@@ -36,17 +36,17 @@ class DisplayShareController extends Controller
                         foreach ($content['data'] as $data) { 
                             DetailDisplayShare::create([
                                 'id_display_share' => $displayShareHeader->id,
-                                'id_category' => $content['id_category'],
-                                'id_brand' => $content['id_brand'],
-                                'tier' => $content['tier'],
-                                'depht' => $content['depht'],
+                                'id_category' => $data['id_category'],
+                                'id_brand' => $data['id_brand'],
+                                'tier' => $data['tier'],
+                                'depth' => $data['depth'],
                             ]);
 
                         }
 
                     });
                 } catch (\Exception $e) {
-                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi'], 500);
+                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 1'], 500);
                 }
 
                 return response()->json(['status' => true, 'id_transaksi' => $displayShareHeader->id, 'message' => 'Data berhasil di input']);
@@ -58,7 +58,7 @@ class DisplayShareController extends Controller
 
                         // HEADER
                         $transaction = DisplayShare::create([
-                                            'id_store' => $content['id_store'],
+                                            'id_store' => $content['store'],
                                             'id_employee' => $employee->id,
                                             'date' => Carbon::now(),
                                             'week' => $content['week'],
@@ -68,21 +68,21 @@ class DisplayShareController extends Controller
                         foreach ($content['data'] as $data) { 
                             DetailDisplayShare::create([
                                 'id_display_share' => $transaction->id,
-                                'id_category' => $content['id_category'],
-                                'id_brand' => $content['id_brand'],
-                                'tier' => $content['tier'],
-                                'depht' => $content['depht'],
+                                'id_category' => $data['id_category'],
+                                'id_brand' => $data['id_brand'],
+                                'tier' => $data['tier'],
+                                'depth' => $data['depth'],
                             ]);
 
                         }
 
                     });
                 } catch (\Exception $e) {
-                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi'], 500);
+                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 2'], 500);
                 }
 
                 // Check sell in(Sell Thru) header after insert
-                $displayShareHeaderAfter = DisplayShare::where('id_employee', $employee->id)->where('id_store', $content['id'])->where('date', date('Y-m-d'))->first();
+                $displayShareHeaderAfter = DisplayShare::where('id_employee', $employee->id)->where('id_store', $content['store'])->where('date', date('Y-m-d'))->first();
 
                 return response()->json(['status' => true, 'id_transaksi' => $displayShareHeaderAfter->id, 'message' => 'Data berhasil di input']);
 

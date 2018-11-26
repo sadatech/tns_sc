@@ -9,7 +9,7 @@ class DisplayShare extends Model
     protected $table = 'display_shares';
 
     protected $fillable = [
-        'id_store', 'id_employee', 'date'
+        'id_store', 'id_employee', 'date', 'week'
     ];
     
     public function detail_display_share(){
