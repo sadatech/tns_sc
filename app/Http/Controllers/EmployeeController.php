@@ -10,6 +10,7 @@ use DB;
 use Auth;
 use File;
 use Excel;
+use App\PlanEmployee;
 use App\TargetGtc;
 use Carbon\Carbon;
 use App\Position;
@@ -81,7 +82,7 @@ class EmployeeController extends Controller
 	{
 		$data=$request->all();
 		$limit=[
-			'foto_ktp' 		=> 'max:10000|required|mimes:jpeg,jpg,bmp,png',
+			'foto_ktp' 		=> 'max:10000',
 			'foto_tabungan' => 'max:10000|mimes:jpeg,jpg,bmp,png',
 			'name' 			=> 'required',
 			'password' 		=> 'required',
@@ -439,14 +440,16 @@ class EmployeeController extends Controller
 	public function delete($id)
 	{
 		{
-			$emp = Employee::find($id);
-			$sub = TargetGtc::where(['id_employee' => $emp->id])->count();
-			if (!$sub < 1) {
+			$emp 		= Employee::find($id);
+			$gtc 		= TargetGtc::where(['id_employee' => $emp->id])->count();
+			$dc 		= PlanEmployee::where(['id_employee' => $emp->id])->count();
+			$jumlah= $gtc + $dc;
+			if (!$jumlah < 1) {
 				return redirect()->back()
 				->with([
 					'type'    => 'danger',
 					'title'   => 'Gagal!<br/>',
-					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di TargetSMD!'
+					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di TargetSMD, Plan DemoCooking!'
 				]);
 			} else {
 				$emp->delete();

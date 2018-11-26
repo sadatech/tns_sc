@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class Pasar extends Model
 {
@@ -15,11 +16,6 @@ class Pasar extends Model
         return $this->belongsTo('App\SubArea', 'id_subarea');
     }
 
-    public function scopeFilter($query, QueryFilters $filters)
-    {
-        return $filters->apply($query);
-    }
-
     public function EmployeePasar()
     {
         return $this->hasMany('App\EmployeePasar', 'id_pasar');
@@ -28,5 +24,10 @@ class Pasar extends Model
     public function stock()
     {
         return $this->hasMany('App\StockMdHeader', 'id_pasar');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }
