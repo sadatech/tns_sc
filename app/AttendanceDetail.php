@@ -34,6 +34,7 @@ class AttendanceDetail extends Model
         $array = parent::toArray();
         $array['store_name1'] = $this->store->name1;
         $array['store_name2'] = $this->store->name2;
+        $array['place_name'] = $this->place->name;
         return $array;
     }
 }

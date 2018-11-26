@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report SMD Pasar")
+@section('title', "Report Sales SPG")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -21,33 +21,25 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.sales.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('export.distpf.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
+                <th colspan="3">SPG</th>
+                <th></th>
+                <th colspan="2">Costumer</th>
+                <th>Detail</th>
+            </tr>
+            <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Area</th>
-              <th>Nama SMD</th>
-              <th>Jabatan</th>
+              <th>Name</th>
               <th>Pasar</th>
-              <th>Nama Stockist</th>
-              <th>Bulan</th>
               <th>Tanggal</th>
-              <th>CALL</th>
-              <th>RO</th>
-              @foreach (\App\SubCategory::get() as $cat)
-              <th>{{ $cat->name }}</th>
-              @endforeach
-              <th>EC</th>
-              <th>Value Product Focus</th>
-              <th width="300px">Value Non Product Focus</th>
-              <th>Value Total</th>
-              <th>CBD</th>
-              @foreach ($product as $pro)
-              <th>{{ $pro->name }}</th>
-              @endforeach
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Product</th>
             </tr>
           </thead>
         </table>
@@ -79,31 +71,18 @@ table.table thead tr th {
   $(function() {
     var table = $('#category').DataTable({
       processing: true,
+      serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.smd.pasar') !!}',
+      ajax: '{!! route('spg.pasar.sales.data') !!}',
       columns: [
-      { data: 'id', name: 'id' },
-      { data: 'area', name: 'area' },
-      { data: 'nama', name: 'name' },
-      { data: 'jabatan', name: 'jabatan' },
-      { data: 'pasar', name: 'pasar' },
-      { data: 'stockist', name: 'stockist' },
-      { data: 'bulan', name: 'bulan' },
-      { data: 'tanggal', name: 'tanggal' },
-      { data: 'call', name: 'call' },
-      { data: 'ro', name: 'ro' },
-      @foreach (\App\SubCategory::get() as $cat)
-      { data: 'cat-{{ $cat->id }}' },
-      @endforeach
-      { data: 'ec' },
-      { data: 'vpf' },
-      { data: 'vnpf' },
-      { data: 'vt' },
-      { data: 'cbd' },
-      @foreach ($product as $pro)
-      { data: 'product-{{ $pro->id }}' },
-      @endforeach
+      { data: 'id', name:'' },
+      { data: 'nama_spg', name:'Nama' },
+      { data: 'pasar', name:'Pasar' },
+      { data: 'tanggal', name:'Tanggal' },
+      { data: 'nama', name:'Outlet' },
+      { data: 'phone', name:'Phone' },
+      { data: 'action', name:'Product' },
       ]
     });
   });

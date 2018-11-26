@@ -25,4 +25,10 @@ class DetailIn extends Model
         return $this->belongsTo('App\MeasurementUnit', 'id_measure');
     }
 
+    public function toArray(){
+        $array = parent::toArray();
+        $array['product_name'] = $this->product->name;
+        return $array;
+    }
+
 }

@@ -142,4 +142,10 @@ class DetailSales extends Model
 
     }
 
+    public function toArray(){
+        $array = parent::toArray();
+        $array['product_name'] = $this->product->name;
+        return $array;
+    }
+
 }

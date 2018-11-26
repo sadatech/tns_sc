@@ -24,4 +24,10 @@ class AttendancePasar extends Model
 	{
 		return $this->belongsTo('App\Pasar', 'id_pasar');
 	}
+
+	public function toArray(){
+        $array = parent::toArray();
+        $array['pasar_name'] = $this->pasar->name;
+        return $array;
+    }
 }

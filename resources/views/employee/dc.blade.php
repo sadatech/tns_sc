@@ -35,6 +35,7 @@
                         <th width="60px">Education</th>
                         <th width="200px">Birth Date</th>
                         <th width="200px">Position</th>
+                        <th width="200px">Timezone</th>
                     </thead>
                 </table>
             </div>
@@ -209,23 +210,23 @@
                 });
             },
             ajax: '{!! route('employee.data.dc') !!}',
-            serverSide: true,
             columns: [
-            { data: 'action', name: 'action' },
-            { data: 'nik', name: 'nik' },
-            { data: 'name', name: 'name' },
-            { data: 'ktp', name: 'ktp' },
-            { data: 'employeeSubArea', name: 'employeeSubArea' },
-            { data: 'phone', name: 'phone' },
-            { data: 'email', name: 'email' },
-            { data: 'rekening', name: 'rekening' },
-            { data: 'bank', name: 'bank' },
-            { data: 'joinAt', name: 'joinAt' },
-            { data: 'agency', name: 'agency' },
-            { data: 'gender', name: 'gender' },
-            { data: 'education', name: 'education' },
-            { data: 'birthdate', name: 'birthdate' },
-            { data: 'position', name: 'position' },
+            { data: 'action'},
+            { data: 'nik'},
+            { data: 'name'},
+            { data: 'ktp'},
+            { data: 'employeeSubArea'},
+            { data: 'phone'},
+            { data: 'email'},
+            { data: 'rekening'},
+            { data: 'bank'},
+            { data: 'joinAt'},
+            { data: 'agency'},
+            { data: 'gender'},
+            { data: 'education'},
+            { data: 'birthdate'},
+            { data: 'timezone'},
+            { data: 'position'}
             ]
         });
     });
