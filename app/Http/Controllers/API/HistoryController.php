@@ -8,6 +8,7 @@ use App\Components\traits\ApiAuthHelper;
 use App\Attendance;
 use App\AttendanceDetail;
 use App\AttendanceOutlet;
+use App\AttendancePasar;
 use App\Sales;
 use App\DetailSales;
 use App\SalesMd;
