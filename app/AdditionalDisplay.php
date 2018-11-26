@@ -9,7 +9,7 @@ class AdditionalDisplay extends Model
     protected $table = 'additional_displays';
 
     protected $fillable = [
-        'id_store', 'id_employee', 'date'
+        'id_store', 'id_employee', 'date', 'week'
     ];
     
     public function detail_additional_display(){
