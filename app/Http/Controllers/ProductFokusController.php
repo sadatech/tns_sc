@@ -101,11 +101,11 @@ class ProductFokusController extends Controller
         $to = explode('/', $data['to']);
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        } else {
+        // if (ProductFokus::hasActivePF($data)) {
+        //     $this->alert['type'] = 'warning';
+        //     $this->alert['title'] = 'Warning!<br/>';
+        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+        // } else {
             DB::transaction(function () use($data) {
                 $productData = $data['product'];
                 unset($data['product']);
@@ -136,7 +136,7 @@ class ProductFokusController extends Controller
                 }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
-        }
+        // }
 
         return redirect()->back()->with($this->alert);
     }
@@ -155,11 +155,11 @@ class ProductFokusController extends Controller
         $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        if (ProductFokus::hasActivePF($data, $product->id)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        } else {
+        // if (ProductFokus::hasActivePF($data, $product->id)) {
+        //     $this->alert['type'] = 'warning';
+        //     $this->alert['title'] = 'Warning!<br/>';
+        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+        // } else {
             DB::transaction(function () use($product, $data) {
                 $channel = $data['channel'];
                 unset($data['channel']);
@@ -209,7 +209,7 @@ class ProductFokusController extends Controller
                 }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!';
-        }
+        // }
 
         return redirect()->back()->with($this->alert);
     }

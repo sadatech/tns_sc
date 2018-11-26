@@ -38,6 +38,7 @@ use App\Target;
 use App\StockMdHeader as StockMD;
 use App\Outlet;
 use App\Attendance;
+use App\AttendancePasar;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
@@ -45,6 +46,9 @@ use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Product;
+use App\SalesSpgPasar;
+use App\SalesSpgPasarDetail;
+use App\SalesRecap;
 
 class ReportController extends Controller
 {
@@ -1483,7 +1487,6 @@ class ReportController extends Controller
         $dt = Datatables::of(collect($data));
         foreach (Product::get() as $pdct) {
             $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
-                // dd($pdct->id);
                 $distribution = DistributionDetail::where([
                     'id_distribution' => $dist['id'],
                     'id_product' => $pdct->id
@@ -1511,6 +1514,38 @@ class ReportController extends Controller
         return Datatables::of(collect($data))->make(true);
     }
 
+    public function SMDstockist()
+    {
+        $stock = StockMD::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $id = 1;
+        foreach ($stock as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'id_stock' => $val->id,
+                'name' => $val->employee->name,
+                'pasar' => $val->pasar->name,
+                'tanggal' => $val->date,
+                'week' => $val->week,
+                'stockist' => $val->stockist
+            );
+        }
+
+        $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+
+        $dt = Datatables::of(collect($data));
+        foreach ($product as $pdct) {
+            $dt->addColumn('product-'.$pdct->id, function($stock) use ($pdct) {
+                $oos = \App\StockMdDetail::where([
+                    'id_stock' => $stock['id_stock'],
+                    'id_product' => $pdct->id
+                ])->first();
+                return (isset($oos['oos']) ? $oos['oos'] : "-");
+            });
+        }
+        return $dt->make(true);
+    }
 
     public function getCbd($data, $day)
     {
@@ -1663,6 +1698,7 @@ class ReportController extends Controller
             ]);
         }
     }
+
     public function getAchievement($date = '')
     {
         $str = 
@@ -1691,4 +1727,85 @@ class ReportController extends Controller
         // return Datatables::of(collect($data))->make(true);
     }
 
+
+    // ************ SPG PASAR ************ //
+    public function SPGsales()
+    {
+        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $product = array();
+        $id = 1;
+        foreach ($sales as $key => $value) {
+            $detail = SalesSpgPasarDetail::where('id_sales',1)->get();
+            foreach ($detail as $keys => $det) {
+                // $product[$key][] = $det->product->name;
+                $product[$key][$keys] = "<tr>";
+                $product[$key][$keys] .= "<td>".$det->product->name."</td>";
+                $product[$key][$keys] .= "<td>".$det->qty."</td>";
+                $product[$key][$keys] .= "<td>".$det->qty_actual."</td>";
+                $product[$key][$keys] .= "<td>".$det->satuan."</td>";
+                $product[$key][$keys] .= "</tr>";
+            }
+            // dd($product);
+            $data[] = array(
+                'id' => $id++,
+                'nama_spg' => $value->employee->name,
+                'pasar' => $value->pasar->name,
+                'tanggal' => $value->date,
+                'nama' => $value->name,
+                'phone' => $value->phone,
+                'list' => implode('', $product[$key]),
+            );
+        }
+        return Datatables::of(collect($data))
+        ->addColumn('action', function ($data) {
+            $html = "<table class='table table-bordered'>";
+            $html .= "<tr><th>Nama</th><th>Quantity</th><th>Actual Quantity</th><th>Satuan</th></tr>";
+            $html .= $data['list'];
+            $html .= "</table>";
+            return $html;
+        })->make(true);
+        // return Datatables::of(collect($data))->make(true);
+    }
+
+    public function SPGrekap()
+    {
+        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month)->get();
+        $id = 1;
+        $data = array();
+        foreach ($rekap as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'name' => $val->employee->name,
+                'outlet' => $val->outlet->name,
+                'date' => $val->date,
+                'total_buyer' => $val->total_buyer,
+                'total_sales' => $val->total_sales,
+                'total_value' => $val->total_value
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
+    }
+
+    public function SPGattendance()
+    {
+        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month)->get();
+        $data = array();
+        $absen = array();
+        $id = 1;
+        foreach ($employee as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'area' => $val->pasar->subarea->area->name,
+                'subarea' => $val->pasar->subarea->name,
+                'nama' => $val->attendance->employee->name,
+                'jabatan' => $val->attendance->employee->position->name,
+                'pasar' => $val->pasar->name,
+                'tanggal' => Carbon::parse($val->checkin)->day,
+                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
+                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
+    }
 }
