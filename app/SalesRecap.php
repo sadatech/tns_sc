@@ -10,6 +10,11 @@ class SalesRecap extends Model
         'id_outlet','id_employee','date','total_buyer','total_sales','total_value','photo'
     ];
 
+    public function employee()
+    {
+        return $this->belongsTo('App\Employee', 'id_employee');
+    }
+
     public function outlet()
     {
         return $this->belongsTo('App\Outlet', 'id_outlet');

@@ -47,6 +47,7 @@ use App\Jobs\ExportJob;
 use App\Product;
 use App\SalesSpgPasar;
 use App\SalesSpgPasarDetail;
+use App\SalesRecap;
 
 class ReportController extends Controller
 {
@@ -1732,5 +1733,24 @@ class ReportController extends Controller
             return $html;
         })->make(true);
         // return Datatables::of(collect($data))->make(true);
+    }
+
+    public function SPGrekap()
+    {
+        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month)->get();
+        $id = 1;
+        $data = array();
+        foreach ($rekap as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'name' => $val->employee->name,
+                'outlet' => $val->outlet->name,
+                'date' => $val->date,
+                'total_buyer' => $val->total_buyer,
+                'total_sales' => $val->total_sales,
+                'total_value' => $val->total_value
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
     }
 }
