@@ -46,10 +46,10 @@ class PlanController extends Controller
 
 			if ($update) {
 				$res['success'] = true;
-				$res['msg'] 	= "Success Check*in.";
+				$res['msg'] 	= "Success Checkin.";
 			} else {
 				$res['success'] = false;
-				$res['msg'] 	= "Fail Check*in.";
+				$res['msg'] 	= "Fail Checkin.";
 			}
 
 		}else{
