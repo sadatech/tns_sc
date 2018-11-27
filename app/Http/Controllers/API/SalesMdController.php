@@ -134,7 +134,7 @@ class SalesMdController extends Controller
 					'id_outlet'		=> $data->outlet,
 					'date'			=> $date,
 					'week'			=> $date->weekOfMonth,
-					'type'			=> $type,
+					'type'			=> $data->type,
 				]);
 				$sales_id = $sales->id;
 			} else {
