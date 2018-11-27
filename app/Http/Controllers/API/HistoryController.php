@@ -196,6 +196,7 @@ class HistoryController extends Controller
 						'total_sales'	=> $data->total_buyer,
 						'total_value'	=> $data->total_buyer,
 						'photo' 		=> $data->photo,
+						'photo_url' 	=> asset('uploads/sales_recap/'.$data->photo),
 					);
 				}
 				$res['success'] = true;

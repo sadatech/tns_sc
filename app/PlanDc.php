@@ -12,6 +12,12 @@ class PlanDc extends Model
 
     public function planEmployee()
     {
-        return $this->belongsTo('App\PlanEmployee', 'id_plandc');
+        return $this->hasMany('App\PlanEmployee', 'id_plandc');
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['photo_url'] = isset($this->photo) ? asset('uploads/plan/'.$this->photo) : null;
+        return $array;
     }
 }

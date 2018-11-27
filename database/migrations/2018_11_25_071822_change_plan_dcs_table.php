@@ -25,6 +25,7 @@ class ChangePlanDcsTable extends Migration
             if (Schema::hasColumn('plan_dcs', 'plan')) {
                 $table->dropColumn('plan');
             }
+            $table->string('lokasi')->after('date');
         });
     }
 }

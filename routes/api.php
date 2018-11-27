@@ -134,6 +134,13 @@ Route::prefix('stock')->group(function () {
 	Route::post('/add', 'API\StockController@store')->name('api.stock.add');
 });
 
+// Plan
+Route::prefix('plan')->group(function () {
+	Route::get('/date', 'API\PlanController@date')->name('api.plan.date');
+	Route::get('/month', 'API\PlanController@month')->name('api.plan.month');
+	Route::post('/update', 'API\PlanController@update')->name('api.plan.update');
+});
+
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
