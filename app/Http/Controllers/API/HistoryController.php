@@ -8,6 +8,7 @@ use App\Components\traits\ApiAuthHelper;
 use App\Attendance;
 use App\AttendanceDetail;
 use App\AttendanceOutlet;
+use App\AttendancePasar;
 use App\Sales;
 use App\DetailSales;
 use App\SalesMd;
@@ -15,6 +16,10 @@ use App\SalesMdDetail;
 use App\SalesSpgPasar;
 use App\SalesSpgPasarDetail;
 use App\SalesRecap;
+use App\SamplingDc;
+use App\SamplingDcDetail;
+use App\SalesDc;
+use App\SalesDcDetail;
 use App\StockMdHeader;
 use App\StockMdDetail;
 use App\Distribution;
@@ -106,6 +111,10 @@ class HistoryController extends Controller
 				$header = SalesMd::query();
 			}else if (strtoupper($type) == 'GTC-SPG') {
 				$header = SalesSpgPasar::query();
+			}else if (strtoupper($type) == 'GTC-DC') {
+				$header = SalesDc::query();
+			}else if (strtoupper($type) == 'GTC-SAMPLING') {
+				$header = SamplingDc::query();
 			}
 
 			$header->when($date == '', function ($q){
@@ -126,7 +135,12 @@ class HistoryController extends Controller
 						$detail = SalesMdDetail::query();
 					}else if (strtoupper($type) == 'GTC-SPG') {
 						$detail = SalesSpgPasar::query();
+					}else if (strtoupper($type) == 'GTC-DC') {
+						$detail = SalesDc::query();
+					}else if (strtoupper($type) == 'GTC-SAMPLING') {
+						$detail = SamplingDc::query();
 					}
+
 					$detail->where('id_sales',$head->id);
 					$dataArr[] = array(
 						'id' 			=> $head->id,
@@ -182,6 +196,7 @@ class HistoryController extends Controller
 						'total_sales'	=> $data->total_buyer,
 						'total_value'	=> $data->total_buyer,
 						'photo' 		=> $data->photo,
+						'photo_url' 	=> asset('uploads/sales_recap/'.$data->photo),
 					);
 				}
 				$res['success'] = true;
@@ -228,7 +243,8 @@ class HistoryController extends Controller
 						'id' 			=> $head->id,
 						'id_employee' 	=> $head->id_employee,
 						'date' 			=> $head->date,
-						'keterangan' 	=> $head->keterangan,
+						'stockist' 		=> $head->stockist,
+						'pasar' 		=> $head->pasar->name,
 						'detail' 		=> $detail,
 					);
 				}
@@ -332,4 +348,66 @@ class HistoryController extends Controller
 
 		return response()->json($res);
 	}
+
+	public function dcHistory($type='SALES', $date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			if (strtoupper($type) == 'SALES') {
+				$header = SalesDc::query();
+			}else if (strtoupper($type) == 'SAMPLING') {
+				$header = SamplingDc::query();
+			}
+
+			$header->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			});
+
+			if ($header->get()->count() > 0) {
+				$dataArr = array();
+				foreach ($header->get() as $key => $head) {
+					if (strtoupper($type) == 'SALES') {
+						$detail = SalesDcDetail::query();
+					}else if (strtoupper($type) == 'SAMPLING') {
+						$detail = SamplingDcDetail::query();
+					}else{
+						$res['success'] = false;
+						$res['msg'] 	= "$type not Found.";
+						return response()->json($res);
+					}
+
+					$detail->where('id_sales',$head->id);
+					$dataArr[] = array(
+						'id' 			=> $head->id,
+						'id_employee' 	=> $head->id_employee,
+						'date' 			=> $head->date,
+						'keterangan' 	=> $head->keterangan,
+						'detail' 		=> $detail->get(),
+					);
+				}
+				$res['success'] = true;
+				$res['sales'] = $dataArr;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "$type not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
 }
