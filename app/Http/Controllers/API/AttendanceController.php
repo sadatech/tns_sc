@@ -106,11 +106,16 @@ class AttendanceController extends Controller
 			} else {
 				$att = Attendance::where([
 					'id_employee' => $user->id,
-					'keterangan' => 'Check-in'
 				])
-				->orWhere('keterangan', '=', 'Cuti')
-				->orWhere('keterangan', '=', 'Off')
-				->orWhere('keterangan', '=', 'Sakit')
+				->where(function($q)
+				{
+					return $q->orWhere([
+						'keterangan' => 'Check-in',
+						'keterangan' => 'Cuti',
+						'keterangan' => 'Sakit',
+						'keterangan' => 'Off'
+					]);
+				})
 				->whereDate('date', '=', Carbon::today()->toDateString())->first();
 				if (isset($att->id)) {
 					$res['success'] = false;
@@ -152,7 +157,7 @@ class AttendanceController extends Controller
 			$res['code'] = 200;
 
 			$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])
-			->whereDate('date', '=', Carbon::today()->toDateString())->first();
+			->whereDate('date', '=', Carbon::today()->toDateString())->orderBy('id','desc')->first();
 			if (isset($attId->id)) {
 
 				if (strtoupper($type) == 'MTC') {
