@@ -32,6 +32,9 @@
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Outlet</th>
+              @foreach ($product as $pro)
+              <th>{{ $pro->name }}</th>
+              @endforeach
             </tr>
           </thead>
         </table>
@@ -75,6 +78,9 @@ table.table thead tr th {
       { data: 'pasar' },
       { data: 'tanggal' },
       { data: 'outlet' },
+      @foreach ($product as $pro)
+      { data: 'product-{{ $pro->id }}' },
+      @endforeach
       ]
     });
   });

@@ -98,7 +98,7 @@ class StockController extends Controller
 
 		$code = $res['code'];
 		unset($res['code']);
-		
+
 		return response()->json($res, $code);
 	}
 }

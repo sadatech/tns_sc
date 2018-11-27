@@ -93,7 +93,7 @@ class SalesDcController extends Controller
 		}
 
 		$res['success'] = true;
-		$res['msg'] 	= "Berhasil melakukan sales.";
+		$res['msg'] 	= "Berhasil melakukan $type.";
 
 		$res['code']= 200;
 		return $res;
