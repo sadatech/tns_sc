@@ -1423,13 +1423,13 @@ class ReportController extends Controller
         foreach ($employee as $val) {
             $data[] = array(
                 'id' => $id++,
-                'region' => $val->outlet->employeePasar->pasar->name,
-                'area' => $val->outlet->employeePasar->pasar->subarea->area->name,
-                'subarea' => $val->outlet->employeePasar->pasar->subarea->name,
-                'nama' => $val->attendance->employee->name,
-                'jabatan' => $val->attendance->employee->position->name,
-                'pasar' => $val->outlet->employeePasar->pasar->name,
-                'outlet' => $val->outlet->name,
+                'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
+                'nama' => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                'jabatan' => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
                 'tanggal' => Carbon::parse($val->checkin)->day,
                 'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
                 'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
