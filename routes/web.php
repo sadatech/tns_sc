@@ -612,6 +612,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.democooking.kunjungan');
 				})->name('report.demo.kunjungan')->middleware('auth');
+				Route::get('/data', 'ReportController@kunjunganDc')->name('dc.kunjungan.data')->middleware('auth');
 			});
 
 			Route::prefix('sampling')->group(function () {
