@@ -1485,15 +1485,28 @@ class ReportController extends Controller
             );
         }
         $dt = Datatables::of(collect($data));
+        $columns = array();
         foreach (Product::get() as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
                 $distribution = DistributionDetail::where([
                     'id_distribution' => $dist['id'],
                     'id_product' => $pdct->id
                 ])->first();
-                return $distribution['value'];
+                $html = "<table class='table table-bordered'>";
+                $html .= "<tr>";
+                $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
+                $html .= "<td>".$distribution['qty']."</td>";
+                $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
+                $html .= "<td>".$distribution['qty_actual']."</td>";
+                $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
+                $html .= "<td>".$distribution['satuan']."</td>";
+                $html .= "</tr>";
+                $html .= "</table>";
+                return $html;
             });
         }
+        $dt->rawColumns($columns);
         return $dt->make(true);
     }
 
@@ -1505,13 +1518,39 @@ class ReportController extends Controller
         foreach ($sales as $value) {
             $data[] = array(
                 'id' => $id++,
+                'id_sales' => $value->id,
                 'nama' => $value->employee->name,
                 'pasar' => $value->outlet->employeePasar->pasar->name,
                 'tanggal' => $value->date,
                 'outlet' => $value->outlet->name,
             );
         }
-        return Datatables::of(collect($data))->make(true);
+        $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+        $dt = Datatables::of(collect($data));
+        $columns = array();
+        foreach ($product as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
+            $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
+                $sale = \App\SalesMdDetail::where([
+                    'id_sales' => $sales['id_sales'],
+                    'id_product' => $pdct->id
+                ])->first();
+                $html = "<table class='table table-bordered'>";
+                $html .= "<tr>";
+                $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
+                $html .= "<td>".$sale['qty']."</td>";
+                $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
+                $html .= "<td>".$sale['qty_actual']."</td>";
+                $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
+                $html .= "<td>".$sale['satuan']."</td>";
+                $html .= "</tr>";
+                $html .= "</table>";
+                return $html;
+            });
+        }
+        $dt->rawColumns($columns);
+        return $dt->make(true);
     }
 
     public function SMDstockist()

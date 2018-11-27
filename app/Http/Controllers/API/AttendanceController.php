@@ -18,6 +18,11 @@ use Config;
 class AttendanceController extends Controller
 {
 	use ApiAuthHelper;
+	
+	public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
 
 	public function absen(Request $request, $type = 'MTC')
 	{
@@ -43,12 +48,13 @@ class AttendanceController extends Controller
 						'id_pasar' => $request->input('pasar')
 					]);			
 				}
-				$attendance->with(['attendance' => function($query) use ($user) {
+
+				$attendance->whereHas('attendance', function($query) use ($user) {
 					$query->where([
 						'id_employee' => $user->id,
 						'keterangan' => 'Check-in',
 					])->whereDate('date', '=', Carbon::today()->toDateString());
-				}]);
+				});
 
 				if ($attendance->count() > 0) {
 					$res['success'] = false;

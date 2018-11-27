@@ -46,7 +46,7 @@ class ProductFokus extends Model
 
     public function fokusproduct()
     {
-    	return $this->hasMany('App\FokusProduct', 'id_product');
+    	return $this->hasMany('App\FokusProduct', 'id_pf');
     }
 
     public function getFromAttribute($value)
