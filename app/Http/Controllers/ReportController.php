@@ -49,6 +49,8 @@ use App\Product;
 use App\SalesSpgPasar;
 use App\SalesSpgPasarDetail;
 use App\SalesRecap;
+use App\PlanDc;
+use App\PlanEmployee;
 
 class ReportController extends Controller
 {
@@ -1846,5 +1848,27 @@ class ReportController extends Controller
             );
         }
         return Datatables::of(collect($data))->make(true);
+    }
+
+    public function kunjunganDc()
+    {
+        $plan = PlanDc::with('planEmployee')
+        ->select('plan_dcs.*');
+        return Datatables::of($plan)
+        ->addColumn('action', function ($plan) {
+            return "<a href=".route('ubah.plan', $plan->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+            <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
+        
+        })
+        ->addColumn('planEmployee', function($plan) {
+           
+            $dist = PlanEmployee::where(['id_plandc'=>$plan->id])->get();
+            $distList = array();
+            foreach ($dist as $data) {
+                $distList[] = $data->employee->name;
+            }
+            return rtrim(implode(',', $distList), ',');
+
+        })->make(true);
     }
 }
