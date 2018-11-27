@@ -141,6 +141,11 @@ Route::prefix('plan')->group(function () {
 	Route::post('/update', 'API\PlanController@update')->name('api.plan.update');
 });
 
+// Documentation
+Route::prefix('documentation')->group(function () {
+	Route::post('/add', 'API\DocumentationController@store')->name('api.plan.add');
+});
+
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
