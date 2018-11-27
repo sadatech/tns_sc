@@ -2,14 +2,14 @@
 @section('title', "Update Plan Demo Cooking")
 @section('content')
 <div class="content">
-        <h2 class="content-heading pt-10">Plan Demo Cooking <small>Update</small></h2>
-        <div class="container">
-            <div class="block">
-                <div class="block-content">
-            <form action="{{action('PlandcController@update', $plan->id) }}" method="post" enctype="multipart/form-data">
+    <h2 class="content-heading pt-10">Plan Demo Cooking <small>Update</small></h2>
+    <div class="container">
+        <div class="block">
+            <div class="block-content">
+                <form action="{{action('PlandcController@update', $plan->id) }}" method="post" enctype="multipart/form-data">
                 {!! csrf_field() !!}
                 {{ method_field('PUT')}}
-                <div class="block-content">
+                    <div class="block-content">
                         <div class="row">
                             <div class="form-group col-md-12" id="EmployeeSelected">
                                 <label class="col-md-12" style="padding: 0">Employee</label>
@@ -57,13 +57,13 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Stockist</label>
-                                <input type="text" class="form-control" name="stocklist" value="{{ $plan->stocklist }}" required>
+                                <input type="text" class="form-control" name="stocklist" value="{{ $plan->stocklist }}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label>Channel</label>
-                                <select class="form-control form-control-lg" id='channel' name="channel" required>
+                                <select class="form-control form-control-lg" id='channel' name="channel">
                                     <option value="" disabled selected>Choose your Channel</option>
                                     <option value="MTC" @if ($plan->channel == "MTC") {{ 'selected' }} @endif>MTC</option>
                                     <option value="GTC" @if ($plan->channel == "GTC") {{ 'selected' }} @endif>GTC</option>
