@@ -179,7 +179,6 @@ class PlandcController extends Controller
         $limit=[
             'date'           => 'required',
             'plan'           => 'required',
-            'actuual'        => 'required',
             'employee'       => 'required'
         ];
         $validator = Validator($data, $limit);
@@ -190,9 +189,9 @@ class PlandcController extends Controller
         } else {
            
             // $data1 = Employee::where(['id' => $request->input('employee')])->first();
-            $data2 = PlanDc::whereRaw("TRIM(UPPER(plan)) = '". trim(strtoupper($request->input('plan')))."'");
+            // $data2 = PlanDc::whereRaw("TRIM(UPPER(plan)) = '". trim(strtoupper($request->input('plan')))."'");
             // $data3 = PlanEmployee::where(['id_employee' => $data1->id]);
-            $store = Plandc::find($id);
+            $store = PlanDc::find($id);
             if ($request->input('employee')) {
                 foreach ($request->input('employee') as $emp) {
                     PlanEmployee::where('id_plandc', $id)->delete();
