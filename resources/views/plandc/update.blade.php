@@ -2,14 +2,14 @@
 @section('title', "Update Plan Demo Cooking")
 @section('content')
 <div class="content">
-        <h2 class="content-heading pt-10">Plan Demo Cooking <small>Update</small></h2>
-        <div class="container">
-            <div class="block">
-                <div class="block-content">
-            <form action="{{action('PlandcController@update', $plan->id) }}" method="post" enctype="multipart/form-data">
+    <h2 class="content-heading pt-10">Plan Demo Cooking <small>Update</small></h2>
+    <div class="container">
+        <div class="block">
+            <div class="block-content">
+                <form action="{{action('PlandcController@update', $plan->id) }}" method="post" enctype="multipart/form-data">
                 {!! csrf_field() !!}
                 {{ method_field('PUT')}}
-                <div class="block-content">
+                    <div class="block-content">
                         <div class="row">
                             <div class="form-group col-md-12" id="EmployeeSelected">
                                 <label class="col-md-12" style="padding: 0">Employee</label>
@@ -70,11 +70,15 @@
                                     <option value="ITC" @if ($plan->channel == "ITC") {{ 'selected' }} @endif>ITC</option>
                                 </select>
                             </div>
+                            <div class="form-group col-md-6">
+                                <label>Plan</label>
+                                <input type="text" class="form-control" name="plan" value="{{ $plan->plan }}" required>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12">
-                                <label>Plan</label>
-                                <textarea type="text" class="form-control" name="plan" required>{{ $plan->plan }}</textarea>
+                                <label>Alamat</label>
+                                <textarea type="text" class="form-control" name="alamat" required>{{ $plan->alamat }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer">

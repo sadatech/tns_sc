@@ -100,7 +100,8 @@ class PlandcController extends Controller
                                 'date'              => \PHPExcel_Style_NumberFormat::toFormattedString($row['date'], 'YYYY-MM-DD'),
                                 'plan'              => $row['plan'],
                                 'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
-                                'channel'           => (isset($row->channel) ? $row->channel : "-")
+                                'channel'           => (isset($row->channel) ? $row->channel : "-"),
+                                'alamat'            => (isset($row->alamat) ? $row->alamat : "-")
                             ]);
                             if (!empty($insert)) 
                                 {
@@ -153,7 +154,8 @@ class PlandcController extends Controller
                     'Date'              => $val->date,
                     'Plan'              => $val->plan,
                     'Stocklist'         => (isset($val->stocklist) ? $val->stocklist : "-"),
-                    'Channel'           => (isset($val->channel) ? $val->channel : "-")
+                    'Channel'           => (isset($val->channel) ? $val->channel : "-"),
+                    'Alamat'            => (isset($val->alamat) ? $val->alamat : "-"),
                 );
             }
             $filename = "PlanDemoCooking_".Carbon::now().".xlsx";
@@ -179,8 +181,8 @@ class PlandcController extends Controller
         $limit=[
             'date'           => 'required',
             'plan'           => 'required',
-            'actuual'        => 'required',
-            'employee'       => 'required'
+            'employee'       => 'required',
+            'alamat'         => 'required'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -190,9 +192,9 @@ class PlandcController extends Controller
         } else {
            
             // $data1 = Employee::where(['id' => $request->input('employee')])->first();
-            $data2 = PlanDc::whereRaw("TRIM(UPPER(plan)) = '". trim(strtoupper($request->input('plan')))."'");
+            // $data2 = PlanDc::whereRaw("TRIM(UPPER(plan)) = '". trim(strtoupper($request->input('plan')))."'");
             // $data3 = PlanEmployee::where(['id_employee' => $data1->id]);
-            $store = Plandc::find($id);
+            $store = PlanDc::find($id);
             if ($request->input('employee')) {
                 foreach ($request->input('employee') as $emp) {
                     PlanEmployee::where('id_plandc', $id)->delete();
@@ -213,6 +215,7 @@ class PlandcController extends Controller
             $store->plan             = $request->input('plan');
             $store->stocklist        = $request->input('stocklist');
             $store->channel          = $request->input('channel');
+            $store->alamat           = $request->input('alamat');
             $store->save();
             return redirect()->route('planDc')
             ->with([
