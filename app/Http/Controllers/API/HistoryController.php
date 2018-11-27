@@ -125,7 +125,8 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->when($date != '', function ($q) use ($date){
+			})
+			->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
 			});
 
