@@ -153,6 +153,7 @@ Route::prefix('history')->group(function () {
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
 	Route::get('/distribution/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
 	Route::get('/cbd/{date?}', 'API\HistoryController@cbdHistory')->name('api.cbd-history.list');
+	Route::get('/dc/{type?}/{date?}', 'API\HistoryController@dcHistory')->name('api.dc-history.list');
 });
 
 /**

@@ -16,6 +16,10 @@ use App\SalesMdDetail;
 use App\SalesSpgPasar;
 use App\SalesSpgPasarDetail;
 use App\SalesRecap;
+use App\SamplingDc;
+use App\SamplingDcDetail;
+use App\SalesDc;
+use App\SalesDcDetail;
 use App\StockMdHeader;
 use App\StockMdDetail;
 use App\Distribution;
@@ -343,4 +347,66 @@ class HistoryController extends Controller
 
 		return response()->json($res);
 	}
+
+	public function dcHistory($type='SALES', $date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			if (strtoupper($type) == 'SALES') {
+				$header = SalesDc::query();
+			}else if (strtoupper($type) == 'SAMPLING') {
+				$header = SamplingDc::query();
+			}
+
+			$header->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			});
+
+			if ($header->get()->count() > 0) {
+				$dataArr = array();
+				foreach ($header->get() as $key => $head) {
+					if (strtoupper($type) == 'SALES') {
+						$detail = SalesDcDetail::query();
+					}else if (strtoupper($type) == 'SAMPLING') {
+						$detail = SamplingDcDetail::query();
+					}else{
+						$res['success'] = false;
+						$res['msg'] 	= "$type not Found.";
+						return response()->json($res);
+					}
+
+					$detail->where('id_sales',$head->id);
+					$dataArr[] = array(
+						'id' 			=> $head->id,
+						'id_employee' 	=> $head->id_employee,
+						'date' 			=> $head->date,
+						'keterangan' 	=> $head->keterangan,
+						'detail' 		=> $detail->get(),
+					);
+				}
+				$res['success'] = true;
+				$res['sales'] = $dataArr;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "$type not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
 }

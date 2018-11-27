@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PlanDc extends Model
 {
     protected $fillable = [
-        'id_employee', 'date', 'stocklist', 'channel', 'plan'
+        'date', 'stocklist', 'channel', 'plan'
     ];
 
     public function planEmployee()
