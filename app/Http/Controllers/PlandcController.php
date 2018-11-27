@@ -100,8 +100,7 @@ class PlandcController extends Controller
                                 'date'              => \PHPExcel_Style_NumberFormat::toFormattedString($row['date'], 'YYYY-MM-DD'),
                                 'plan'              => $row['plan'],
                                 'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
-                                'channel'           => (isset($row->channel) ? $row->channel : "-"),
-                                'alamat'            => (isset($row->alamat) ? $row->alamat : "-")
+                                'channel'           => (isset($row->channel) ? $row->channel : "-")
                             ]);
                             if (!empty($insert)) 
                                 {
@@ -154,8 +153,7 @@ class PlandcController extends Controller
                     'Date'              => $val->date,
                     'Plan'              => $val->plan,
                     'Stocklist'         => (isset($val->stocklist) ? $val->stocklist : "-"),
-                    'Channel'           => (isset($val->channel) ? $val->channel : "-"),
-                    'Alamat'            => (isset($val->alamat) ? $val->alamat : "-"),
+                    'Channel'           => (isset($val->channel) ? $val->channel : "-")
                 );
             }
             $filename = "PlanDemoCooking_".Carbon::now().".xlsx";
@@ -181,8 +179,7 @@ class PlandcController extends Controller
         $limit=[
             'date'           => 'required',
             'plan'           => 'required',
-            'employee'       => 'required',
-            'alamat'         => 'required'
+            'employee'       => 'required'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -215,7 +212,6 @@ class PlandcController extends Controller
             $store->plan             = $request->input('plan');
             $store->stocklist        = $request->input('stocklist');
             $store->channel          = $request->input('channel');
-            $store->alamat           = $request->input('alamat');
             $store->save();
             return redirect()->route('planDc')
             ->with([

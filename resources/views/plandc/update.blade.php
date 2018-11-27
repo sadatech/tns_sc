@@ -57,28 +57,24 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Stockist</label>
-                                <input type="text" class="form-control" name="stocklist" value="{{ $plan->stocklist }}" required>
+                                <input type="text" class="form-control" name="stocklist" value="{{ $plan->stocklist }}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label>Channel</label>
-                                <select class="form-control form-control-lg" id='channel' name="channel" required>
+                                <select class="form-control form-control-lg" id='channel' name="channel">
                                     <option value="" disabled selected>Choose your Channel</option>
                                     <option value="MTC" @if ($plan->channel == "MTC") {{ 'selected' }} @endif>MTC</option>
                                     <option value="GTC" @if ($plan->channel == "GTC") {{ 'selected' }} @endif>GTC</option>
                                     <option value="ITC" @if ($plan->channel == "ITC") {{ 'selected' }} @endif>ITC</option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-6">
-                                <label>Plan</label>
-                                <input type="text" class="form-control" name="plan" value="{{ $plan->plan }}" required>
-                            </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12">
-                                <label>Alamat</label>
-                                <textarea type="text" class="form-control" name="alamat" required>{{ $plan->alamat }}</textarea>
+                                <label>Plan</label>
+                                <textarea type="text" class="form-control" name="plan" required>{{ $plan->plan }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer">

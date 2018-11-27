@@ -29,7 +29,6 @@
                     <th style="width: 300px;">Employee</th>
                     <th style="width: 10%;">Date</th>
                     <th style="width: 10%;">Plan</th>
-                    <th style="width: 15%;">Alamat</th>
                     <th style="width: 10%;">Stockist</th>
                     <th>Channel</th>
                 </thead>
@@ -190,7 +189,6 @@
             { data: 'planEmployee', name: 'planEmployee' },
             { data: 'date', name: 'plan_dcs.date'},
             { data: 'plan', name: 'plan_dcs.plan'},
-            { data: 'alamat', name: 'plan_dcs.alamat'},
             { data: 'stocklist', name: 'plan_dcs.stocklist'},
             { data: 'channel', name: 'plan_dcs.channel'}
             ]
