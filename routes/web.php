@@ -541,7 +541,9 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
-					return view('report.smd.sales');
+					$getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.smd.sales',$data);
 				})->name('report.sales.pasar')->middleware('auth');
 				Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
 				Route::get('/export', 'ReportController@exportMdPasar')->name('export.sales.smd')->middleware('auth');
