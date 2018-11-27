@@ -90,56 +90,68 @@ class ProductFokusController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->all();
-
-        if (($validator = ProductFokus::validate($data))->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $from = explode('/', $data['from']);
-        $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
-        $to = explode('/', $data['to']);
-        $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
-
-        // if (ProductFokus::hasActivePF($data)) {
-        //     $this->alert['type'] = 'warning';
-        //     $this->alert['title'] = 'Warning!<br/>';
-        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        // } else {
-            DB::transaction(function () use($data) {
-                $productData = $data['product'];
-                unset($data['product']);
-                $channel = $data['channel'];
-                unset($data['channel']);
-                $area = (isset($data['area']) ? $data['area'] : null);
-                unset($data['area']);
-                $product = ProductFokus::create($data);
-                foreach ($channel as $channel_id) {
-                    FokusChannel::create([
-                        'id_pf'              => $product->id,
-                        'id_channel'         => $channel_id
-                    ]);
-                }
-                foreach ($productData as $product_id) {
-                    FokusProduct::create([
-                        'id_pf'              => $product->id,
-                        'id_product'         => $product_id
-                    ]);
-                }
-                if (!empty($area)) {
-                    foreach ($area as $area_id) {
-                        FokusArea::create([
-                            'id_pf'              => $product->id,
-                            'id_area'            => $area_id
-                        ]);
+        $data=$request->all();
+        $limit=[
+            'to'          => 'required',
+            'from'        => 'required'
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+        } else {
+            $x = DB::table('channels')->join('fokus_channels', 'channels.id', '=', 'fokus_channels.id_channel')->where('name', '<>', '')->get();
+            // $y = count(collect($x, $request->input('channel'))->get('id'));
+            $q = $x->where('id', $request->input('channel'))->count();
+            $z = ProductFokus::where(function($query) use ($request){
+                $query->whereBetween('from', [$request->input('from'), $request->input('to')]);
+                $query->orWhereBetween('to', [$request->input('to'), $request->input('to')]);
+            })->count();
+            // dd($q);
+            // if ($q + $z < 1 )
+            // {
+                $insert = ProductFokus::create([
+                    'from'           => $request->input('from'),
+                    'to'             => $request->input('to')
+                ]);
+                if ($insert) 
+                {
+                    $dataChannel = array();
+                    foreach ($request->input('channel') as $channel) {
+                        $dataChannel[] = array(
+                            'id_channel'    => $channel,
+                            'id_pf'          => $insert->id,
+                        );
                     }
-                }
-            });
-            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
-        // }
+                    DB::table('fokus_channels')->insert($dataChannel); 
 
-        return redirect()->back()->with($this->alert);
-    }
+                    $dataProduct = array();
+                    foreach ($request->input('product') as $product) {
+                        $dataProduct[] = array(
+                            'id_product'    => $product,
+                            'id_pf'          => $insert->id,
+                        );
+                    }
+                    DB::table('fokus_products')->insert($dataProduct); 
+                    return redirect()->back()
+                    ->with([
+                        'type'      => 'success',
+                        'title'     => 'Sukses!<br/>',
+                        'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Product Fokus!'
+                    ]);
+                }
+            // } else {
+            //     return redirect()->back()
+            //         ->with([
+            //             'type'      => 'warning',
+            //             'title'     => 'Failded!<br/>',
+            //             'message'   => '<i class="em em-thinking_face mr-2"></i>Product Fokus Sudah Ada!'
+            //         ]);
+            // }
+        }
+    }  
+
 
     public function update(Request $request, $id) 
     {
