@@ -63,15 +63,16 @@ class ProductFokus extends Model
     {
         $x = DB::table('fokus_channels')->join('channels', 'fokus_channels.id_channel', '=', 'channels.id')->get();
         // $xp = DB::table('products')->join('fokus_products', 'products.id', '=', 'fokus_products.id_product')->get();
-        // $y = count(collect($x, $request->input('channel'))->get('id'));
-        $q = $x->whereIn('id_channel', $data['channel'])->count();
+        // $y = count(collect($x, $data['channel'])->get('id'));
+        // $xp = ProductFokus::f();
+      
         // $channel = Channel::whereRaw("TRIM(UPPER(name)) = '". strtoupper($data['channel'])."'")->count();
         $fokus = ProductFokus::where('id', '!=', $self_id)
                                 ->where(function($query) use ($data){
                                     $query->whereBetween('from', [$data['from'], $data['to']]);
                                     $query->orWhereBetween('to', [$data['from'], $data['to']]);
                                 })->count();
-
-        return $fokus > 0 && $q > 0;
+$q = $x->whereIn(['id_channel' => $data['channel']])->where('id_pf', $fokus)->count();
+        return  $q > 0;
     }
 }
