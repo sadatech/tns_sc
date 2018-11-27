@@ -9,7 +9,7 @@
                 <form action="{{action('PlandcController@update', $plan->id) }}" method="post" enctype="multipart/form-data">
                 {!! csrf_field() !!}
                 {{ method_field('PUT')}}
-                    <div class="block-content">
+                <div class="block-content">
                         <div class="row">
                             <div class="form-group col-md-12" id="EmployeeSelected">
                                 <label class="col-md-12" style="padding: 0">Employee</label>
@@ -74,7 +74,7 @@
                         <div class="row">
                             <div class="form-group col-md-12">
                                 <label>Plan</label>
-                                <textarea type="text" class="form-control" name="plan" required>{{ $plan->plan }}</textarea>
+                                <textarea class="form-control" name="plan" required>{{ $plan->plan }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
