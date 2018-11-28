@@ -537,6 +537,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.stockist', $data);
 				})->name('report.stockist')->middleware('auth');
 				Route::get('/data', 'ReportController@SMDstockist')->name('data.smd.stockist')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDstocking')->name('export.smd.stockist')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -584,6 +585,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.attendance');
 				})->name('report.spg.attendance')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGattendance')->name('data.spg.attendance')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSpgAttandance')->name('export.spg.attendance')->middleware('auth');
 			});
 			Route::prefix('achievement')->group(function () {
 				Route::get('/', function(){
@@ -596,6 +598,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.sales');
 				})->name('report.sales.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSpgSales')->name('spg.pasar.sales.export')->middleware('auth');
 			});
 
 			Route::prefix('recap')->group(function () {
@@ -654,6 +657,13 @@ Route::prefix('mtc')->group(function () {
 	Route::prefix('salesmtc')->group(function () {
 		Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');
 		Route::post('/data', 'ReportController@salesMtcDataSalesAlt')->name('salesmtc.data')->middleware('auth');
+	});
+
+	Route::prefix('achievement')->group(function () {
+		Route::get('/', 'ReportController@achievementSalesMtcIndex')->name('achievement-salesmtc')->middleware('auth');
+		Route::post('/data-spg', 'ReportController@achievementSalesMtcDataSPG')->name('achievement-salesmtc-spg.data')->middleware('auth');
+		Route::post('/data-md', 'ReportController@achievementSalesMtcDataMD')->name('achievement-salesmtc-md.data')->middleware('auth');
+		Route::post('/data-tl', 'ReportController@achievementSalesMtcDataTL')->name('achievement-salesmtc-tl.data')->middleware('auth');
 	});
 
 

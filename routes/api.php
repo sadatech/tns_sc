@@ -46,6 +46,14 @@ Route::prefix('subcategory')->group(function () {
 	Route::get('/list/{id_category?}', 'API\SubCategoryController@list')->name('api.subcategory.list');
 });
 
+Route::prefix('area')->group(function () {
+	Route::get('/list', 'API\AreaController@list')->name('api.area.list');
+});
+
+Route::prefix('subarea')->group(function () {
+	Route::get('/list/{id_area?}', 'API\SubAreaController@list')->name('api.subarea.list');
+});
+
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 	Route::get('pf/list/{id_pasar}', 'API\ProductController@pfList')->name('api.product.pf.list');
@@ -159,6 +167,13 @@ Route::prefix('outlet')->group(function () {
 	Route::post('/checkin', 'API\OutletController@checkin')->name('api.outlet.checkin');
 	Route::get('/checkout', 'API\OutletController@checkout')->name('api.outlet.checkout');
 	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
+});
+
+// Block
+Route::prefix('block')->group(function () {
+	Route::post('/add', 'API\BlockController@store')->name('api.block.add');
+	Route::post('/edit/{id}', 'API\BlockController@update')->name('api.block.edit');
+	Route::get('/list/{id}', 'API\BlockController@list')->name('api.block.list');
 });
 
 // History
