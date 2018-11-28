@@ -10,6 +10,7 @@ use DB;
 use Auth;
 use File;
 use Excel;
+use App\PlanEmployee;
 use App\TargetGtc;
 use Carbon\Carbon;
 use App\Position;
@@ -81,7 +82,7 @@ class EmployeeController extends Controller
 	{
 		$data=$request->all();
 		$limit=[
-			'foto_ktp' 		=> 'max:10000|required|mimes:jpeg,jpg,bmp,png',
+			'foto_ktp' 		=> 'max:10000',
 			'foto_tabungan' => 'max:10000|mimes:jpeg,jpg,bmp,png',
 			'name' 			=> 'required',
 			'password' 		=> 'required',
@@ -99,9 +100,11 @@ class EmployeeController extends Controller
 		];
 		$validator = Validator($data, $limit);
 		if ($validator->fails()){
-			return redirect()->back()
-			->withErrors($validator)
-			->withInput();
+			return response()->json([
+				'type' 		=> 'danger',
+				'title' 	=> 'Error!<br/>',
+				'message'	=> implode("<br>", $validator->messages()->all())
+			]);
 		} else {
 			$ktp = $data['foto_ktp'];
 			$foto_ktp = Str::random().time()."_".rand(1,99999).".".$ktp->getClientOriginalExtension();
@@ -158,8 +161,7 @@ class EmployeeController extends Controller
 							'id_store' 		=> $request->input('store'),
 							'id_employee' 	=> $insert->id,
 						]);
-						return redirect()->route('employee')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -173,8 +175,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_stores')->insert($dataStore);
-						return redirect()->route('employee')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -188,8 +189,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_pasars')->insert($dataPasar);
-						return redirect()->route('employee.pasar')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -211,8 +211,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_sub_areas')->insert($dataSubArea);
-						return redirect()->route('employee.dc')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -220,8 +219,7 @@ class EmployeeController extends Controller
 					}
 				}
 			} else {
-				return redirect()->route('employee')
-				->with([
+				return response()->json([
 					'type' 		=> 'danger',
 					'title' 	=> 'Terjadi Kesalahan!<br/>',
 					'message'	=> '<i class="em em-thinking_face mr-2"></i>Position tidak tersedia!'
@@ -439,14 +437,16 @@ class EmployeeController extends Controller
 	public function delete($id)
 	{
 		{
-			$emp = Employee::find($id);
-			$sub = TargetGtc::where(['id_employee' => $emp->id])->count();
-			if (!$sub < 1) {
+			$emp 		= Employee::find($id);
+			$gtc 		= TargetGtc::where(['id_employee' => $emp->id])->count();
+			$dc 		= PlanEmployee::where(['id_employee' => $emp->id])->count();
+			$jumlah= $gtc + $dc;
+			if (!$jumlah < 1) {
 				return redirect()->back()
 				->with([
 					'type'    => 'danger',
 					'title'   => 'Gagal!<br/>',
-					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di TargetSMD!'
+					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di TargetSMD, Plan DemoCooking!'
 				]);
 			} else {
 				$emp->delete();

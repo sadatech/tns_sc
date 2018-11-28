@@ -75,6 +75,11 @@ Route::prefix('sales-recap')->group(function () {
 	Route::get('/list/{date?}', 'API\SalesRecapController@list')->name('api.sales-recap.list');
 });
 
+Route::prefix('sales-dc')->group(function () {
+	Route::post('/add/{type?}', 'API\SalesDcController@store')->name('api.sales-dc.add');
+	// Route::get('/list/{date?}', 'API\SalesDcController@history')->name('api.sales-dc.list');
+});
+
 Route::prefix('promo')->group(function () {
 	Route::post('/add', 'API\PromoController@store')->name('api.promo.add');
 });
@@ -85,6 +90,14 @@ Route::prefix('dataprice')->group(function () {
 
 Route::prefix('availability')->group(function () {
 	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
+});
+
+Route::prefix('display-share')->group(function () {
+	Route::post('/add', 'API\DisplayShareController@store')->name('api.display-share.add');
+});
+
+Route::prefix('additional-display')->group(function () {
+	Route::post('/add', 'API\AdditionalDisplayController@store')->name('api.additional-display.add');
 });
 
 Route::prefix('cbd')->group(function () {
@@ -121,6 +134,18 @@ Route::prefix('stock')->group(function () {
 	Route::post('/add', 'API\StockController@store')->name('api.stock.add');
 });
 
+// Plan
+Route::prefix('plan')->group(function () {
+	Route::get('/date', 'API\PlanController@date')->name('api.plan.date');
+	Route::get('/month', 'API\PlanController@month')->name('api.plan.month');
+	Route::post('/update', 'API\PlanController@update')->name('api.plan.update');
+});
+
+// Documentation
+Route::prefix('documentation')->group(function () {
+	Route::post('/add', 'API\DocumentationController@store')->name('api.plan.add');
+});
+
 // Outlet
 Route::prefix('outlet')->group(function () {
 	Route::post('/add', 'API\OutletController@store')->name('api.outlet.add');
@@ -140,6 +165,9 @@ Route::prefix('history')->group(function () {
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
 	Route::get('/distribution/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
 	Route::get('/cbd/{date?}', 'API\HistoryController@cbdHistory')->name('api.cbd-history.list');
+	Route::get('/dc/{type?}/{date?}', 'API\HistoryController@dcHistory')->name('api.dc-history.list');
+	Route::get('/plan/{date?}', 'API\HistoryController@planHistory')->name('api.plan-history.list');
+	Route::get('/documentation/{date?}', 'API\HistoryController@documentationHistory')->name('api.documentation-history.list');
 });
 
 /**

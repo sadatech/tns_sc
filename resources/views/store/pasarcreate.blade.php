@@ -30,13 +30,13 @@
                         <input type="text" class="form-control" name="name" placeholder="Add new name" required>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Sub-area / Area</label>
-                        <select class="js-select2 form-control" name="subarea" required>
-                            <option value="" disabled selected>Choose your Subarea</option>
-                            @foreach($subarea as $data)
-                                <option value="{{ $data->id }}">{{ $data->name }} - {{ $data->area->name }}</option>
-                            @endforeach
-                        </select>
+                        <label class="col-md-12 col-sm-12" style="padding: 0">Sub Area</label>
+                        <div class="input-group mb-3 col-sm-12 col-md-12" style="padding: 0">
+                            <div class="col-sm-12" style="padding: 0">
+                                <select class="form-control" style="width: 100%" name="subarea" id="subSelect" required>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -69,7 +69,7 @@
                 <button type="submit" class="btn btn-alt-success">
                     <i class="fa fa-save"></i> Save
                 </button>
-                <button type="submit" class="btn btn-alt-secondary"><a href="{{ route('pasar') }}">Back</a></button>
+                <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Back</a>
         </form>
     </div>
 </div>
@@ -86,12 +86,22 @@
 @section('script')
 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyCcAydgyjdaptJ3y8AyiSqgYYMQEU6z7Cg&amp;v=3&amp;libraries=places"></script>
 <script src="{{ asset('js/locationpicker.jquery.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+    $('#subSelect').select2(setOptions('{{ route("sub-area-select2") }}', 'Choose your SubArea', function (params) {
+        return filterData('name', params.term);
+    }, function (data, params) {
+        return {
+            results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+            })
+        }
+    }));
     var lat     = -6.2241031;
     var long    = 106.9212855;
     if( $('#latitude').val() != '') lat = $('#latitude').val();

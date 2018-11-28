@@ -39,42 +39,33 @@ class ProductFokusController extends Controller
 
     public function data()
     {
-        $product = ProductFokus::with(['product','fokusarea','fokus'])
-        ->select('product_fokuses.*');
-        return Datatables::of($product)
-        // ->addColumn('area', function($product) {
-		// 	if (isset($product->area)) {
-		// 		$area = $product->area->name;
-		// 	} else {
-		// 		$area = "Without Area";
-		// 	}
-		// 	return $area;
-        // })
-        ->addColumn('fokusproduct', function($product) {
-            $sku = FokusProduct::where(['id_pf'=>$product->id])->get();
-            $skuList = array();
-            foreach ($sku as $data) {
-                $skuList[] = $data->product->name;
+        $fokus = FokusProduct::get();
+        $data = array();
+        $chan = array();
+        $areas = array();
+        $id = 1;
+        foreach ($fokus as $key => $value) {
+            $channel = FokusChannel::where('id_pf', $value->id_pf)->get();
+            $area = FokusArea::where('id_pf', $value->id_pf)->get();
+            foreach ($area as $ar) {
+                $areas[$key][] = (isset($ar->area->name) ? $ar->area->name : "-");
             }
-            return rtrim(implode(',', $skuList), ',');
-        })
-        ->addColumn('fokusarea', function($product) {
-            $area = FokusArea::where(['id_pf'=>$product->id])->get();
-            $areaList = array();
-            foreach ($area as $data) {
-                $areaList[] = (isset($data->area->name) ? $data->area->name : "-");
+            foreach ($channel as $val) {
+                $chan[$key][] = $val->channel->name;
             }
-            return rtrim(implode(',', $areaList), ',');
-        })
-        ->addColumn('fokus', function($product) {
-            $chan = FokusChannel::where(['id_pf'=>$product->id])->get();
-            $channelList = array();
-            foreach ($chan as $data) {
-                $channelList[] = $data->channel->name;
-            }
-            return rtrim(implode(',', $channelList), ',');
-        })
-        ->addColumn('action', function ($product) {
+            $data[] = array(
+                'id' => $id++,
+                'id_pf' => $value->id_pf,
+                'product' => $value->product->name,
+                'channel' => implode(',', $chan[$key]),
+                'area' => (isset($areas[$key]) ? implode(',', $areas[$key]) : "-"),
+                'from' => $value->pf->from,
+                'until' => $value->pf->to,
+            );
+        }
+        return Datatables::of(collect($data))
+        ->addColumn('action', function ($fokus) {
+            $product = ProductFokus::where('id', $fokus['id_pf'])->first();
             $data = array(
                 'id'            => $product->id,
                 'product'       => FokusProduct::where('id_pf',$product->id)->pluck('id_product'),
@@ -101,11 +92,11 @@ class ProductFokusController extends Controller
         $to = explode('/', $data['to']);
         $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
 
-        // if (ProductFokus::hasActivePF($data)) {
-        //     $this->alert['type'] = 'warning';
-        //     $this->alert['title'] = 'Warning!<br/>';
-        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        // } else {
+        if (ProductFokus::hasActivePF($data)) {
+            $this->alert['type'] = 'warning';
+            $this->alert['title'] = 'Warning!<br/>';
+            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
+        } else {
             DB::transaction(function () use($data) {
                 $productData = $data['product'];
                 unset($data['product']);
@@ -136,7 +127,7 @@ class ProductFokusController extends Controller
                 }
             });
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
-        // }
+        }
 
         return redirect()->back()->with($this->alert);
     }

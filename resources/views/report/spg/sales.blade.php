@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sales SMD Pasar")
+@section('title', "Report Sales SPG")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sales SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -17,21 +17,29 @@
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
-        <div class="block-header p-0 mb-20">
+      <div class="block-header p-0 mb-20">
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.sales.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('export.distpf.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
+                <th colspan="3">SPG</th>
+                <th></th>
+                <th colspan="2">Costumer</th>
+                <th>Detail</th>
+            </tr>
+            <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama</th>
+              <th>Name</th>
               <th>Pasar</th>
               <th>Tanggal</th>
-              <th>Outlet</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Product</th>
             </tr>
           </thead>
         </table>
@@ -64,17 +72,17 @@ table.table thead tr th {
     var table = $('#category').DataTable({
       processing: true,
       serverSide: true,
-      stateSave: true,
-      paging: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.sales.smd') !!}',
+      ajax: '{!! route('spg.pasar.sales.data') !!}',
       columns: [
-      { data: 'id' },
-      { data: 'nama' },
-      { data: 'pasar' },
-      { data: 'tanggal' },
-      { data: 'outlet' },
+      { data: 'id', name:'' },
+      { data: 'nama_spg', name:'Nama' },
+      { data: 'pasar', name:'Pasar' },
+      { data: 'tanggal', name:'Tanggal' },
+      { data: 'nama', name:'Outlet' },
+      { data: 'phone', name:'Phone' },
+      { data: 'action', name:'Product' },
       ]
     });
   });

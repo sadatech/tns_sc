@@ -281,7 +281,7 @@
                 <button type="submit" class="btn btn-alt-success">
                     <i class="fa fa-save"></i> Save
                 </button>
-                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Back</a>
             </div>
         </form>            
     </div>
@@ -304,6 +304,30 @@
             $('#example-inline-checkbox2').val(0);
         }
     });
+
+    var url = document.referrer;
+    if (url.split("/")[5] == null) {
+        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
+    } else if (url.split("/")[5] == "pasar") {
+        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
+    } else if (url.split("/")[5] == "dc") {
+        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
+        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
+
+    }
+    
     var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
     var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;
 
@@ -373,6 +397,19 @@
         $('#storeStay').hide();
         $('#storeMobile').hide();
     } else if (position == {{ App\Position::where(['level' => 'mdgtc'])->first()->id }}) {
+        var selected = {!! $pasar_selected !!};
+        $.each(selected, function( index, value ) {
+          addItemPasar(value.pasars_item);
+      });
+        $('#pasarMobile').show();
+        $('#status').hide();
+        $('#tl').hide();
+        $('#subarea').hide();
+        $('#subareaInput').val(null);
+        $('#status').val(null);
+        $('#storeStay').hide();
+        $('#storeMobile').hide();
+    } else if (position == {{ App\Position::where(['level' => 'motoric'])->first()->id }}) {
         var selected = {!! $pasar_selected !!};
         $.each(selected, function( index, value ) {
           addItemPasar(value.pasars_item);

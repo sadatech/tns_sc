@@ -38,6 +38,7 @@ use App\Target;
 use App\StockMdHeader as StockMD;
 use App\Outlet;
 use App\Attendance;
+use App\AttendancePasar;
 use App\AttendanceOutlet;
 use App\Distribution;
 use App\DistributionDetail;
@@ -45,6 +46,11 @@ use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Product;
+use App\SalesSpgPasar;
+use App\SalesSpgPasarDetail;
+use App\SalesRecap;
+use App\PlanDc;
+use App\PlanEmployee;
 
 class ReportController extends Controller
 {
@@ -1419,13 +1425,13 @@ class ReportController extends Controller
         foreach ($employee as $val) {
             $data[] = array(
                 'id' => $id++,
-                'region' => $val->outlet->employeePasar->pasar->name,
-                'area' => $val->outlet->employeePasar->pasar->subarea->area->name,
-                'subarea' => $val->outlet->employeePasar->pasar->subarea->name,
-                'nama' => $val->attendance->employee->name,
-                'jabatan' => $val->attendance->employee->position->name,
-                'pasar' => $val->outlet->employeePasar->pasar->name,
-                'outlet' => $val->outlet->name,
+                'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
+                'nama' => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                'jabatan' => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
                 'tanggal' => Carbon::parse($val->checkin)->day,
                 'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
                 'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
@@ -1481,16 +1487,28 @@ class ReportController extends Controller
             );
         }
         $dt = Datatables::of(collect($data));
+        $columns = array();
         foreach (Product::get() as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
-                // dd($pdct->id);
                 $distribution = DistributionDetail::where([
                     'id_distribution' => $dist['id'],
                     'id_product' => $pdct->id
                 ])->first();
-                return $distribution['value'];
+                // $html = "<table class='table table-bordered'>";
+                // $html .= "<tr>";
+                // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
+                // $html .= "<td>".$distribution['qty']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
+                // $html .= "<td>".$distribution['qty_actual']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
+                // $html .= "<td>".$distribution['satuan']."</td>";
+                // $html .= "</tr>";
+                // $html .= "</table>";
+                return $distribution['qty_actual']."&nbsp;".$distribution['satuan'];
             });
         }
+        $dt->rawColumns($columns);
         return $dt->make(true);
     }
 
@@ -1502,15 +1520,73 @@ class ReportController extends Controller
         foreach ($sales as $value) {
             $data[] = array(
                 'id' => $id++,
+                'id_sales' => $value->id,
                 'nama' => $value->employee->name,
                 'pasar' => $value->outlet->employeePasar->pasar->name,
                 'tanggal' => $value->date,
                 'outlet' => $value->outlet->name,
             );
         }
-        return Datatables::of(collect($data))->make(true);
+        $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+        $dt = Datatables::of(collect($data));
+        $columns = array();
+        foreach ($product as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
+            $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
+                $sale = \App\SalesMdDetail::where([
+                    'id_sales' => $sales['id_sales'],
+                    'id_product' => $pdct->id
+                ])->first();
+                // $html = "<table class='table table-bordered'>";
+                // $html .= "<tr>";
+                // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
+                // $html .= "<td>".$sale['qty']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
+                // $html .= "<td>".$sale['qty_actual']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
+                // $html .= "<td>".$sale['satuan']."</td>";
+                // $html .= "</tr>";
+                // $html .= "</table>";
+                return $sale['qty_actual']."&nbsp;".$sale['satuan'];
+            });
+        }
+        $dt->rawColumns($columns);
+        return $dt->make(true);
     }
 
+    public function SMDstockist()
+    {
+        $stock = StockMD::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $id = 1;
+        foreach ($stock as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'id_stock' => $val->id,
+                'name' => $val->employee->name,
+                'pasar' => $val->pasar->name,
+                'tanggal' => $val->date,
+                'week' => $val->week,
+                'stockist' => $val->stockist
+            );
+        }
+
+        $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+
+        $dt = Datatables::of(collect($data));
+        foreach ($product as $pdct) {
+            $dt->addColumn('product-'.$pdct->id, function($stock) use ($pdct) {
+                $oos = \App\StockMdDetail::where([
+                    'id_stock' => $stock['id_stock'],
+                    'id_product' => $pdct->id
+                ])->first();
+                return (isset($oos['oos']) ? $oos['oos'] : "-");
+            });
+        }
+        return $dt->make(true);
+    }
 
     public function getCbd($data, $day)
     {
@@ -1663,6 +1739,7 @@ class ReportController extends Controller
             ]);
         }
     }
+
     public function getAchievement($date = '')
     {
         $str = 
@@ -1691,4 +1768,117 @@ class ReportController extends Controller
         // return Datatables::of(collect($data))->make(true);
     }
 
+
+    // ************ SPG PASAR ************ //
+    public function SPGsales()
+    {
+        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $product = array();
+        $id = 1;
+        foreach ($sales as $key => $value) {
+            $detail = SalesSpgPasarDetail::where('id_sales',1)->get();
+            foreach ($detail as $keys => $det) {
+                // $product[$key][] = $det->product->name;
+                $product[$key][$keys] = "<tr>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->product->name)."</td>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->qty)."</td>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->qty_actual)."</td>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->satuan)."</td>";
+                $product[$key][$keys] .= "</tr>";
+            }
+            // dd($product);
+            $data[] = array(
+                'id' => $id++,
+                'nama_spg' => $this->isset($value->employee->name),
+                'pasar' => $this->isset($value->pasar->name),
+                'tanggal' => $this->isset($value->date),
+                'nama' => $this->isset($value->name),
+                'phone' => $this->isset($value->phone),
+                'list' => implode('', $product[$key]),
+            );
+        }
+        return Datatables::of(collect($data))
+        ->addColumn('action', function ($data) {
+            $html = "<table class='table table-bordered'>";
+            $html .= "<tr><th>Nama</th><th>Quantity</th><th>Actual Quantity</th><th>Satuan</th></tr>";
+            $html .= $data['list'];
+            $html .= "</table>";
+            return $html;
+        })->make(true);
+        // return Datatables::of(collect($data))->make(true);
+    }
+
+    public function SPGrekap()
+    {
+        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month)->get();
+        $id = 1;
+        $data = array();
+        foreach ($rekap as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'name' => (isset($val->employee->name) ? $val->employee->name : "-"),
+                'outlet' => (isset($val->outlet->name) ? : "-"),
+                'date' => (isset($val->date) ? $val->date : "-"),
+                'total_buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
+                'total_sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
+                'total_value' => (isset($val->total_value) ? $val->total_value : "-"),
+                'photo' => (isset($val->photo) ? $val->photo : "-")
+            );
+        }
+        return Datatables::of(collect($data))
+        ->addColumn('action', function($stock) {
+            if (isset($stock['photo'])) {
+                $oos = "<a href=".asset('/uploads/sales_recap')."/".$stock['photo']." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP' target='_blank'><i class='si si-picture mr-2'></i>Photo</a>";
+            } else {
+                $oos = "-";
+            }
+            return $oos;
+        })->make(true);
+    }
+
+    public function SPGattendance()
+    {
+        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month)->get();
+        $data = array();
+        $absen = array();
+        $id = 1;
+        foreach ($employee as $val) {
+            $data[] = array(
+                'id' => $id++,
+                'area' => $this->isset($val->pasar->subarea->area->name),
+                'subarea' => $this->isset($val->pasar->subarea->name),
+                'nama' => $this->isset($val->attendance->employee->name),
+                'jabatan' => $this->isset($val->attendance->employee->position->name),
+                'pasar' => $this->isset($val->pasar->name,
+                'tanggal' => Carbon::parse($this->isset($val->checkin))->day,
+                'checkin' => Carbon::parse($this->isset($val->checkin))->format('H:m:s'),
+                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
+    }
+    public function isset($val)
+    {
+        return (isset($val) ? $val : "-");
+    }
+    public function kunjunganDc()
+    {
+        $plan = PlanDc::with('planEmployee')
+        ->select('plan_dcs.*');
+        return Datatables::of($plan)
+        ->addColumn('action', function ($plan) {
+            return "<a href=".route('ubah.plan', $plan->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+            <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
+        
+        })
+        ->addColumn('planEmployee', function($plan) {
+            $dist = PlanEmployee::where(['id_plandc'=>$plan->id])->get();
+            $distList = array();
+            foreach ($dist as $data) {
+                $distList[] = $data->employee->name;
+            }
+            return rtrim(implode(',', $distList), ',');
+        })->make(true);
+    }
 }

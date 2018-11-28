@@ -2,6 +2,9 @@
 
 namespace App;
 
+use DB;
+use App\FokusChannel;
+use App\FokusProduct;
 use App\Components\traits\DropDownHelper;
 use App\Components\traits\ValidationHelper;
 use Illuminate\Database\Eloquent\Model;
@@ -58,16 +61,21 @@ class ProductFokus extends Model
         return date('m/Y', strtotime($value));
     }
 
-    // public static function hasActivePF($data, $self_id = null)
-    // {
-    //     $products = ProductFokus::where('id_product', $data['id_product'])
-    //                             ->where('fr', $data['id_area'])
-    //                             ->where('id', '!=', $self_id)
-    //                             ->where(function($query) use ($data){
-    //                                 $query->whereBetween('from', [$data['from'], $data['to']]);
-    //                                 $query->orWhereBetween('to', [$data['from'], $data['to']]);
-    //                             })->count();
+    public static function hasActivePF($data, $self_id = null)
+    {
+        $x = DB::table('fokus_products')->join('products', 'fokus_products.id_product', '=', 'products.id')->where('name', '<>', '')->get();
+        $z = DB::table('fokus_channels')->join('channels', 'fokus_channels.id_channel', '=', 'channels.id')->where('name', '<>', '')->get();
+        // $xp = DB::table('products')->join('fokus_products', 'products.id', '=', 'fokus_products.id_product')->get();
+        // $y = count(collect($x, $request->input('channel'))->get('id'));
+        $q = $x->whereIn('id_product', $data['product'])->count();
+        $h = $z->whereIn('id_channel', $data['channel'])->count();
+        // $channel = Channel::whereRaw("TRIM(UPPER(name)) = '". strtoupper($data['channel'])."'")->count();
+        $fokus = ProductFokus::where('id', '!=', $self_id)
+                                ->where(function($query) use ($data){
+                                    $query->whereBetween('from', [$data['from'], $data['to']]);
+                                    $query->orWhereBetween('to', [$data['from'], $data['to']]);
+                                })->count();
 
-    //     return $products > 0;
-    // }
+        return $fokus > 0 && $q > 0 && $h > 0;
+    }
 }

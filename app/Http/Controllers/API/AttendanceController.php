@@ -9,6 +9,7 @@ use App\Attendance;
 use App\AttendanceDetail;
 use App\AttendanceOutlet;
 use App\AttendancePasar;
+use App\Cbd;
 use Carbon\Carbon;
 use JWTFactory;
 use JWTAuth;
@@ -17,6 +18,11 @@ use Config;
 class AttendanceController extends Controller
 {
 	use ApiAuthHelper;
+	
+	public function __construct()
+	{
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
 
 	public function absen(Request $request, $type = 'MTC')
 	{
@@ -35,19 +41,20 @@ class AttendanceController extends Controller
 					]);
 				}else if (strtoupper($type) == 'GTC-MD') {
 					$attendance = AttendanceOutlet::where([
-						'id_outlet' => 1
+						'id_outlet' => $request->input('outlet')
 					]);		
 				}else if (strtoupper($type) == 'GTC-SPG') {
 					$attendance = AttendancePasar::where([
 						'id_pasar' => $request->input('pasar')
 					]);			
 				}
-				$attendance->with(['attendance' => function($query) use ($user) {
+
+				$attendance->whereHas('attendance', function($query) use ($user) {
 					$query->where([
 						'id_employee' => $user->id,
 						'keterangan' => 'Check-in',
 					])->whereDate('date', '=', Carbon::today()->toDateString());
-				}]);
+				});
 
 				if ($attendance->count() > 0) {
 					$res['success'] = false;
@@ -99,11 +106,16 @@ class AttendanceController extends Controller
 			} else {
 				$att = Attendance::where([
 					'id_employee' => $user->id,
-					'keterangan' => 'Check-in'
 				])
-				->orWhere('keterangan', '=', 'Cuti')
-				->orWhere('keterangan', '=', 'Off')
-				->orWhere('keterangan', '=', 'Sakit')
+				->where(function($q)
+				{
+					return $q->orWhere([
+						'keterangan' => 'Check-in',
+						'keterangan' => 'Cuti',
+						'keterangan' => 'Sakit',
+						'keterangan' => 'Off'
+					]);
+				})
 				->whereDate('date', '=', Carbon::today()->toDateString())->first();
 				if (isset($att->id)) {
 					$res['success'] = false;
@@ -145,7 +157,7 @@ class AttendanceController extends Controller
 			$res['code'] = 200;
 
 			$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])
-			->whereDate('date', '=', Carbon::today()->toDateString())->first();
+			->whereDate('date', '=', Carbon::today()->toDateString())->orderBy('id','desc')->first();
 			if (isset($attId->id)) {
 
 				if (strtoupper($type) == 'MTC') {
