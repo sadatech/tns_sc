@@ -659,6 +659,13 @@ Route::prefix('mtc')->group(function () {
 		Route::post('/data', 'ReportController@salesMtcDataSalesAlt')->name('salesmtc.data')->middleware('auth');
 	});
 
+	Route::prefix('achievement')->group(function () {
+		Route::get('/', 'ReportController@achievementSalesMtcIndex')->name('achievement-salesmtc')->middleware('auth');
+		Route::post('/data-spg', 'ReportController@achievementSalesMtcDataSPG')->name('achievement-salesmtc-spg.data')->middleware('auth');
+		Route::post('/data-md', 'ReportController@achievementSalesMtcDataMD')->name('achievement-salesmtc-md.data')->middleware('auth');
+		Route::post('/data-tl', 'ReportController@achievementSalesMtcDataTL')->name('achievement-salesmtc-tl.data')->middleware('auth');
+	});
+
 
 	Route::prefix('availability')->group(function () {
 		Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
