@@ -88,7 +88,7 @@ class EmployeeController extends Controller
 			'password' 		=> 'required',
 			'position' 		=> 'required',
 			'agency' 		=> 'required|numeric',
-			'email' 		=> 'email|required',
+			'email' 		=> 'email|required|unique:employees',
 			'phone' 		=> 'required|numeric|unique:employees',
 			'nik' 			=> 'required|unique:employees',
 			'ktp' 			=> 'required|numeric|unique:employees',

@@ -363,9 +363,20 @@ class ProductFokusController extends Controller
 		    		} else {
 		    			$channelList[] = "-";
 		    		}
+                }
+                $product = FokusProduct::where(
+		    		'id_pf', $val->id
+		    	)->get();
+                $productList = array();
+		    	foreach($product as $dataProduct) {
+		    		if(isset($dataProduct->id_product)) {
+		    			$productList[] = $dataProduct->product->name;
+		    		} else {
+		    			$productList[] = "-";
+		    		}
 		    	}
 		    	$data[] = array(
-		    		'Product'		=> $val->product->name,
+		    		'Product'		=> rtrim(implode(',', $productList), ','),
                     'Channel'	    => rtrim(implode(',', $channelList), ','),
                     'Area'			=> rtrim(implode(',', $areaList), ','),
                     'Month From'    => (isset($val->from) ? $val->from : "-"),
