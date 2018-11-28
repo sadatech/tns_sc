@@ -146,15 +146,15 @@ class OutletController extends Controller
 						$res['success'] = true;
 						foreach ($outlet as $data) {
 							$listOutlet[] = array(
-								'id' 		=> $data->id,
-								'name' 		=> $data->name,
-								'code' 		=> $data->customer_code,
-								'phone' 	=> $data->phone,
-								'address'	=> $data->address,
-								'new_ro'	=> $data->new_ro,
-								'id_pasar' 	=> $data->employeePasar->pasar->id,
-								'pasar' 	=> $data->employeePasar->pasar->name,
-								'address' 	=> $data->employeePasar->pasar->address,
+								'id' 				=> $data->id,
+								'name' 				=> $data->name,
+								'code' 				=> $data->customer_code,
+								'phone' 			=> $data->phone,
+								'address'			=> $data->address,
+								'new_ro'			=> $data->new_ro,
+								'id_pasar' 			=> $data->employeePasar->pasar->id,
+								'pasar' 			=> $data->employeePasar->pasar->name,
+								'pasar_address' 	=> $data->employeePasar->pasar->address,
 							);
 						}
 						$res['outlet'] = $listOutlet;
@@ -349,10 +349,10 @@ class OutletController extends Controller
 				$code = 200;
 				if (empty($id)) {
 					$res['success'] = false;
-					$res['msg'] = "Please select store.";
+					$res['msg'] = "Please select outlet.";
 				} else if( empty($status) ) {
 					$res['success'] = false;
-					$res['msg'] = "Please set store status.";
+					$res['msg'] = "Please set outlet status.";
 				} else {
 					DB::transaction(function() use ($id, $status, &$res){
 						if ($status == 'true') {
