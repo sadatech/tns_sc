@@ -58,8 +58,8 @@ class SalesRecapController extends Controller
 						],
 						[
 							'total_buyer'	=> $request->total_buyer,
-							'total_sales'	=> $request->total_buyer,
-							'total_value'	=> $request->total_buyer,
+							'total_sales'	=> $request->total_sales,
+							'total_value'	=> $request->total_value,
 							'photo' 		=> $photo,
 						]
 					);
