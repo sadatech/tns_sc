@@ -537,6 +537,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.stockist', $data);
 				})->name('report.stockist')->middleware('auth');
 				Route::get('/data', 'ReportController@SMDstockist')->name('data.smd.stockist')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDstocking')->name('export.smd.stockist')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {

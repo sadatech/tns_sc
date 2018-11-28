@@ -36,6 +36,7 @@ use App\Sales;
 use App\DetailSales;
 use App\Target;
 use App\StockMdHeader as StockMD;
+use App\StockMdDetail;
 use App\Outlet;
 use App\Attendance;
 use App\AttendancePasar;
@@ -1648,7 +1649,8 @@ class ReportController extends Controller
     {
         $dist = Distribution::whereMonth('date',Carbon::now()->month);
         if ($dist->count() > 0) {
-		    foreach ($dist->get() as $val) {
+		    foreach ($dist->get() as $key => $val) {
+                $detail = DistributionDetail::where('id_distribution',$val->id)->get();
 		    	$data[] = array(
                     'Employee'  => $val->employee->name,
                     'Pasar'     => $val->outlet->employeePasar->pasar->name,
@@ -1656,6 +1658,15 @@ class ReportController extends Controller
                     'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
 		    	);
             }
+
+            $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
         
 		    $filename = "ReportDistPf".Carbon::now().".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
@@ -1930,6 +1941,46 @@ class ReportController extends Controller
                 'type'   => 'danger',
                 'title'  => 'Gagal Unduh!<br/>',
                 'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportSMDstocking()
+    {
+        $stock = StockMD::whereMonth('date', Carbon::now()->month);
+        if ($stock->count() > 0) {
+		    foreach ($stock->get() as $key => $val) {
+                $detail = StockMdDetail::where('id_stock',$val->id)->get();
+		    	$data[] = array(
+                    'Name'      => $val->employee->name,
+                    'Pasar'     => $val->pasar->name,
+                    'Date'      => $val->date,
+                    'Week'      => $val->week,
+                    'Stockist'  => $val->stockist
+                );
+                $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->oos;
+                }
+            }
+        
+		    $filename = "ReportSMDStokist".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('ReportSMDStokist', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
             ]);
         }
     }
