@@ -178,8 +178,7 @@ class PlandcController extends Controller
         $data=$request->all();
         $limit=[
             'date'           => 'required',
-            'plan'           => 'required',
-            'employee'       => 'required'
+            'plan'           => 'required'
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -187,11 +186,7 @@ class PlandcController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
-           
-            // $data1 = Employee::where(['id' => $request->input('employee')])->first();
-            // $data2 = PlanDc::whereRaw("TRIM(UPPER(plan)) = '". trim(strtoupper($request->input('plan')))."'");
-            // $data3 = PlanEmployee::where(['id_employee' => $data1->id]);
-            $store = PlanDc::find($id);
+            $store = Plandc::find($id);
             if ($request->input('employee')) {
                 foreach ($request->input('employee') as $emp) {
                     PlanEmployee::where('id_plandc', $id)->delete();
@@ -201,12 +196,6 @@ class PlandcController extends Controller
                     );
                 }
                 DB::table('plan_employees')->insert($dataEmp);
-                return redirect()->route('planDc')
-                ->with([
-                'type'    => 'success',
-                'title'   => 'Sukses!<br/>',
-                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Plan Demo Cooking!'
-                ]);
             }
             $store->date             = $request->input('date');
             $store->plan             = $request->input('plan');
