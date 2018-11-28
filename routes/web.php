@@ -537,6 +537,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.stockist', $data);
 				})->name('report.stockist')->middleware('auth');
 				Route::get('/data', 'ReportController@SMDstockist')->name('data.smd.stockist')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDstocking')->name('export.smd.stockist')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -584,6 +585,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.attendance');
 				})->name('report.spg.attendance')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGattendance')->name('data.spg.attendance')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSpgAttandance')->name('export.spg.attendance')->middleware('auth');
 			});
 			Route::prefix('achievement')->group(function () {
 				Route::get('/', function(){
@@ -596,6 +598,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.sales');
 				})->name('report.sales.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSpgSales')->name('spg.pasar.sales.export')->middleware('auth');
 			});
 
 			Route::prefix('recap')->group(function () {

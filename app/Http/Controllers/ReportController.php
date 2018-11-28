@@ -36,6 +36,7 @@ use App\Sales;
 use App\DetailSales;
 use App\Target;
 use App\StockMdHeader as StockMD;
+use App\StockMdDetail;
 use App\Outlet;
 use App\Attendance;
 use App\AttendancePasar;
@@ -1648,7 +1649,8 @@ class ReportController extends Controller
     {
         $dist = Distribution::whereMonth('date',Carbon::now()->month);
         if ($dist->count() > 0) {
-		    foreach ($dist->get() as $val) {
+		    foreach ($dist->get() as $key => $val) {
+                $detail = DistributionDetail::where('id_distribution',$val->id)->get();
 		    	$data[] = array(
                     'Employee'  => $val->employee->name,
                     'Pasar'     => $val->outlet->employeePasar->pasar->name,
@@ -1656,6 +1658,15 @@ class ReportController extends Controller
                     'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
 		    	);
             }
+
+            $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
         
 		    $filename = "ReportDistPf".Carbon::now().".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
@@ -1696,6 +1707,40 @@ class ReportController extends Controller
 		    $filename = "AttandanceReport".Carbon::now().".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
 		    	$excel->sheet('AttandanceReport', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportSpgAttandance()
+    {
+        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month);
+        if ($employee->count() > 0) {
+		    foreach ($employee->get() as $val) {
+		    	$data[] = array(
+                'area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
+                'subarea'   => (isset($val->pasar->subarea->name) ?  $val->pasar->subarea->area->name : ""),
+                'nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                'pasar'     => (isset($val->pasar->name) ? $val->pasar->name : ""),
+                'tanggal'   => Carbon::parse($val->checkin)->day,
+                'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
+                'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+		    	);
+            }
+        
+		    $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
 		    	{
 		    		$sheet->fromArray($data);
 		    	});
@@ -1777,7 +1822,7 @@ class ReportController extends Controller
         $product = array();
         $id = 1;
         foreach ($sales as $key => $value) {
-            $detail = SalesSpgPasarDetail::where('id_sales',1)->get();
+            $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
             foreach ($detail as $keys => $det) {
                 // $product[$key][] = $det->product->name;
                 $product[$key][$keys] = "<tr>";
@@ -1858,10 +1903,93 @@ class ReportController extends Controller
         }
         return Datatables::of(collect($data))->make(true);
     }
+
+    // EXPORT SPG
+    public function exportSpgSales()
+    {
+        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month);
+        if ($sales->count() > 0) {
+            $product = array();
+            foreach ($sales->get() as $key => $value) {
+                $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
+                $data[] = array(
+                    'Nama SPG' => $value->employee->name,
+                    'Pasar' => $value->pasar->name,
+                    'Date' => $value->date,
+                    'Nama Pemilik Pasar' => $value->name,
+                    'Phone Pemilik Pasar' => $value->phone
+                );
+                $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
+            }
+            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportSMDstocking()
+    {
+        $stock = StockMD::whereMonth('date', Carbon::now()->month);
+        if ($stock->count() > 0) {
+		    foreach ($stock->get() as $key => $val) {
+                $detail = StockMdDetail::where('id_stock',$val->id)->get();
+		    	$data[] = array(
+                    'Name'      => $val->employee->name,
+                    'Pasar'     => $val->pasar->name,
+                    'Date'      => $val->date,
+                    'Week'      => $val->week,
+                    'Stockist'  => $val->stockist
+                );
+                $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->oos;
+                }
+            }
+        
+		    $filename = "ReportSMDStokist".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('ReportSMDStokist', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
     public function isset($val)
     {
         return (isset($val) ? $val : "-");
     }
+
     public function kunjunganDc()
     {
         $plan = PlanDc::with('planEmployee')
