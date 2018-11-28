@@ -3,6 +3,8 @@
 namespace App;
 
 use DB;
+use App\FokusChannel;
+use App\FokusProduct;
 use App\Components\traits\DropDownHelper;
 use App\Components\traits\ValidationHelper;
 use Illuminate\Database\Eloquent\Model;

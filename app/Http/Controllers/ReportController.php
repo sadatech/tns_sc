@@ -1493,17 +1493,17 @@ class ReportController extends Controller
                     'id_distribution' => $dist['id'],
                     'id_product' => $pdct->id
                 ])->first();
-                $html = "<table class='table table-bordered'>";
-                $html .= "<tr>";
-                $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
-                $html .= "<td>".$distribution['qty']."</td>";
-                $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
-                $html .= "<td>".$distribution['qty_actual']."</td>";
-                $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
-                $html .= "<td>".$distribution['satuan']."</td>";
-                $html .= "</tr>";
-                $html .= "</table>";
-                return $html;
+                // $html = "<table class='table table-bordered'>";
+                // $html .= "<tr>";
+                // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
+                // $html .= "<td>".$distribution['qty']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
+                // $html .= "<td>".$distribution['qty_actual']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
+                // $html .= "<td>".$distribution['satuan']."</td>";
+                // $html .= "</tr>";
+                // $html .= "</table>";
+                return $distribution['qty_actual']."&nbsp;".$distribution['satuan'];
             });
         }
         $dt->rawColumns($columns);
@@ -1536,17 +1536,17 @@ class ReportController extends Controller
                     'id_sales' => $sales['id_sales'],
                     'id_product' => $pdct->id
                 ])->first();
-                $html = "<table class='table table-bordered'>";
-                $html .= "<tr>";
-                $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
-                $html .= "<td>".$sale['qty']."</td>";
-                $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
-                $html .= "<td>".$sale['qty_actual']."</td>";
-                $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
-                $html .= "<td>".$sale['satuan']."</td>";
-                $html .= "</tr>";
-                $html .= "</table>";
-                return $html;
+                // $html = "<table class='table table-bordered'>";
+                // $html .= "<tr>";
+                // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
+                // $html .= "<td>".$sale['qty']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
+                // $html .= "<td>".$sale['qty_actual']."</td>";
+                // $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
+                // $html .= "<td>".$sale['satuan']."</td>";
+                // $html .= "</tr>";
+                // $html .= "</table>";
+                return $sale['qty_actual']."&nbsp;".$sale['satuan'];
             });
         }
         $dt->rawColumns($columns);
@@ -1779,20 +1779,20 @@ class ReportController extends Controller
             foreach ($detail as $keys => $det) {
                 // $product[$key][] = $det->product->name;
                 $product[$key][$keys] = "<tr>";
-                $product[$key][$keys] .= "<td>".$det->product->name."</td>";
-                $product[$key][$keys] .= "<td>".$det->qty."</td>";
-                $product[$key][$keys] .= "<td>".$det->qty_actual."</td>";
-                $product[$key][$keys] .= "<td>".$det->satuan."</td>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->product->name)."</td>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->qty)."</td>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->qty_actual)."</td>";
+                $product[$key][$keys] .= "<td>".$this->isset($det->satuan)."</td>";
                 $product[$key][$keys] .= "</tr>";
             }
             // dd($product);
             $data[] = array(
                 'id' => $id++,
-                'nama_spg' => $value->employee->name,
-                'pasar' => $value->pasar->name,
-                'tanggal' => $value->date,
-                'nama' => $value->name,
-                'phone' => $value->phone,
+                'nama_spg' => $this->isset($value->employee->name),
+                'pasar' => $this->isset($value->pasar->name),
+                'tanggal' => $this->isset($value->date),
+                'nama' => $this->isset($value->name),
+                'phone' => $this->isset($value->phone),
                 'list' => implode('', $product[$key]),
             );
         }
@@ -1815,15 +1815,24 @@ class ReportController extends Controller
         foreach ($rekap as $val) {
             $data[] = array(
                 'id' => $id++,
-                'name' => $val->employee->name,
-                'outlet' => $val->outlet->name,
-                'date' => $val->date,
-                'total_buyer' => $val->total_buyer,
-                'total_sales' => $val->total_sales,
-                'total_value' => $val->total_value
+                'name' => (isset($val->employee->name) ? $val->employee->name : "-"),
+                'outlet' => (isset($val->outlet->name) ? : "-"),
+                'date' => (isset($val->date) ? $val->date : "-"),
+                'total_buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
+                'total_sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
+                'total_value' => (isset($val->total_value) ? $val->total_value : "-"),
+                'photo' => (isset($val->photo) ? $val->photo : "-")
             );
         }
-        return Datatables::of(collect($data))->make(true);
+        return Datatables::of(collect($data))
+        ->addColumn('action', function($stock) {
+            if (isset($stock['photo'])) {
+                $oos = "<a href=".asset('/uploads/sales_recap')."/".$stock['photo']." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP' target='_blank'><i class='si si-picture mr-2'></i>Photo</a>";
+            } else {
+                $oos = "-";
+            }
+            return $oos;
+        })->make(true);
     }
 
     public function SPGattendance()
@@ -1846,5 +1855,10 @@ class ReportController extends Controller
             );
         }
         return Datatables::of(collect($data))->make(true);
+    }
+
+    public function isset($val)
+    {
+        return (isset($val) ? $val : "-");
     }
 }
