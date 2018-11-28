@@ -1850,9 +1850,9 @@ class ReportController extends Controller
                 'subarea' => $this->isset($val->pasar->subarea->name),
                 'nama' => $this->isset($val->attendance->employee->name),
                 'jabatan' => $this->isset($val->attendance->employee->position->name),
-                'pasar' => $this->isset($val->pasar->name,
-                'tanggal' => Carbon::parse($this->isset($val->checkin))->day,
-                'checkin' => Carbon::parse($this->isset($val->checkin))->format('H:m:s'),
+                'pasar' => $this->isset($val->pasar->name),
+                'tanggal' => Carbon::parse($val->checkin)->day,
+                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
                 'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
             );
         }
