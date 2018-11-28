@@ -150,7 +150,7 @@ class EmployeeController extends Controller
 					'joinAt' 		=> $request->input('joinAt'),
 					'foto_ktp' 		=> $foto_ktp,
 					'foto_tabungan' => $foto_tabungan,
-					'foto_profile' => $foto_profile,
+					'foto_profile' 	=> $foto_profile,
 					'id_position' 	=> $request->input('position'),
 					'id_timezone' 	=> $request->input('timezone'),
 					'id_agency' 	=> $request->input('agency')

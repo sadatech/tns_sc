@@ -32,8 +32,8 @@
           <th>Product</th>
           <th>Channel</th>
           <th>Area</th>
-          <th>Date From</th>
-          <th>Date Until</th>
+          <th>Month From</th>
+          <th>Month Until</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -69,6 +69,8 @@
                                     <td><b>SKU</b></td>
                                     <td><b>Channel</b></td>
                                     <td><b>Area</b></td>
+                                    <td><b>From</b></td>
+                                    <td><b>Until</b></td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -76,11 +78,15 @@
                                     <td>SKU 1</td>
                                     <td>Channel1, Channel2, Channel3</td>
                                     <td>Area1, Area2</td>
+                                    <td>11-2018</td>
+                                    <td>12-2018</td>
                                 </tr>
                                 <tr>
-                                    <td>SKU 2</td>
-                                    <td>Channel1</td>
+                                    <td>SKU 3, SKU 4</td>
+                                    <td>Channel1, Channel3</td>
                                     <td></td>
+                                    <td>1-2019</td>
+                                    <td>2-2019</td>
                                 </tr>
                             </tbody>
                         </table>

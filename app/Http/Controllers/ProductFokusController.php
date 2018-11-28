@@ -238,8 +238,8 @@ class ProductFokusController extends Controller
                             foreach($results as $row)
                             {
                                 $fokus = ProductFokus::create([
-                                    'from'  => Carbon::now(),
-                                    'to'    => Carbon::now() 
+                                    'from'  => \PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'),
+                                    'to'    => \PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM')
                                 ]);
                                 if (!isset($fokus->id)) {
                                     
