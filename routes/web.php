@@ -596,6 +596,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.sales');
 				})->name('report.sales.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSpgSales')->name('spg.pasar.sales.export')->middleware('auth');
 			});
 
 			Route::prefix('recap')->group(function () {

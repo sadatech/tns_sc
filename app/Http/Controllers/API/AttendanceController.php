@@ -9,6 +9,8 @@ use App\Attendance;
 use App\AttendanceDetail;
 use App\AttendanceOutlet;
 use App\AttendancePasar;
+use App\AttendancePlace;
+use App\AttendanceBlock;
 use App\Cbd;
 use Carbon\Carbon;
 use JWTFactory;
@@ -47,6 +49,14 @@ class AttendanceController extends Controller
 					$attendance = AttendancePasar::where([
 						'id_pasar' => $request->input('pasar')
 					]);			
+				}else if (strtoupper($type) == 'GTC-DC') {
+					$attendance = AttendancePlace::where([
+						'id_place' => $request->input('place')
+					]);
+				}else if (strtoupper($type) == 'GTC-MOTORIC') {
+					$attendance = AttendanceBlock::where([
+						'id_block' => $request->input('block')
+					]);
 				}
 
 				$attendance->whereHas('attendance', function($query) use ($user) {
@@ -84,6 +94,18 @@ class AttendanceController extends Controller
 							$insertAtt = AttendancePasar::create([
 								'id_attendance' => $insert->id,
 								'id_pasar' 		=> $request->input('pasar'),
+								'checkin' 		=> Carbon::now()
+							]);
+						}else if (strtoupper($type) == 'GTC-DC') {
+							$insertAtt = AttendancePlace::create([
+								'id_attendance' => $insert->id,
+								'id_place' 		=> $request->input('place'),
+								'checkin' 		=> Carbon::now()
+							]);
+						}else if (strtoupper($type) == 'GTC-MOTORIC') {
+							$insertAtt = AttendanceBlock::create([
+								'id_attendance' => $insert->id,
+								'id_block' 		=> $request->input('block'),
 								'checkin' 		=> Carbon::now()
 							]);
 						}
@@ -166,6 +188,10 @@ class AttendanceController extends Controller
 					$absen = AttendanceOutlet::where(['id_attendance' => $attId->id])->first();
 				}else if (strtoupper($type) == 'GTC-SPG') {
 					$absen = AttendancePasar::where(['id_attendance' => $attId->id])->first();
+				}else if (strtoupper($type) == 'GTC-DC') {
+					$absen = AttendancePlace::where(['id_attendance' => $attId->id])->first();
+				}else if (strtoupper($type) == 'GTC-MOTORIC') {
+					$absen = AttendanceBlock::where(['id_attendance' => $attId->id])->first();
 				}
 
 				if (isset($absen->checkout) == null) {
@@ -216,6 +242,12 @@ class AttendanceController extends Controller
 				}else if (strtoupper($type) == 'GTC-SPG') {
 					$attendance = AttendancePasar::where(['id_attendance' => $attId->id])->first();
 					$lokasi = 'pasar';
+				}else if (strtoupper($type) == 'GTC-DC') {
+					$attendance = AttendancePlace::where(['id_attendance' => $attId->id])->first();
+					$lokasi = 'distributor';
+				}else if (strtoupper($type) == 'GTC-MOTORIC') {
+					$attendance = AttendanceBlock::where(['id_attendance' => $attId->id])->first();
+					$lokasi = 'block';
 				}
 
 				if (!empty($attendance)) {
@@ -240,6 +272,14 @@ class AttendanceController extends Controller
 						}else if (strtoupper($type) == 'GTC-SPG') {
 							$res['id_pasar']	= (isset($attendance->id_pasar) ? $attendance->id_pasar : null);
 							$res['name'] 		= (isset($attendance->pasar->name) ? $attendance->pasar->name : null);
+							$res['time'] 		= $attendance->checkin;
+						}else if (strtoupper($type) == 'GTC-DC') {
+							$res['id_place']	= (isset($attendance->id_place) ? $attendance->id_place : null);
+							$res['name'] 		= (isset($attendance->place->name) ? $attendance->place->name : null);
+							$res['time'] 		= $attendance->checkin;
+						}else if (strtoupper($type) == 'GTC-MOTORIC') {
+							$res['id_block']	= (isset($attendance->id_block) ? $attendance->id_block : null);
+							$res['name'] 		= (isset($attendance->block->name) ? $attendance->block->name : null);
 							$res['time'] 		= $attendance->checkin;
 						}
 					} else {
