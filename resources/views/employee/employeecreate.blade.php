@@ -470,7 +470,7 @@ $("#example-inline-checkbox2").on('change', function() {
             $('#storeStay').hide();
             $('#storeMobile').hide();
         } else if (select == "{{ App\Position::where(['level' => 'motoric'])->first()->id }}") {
-            $('#pasarMobile').show();
+            $('#pasarMobile').hide();
             $('#status').hide();
             $('#subarea').hide();
             $('#tl').hide();
