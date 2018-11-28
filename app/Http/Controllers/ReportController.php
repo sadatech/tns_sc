@@ -54,6 +54,8 @@ use App\PlanDc;
 use App\PlanEmployee;
 use App\Filters\EmployeeFilters;
 use App\Filters\EmployeeStoreFilters;
+use App\Model\Extend\SalesSpgPasarAchievement;
+use App\Model\Extend\SalesSpgPasarSummary;
 
 class ReportController extends Controller
 {
@@ -2135,5 +2137,100 @@ class ReportController extends Controller
             }
             return rtrim(implode(',', $distList), ',');
         })->make(true);
+    }
+
+    public function SPGsalesSummary()
+    {
+        $sales = SalesSpgPasarSummary::whereNull('deleted_at')->groupBy('id_employee', 'id_pasar', 'date')->orderBy('date', 'ASC')->orderBy('id_employee', 'ASC')->orderBy('id_pasar', 'ASC');
+
+        // return $sales->get();
+        
+        return Datatables::of($sales)
+        // ->addColumn('area', function ($data) {
+        //     return @$data->pasar->subarea->area->name;
+        // })
+        // ->addColumn('nama_spg', function ($data) {
+        //     return @$data->employee->name;
+        // })
+        // ->addColumn('tanggal', function ($data) {
+        //     return Carbon::parse($data->date)->format('D, F d, Y');
+        // })
+        // ->addColumn('nama_pasar', function ($data) {
+        //     return @$data->pasar->name;
+        // })
+        // ->addColumn('nama_stokies', function ($data) {
+        //     return 'Under Construction';
+        // })
+        // ->addColumn('jumlah_beli', function ($data) {
+        //     return $data->getJumlahBeli();
+        // })
+        // ->addColumn('detail', function ($data) {
+            
+        //     return $data->getDetail();
+        //     // return $pf;
+        //     // return "<table class='table'>
+        //     //             <thead>
+        //     //                 <th>Sales CCL 65 ml (Pcs)</th>
+        //     //                 <th>Sales CCL 200 ml</th>
+        //     //             </thead>
+        //     //             <tbody>
+        //     //                 <tr>
+        //     //                     <td>100</td>
+        //     //                     <td>0</td>
+        //     //                 </tr>
+        //     //                 <tr>
+        //     //                     <td>20</td>
+        //     //                     <td>10</td>
+        //     //                 </tr>
+        //     //             </tbody>
+        //     //         </table>";
+        // })
+        ->rawColumns(['detail'])
+        ->make(true);
+        // return Datatables::of($sales)->make(true);
+    }
+
+    public function SPGsalesAchievement()
+    {
+        $sales = SalesSpgPasarAchievement::whereNull('deleted_at')
+                              ->groupBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), DB::raw('id_employee'))
+                              ->orderBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), 'ASC')
+                              ->orderBy('id_employee', 'ASC');
+
+        // return $sales->get();
+        
+        return Datatables::of($sales)
+        // ->addColumn('periode', function ($data) {
+        //     return Carbon::parse($data->date)->format('F Y');
+        // })
+        // ->addColumn('area', function ($data) {
+        //     return $data->employee->getAreaByPasar();
+        // })
+        // ->addColumn('nama_spg', function ($data) {
+        //     return $data->employee->name;
+        // })
+        // ->addColumn('hk', function ($data) {
+        //     // return $data->getHk();
+        // })
+        // ->addColumn('sum_of_jumlah', function ($data) {
+        //     return $data->getSumOfJumlah();
+        // })
+        // ->addColumn('sum_of_pf', function ($data) {
+        //     return $data->getSumOfPfValue();
+        // })
+        // ->addColumn('sum_of_total', function ($data) {
+        //     return $data->getSumOfTotalValue();
+        // })
+        // ->addColumn('eff_kontak', function ($data) {
+        //     return $data->getSumEffKontak();
+        // })
+        // ->addColumn('act_value', function ($data) {
+        //     return 'TEST';
+        // })
+        // ->addColumn('sales_per_kontak', function ($data) {
+        //     return 'TEST';
+        // })
+        ->make(true);
+        // return Datatables::of($sales)->make(true);
     }
 }

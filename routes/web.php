@@ -591,6 +591,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.achievement');
 				})->name('report.achievement.spg')->middleware('auth');
+				Route::get('/data', 'ReportController@SPGsalesAchievement')->name('spg.pasar.sales.achievement.data')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -606,6 +607,13 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.recap');
 				})->name('report.recap.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGrekap')->name('spg.pasar.recap.data')->middleware('auth');
+			});
+
+			Route::prefix('sales-summary')->group(function () {
+				Route::get('/', function(){
+					return view('report.spg.sales-summary');
+				})->name('report.sales.summary.spg')->middleware('auth');
+				Route::get('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
 			});
 		});
 
