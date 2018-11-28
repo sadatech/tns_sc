@@ -312,6 +312,10 @@
                             <li>
                                 <a class="{{ request()->is('report/mtc/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
                             </li>
+                            {{-- SALES MTC REVIEW --}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
+                            </li>
                             {{-- Display Share--}}
                             <li>
                                 <a class="{{ request()->is('report/mtc/display_share') ? 'active' : '' }}" href="{{ route('display_share') }}"><span class="sidebar-mini-hide">Display Share</span></a>

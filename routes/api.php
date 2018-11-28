@@ -46,6 +46,14 @@ Route::prefix('subcategory')->group(function () {
 	Route::get('/list/{id_category?}', 'API\SubCategoryController@list')->name('api.subcategory.list');
 });
 
+Route::prefix('area')->group(function () {
+	Route::get('/list', 'API\AreaController@list')->name('api.area.list');
+});
+
+Route::prefix('subarea')->group(function () {
+	Route::get('/list/{id_area?}', 'API\SubAreaController@list')->name('api.subarea.list');
+});
+
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 	Route::get('pf/list/{id_pasar}', 'API\ProductController@pfList')->name('api.product.pf.list');
@@ -77,7 +85,10 @@ Route::prefix('sales-recap')->group(function () {
 
 Route::prefix('sales-dc')->group(function () {
 	Route::post('/add/{type?}', 'API\SalesDcController@store')->name('api.sales-dc.add');
-	// Route::get('/list/{date?}', 'API\SalesDcController@history')->name('api.sales-dc.list');
+});
+
+Route::prefix('sales-motoric')->group(function () {
+	Route::post('/add', 'API\SalesMotoricController@store')->name('api.sales-motoric.add');
 });
 
 Route::prefix('promo')->group(function () {
@@ -107,6 +118,7 @@ Route::prefix('cbd')->group(function () {
 
 Route::prefix('distribution')->group(function () {
 	Route::post('/add', 'API\DistributionController@store')->name('api.distribution.add');
+	Route::post('/add/{type}', 'API\DistributionController@store')->name('api.distribution.add.motoric');
 });
 
 Route::prefix('faq')->group(function () {
@@ -157,13 +169,20 @@ Route::prefix('outlet')->group(function () {
 	Route::get('/status', 'API\OutletController@status')->name('api.status.list');
 });
 
+// Block
+Route::prefix('block')->group(function () {
+	Route::post('/add', 'API\BlockController@store')->name('api.block.add');
+	Route::post('/edit/{id}', 'API\BlockController@update')->name('api.block.edit');
+	Route::get('/list/{id}', 'API\BlockController@list')->name('api.block.list');
+});
+
 // History
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
 	Route::get('/sales/{type}/{date?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
 	Route::get('/sales-recap/{date?}', 'API\HistoryController@salesRecapHistory')->name('api.sales-recap-history.list');
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
-	Route::get('/distribution/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
+	Route::get('/distribution/{type}/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
 	Route::get('/cbd/{date?}', 'API\HistoryController@cbdHistory')->name('api.cbd-history.list');
 	Route::get('/dc/{type?}/{date?}', 'API\HistoryController@dcHistory')->name('api.dc-history.list');
 	Route::get('/plan/{date?}', 'API\HistoryController@planHistory')->name('api.plan-history.list');

@@ -39,42 +39,33 @@ class ProductFokusController extends Controller
 
     public function data()
     {
-        $product = ProductFokus::with(['product','fokusarea','fokus'])
-        ->select('product_fokuses.*');
-        return Datatables::of($product)
-        // ->addColumn('area', function($product) {
-		// 	if (isset($product->area)) {
-		// 		$area = $product->area->name;
-		// 	} else {
-		// 		$area = "Without Area";
-		// 	}
-		// 	return $area;
-        // })
-        ->addColumn('fokusproduct', function($product) {
-            $sku = FokusProduct::where(['id_pf'=>$product->id])->get();
-            $skuList = array();
-            foreach ($sku as $data) {
-                $skuList[] = $data->product->name;
+        $fokus = FokusProduct::get();
+        $data = array();
+        $chan = array();
+        $areas = array();
+        $id = 1;
+        foreach ($fokus as $key => $value) {
+            $channel = FokusChannel::where('id_pf', $value->id_pf)->get();
+            $area = FokusArea::where('id_pf', $value->id_pf)->get();
+            foreach ($area as $ar) {
+                $areas[$key][] = (isset($ar->area->name) ? $ar->area->name : "-");
             }
-            return rtrim(implode(',', $skuList), ',');
-        })
-        ->addColumn('fokusarea', function($product) {
-            $area = FokusArea::where(['id_pf'=>$product->id])->get();
-            $areaList = array();
-            foreach ($area as $data) {
-                $areaList[] = (isset($data->area->name) ? $data->area->name : "-");
+            foreach ($channel as $val) {
+                $chan[$key][] = $val->channel->name;
             }
-            return rtrim(implode(',', $areaList), ',');
-        })
-        ->addColumn('fokus', function($product) {
-            $chan = FokusChannel::where(['id_pf'=>$product->id])->get();
-            $channelList = array();
-            foreach ($chan as $data) {
-                $channelList[] = $data->channel->name;
-            }
-            return rtrim(implode(',', $channelList), ',');
-        })
-        ->addColumn('action', function ($product) {
+            $data[] = array(
+                'id' => $id++,
+                'id_pf' => $value->id_pf,
+                'product' => $value->product->name,
+                'channel' => implode(',', $chan[$key]),
+                'area' => (isset($areas[$key]) ? implode(',', $areas[$key]) : "-"),
+                'from' => $value->pf->from,
+                'until' => $value->pf->to,
+            );
+        }
+        return Datatables::of(collect($data))
+        ->addColumn('action', function ($fokus) {
+            $product = ProductFokus::where('id', $fokus['id_pf'])->first();
             $data = array(
                 'id'            => $product->id,
                 'product'       => FokusProduct::where('id_pf',$product->id)->pluck('id_product'),
@@ -247,8 +238,8 @@ class ProductFokusController extends Controller
                             foreach($results as $row)
                             {
                                 $fokus = ProductFokus::create([
-                                    'from'  => Carbon::now(),
-                                    'to'    => Carbon::now() 
+                                    'from'  => \PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'),
+                                    'to'    => \PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM')
                                 ]);
                                 if (!isset($fokus->id)) {
                                     
@@ -363,9 +354,20 @@ class ProductFokusController extends Controller
 		    		} else {
 		    			$channelList[] = "-";
 		    		}
+                }
+                $product = FokusProduct::where(
+		    		'id_pf', $val->id
+		    	)->get();
+                $productList = array();
+		    	foreach($product as $dataProduct) {
+		    		if(isset($dataProduct->id_product)) {
+		    			$productList[] = $dataProduct->product->name;
+		    		} else {
+		    			$productList[] = "-";
+		    		}
 		    	}
 		    	$data[] = array(
-		    		'Product'		=> $val->product->name,
+		    		'Product'		=> rtrim(implode(',', $productList), ','),
                     'Channel'	    => rtrim(implode(',', $channelList), ','),
                     'Area'			=> rtrim(implode(',', $areaList), ','),
                     'Month From'    => (isset($val->from) ? $val->from : "-"),
