@@ -1858,10 +1858,53 @@ class ReportController extends Controller
         }
         return Datatables::of(collect($data))->make(true);
     }
+
+    // EXPORT SPG
+    public function exportSpgSales()
+    {
+        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month);
+        if ($sales->count() > 0) {
+            $product = array();
+            foreach ($sales->get() as $key => $value) {
+                $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
+                $data[] = array(
+                    'Nama SPG' => $value->employee->name,
+                    'Pasar' => $value->pasar->name,
+                    'Date' => $value->date,
+                    'Nama Pemilik Pasar' => $value->name,
+                    'Phone Pemilik Pasar' => $value->phone
+                );
+                $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
+            }
+            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
     public function isset($val)
     {
         return (isset($val) ? $val : "-");
     }
+
     public function kunjunganDc()
     {
         $plan = PlanDc::with('planEmployee')
