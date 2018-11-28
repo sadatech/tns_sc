@@ -34,6 +34,7 @@
               <th>Total Buyer</th>
               <th>Total Sales</th>
               <th>Total Value</th>
+              <th>Photo</th>
             </tr>
           </thead>
         </table>
@@ -77,6 +78,7 @@ table.table thead tr th {
           { data: 'total_buyer' },
           { data: 'total_sales' },
           { data: 'total_value' },
+          { data: 'action' },
       ]
     });
   });
