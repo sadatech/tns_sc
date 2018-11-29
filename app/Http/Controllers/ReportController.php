@@ -1863,7 +1863,7 @@ class ReportController extends Controller
             $data[] = array(
                 'id' => $id++,
                 'name' => (isset($val->employee->name) ? $val->employee->name : "-"),
-                'outlet' => (isset($val->outlet->name) ? : "-"),
+                'outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
                 'date' => (isset($val->date) ? $val->date : "-"),
                 'total_buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
                 'total_sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
@@ -1880,6 +1880,37 @@ class ReportController extends Controller
             }
             return $oos;
         })->make(true);
+    }
+
+    public function exportSPGrekap()
+    {
+        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month);
+        if ($rekap->count() > 0) {
+            foreach ($rekap->get() as $val) {
+                $data[] = array(
+                    'Name' => (isset($val->employee->name) ? $val->employee->name : "-"),
+                    'Outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
+                    'Date' => (isset($val->date) ? $val->date : "-"),
+                    'Total Buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
+                    'Total Sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
+                    'Total Value' => (isset($val->total_value) ? $val->total_value : "-")
+                );
+            }
+            $filename = "SPGRekap".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('SPGReakp', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
     }
 
     public function SPGattendance()

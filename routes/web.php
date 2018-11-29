@@ -606,6 +606,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.recap');
 				})->name('report.recap.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGrekap')->name('spg.pasar.recap.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSPGrekap')->name('spg.pasar.recap.export')->middleware('auth');
 			});
 		});
 
