@@ -525,29 +525,29 @@ class ReportController extends Controller
                 })
                 ->orderBy('id', 'ASC');
 
-        return response()->json($data);
+        // return response()->json($data->get());
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
-            return number_format($item->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+            // return number_format($item->getActualPrevious(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]));
         })
         ->addColumn('actual_current', function($item) use ($periode) {
-            return number_format($item->getActual(['store' => $item->id_store, 'date' => $periode]));
+            // return number_format($item->getActual(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]));
         })
         ->addColumn('target', function($item) use ($periode) {
-            return number_format($item->getTarget(['store' => $item->id_store, 'date' => $periode]));
+            // return number_format($item->getTarget(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]));
         })
         ->addColumn('achievement', function($item) use ($periode) {
-            return $item->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+            // return $item->getAchievement(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]);
         })
         ->addColumn('growth', function($item) use ($periode) {
-            return $item->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+            // return $item->getGrowth(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]);
         })
         ->addColumn('area', function($item) {
-            return $item->employeeArea->area->name;
+            return $item->employeeSubArea->subarea;
         })
         ->make(true);     
     }
@@ -2214,7 +2214,8 @@ class ReportController extends Controller
         return Datatables::of(collect($data))
         ->addColumn('action', function($stock) {
             if (isset($stock['photo'])) {
-                $oos = "<a href=".asset('/uploads/sales_recap')."/".$stock['photo']." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP' target='_blank'><i class='si si-picture mr-2'></i>Photo</a>";
+                $img_url = asset('/uploads/sales_recap')."/".$stock['photo'];
+                $oos = "<img src='".$img_url."' width='50px'/>";
             } else {
                 $oos = "-";
             }
@@ -2367,8 +2368,8 @@ class ReportController extends Controller
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
-            return "<a href=".route('ubah.plan', $plan->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-            <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
+            $img_url = asset('/uploads/plan')."/".$plan->photo;
+            return "<img src='".$img_url."' width='50px'/>";
         
         })
         ->addColumn('planEmployee', function($plan) {
