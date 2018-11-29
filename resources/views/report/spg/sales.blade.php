@@ -27,19 +27,15 @@
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
-                <th colspan="3">SPG</th>
-                <th></th>
-                <th colspan="2">Costumer</th>
-                <th>Detail</th>
-            </tr>
-            <tr>
               <th class="text-center" style="width: 70px;"></th>
               <th>Name</th>
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Name</th>
               <th>Phone</th>
-              <th>Product</th>
+              @foreach ($product as $pro)
+              <th>{{ $pro->name }}</th>
+              @endforeach
             </tr>
           </thead>
         </table>
@@ -82,7 +78,9 @@ table.table thead tr th {
       { data: 'tanggal', name:'Tanggal' },
       { data: 'nama', name:'Outlet' },
       { data: 'phone', name:'Phone' },
-      { data: 'action', name:'Product' },
+      @foreach ($product as $pro)
+      { data: 'product-{{ $pro->id }}' },
+      @endforeach
       ]
     });
   });

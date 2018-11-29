@@ -83,7 +83,8 @@ class ProductController extends Controller
 					->whereHas('Fokus.channel', function($query)
 					{
 						return $query->where('name','GTC');
-					})->whereRaw("'$today' BETWEEN product_fokuses.from and product_fokuses.to")->get();
+					})->whereRaw("'$today' BETWEEN product_fokuses.from and product_fokuses.to")
+					->get();
 
 					$product= [];
 					foreach ($pf as $key => $value) {
