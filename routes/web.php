@@ -663,10 +663,10 @@ Route::prefix('report')->group(function () {
 				})->name('report.motorik.attendance')->middleware('auth');
 			});
 
-			Route::prefix('stockist')->group(function () {
+			Route::prefix('distPF')->group(function () {
 				Route::get('/', function(){
-					return view('report.motorik.stockist');
-				})->name('report.motorik.stockist')->middleware('auth');
+					return view('report.motorik.distPF');
+				})->name('report.motorik.distPF')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {

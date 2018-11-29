@@ -310,9 +310,9 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
                                     </li>
-                                    {{-- STOCKIST MOTORIK --}}
+                                    {{-- DIST PF MOTORIK --}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/motorik/stockist') ? 'active' : '' }}" href="{{ route('report.motorik.stockist') }}"><span class="sidebar-mini-hide">Stokist</span></a>
+                                        <a class="{{ request()->is('report/gtc/motorik/distPF') ? 'active' : '' }}" href="{{ route('report.motorik.distPF') }}"><span class="sidebar-mini-hide">Dist PF</span></a>
                                     </li>
                                     {{-- SALES MOTORIK --}}
                                     <li>
