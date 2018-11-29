@@ -52,6 +52,10 @@ use App\SalesSpgPasarDetail;
 use App\SalesRecap;
 use App\PlanDc;
 use App\PlanEmployee;
+use App\Filters\EmployeeFilters;
+use App\Filters\EmployeeStoreFilters;
+use App\Model\Extend\SalesSpgPasarAchievement;
+use App\Model\Extend\SalesSpgPasarSummary;
 
 class ReportController extends Controller
 {
@@ -415,6 +419,131 @@ class ReportController extends Controller
 
     public function salesMtcDataTarget(SummaryFilters $filters){
         return Datatables::of(SalesMtcSummary('sales_mtc_summary_by_target')->filter($filters))->make(true);
+    }
+
+    // *********** ACHIEVEMENT **************** //
+
+    public function achievementSalesMtcIndex(){
+        return view('report.achievement-salesmtc');
+    }
+
+    public function achievementSalesMtcDataSPG(Request $request, EmployeeStoreFilters $filters){
+
+        $periode = Carbon::parse($request->periode);
+        $data = EmployeeStore::filter($filters)
+                ->whereHas('employee.position', function($query){
+                    return $query->where('level', 'spgmtc');
+                })
+                ->orderBy('id_employee', 'ASC');            
+
+        // foreach ($data as $item) {
+            
+        //     $item['employee_name'] = $item->employee->name;
+        //     $item['actual_previous'] = number_format($item->employee->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+        //     $item['actual_current'] = number_format($item->employee->getActual(['store' => $item->id_store, 'date' => $periode]));
+        //     $item['target'] = number_format($item->employee->getTarget(['store' => $item->id_store, 'date' => $periode]));
+        //     $item['achievement'] = $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+        //     $item['growth'] = $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+        //     $item['store_name'] = $item->store->name1;
+
+        // }
+
+        // return response()->json($data);
+
+        return Datatables::of($data)        
+        ->addColumn('employee_name', function($item) {
+            return $item->employee->name;
+        })
+        ->addColumn('actual_previous', function($item) use ($periode) {
+            return number_format($item->employee->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('actual_current', function($item) use ($periode) {
+            return number_format($item->employee->getActual(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('target', function($item) use ($periode) {
+            return number_format($item->employee->getTarget(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement', function($item) use ($periode) {
+            return $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('growth', function($item) use ($periode) {
+            return $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('store_name', function($item) use ($periode) {
+            return $item->store->name1;
+            return $item->employee->getActualPf1(['id_channel' => $item->store->account->id_channel, 'date' => $periode]);
+        })
+        ->make(true);     
+    }
+
+    public function achievementSalesMtcDataMD(Request $request, EmployeeFilters $filters){
+
+        $periode = Carbon::parse($request->periode);
+        $data = Employee::filter($filters)->whereHas('position', function ($query){
+                    return $query->where('level', 'mdmtc');
+                })->orderBy('id', 'ASC');
+
+        // return response()->json('zz');
+
+        return Datatables::of($data)        
+        ->addColumn('employee_name', function($item) {
+            return $item->name;
+        })
+        ->addColumn('actual_previous', function($item) use ($periode) {
+            return number_format($item->getActualPrevious(['date' => $periode]));
+        })
+        ->addColumn('actual_current', function($item) use ($periode) {
+            return number_format($item->getActual(['date' => $periode]));
+        })
+        ->addColumn('target', function($item) use ($periode) {
+            return number_format($item->getTarget(['date' => $periode]));
+        })
+        ->addColumn('achievement', function($item) use ($periode) {
+            return $item->getAchievement(['date' => $periode]);
+        })
+        ->addColumn('growth', function($item) use ($periode) {
+            return $item->getGrowth(['date' => $periode]);
+        })
+        ->addColumn('jml_store', function($item) {
+            return $item->employeeStore->count();
+        })
+        ->make(true);     
+    }
+
+    public function achievementSalesMtcDataTL(Request $request, EmployeeStoreFilters $filters){
+
+        $periode = Carbon::parse($request->periode);
+        $data = Employee::filter($filters)
+                ->whereHas('position', function($query){
+                    return $query->where('level', 'tlmtc');
+                })
+                ->orderBy('id', 'ASC');
+
+        return response()->json($data);
+
+        return Datatables::of($data)        
+        ->addColumn('employee_name', function($item) {
+            return $item->name;
+        })
+        ->addColumn('actual_previous', function($item) use ($periode) {
+            return number_format($item->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('actual_current', function($item) use ($periode) {
+            return number_format($item->getActual(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('target', function($item) use ($periode) {
+            return number_format($item->getTarget(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement', function($item) use ($periode) {
+            return $item->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('growth', function($item) use ($periode) {
+            return $item->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('area', function($item) {
+            return $item->employeeArea->area->name;
+        })
+        ->make(true);     
     }
 
 
@@ -1822,36 +1951,36 @@ class ReportController extends Controller
         $product = array();
         $id = 1;
         foreach ($sales as $key => $value) {
-            $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
-            foreach ($detail as $keys => $det) {
-                // $product[$key][] = $det->product->name;
-                $product[$key][$keys] = "<tr>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->product->name)."</td>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->qty)."</td>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->qty_actual)."</td>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->satuan)."</td>";
-                $product[$key][$keys] .= "</tr>";
-            }
-            // dd($product);
             $data[] = array(
                 'id' => $id++,
+                'id_sales' => $value->id,
                 'nama_spg' => $this->isset($value->employee->name),
                 'pasar' => $this->isset($value->pasar->name),
                 'tanggal' => $this->isset($value->date),
                 'nama' => $this->isset($value->name),
-                'phone' => $this->isset($value->phone),
-                'list' => implode('', $product[$key]),
+                'phone' => $this->isset($value->phone)
             );
         }
-        return Datatables::of(collect($data))
-        ->addColumn('action', function ($data) {
-            $html = "<table class='table table-bordered'>";
-            $html .= "<tr><th>Nama</th><th>Quantity</th><th>Actual Quantity</th><th>Satuan</th></tr>";
-            $html .= $data['list'];
-            $html .= "</table>";
-            return $html;
-        })->make(true);
-        // return Datatables::of(collect($data))->make(true);
+        $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+        $dt = Datatables::of(collect($data));
+        $columns = array();
+        foreach ($product as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
+            $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
+                $sale = \App\SalesSpgPasarDetail::where([
+                    'id_sales' => $sales['id_sales'],
+                    'id_product' => $pdct->id
+                ])->first();
+                if ($sale != null) {
+                    return $sale['qty_actual']."&nbsp;".$sale['satuan'];
+                } else {
+                    return "-";
+                }
+            });
+        }
+        $dt->rawColumns($columns);
+        return $dt->make(true);
     }
 
     public function SPGrekap()
@@ -2039,5 +2168,100 @@ class ReportController extends Controller
             }
             return rtrim(implode(',', $distList), ',');
         })->make(true);
+    }
+
+    public function SPGsalesSummary()
+    {
+        $sales = SalesSpgPasarSummary::whereNull('deleted_at')->groupBy('id_employee', 'id_pasar', 'date')->orderBy('date', 'ASC')->orderBy('id_employee', 'ASC')->orderBy('id_pasar', 'ASC');
+
+        // return $sales->get();
+        
+        return Datatables::of($sales)
+        // ->addColumn('area', function ($data) {
+        //     return @$data->pasar->subarea->area->name;
+        // })
+        // ->addColumn('nama_spg', function ($data) {
+        //     return @$data->employee->name;
+        // })
+        // ->addColumn('tanggal', function ($data) {
+        //     return Carbon::parse($data->date)->format('D, F d, Y');
+        // })
+        // ->addColumn('nama_pasar', function ($data) {
+        //     return @$data->pasar->name;
+        // })
+        // ->addColumn('nama_stokies', function ($data) {
+        //     return 'Under Construction';
+        // })
+        // ->addColumn('jumlah_beli', function ($data) {
+        //     return $data->getJumlahBeli();
+        // })
+        // ->addColumn('detail', function ($data) {
+            
+        //     return $data->getDetail();
+        //     // return $pf;
+        //     // return "<table class='table'>
+        //     //             <thead>
+        //     //                 <th>Sales CCL 65 ml (Pcs)</th>
+        //     //                 <th>Sales CCL 200 ml</th>
+        //     //             </thead>
+        //     //             <tbody>
+        //     //                 <tr>
+        //     //                     <td>100</td>
+        //     //                     <td>0</td>
+        //     //                 </tr>
+        //     //                 <tr>
+        //     //                     <td>20</td>
+        //     //                     <td>10</td>
+        //     //                 </tr>
+        //     //             </tbody>
+        //     //         </table>";
+        // })
+        ->rawColumns(['detail'])
+        ->make(true);
+        // return Datatables::of($sales)->make(true);
+    }
+
+    public function SPGsalesAchievement()
+    {
+        $sales = SalesSpgPasarAchievement::whereNull('deleted_at')
+                              ->groupBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), DB::raw('id_employee'))
+                              ->orderBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), 'ASC')
+                              ->orderBy('id_employee', 'ASC');
+
+        // return $sales->get();
+        
+        return Datatables::of($sales)
+        // ->addColumn('periode', function ($data) {
+        //     return Carbon::parse($data->date)->format('F Y');
+        // })
+        // ->addColumn('area', function ($data) {
+        //     return $data->employee->getAreaByPasar();
+        // })
+        // ->addColumn('nama_spg', function ($data) {
+        //     return $data->employee->name;
+        // })
+        // ->addColumn('hk', function ($data) {
+        //     // return $data->getHk();
+        // })
+        // ->addColumn('sum_of_jumlah', function ($data) {
+        //     return $data->getSumOfJumlah();
+        // })
+        // ->addColumn('sum_of_pf', function ($data) {
+        //     return $data->getSumOfPfValue();
+        // })
+        // ->addColumn('sum_of_total', function ($data) {
+        //     return $data->getSumOfTotalValue();
+        // })
+        // ->addColumn('eff_kontak', function ($data) {
+        //     return $data->getSumEffKontak();
+        // })
+        // ->addColumn('act_value', function ($data) {
+        //     return 'TEST';
+        // })
+        // ->addColumn('sales_per_kontak', function ($data) {
+        //     return 'TEST';
+        // })
+        ->make(true);
+        // return Datatables::of($sales)->make(true);
     }
 }

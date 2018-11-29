@@ -142,11 +142,11 @@ class HistoryController extends Controller
 					}else if (strtoupper($type) == 'GTC-MD') {
 						$detail = SalesMdDetail::query();
 					}else if (strtoupper($type) == 'GTC-SPG') {
-						$detail = SalesSpgPasar::query();
+						$detail = SalesSpgPasarDetail::query();
 					}else if (strtoupper($type) == 'GTC-DC') {
-						$detail = SalesDc::query();
+						$detail = SalesDcDetail::query();
 					}else if (strtoupper($type) == 'GTC-SAMPLING') {
-						$detail = SamplingDc::query();
+						$detail = SamplingDcDetail::query();
 					}
 
 					$detail->where('id_sales',$head->id);
