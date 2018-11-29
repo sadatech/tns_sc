@@ -50,6 +50,7 @@ use App\Product;
 use App\SalesSpgPasar;
 use App\SalesSpgPasarDetail;
 use App\SalesRecap;
+use App\SalesMdDetail;
 use App\PlanDc;
 use App\PlanEmployee;
 use App\Filters\EmployeeFilters;
@@ -1888,13 +1889,22 @@ class ReportController extends Controller
     {
         $sales = SalesMD::whereMonth('date', Carbon::now()->month);
         if ($sales->count() > 0) {
-		    foreach ($sales->get() as $val) {
+		    foreach ($sales->get() as $key => $val) {
+                $detail = SalesMdDetail::where('id_sales',$val->id)->get();
 		    	$data[] = array(
                     'Employee'  => $val->employee->name,
                     'Pasar'     => $val->outlet->employeePasar->pasar->name,
                     'Tanggal'   => $val->date,
                     'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
-		    	);
+                );
+                $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
             }
         
 		    $filename = "ReportSalesMD".Carbon::now().".xlsx";
