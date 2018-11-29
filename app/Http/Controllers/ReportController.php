@@ -519,29 +519,29 @@ class ReportController extends Controller
                 })
                 ->orderBy('id', 'ASC');
 
-        return response()->json($data);
+        // return response()->json($data);
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
-            return number_format($item->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->getActualPrevious(['area' => $item->employeeSubArea->area->name, 'date' => $periode]));
         })
         ->addColumn('actual_current', function($item) use ($periode) {
-            return number_format($item->getActual(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->getActual(['area' => $item->employeeSubArea->area->name, 'date' => $periode]));
         })
         ->addColumn('target', function($item) use ($periode) {
-            return number_format($item->getTarget(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->getTarget(['area' => $item->employeeSubArea->area->name, 'date' => $periode]));
         })
         ->addColumn('achievement', function($item) use ($periode) {
-            return $item->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+            return $item->getAchievement(['area' => $item->employeeSubArea->area->name, 'date' => $periode]);
         })
         ->addColumn('growth', function($item) use ($periode) {
-            return $item->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+            return $item->getGrowth(['area' => $item->employeeSubArea->area->name, 'date' => $periode]);
         })
         ->addColumn('area', function($item) {
-            return $item->employeeArea->area->name;
+            return $item->employeeSubArea->area->name;
         })
         ->make(true);     
     }

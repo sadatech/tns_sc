@@ -42,15 +42,12 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
 
     public function attendanceOutlet()
     {
-
         return $this->hasMany('App\AttendanceOutlet', 'id_employee');
-
     }
 
     public function attendance()
     {
         return $this->hasMany('App\Attendance', 'id_employee');
-
     }
 
     public function rejoins()
@@ -138,6 +135,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                         SELECT SUM(target_value) AS result
                         FROM sales_mtc_summary
                         WHERE id_employee = ".$this->id."
+                        AND area = ".$data['area']."
                         AND MONTH(date) = ".$data['date']->month."
                         AND YEAR(date) = ".$data['date']->year."
                         LIMIT 1
