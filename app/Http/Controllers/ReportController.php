@@ -50,6 +50,7 @@ use App\Product;
 use App\SalesSpgPasar;
 use App\SalesSpgPasarDetail;
 use App\SalesRecap;
+use App\SalesMdDetail;
 use App\PlanDc;
 use App\PlanEmployee;
 use App\Filters\EmployeeFilters;
@@ -519,29 +520,29 @@ class ReportController extends Controller
                 })
                 ->orderBy('id', 'ASC');
 
-        return response()->json($data);
+        // return response()->json($data);
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
-            return number_format($item->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->getActualPrevious(['area' => $item->employeeSubArea->area->name, 'date' => $periode]));
         })
         ->addColumn('actual_current', function($item) use ($periode) {
-            return number_format($item->getActual(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->getActual(['area' => $item->employeeSubArea->area->name, 'date' => $periode]));
         })
         ->addColumn('target', function($item) use ($periode) {
-            return number_format($item->getTarget(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->getTarget(['area' => $item->employeeSubArea->area->name, 'date' => $periode]));
         })
         ->addColumn('achievement', function($item) use ($periode) {
-            return $item->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+            return $item->getAchievement(['area' => $item->employeeSubArea->area->name, 'date' => $periode]);
         })
         ->addColumn('growth', function($item) use ($periode) {
-            return $item->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+            return $item->getGrowth(['area' => $item->employeeSubArea->area->name, 'date' => $periode]);
         })
         ->addColumn('area', function($item) {
-            return $item->employeeArea->area->name;
+            return $item->employeeSubArea->area->name;
         })
         ->make(true);     
     }
@@ -1825,8 +1826,8 @@ class ReportController extends Controller
                     'subarea' => $val->outlet->employeePasar->pasar->subarea->name,
                     'nama' => $val->attendance->employee->name,
                     'jabatan' => $val->attendance->employee->position->name,
-                    'pasar' => $val->outlet->employeePasar->pasar->name,
-                    'outlet' => $val->outlet->name,
+                    'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
                     'tanggal' => Carbon::parse($val->checkin)->day,
                     'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
                     'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
@@ -1888,13 +1889,22 @@ class ReportController extends Controller
     {
         $sales = SalesMD::whereMonth('date', Carbon::now()->month);
         if ($sales->count() > 0) {
-		    foreach ($sales->get() as $val) {
+		    foreach ($sales->get() as $key => $val) {
+                $detail = SalesMdDetail::where('id_sales',$val->id)->get();
 		    	$data[] = array(
                     'Employee'  => $val->employee->name,
                     'Pasar'     => $val->outlet->employeePasar->pasar->name,
                     'Tanggal'   => $val->date,
                     'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
-		    	);
+                );
+                $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
             }
         
 		    $filename = "ReportSalesMD".Carbon::now().".xlsx";

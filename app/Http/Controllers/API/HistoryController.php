@@ -64,7 +64,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
@@ -136,7 +136,7 @@ class HistoryController extends Controller
 			})
 			->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
-			});
+			})->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
 				$dataArr = array();
@@ -205,7 +205,7 @@ class HistoryController extends Controller
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
-			})->where('id_employee', $user->id);
+			})->where('id_employee', $user->id)->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
 				$dataArr = array();
@@ -256,7 +256,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
@@ -314,7 +314,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
@@ -371,7 +371,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($data->count() > 0) {
 				$res['success'] = true;
@@ -412,7 +412,7 @@ class HistoryController extends Controller
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
-			});
+			})->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
 				$dataArr = array();
@@ -472,7 +472,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($data->count() > 0) {
 				$res['success'] = true;
@@ -508,7 +508,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($data->count() > 0) {
 				$res['success'] 		= true;
