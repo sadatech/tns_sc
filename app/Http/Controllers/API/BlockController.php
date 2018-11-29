@@ -117,9 +117,7 @@ class BlockController extends Controller
 				}else{
 					$activeStatus = "tidak aktif";
 				}
-				$block = Block::where('active', $active)->whereHas('employeePasar', function($query) use ($user) {
-					return $query->where('id_employee', $user->id);
-				})->get();
+				$block = Block::where('active', $active)->where('id_employee', $user->id)->get();
 				if ($block->count() > 0) {
 					$listBlock = [];
 					$res['success'] = true;
