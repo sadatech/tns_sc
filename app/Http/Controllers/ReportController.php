@@ -60,8 +60,11 @@ use App\PlanDc;
 use App\PlanEmployee;
 use App\Filters\EmployeeFilters;
 use App\Filters\EmployeeStoreFilters;
+use App\Filters\SalesSpgSummaryFilters;
 use App\Model\Extend\SalesSpgPasarAchievement;
 use App\Model\Extend\SalesSpgPasarSummary;
+use App\SubCategory;
+use App\ProductFokusSpg;
 
 class ReportController extends Controller
 {
@@ -2382,13 +2385,54 @@ class ReportController extends Controller
         })->make(true);
     }
 
-    public function SPGsalesSummary()
+    public function SPGsalesSummary(Request $request)
     {
-        $sales = SalesSpgPasarSummary::whereNull('deleted_at')->groupBy('id_employee', 'id_pasar', 'date')->orderBy('date', 'ASC')->orderBy('id_employee', 'ASC')->orderBy('id_pasar', 'ASC');
+        // return $request->all();
 
-        // return $sales->get();
+        $periode = Carbon::parse($request->periode)->format('Y-m-d');
         
-        return Datatables::of($sales)
+        $products = ProductFokusSpg::whereHas('product', function($query) use ($request){
+                        return $query->where('id_subcategory', $request->id_subcategory);
+                    })->whereDate('from', '<=', $periode)->whereDate('to', '>=', $periode)->get();        
+
+        $sub_cat = array_unique($products->pluck('product.subcategory.id')->toArray());
+
+        $sales = SalesSpgPasarSummary::whereHas('detailSales.product.subcategory', function ($query) use ($request, $sub_cat){
+                                        return $query->where('id', $request->id_subcategory)->whereIn('id', $sub_cat);
+                                     })
+                                     ->whereMonth('date', Carbon::parse($request->periode)->month)
+                                     ->whereYear('date', Carbon::parse($request->periode)->year)
+                                     ->groupBy('id_employee', 'id_pasar', 'date')
+                                     ->orderBy('date', 'DESC')
+                                     ->orderBy('id_employee', 'ASC')
+                                     ->orderBy('id_pasar', 'ASC');
+
+        // return $sales->first()->getProductsValue();
+        
+        $dt = Datatables::of($sales);
+
+        /* SALES PER PRODUCT(S) */
+        foreach ($products as $column) {
+            $dt->addColumn('product_'.$column->id, function($item) use ($column) {
+                // return $item->detail;
+                return array_key_exists($column->id, $item->detail) ? number_format($item->detail[$column->id]) : 0;
+            });
+        }
+
+        /* SALES OTHER, SALES PF, TOTAL VALUE */
+        $dt->addColumn('sales_other', function($item) {
+            return number_format($item->sales_other);
+        });
+        $dt->addColumn('sales_pf', function($item) {
+            return number_format($item->sales_pf);
+        });
+        $dt->addColumn('total_value', function($item) {
+            return number_format($item->total_value);
+        });
+
+        return $dt->make(true);
+        
+        // return Datatables::of($sales)
         // ->addColumn('area', function ($data) {
         //     return @$data->pasar->subarea->area->name;
         // })
@@ -2428,9 +2472,44 @@ class ReportController extends Controller
         //     //             </tbody>
         //     //         </table>";
         // })
-        ->rawColumns(['detail'])
-        ->make(true);
+        // ->rawColumns(['detail'])
+        // ->make(true);
         // return Datatables::of($sales)->make(true);
+    }    
+
+    public function SPGsalesSummaryHeader(Request $request){
+
+        // return $request->all();
+
+        $periode = Carbon::parse($request->periode)->format('Y-m-d');
+        
+        $products = ProductFokusSpg::whereHas('product', function($query) use ($request){
+                        return $query->where('id_subcategory', $request->id_subcategory);
+                    })->whereDate('from', '<=', $periode)->whereDate('to', '>=', $periode)->get();
+
+        $sub_category = SubCategory::where('id', $request->id_subcategory)->first()->name;
+
+        $th = "";
+        $array_column = array();
+
+        foreach ($products as $item) {
+            $th .= "<th>Sales ".$item->product->name."</th>";
+            array_push($array_column, ['data'=>'product_'.$item->product->id, 'name'=>'product_'.$item->product->id ]);
+            // array_push($array_column, $item->id);
+        }
+
+        $th .= "<th>Sales Other</th><th>Sales Product Fokus</th><th>Total Value</th>";
+        array_push($array_column, 
+            ['data'=>'sales_other', 'name'=>'sales_other'],
+            ['data'=>'sales_pf', 'name'=>'sales_pf'],
+            ['data'=>'total_value', 'name'=>'total_value']
+        );
+
+        return 
+        [
+            "th" => $th,
+            "columns" => $array_column
+        ];
     }
 
     public function SPGsalesAchievement()
