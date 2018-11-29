@@ -644,6 +644,28 @@ Route::prefix('report')->group(function () {
 			});
 
 		});
+
+		// Motorik Report
+		Route::prefix('motorik')->group(function () {
+			Route::prefix('attendance')->group(function () {
+				Route::get('/', function(){
+					return view('report.motorik.attendance');
+				})->name('report.motorik.attendance')->middleware('auth');
+			});
+
+			Route::prefix('stockist')->group(function () {
+				Route::get('/', function(){
+					return view('report.motorik.stockist');
+				})->name('report.motorik.stockist')->middleware('auth');
+			});
+
+			Route::prefix('sales')->group(function () {
+				Route::get('/', function(){
+					return view('report.motorik.sales');
+				})->name('report.motorik.sales')->middleware('auth');
+			});
+
+		});
 	});
 
 Route::prefix('mtc')->group(function () {
