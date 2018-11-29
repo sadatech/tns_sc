@@ -40,6 +40,7 @@ class BlockController extends Controller
 				if (!empty(SubArea::find($request->subarea))) {
 					$insert = Block::create([
 						'id_subarea'	=> $request->subarea,
+						'id_employee'	=> $user->id,
 						'name'			=> $request->name,
 						'phone'			=> $request->phone,
 						'address'		=> $request->address,
