@@ -42,12 +42,17 @@ use App\Attendance;
 use App\AttendancePasar;
 use App\AttendanceOutlet;
 use App\Distribution;
+use App\DistributionMotoric;
 use App\DistributionDetail;
+use App\DistributionMotoricDetail;
 use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Product;
 use App\SalesSpgPasar;
+use App\SalesMotoricDetail;
+use App\SalesMotoric;
+use App\AttendanceBlock;
 use App\SalesSpgPasarDetail;
 use App\SalesRecap;
 use App\SalesMdDetail;
@@ -1602,6 +1607,202 @@ class ReportController extends Controller
         // })->make(true);
     }
 
+    public function Motorikattendance()
+    {
+        $employee = AttendanceBlock::whereMonth('checkin', Carbon::now()->month)->get();;
+        $absen = array();
+        $id = 1;
+        foreach ($employee as $val) {
+            $data[] = array(
+                'id'        => $id++,
+                'region'    => (isset($val->block->subArea->area->region->name) ? $val->block->subArea->area->region->name : ""),
+                'area'      => (isset($val->block->subArea->area->name) ? $val->block->subArea->area->name : ""),
+                'subarea'   => (isset($val->block->subArea->name) ? $val->block->subArea->name : ""),
+                'block'     => (isset($val->block->name) ? $val->block->name : ""),
+                'nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                'tanggal'   => Carbon::parse($val->checkin)->day,
+                'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
+                'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+            );
+        }
+        return Datatables::of(collect($data))->make(true);
+    }
+
+    public function exportMptorikAttandance()
+    {
+        $employee = AttendanceBlock::whereMonth('checkin', Carbon::now()->month);
+        if ($employee->count() > 0) {
+		    foreach ($employee->get() as $val) {
+		    	$data[] = array(
+                'Region'    => (isset($val->block->subArea->area->region->name) ? $val->block->subArea->area->region->name : ""),
+                'Area'      => (isset($val->block->subArea->area->name) ? $val->block->subArea->area->name : ""),
+                'Subarea'   => (isset($val->block->subArea->name) ? $val->block->subArea->name : ""),
+                'Block'     => (isset($val->block->name) ? $val->block->name : ""),
+                'Nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                'Jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                'Tanggal'   => Carbon::parse($val->checkin)->day,
+                'Check-in'  => Carbon::parse($val->checkin)->format('H:m:s'),
+                'Check-out' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+		    	);
+            }
+        
+		    $filename = "AttandanceMotorikReport".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('AttandanceMotorikReport', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function motorikDistPF()
+    {
+        $dist = DistributionMotoric::whereMonth('date',Carbon::now()->month)->get();
+        $data = array();
+        $product = array();
+        $id = 1;
+        foreach ($dist as $key => $value) {
+            $data[] = array(
+                'id'        => $id++,
+                'nama'      => $value->employee->name,
+                'block'     => (isset($value->block->name) ? $value->block->name : "-"),
+                'tanggal'   => Carbon::parse($value->date)->day,
+            
+            );
+        }
+        $dt = Datatables::of(collect($data));
+        $columns = array();
+        foreach (Product::get() as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
+            $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
+                $distribution = DistributionMotoricDetail::where([
+                    'id_distribution' => $dist['id'],
+                    'id_product' => $pdct->id
+                ])->first();
+                return $distribution['qty_actual']."&nbsp;".$distribution['satuan'];
+            });
+        }
+        $dt->rawColumns($columns);
+        return $dt->make(true);
+    }
+
+    public function exportMotorikDistPF()
+    {
+        $dist = DistributionMotoric::whereMonth('date',Carbon::now()->month);
+        if ($dist->count() > 0) {
+            foreach ($dist->get() as $key => $value) {
+                $detail = DistributionMotoricDetail::where('id_distribution',$value->id)->get();
+                $data[] = array(
+                'Nama Motorik'  => $value->employee->name,
+                'Block'         => (isset($value->block->name) ? $value->block->name : "-"),
+                'Tanggal'       => Carbon::parse($value->date)->day
+                );
+            }
+            $getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
+            $productList = \App\Product::whereIn('id', $getId)->get();
+            foreach ($productList as $pro) {
+                $data[$key][$pro->name] = "-";
+            }
+            foreach ($detail as $det) {
+                $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+            }
+        
+		    $filename = "ReportMotorikDistPF".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('ReportMotorikDistPF', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function MotorikSales()
+    {
+        $sales = SalesMotoric::whereMonth('date', Carbon::now()->month)->get();
+        $data = array();
+        $id = 1;
+        foreach ($sales as $value) {
+            $data[] = array(
+                'id'        => $id++,
+                'id_sales'  => $value->id,
+                'nama'      => $value->employee->name,
+                'block'     => $value->block->name,
+                'tanggal'   => $value->date,
+            );
+        }
+        $getId = array_column(\App\SalesMotoricDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+        $dt = Datatables::of(collect($data));
+        $columns = array();
+        foreach ($product as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
+            $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
+                $sale = \App\SalesMotoricDetail::where([
+                    'id_sales' => $sales['id_sales'],
+                    'id_product' => $pdct->id
+                ])->first();
+                return $sale['qty_actual']."&nbsp;".$sale['satuan'];
+            });
+        }
+        $dt->rawColumns($columns);
+        return $dt->make(true);
+    }
+
+    public function exportMotorikSales()
+    {
+        $sales = SalesMotoric::whereMonth('date', Carbon::now()->month);
+        if ($sales->count() > 0) {
+            $product = array();
+            foreach ($sales->get() as $key => $value) {
+                $detail = SalesMotoricDetail::where('id_sales',$value->id)->get();
+                $data[] = array(
+                    'Nama Motorik'  => $value->employee->name,
+                    'Block'         => $value->block->name,
+                    'Date'          => $value->date,
+                );
+                $getId = array_column(\App\SalesMotoricDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
+            }
+            $filename = "MotorikSales".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('MotorikSales', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
     public function SMDdistpf()
     {
         $dist = Distribution::whereMonth('date',Carbon::now()->month)->get();
@@ -2013,7 +2214,8 @@ class ReportController extends Controller
         return Datatables::of(collect($data))
         ->addColumn('action', function($stock) {
             if (isset($stock['photo'])) {
-                $oos = "<a href=".asset('/uploads/sales_recap')."/".$stock['photo']." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP' target='_blank'><i class='si si-picture mr-2'></i>Photo</a>";
+                $img_url = asset('/uploads/sales_recap')."/".$stock['photo'];
+                $oos = "<img src='".$img_url."' width='50px'/>";
             } else {
                 $oos = "-";
             }
@@ -2166,8 +2368,8 @@ class ReportController extends Controller
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
-            return "<a href=".route('ubah.plan', $plan->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-            <button data-url=".route('plan.delete', $plan->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
+            $img_url = asset('/uploads/plan')."/".$plan->photo;
+            return "<img src='".$img_url."' width='50px'/>";
         
         })
         ->addColumn('planEmployee', function($plan) {
