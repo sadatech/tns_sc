@@ -2,7 +2,7 @@
 @section('title', "Report Sales SPG")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sales Achievement<small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales Summary<small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -28,16 +28,13 @@
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;">No.</th>
-              <th>Periode</th>
               <th>Area</th>
               <th>Nama SPG</th>
-              <th>HK</th>
-              <th>Sum Of Jumlah</th>
-              <th>Sum Of PF Value</th>
-              <th>Sum Of Total Value</th>
-              <th>Eff. Kontak</th>
-              <th>Value</th>
-              <th>Sales/Kontak</th>
+              <th>Tanggal</th>
+              <th>Nama Pasar</th>
+              <th>Nama Stokies/Grosir</th>
+              <th>Jumlah Konsumen Beli</th>
+              <th style="text-align: center;">Detail</th>
             </tr>
           </thead>
         </table>
@@ -72,19 +69,16 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('spg.pasar.sales.achievement.data') !!}',
+      ajax: '{!! route('spg.pasar.sales.summary.data') !!}',
       columns: [
       { data: 'id', name:'id', visible: false },
-      { data: 'periode', name:'periode' },
       { data: 'area', name:'area' },
       { data: 'nama_spg', name:'nama_spg' },
-      { data: 'hk', name:'hk' },
-      { data: 'sum_of_jumlah', name:'sum_of_jumlah' },
-      { data: 'sum_of_pf_value', name:'sum_of_pf_value' },
-      { data: 'sum_of_total_value', name:'sum_of_total_value' },
-      { data: 'eff_kontak', name:'eff_kontak' },
-      { data: 'act_value', name:'act_value' },
-      { data: 'sales_per_kontak', name:'sales_per_kontak' },
+      { data: 'tanggal', name:'tanggal' },
+      { data: 'nama_pasar', name:'nama_pasar' },
+      { data: 'nama_stokies', name:'nama_stokies' },
+      { data: 'jumlah_beli', name:'jumlah_beli' },
+      { data: 'detail', name:'detail' },
       ]
     });
   });
