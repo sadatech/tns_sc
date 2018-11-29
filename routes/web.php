@@ -593,7 +593,9 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
-					return view('report.spg.sales');
+					$getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.spg.sales', $data);
 				})->name('report.sales.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
 				Route::get('/export', 'ReportController@exportSpgSales')->name('spg.pasar.sales.export')->middleware('auth');
