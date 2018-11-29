@@ -238,8 +238,8 @@ class ProductFokusController extends Controller
                             foreach($results as $row)
                             {
                                 $fokus = ProductFokus::create([
-                                    'from'  => Carbon::now(),
-                                    'to'    => Carbon::now() 
+                                    'from'  => \PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'),
+                                    'to'    => \PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM')
                                 ]);
                                 if (!isset($fokus->id)) {
                                     
@@ -354,9 +354,20 @@ class ProductFokusController extends Controller
 		    		} else {
 		    			$channelList[] = "-";
 		    		}
+                }
+                $product = FokusProduct::where(
+		    		'id_pf', $val->id
+		    	)->get();
+                $productList = array();
+		    	foreach($product as $dataProduct) {
+		    		if(isset($dataProduct->id_product)) {
+		    			$productList[] = $dataProduct->product->name;
+		    		} else {
+		    			$productList[] = "-";
+		    		}
 		    	}
 		    	$data[] = array(
-		    		'Product'		=> $val->product->name,
+		    		'Product'		=> rtrim(implode(',', $productList), ','),
                     'Channel'	    => rtrim(implode(',', $channelList), ','),
                     'Area'			=> rtrim(implode(',', $areaList), ','),
                     'Month From'    => (isset($val->from) ? $val->from : "-"),

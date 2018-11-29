@@ -537,6 +537,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.stockist', $data);
 				})->name('report.stockist')->middleware('auth');
 				Route::get('/data', 'ReportController@SMDstockist')->name('data.smd.stockist')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDstocking')->name('export.smd.stockist')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -584,11 +585,13 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.attendance');
 				})->name('report.spg.attendance')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGattendance')->name('data.spg.attendance')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSpgAttandance')->name('export.spg.attendance')->middleware('auth');
 			});
 			Route::prefix('achievement')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.achievement');
 				})->name('report.achievement.spg')->middleware('auth');
+				Route::get('/data', 'ReportController@SPGsalesAchievement')->name('spg.pasar.sales.achievement.data')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -606,6 +609,14 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.recap');
 				})->name('report.recap.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGrekap')->name('spg.pasar.recap.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSPGrekap')->name('spg.pasar.recap.export')->middleware('auth');
+			});
+
+			Route::prefix('sales-summary')->group(function () {
+				Route::get('/', function(){
+					return view('report.spg.sales-summary');
+				})->name('report.sales.summary.spg')->middleware('auth');
+				Route::get('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
 			});
 		});
 
@@ -657,6 +668,13 @@ Route::prefix('mtc')->group(function () {
 	Route::prefix('salesmtc')->group(function () {
 		Route::get('/', 'ReportController@salesMtcIndex')->name('salesmtc')->middleware('auth');
 		Route::post('/data', 'ReportController@salesMtcDataSalesAlt')->name('salesmtc.data')->middleware('auth');
+	});
+
+	Route::prefix('achievement')->group(function () {
+		Route::get('/', 'ReportController@achievementSalesMtcIndex')->name('achievement-salesmtc')->middleware('auth');
+		Route::post('/data-spg', 'ReportController@achievementSalesMtcDataSPG')->name('achievement-salesmtc-spg.data')->middleware('auth');
+		Route::post('/data-md', 'ReportController@achievementSalesMtcDataMD')->name('achievement-salesmtc-md.data')->middleware('auth');
+		Route::post('/data-tl', 'ReportController@achievementSalesMtcDataTL')->name('achievement-salesmtc-tl.data')->middleware('auth');
 	});
 
 
