@@ -8,10 +8,12 @@ use Carbon\Carbon;
 use DB;
 use App\ProductFokusSpg;
 use App\Product;
+use Illuminate\Http\Request;
+use App\SalesRecap;
 
 class SalesSpgPasarSummary extends SalesSpgPasar
 {
-    protected $appends = ['area', 'nama_spg', 'tanggal', 'nama_pasar', 'nama_stokies', 'jumlah_beli', 'detail'];
+    protected $appends = ['area', 'nama_spg', 'tanggal', 'nama_pasar', 'nama_stokies', 'jumlah_beli', 'product_focus_list', 'detail', 'sales_other', 'sales_other_value', 'sales_pf', 'total_value'];
 
     public function getAreaAttribute(){
         return @$this->pasar->subarea->area->name;
@@ -30,7 +32,7 @@ class SalesSpgPasarSummary extends SalesSpgPasar
     }
 
     public function getNamaStokiesAttribute(){
-        return 'Under Construction';
+        return implode(", ", array_unique(SalesRecap::where('id_employee', $this->id_employee)->whereDate('date', Carbon::parse($this->date))->get()->pluck('outlet.name')->toArray()));
     }
 
     public function getJumlahBeliAttribute(){
@@ -38,85 +40,181 @@ class SalesSpgPasarSummary extends SalesSpgPasar
                             ->where('id_employee', $this->id_employee)
                             ->where('id_pasar', $this->id_pasar)
                             ->count() * 1);
+    }
+
+    public function getProductFocusListAttribute(){
+    	$products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
+                             ->whereDate('to', '>=', Carbon::parse($this->date))
+                             ->where('id_employee', $this->id_employee)
+                             ->pluck('id');
+
+        // $products = ProductFokusSpg::whereHas('product', function($query) use ($id_cat){
+        //                 return $query->where('id_subcategory', $id_cat);
+        //             })->where('id_employee', $this->id_employee)->whereDate('from', '<=', Carbon::parse($this->date))->whereDate('to', '>=', Carbon::parse($this->date))->get();
+
+        return array_unique($products->toArray());
     }  
 
     public function getDetailAttribute(){
-    	$id_products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
-                                 ->whereDate('to', '>=', Carbon::parse($this->date))
-                                 ->where('id_employee', $this->id_employee)
-                                 ->pluck('id_product');
+    	// return [1=>100,3=>200];
+    	$result = array();
+    	$products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
+                             ->whereDate('to', '>=', Carbon::parse($this->date))
+                             ->where('id_employee', $this->id_employee)
+                             // ->where('id_product', $id_product)
+                             ->get();
 
-        $thead = "<table><thead>";
-        $tbody = "<tbody><tr>";
+        // return $products;
 
-        $products = Product::whereIn('id', $id_products)->get();
+        foreach ($products as $item) {
+        	$data = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
+                                ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
+                                ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
+                                ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
+                                ->where('sales_spg_pasars.id_employee', $this->id_employee)
+                                ->where('sales_spg_pasars.id_pasar', $this->id_pasar)
+                                ->where('sales_spg_pasar_details.id_product', $item->id)
+                                ->select(DB::raw('sum(qty) as qty'));
 
-        $value_pf = 0;
-        $value_other = 0;
+            $result[$item->id] = $data->first()->qty;
+        }
 
-        /* SALES FOCUS */
+        return $result;
 
-        foreach ($products as $product) {
-            $thead .= "<th>Sales ".$product->name."</th>";
-            $tbody .= "<td>";
-
-            $data = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
+        $result = 0;
+        if($products){
+        	$data = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
                                 ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
                                 ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
                                 ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
                                 ->where('sales_spg_pasars.id_employee', $this->id_employee)
                                 ->where('sales_spg_pasars.id_pasar', $this->id_pasar)
                                 ->where('sales_spg_pasar_details.id_product', $product->id)
-                                ->select(DB::raw('sum(qty) as qty, sum(qty*price) as value'));
+                                ->select(DB::raw('sum(qty) as qty'));
 
-            $tbody .= (string)number_format($data->first()->qty * 1);
-            $value_pf += $data->first()->value * 1;
-
-            $tbody .= "</td>";
+            $result = $data->first()->value;
         }
 
-        /* ============ */
+        return $result;
+    }
 
-        /* SALES OTHER */
-
-        $thead .= "<th>Sales Other</th>";
-
-        $tbody .= "<td>";
-
-        $data2 = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
+    public function getSalesOtherAttribute(){
+    	return SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
                             ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
                             ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
                             ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
                             ->where('sales_spg_pasars.id_employee', $this->id_employee)
                             ->where('sales_spg_pasars.id_pasar', $this->id_pasar)
-                            ->whereNotIn('sales_spg_pasar_details.id_product', $id_products)
-                            ->select(DB::raw('sum(qty) as qty, sum(qty*price) as value'));
+                            ->whereNotIn('sales_spg_pasar_details.id_product', $this->product_focus_list)
+                            ->select(DB::raw('sum(qty) as qty'))
+                            ->first()->qty;
+    }
 
-        $tbody .= (string)number_format($data2->first()->qty * 1);
-        $value_other += $data2->first()->value * 1;
+    public function getSalesOtherValueAttribute(){
+    	return SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
+                            ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
+                            ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
+                            ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
+                            ->where('sales_spg_pasars.id_employee', $this->id_employee)
+                            ->where('sales_spg_pasars.id_pasar', $this->id_pasar)
+                            ->whereNotIn('sales_spg_pasar_details.id_product', $this->product_focus_list)
+                            ->select(DB::raw('sum(qty*price) as value'))
+                            ->first()->value;
+    }
 
-        $tbody .= "</td>";
+    public function getSalesPfAttribute(){
+    	return SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
+                            ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
+                            ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
+                            ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
+                            ->where('sales_spg_pasars.id_employee', $this->id_employee)
+                            ->where('sales_spg_pasars.id_pasar', $this->id_pasar)
+                            ->whereIn('sales_spg_pasar_details.id_product', $this->product_focus_list)
+                            ->select(DB::raw('sum(qty*price) as value'))
+                            ->first()->value;
+    }
 
-        /* ============ */
+    public function getTotalValueAttribute(){
+    	return $this->sales_other_value + $this->sales_pf;
+    }
 
-        /* VALUE */
+    // public function getDetailAttribute(){
+    // 	$id_products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
+    //                              ->whereDate('to', '>=', Carbon::parse($this->date))
+    //                              ->where('id_employee', $this->id_employee)
+    //                              ->pluck('id_product');
 
-        $thead .= "<th>Sales PF Value</th>";
+    //     $thead = "<table><thead>";
+    //     $tbody = "<tbody><tr>";
 
-        $tbody .= "<td>".(string)number_format($value_pf)."</td>";
+    //     $products = Product::whereIn('id', $id_products)->get();
 
-        $thead .= "<th>Sales Other Value</th>";
+    //     $value_pf = 0;
+    //     $value_other = 0;
 
-        $tbody .= "<td>".(string)number_format($value_other)."</td>";
+    //     /* SALES FOCUS */
 
-        $thead .= "<th>Total Value</th>";
+    //     foreach ($products as $product) {
+    //         $thead .= "<th>Sales ".$product->name."</th>";
+    //         $tbody .= "<td>";
 
-        $tbody .= "<td>".(string)number_format($value_pf+$value_other)."</td>";
+    //         $data = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
+    //                             ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
+    //                             ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
+    //                             ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
+    //                             ->where('sales_spg_pasars.id_employee', $this->id_employee)
+    //                             ->where('sales_spg_pasars.id_pasar', $this->id_pasar)
+    //                             ->where('sales_spg_pasar_details.id_product', $product->id)
+    //                             ->select(DB::raw('sum(qty) as qty, sum(qty*price) as value'));
 
-        /* RESULT */
+    //         $tbody .= (string)number_format($data->first()->qty * 1);
+    //         $value_pf += $data->first()->value * 1;
 
-        $tresult = $thead."</thead>".$tbody."</tr></tbody></table>";
+    //         $tbody .= "</td>";
+    //     }
 
-        return $tresult;
-    } 
+    //     /* ============ */
+
+    //     /* SALES OTHER */
+
+    //     $thead .= "<th>Sales Other</th>";
+
+    //     $tbody .= "<td>";
+
+    //     $data2 = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
+    //                         ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
+    //                         ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
+    //                         ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
+    //                         ->where('sales_spg_pasars.id_employee', $this->id_employee)
+    //                         ->where('sales_spg_pasars.id_pasar', $this->id_pasar)
+    //                         ->whereNotIn('sales_spg_pasar_details.id_product', $id_products)
+    //                         ->select(DB::raw('sum(qty) as qty, sum(qty*price) as value'));
+
+    //     $tbody .= (string)number_format($data2->first()->qty * 1);
+    //     $value_other += $data2->first()->value * 1;
+
+    //     $tbody .= "</td>";
+
+    //     /* ============ */
+
+    //     /* VALUE */
+
+    //     $thead .= "<th>Sales PF Value</th>";
+
+    //     $tbody .= "<td>".(string)number_format($value_pf)."</td>";
+
+    //     $thead .= "<th>Sales Other Value</th>";
+
+    //     $tbody .= "<td>".(string)number_format($value_other)."</td>";
+
+    //     $thead .= "<th>Total Value</th>";
+
+    //     $tbody .= "<td>".(string)number_format($value_pf+$value_other)."</td>";
+
+    //     /* RESULT */
+
+    //     $tresult = $thead."</thead>".$tbody."</tr></tbody></table>";
+
+    //     return $tresult;
+    // } 
 }
