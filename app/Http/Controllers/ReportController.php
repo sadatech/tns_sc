@@ -1951,36 +1951,36 @@ class ReportController extends Controller
         $product = array();
         $id = 1;
         foreach ($sales as $key => $value) {
-            $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
-            foreach ($detail as $keys => $det) {
-                // $product[$key][] = $det->product->name;
-                $product[$key][$keys] = "<tr>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->product->name)."</td>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->qty)."</td>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->qty_actual)."</td>";
-                $product[$key][$keys] .= "<td>".$this->isset($det->satuan)."</td>";
-                $product[$key][$keys] .= "</tr>";
-            }
-            // dd($product);
             $data[] = array(
                 'id' => $id++,
+                'id_sales' => $value->id,
                 'nama_spg' => $this->isset($value->employee->name),
                 'pasar' => $this->isset($value->pasar->name),
                 'tanggal' => $this->isset($value->date),
                 'nama' => $this->isset($value->name),
-                'phone' => $this->isset($value->phone),
-                'list' => implode('', $product[$key]),
+                'phone' => $this->isset($value->phone)
             );
         }
-        return Datatables::of(collect($data))
-        ->addColumn('action', function ($data) {
-            $html = "<table class='table table-bordered'>";
-            $html .= "<tr><th>Nama</th><th>Quantity</th><th>Actual Quantity</th><th>Satuan</th></tr>";
-            $html .= $data['list'];
-            $html .= "</table>";
-            return $html;
-        })->make(true);
-        // return Datatables::of(collect($data))->make(true);
+        $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+        $product = \App\Product::whereIn('id', $getId)->get();
+        $dt = Datatables::of(collect($data));
+        $columns = array();
+        foreach ($product as $pdct) {
+            $columns[] = 'product-'.$pdct->id;
+            $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
+                $sale = \App\SalesSpgPasarDetail::where([
+                    'id_sales' => $sales['id_sales'],
+                    'id_product' => $pdct->id
+                ])->first();
+                if ($sale != null) {
+                    return $sale['qty_actual']."&nbsp;".$sale['satuan'];
+                } else {
+                    return "-";
+                }
+            });
+        }
+        $dt->rawColumns($columns);
+        return $dt->make(true);
     }
 
     public function SPGrekap()

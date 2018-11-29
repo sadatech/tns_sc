@@ -447,6 +447,26 @@
         $('#pasarMobile').hide();
         $('#status').val(null);
         $('#tl').hide();
+    } else if (position == {{ App\Position::where(['level' => 'tlgtc'])->first()->id }}) {
+        var selectedArea = {!! $area_selected !!};
+        var getIdArea = selectedArea[0].subarea_item.split("|")[0];
+        $('#subareaInput').val(getIdArea).trigger("change");
+        $('#subarea').show();
+        $('#status').hide();
+        $('#storeStay').hide();
+        $('#storeMobile').hide();
+        $('#pasarMobile').hide();
+        $('#status').val(null);
+        $('#tl').hide();
+    } else if (position == {{ App\Position::where(['level' => 'motoric'])->first()->id }}) {
+        $('#subarea').hide();
+        $('#status').hide();
+        $('#storeStay').hide();
+        $('#storeMobile').hide();
+        $('#pasarMobile').hide();
+        $('#status').val(null);
+        $('#subareaInput').val(null);
+        $('#tl').hide();
     } else {
         $('#status').hide();
         $('#storeStay').hide();
@@ -546,7 +566,25 @@
                 $('#status').hide();
                 $('#storeStay').hide();
                 $('#storeMobile').hide();
+                $('#pasarMobile').hide();
                 $('#status').val(null);
+            } else if (select == "{{ App\Position::where(['level' => 'tlgtc'])->first()->id }}") {
+                $('#status').hide();
+                $('#storeStay').hide();
+                $('#storeMobile').hide();
+                $('#pasarMobile').hide();
+                $('#status').val(null);
+                $('#subareaInput').val(null);
+                $('#subarea').show();
+            } else if (select == "{{ App\Position::where(['level' => 'motoric'])->first()->id }}") {
+                $('#status').hide();
+                $('#storeStay').hide();
+                $('#storeMobile').hide();
+                $('#pasarMobile').hide();
+                $('#status').val(null);
+                $('#subareaInput').val(null);
+                $('#subarea').hide();
+                $('#tl').hide();
             } else {
                 $('#status').hide();
                 $('#storeStay').hide();
