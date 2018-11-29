@@ -302,26 +302,27 @@
                                     </li>
                                 </ul>
                             </li>
+                            {{-- MOTORIK --}}
+                            <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motorik</span></a>
+                                <ul>
+                                    {{-- ATTENDANCE MOTORIK --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                                    </li>
+                                    {{-- STOCKIST MOTORIK --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/motorik/stockist') ? 'active' : '' }}" href="{{ route('report.motorik.stockist') }}"><span class="sidebar-mini-hide">Stokist</span></a>
+                                    </li>
+                                    {{-- SALES MOTORIK --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
+                                    </li>
+                                </ul>
+                            </li>
                         </ul>
 
-                        {{-- MOTORIK --}}
-                        <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
-                        <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motorik</span></a>
-                            <ul>
-                                {{-- ATTENDANCE MOTORIK --}}
-                                <li>
-                                    <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
-                                </li>
-                                {{-- STOCKIST MOTORIK --}}
-                                <li>
-                                    <a class="{{ request()->is('report/gtc/motorik/stockist') ? 'active' : '' }}" href="{{ route('report.motorik.stockist') }}"><span class="sidebar-mini-hide">Stokist</span></a>
-                                </li>
-                                {{-- SALES MOTORIK --}}
-                                <li>
-                                    <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
-                                </li>
-                            </ul>
-                        </li>
+                      
                     </li>
 
                     {{-- REPORT MTC --}}
