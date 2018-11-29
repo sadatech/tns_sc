@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use DB;
 use Carbon\Carbon;
+use App\Pasar;
 
 class Employee extends Model implements AuthenticatableContract, JWTSubject
 {
@@ -294,6 +295,10 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     public function scopeFilter($query, QueryFilters $filters)
     {
         return $filters->apply($query);
+    }
+
+    public function getAreaByPasar(){
+        return implode(', ', array_unique(Pasar::with('subarea.area')->whereIn('id', $this->employeePasar->pluck('id_pasar')->toArray())->get()->pluck('subarea.area.name')->toArray()));
     }
 }
 

@@ -263,6 +263,11 @@
                                         <a class="{{ request()->is('report/gtc/spg/recap') ? 'active' : '' }}" href="{{ route('report.recap.spg') }}"><span class="sidebar-mini-hide">Recap</span></a>
                                     </li>
 
+                                    {{-- SALES SUMMARY SPG --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/spg/sales-summary') ? 'active' : '' }}" href="{{ route('report.sales.summary.spg') }}"><span class="sidebar-mini-hide">Sales Summary</span></a>
+                                    </li>
+
                                     {{-- Achievement SPG --}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/spg/achievement') ? 'active' : '' }}" href="{{ route('report.achievement.spg') }}"><span class="sidebar-mini-hide">Achievement</span></a>
