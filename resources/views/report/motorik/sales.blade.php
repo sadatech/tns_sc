@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Recap SPG")
+@section('title', "Report Sales Motorik")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Recap <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales Motorik <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -21,20 +21,19 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('spg.pasar.recap.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('report.motorik.sales.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama</th>
-              <th>Outlet</th>
+              <th>Nama Motorik</th>
+              <th>Block</th>
               <th>Tanggal</th>
-              <th>Total Buyer</th>
-              <th>Total Sales</th>
-              <th>Total Value</th>
-              <th>Photo</th>
+              @foreach ($product as $pro)
+              <th>{{ $pro->name }}</th>
+              @endforeach
             </tr>
           </thead>
         </table>
@@ -69,16 +68,15 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('spg.pasar.recap.data') !!}',
+      ajax: '{!! route('report.motorik.sales.data') !!}',
       columns: [
-          { data: 'id' },
-          { data: 'name' },
-          { data: 'outlet' },
-          { data: 'date' },
-          { data: 'total_buyer' },
-          { data: 'total_sales' },
-          { data: 'total_value' },
-          { data: 'action' },
+      { data: 'id', name:'' },
+      { data: 'nama', name:'Nama' },
+      { data: 'block', name:'Block' },
+      { data: 'tanggal', name:'Tanggal' },
+      @foreach ($product as $pro)
+      { data: 'product-{{ $pro->id }}' },
+      @endforeach
       ]
     });
   });

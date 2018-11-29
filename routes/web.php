@@ -596,7 +596,9 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
-					return view('report.spg.sales');
+					$getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.spg.sales', $data);
 				})->name('report.sales.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
 				Route::get('/export', 'ReportController@exportSpgSales')->name('spg.pasar.sales.export')->middleware('auth');
@@ -607,6 +609,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.recap');
 				})->name('report.recap.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGrekap')->name('spg.pasar.recap.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSPGrekap')->name('spg.pasar.recap.export')->middleware('auth');
 			});
 
 			Route::prefix('sales-summary')->group(function () {
@@ -648,6 +651,38 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.democooking.cash');
 				})->name('report.demo.cashAdvance')->middleware('auth');
+			});
+
+		});
+
+		// Motorik Report
+		Route::prefix('motorik')->group(function () {
+			Route::prefix('attendance')->group(function () {
+				Route::get('/', function(){
+					return view('report.motorik.attendance');
+				})->name('report.motorik.attendance')->middleware('auth');
+				Route::get('/data', 'ReportController@Motorikattendance')->name('report.motorik.attendance.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportMptorikAttandance')->name('report.motorik.attendance.export')->middleware('auth');
+			});
+
+			Route::prefix('distPF')->group(function () {
+				Route::get('/', function(){
+				$getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
+				$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.motorik.distPF', $data);
+				})->name('report.motorik.distPF')->middleware('auth');
+				Route::get('/data', 'ReportController@motorikDistPF')->name('report.motorik.distPF.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportMotorikDistPF')->name('report.motorik.distPF.export')->middleware('auth');
+			});
+
+			Route::prefix('sales')->group(function () {
+				Route::get('/', function(){
+					$getId = array_column(\App\SalesMotoricDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.motorik.sales', $data);
+				})->name('report.motorik.sales')->middleware('auth');
+				Route::get('/data', 'ReportController@MotorikSales')->name('report.motorik.sales.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportMotorikSales')->name('report.motorik.sales.export')->middleware('auth');
 			});
 
 		});
