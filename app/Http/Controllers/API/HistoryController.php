@@ -22,6 +22,8 @@ use App\SamplingDc;
 use App\SamplingDcDetail;
 use App\SalesDc;
 use App\SalesDcDetail;
+use App\SalesMotoric;
+use App\SalesMotoricDetail;
 use App\StockMdHeader;
 use App\StockMdDetail;
 use App\Distribution;
@@ -62,7 +64,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
@@ -121,6 +123,8 @@ class HistoryController extends Controller
 				$header = SalesDc::query();
 			}else if (strtoupper($type) == 'GTC-SAMPLING') {
 				$header = SamplingDc::query();
+			}else if (strtoupper($type) == 'GTC-MOTORIC') {
+				$header = SalesMotoric::query();
 			}
 
 			$header->where('id_employee', $user->id)
@@ -132,7 +136,7 @@ class HistoryController extends Controller
 			})
 			->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
-			});
+			})->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
 				$dataArr = array();
@@ -147,12 +151,23 @@ class HistoryController extends Controller
 						$detail = SalesDcDetail::query();
 					}else if (strtoupper($type) == 'GTC-SAMPLING') {
 						$detail = SamplingDcDetail::query();
+					}else if (strtoupper($type) == 'GTC-MOTORIC') {
+						$detail = SalesMotoricDetail::query();
 					}
 
 					$detail->where('id_sales',$head->id);
 					$dataArr[] = array(
 						'id' 			=> $head->id,
 						'id_employee' 	=> $head->id_employee,
+						'id_store' 		=> $head->id_store ?? '',
+						'store_name'	=> $head->store->name1 ?? '',
+						'id_outlet' 	=> $head->id_outlet ?? '',
+						'outlet_name' 	=> $head->outlet->name ?? '',
+						'id_pasar' 		=> $head->id_pasar ?? '',
+						'pasar_name' 	=> $head->pasar->name ?? '',
+						'place' 		=> $head->place ?? '',
+						'id_block' 		=> $head->id_block ?? '',
+						'block_name' 	=> $head->block->name ?? '',
 						'date' 			=> $head->date,
 						'keterangan' 	=> $head->keterangan,
 						'detail' 		=> $detail->get(),
@@ -190,7 +205,7 @@ class HistoryController extends Controller
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
-			})->where('id_employee', $user->id);
+			})->where('id_employee', $user->id)->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
 				$dataArr = array();
@@ -199,6 +214,8 @@ class HistoryController extends Controller
 						'id' 			=> $data->id,
 						'id_employee'	=> $data->id_employee,
 						'id_outlet'		=> $data->id_outlet,
+						'outlet_name'	=> $data->outlet->name ?? '',
+						'pasar_name'	=> $data->outlet->employeePasar->pasar->name ?? '',
 						'date'			=> $data->date,
 						'total_buyer'	=> $data->total_buyer,
 						'total_sales'	=> $data->total_buyer,
@@ -239,7 +256,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
@@ -297,7 +314,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($header->count() > 0) {
 				$dataArr = array();
@@ -309,6 +326,12 @@ class HistoryController extends Controller
 					$dataArr[] = array(
 						'id' 			=> $head->id,
 						'id_employee' 	=> $head->id_employee,
+						'id_outlet' 	=> $head->id_outlet ?? '',
+						'outlet_name' 	=> $head->outlet->name ?? '',
+						'id_pasar' 		=> $head->id_pasar ?? '',
+						'pasar_name' 	=> $head->pasar->name ?? '',
+						'id_block' 		=> $head->id_block ?? '',
+						'block_name' 	=> $head->block->name ?? '',
 						'date' 			=> $head->date,
 						'keterangan' 	=> $head->keterangan,
 						'detail' 		=> $detail,
@@ -348,7 +371,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($data->count() > 0) {
 				$res['success'] = true;
@@ -389,7 +412,7 @@ class HistoryController extends Controller
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
-			});
+			})->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
 				$dataArr = array();
@@ -449,7 +472,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($data->count() > 0) {
 				$res['success'] = true;
@@ -485,7 +508,7 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->get();
+			})->orderBy('id','desc')->get();
 
 			if ($data->count() > 0) {
 				$res['success'] 		= true;

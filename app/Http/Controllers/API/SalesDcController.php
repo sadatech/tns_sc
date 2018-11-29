@@ -1,7 +1,4 @@
 <?php
-
-// sisah ngambil is_target
-
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
