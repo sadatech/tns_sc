@@ -36,6 +36,7 @@ use App\Sales;
 use App\DetailSales;
 use App\Target;
 use App\StockMdHeader as StockMD;
+use App\StockMdDetail;
 use App\Outlet;
 use App\Attendance;
 use App\AttendancePasar;
@@ -51,6 +52,10 @@ use App\SalesSpgPasarDetail;
 use App\SalesRecap;
 use App\PlanDc;
 use App\PlanEmployee;
+use App\Filters\EmployeeFilters;
+use App\Filters\EmployeeStoreFilters;
+use App\Model\Extend\SalesSpgPasarAchievement;
+use App\Model\Extend\SalesSpgPasarSummary;
 
 class ReportController extends Controller
 {
@@ -414,6 +419,131 @@ class ReportController extends Controller
 
     public function salesMtcDataTarget(SummaryFilters $filters){
         return Datatables::of(SalesMtcSummary('sales_mtc_summary_by_target')->filter($filters))->make(true);
+    }
+
+    // *********** ACHIEVEMENT **************** //
+
+    public function achievementSalesMtcIndex(){
+        return view('report.achievement-salesmtc');
+    }
+
+    public function achievementSalesMtcDataSPG(Request $request, EmployeeStoreFilters $filters){
+
+        $periode = Carbon::parse($request->periode);
+        $data = EmployeeStore::filter($filters)
+                ->whereHas('employee.position', function($query){
+                    return $query->where('level', 'spgmtc');
+                })
+                ->orderBy('id_employee', 'ASC');            
+
+        // foreach ($data as $item) {
+            
+        //     $item['employee_name'] = $item->employee->name;
+        //     $item['actual_previous'] = number_format($item->employee->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+        //     $item['actual_current'] = number_format($item->employee->getActual(['store' => $item->id_store, 'date' => $periode]));
+        //     $item['target'] = number_format($item->employee->getTarget(['store' => $item->id_store, 'date' => $periode]));
+        //     $item['achievement'] = $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+        //     $item['growth'] = $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+        //     $item['store_name'] = $item->store->name1;
+
+        // }
+
+        // return response()->json($data);
+
+        return Datatables::of($data)        
+        ->addColumn('employee_name', function($item) {
+            return $item->employee->name;
+        })
+        ->addColumn('actual_previous', function($item) use ($periode) {
+            return number_format($item->employee->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('actual_current', function($item) use ($periode) {
+            return number_format($item->employee->getActual(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('target', function($item) use ($periode) {
+            return number_format($item->employee->getTarget(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement', function($item) use ($periode) {
+            return $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('growth', function($item) use ($periode) {
+            return $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('store_name', function($item) use ($periode) {
+            return $item->store->name1;
+            return $item->employee->getActualPf1(['id_channel' => $item->store->account->id_channel, 'date' => $periode]);
+        })
+        ->make(true);     
+    }
+
+    public function achievementSalesMtcDataMD(Request $request, EmployeeFilters $filters){
+
+        $periode = Carbon::parse($request->periode);
+        $data = Employee::filter($filters)->whereHas('position', function ($query){
+                    return $query->where('level', 'mdmtc');
+                })->orderBy('id', 'ASC');
+
+        // return response()->json('zz');
+
+        return Datatables::of($data)        
+        ->addColumn('employee_name', function($item) {
+            return $item->name;
+        })
+        ->addColumn('actual_previous', function($item) use ($periode) {
+            return number_format($item->getActualPrevious(['date' => $periode]));
+        })
+        ->addColumn('actual_current', function($item) use ($periode) {
+            return number_format($item->getActual(['date' => $periode]));
+        })
+        ->addColumn('target', function($item) use ($periode) {
+            return number_format($item->getTarget(['date' => $periode]));
+        })
+        ->addColumn('achievement', function($item) use ($periode) {
+            return $item->getAchievement(['date' => $periode]);
+        })
+        ->addColumn('growth', function($item) use ($periode) {
+            return $item->getGrowth(['date' => $periode]);
+        })
+        ->addColumn('jml_store', function($item) {
+            return $item->employeeStore->count();
+        })
+        ->make(true);     
+    }
+
+    public function achievementSalesMtcDataTL(Request $request, EmployeeStoreFilters $filters){
+
+        $periode = Carbon::parse($request->periode);
+        $data = Employee::filter($filters)
+                ->whereHas('position', function($query){
+                    return $query->where('level', 'tlmtc');
+                })
+                ->orderBy('id', 'ASC');
+
+        return response()->json($data);
+
+        return Datatables::of($data)        
+        ->addColumn('employee_name', function($item) {
+            return $item->name;
+        })
+        ->addColumn('actual_previous', function($item) use ($periode) {
+            return number_format($item->getActualPrevious(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('actual_current', function($item) use ($periode) {
+            return number_format($item->getActual(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('target', function($item) use ($periode) {
+            return number_format($item->getTarget(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement', function($item) use ($periode) {
+            return $item->getAchievement(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('growth', function($item) use ($periode) {
+            return $item->getGrowth(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('area', function($item) {
+            return $item->employeeArea->area->name;
+        })
+        ->make(true);     
     }
 
 
@@ -1648,7 +1778,8 @@ class ReportController extends Controller
     {
         $dist = Distribution::whereMonth('date',Carbon::now()->month);
         if ($dist->count() > 0) {
-		    foreach ($dist->get() as $val) {
+		    foreach ($dist->get() as $key => $val) {
+                $detail = DistributionDetail::where('id_distribution',$val->id)->get();
 		    	$data[] = array(
                     'Employee'  => $val->employee->name,
                     'Pasar'     => $val->outlet->employeePasar->pasar->name,
@@ -1656,6 +1787,15 @@ class ReportController extends Controller
                     'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
 		    	);
             }
+
+            $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                }
         
 		    $filename = "ReportDistPf".Carbon::now().".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
@@ -1696,6 +1836,40 @@ class ReportController extends Controller
 		    $filename = "AttandanceReport".Carbon::now().".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
 		    	$excel->sheet('AttandanceReport', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportSpgAttandance()
+    {
+        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month);
+        if ($employee->count() > 0) {
+		    foreach ($employee->get() as $val) {
+		    	$data[] = array(
+                'area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
+                'subarea'   => (isset($val->pasar->subarea->name) ?  $val->pasar->subarea->area->name : ""),
+                'nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                'pasar'     => (isset($val->pasar->name) ? $val->pasar->name : ""),
+                'tanggal'   => Carbon::parse($val->checkin)->day,
+                'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
+                'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+		    	);
+            }
+        
+		    $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
 		    	{
 		    		$sheet->fromArray($data);
 		    	});
@@ -1818,7 +1992,7 @@ class ReportController extends Controller
             $data[] = array(
                 'id' => $id++,
                 'name' => (isset($val->employee->name) ? $val->employee->name : "-"),
-                'outlet' => (isset($val->outlet->name) ? : "-"),
+                'outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
                 'date' => (isset($val->date) ? $val->date : "-"),
                 'total_buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
                 'total_sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
@@ -1836,6 +2010,37 @@ class ReportController extends Controller
             }
             return $oos;
         })->make(true);
+    }
+
+    public function exportSPGrekap()
+    {
+        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month);
+        if ($rekap->count() > 0) {
+            foreach ($rekap->get() as $val) {
+                $data[] = array(
+                    'Name' => (isset($val->employee->name) ? $val->employee->name : "-"),
+                    'Outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
+                    'Date' => (isset($val->date) ? $val->date : "-"),
+                    'Total Buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
+                    'Total Sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
+                    'Total Value' => (isset($val->total_value) ? $val->total_value : "-")
+                );
+            }
+            $filename = "SPGRekap".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('SPGReakp', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
     }
 
     public function SPGattendance()
@@ -1901,6 +2106,46 @@ class ReportController extends Controller
         }
     }
 
+    public function exportSMDstocking()
+    {
+        $stock = StockMD::whereMonth('date', Carbon::now()->month);
+        if ($stock->count() > 0) {
+		    foreach ($stock->get() as $key => $val) {
+                $detail = StockMdDetail::where('id_stock',$val->id)->get();
+		    	$data[] = array(
+                    'Name'      => $val->employee->name,
+                    'Pasar'     => $val->pasar->name,
+                    'Date'      => $val->date,
+                    'Week'      => $val->week,
+                    'Stockist'  => $val->stockist
+                );
+                $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+                $productList = \App\Product::whereIn('id', $getId)->get();
+                foreach ($productList as $pro) {
+                    $data[$key][$pro->name] = "-";
+                }
+                foreach ($detail as $det) {
+                    $data[$key][$det->product->name] = $det->oos;
+                }
+            }
+        
+		    $filename = "ReportSMDStokist".Carbon::now().".xlsx";
+		    return Excel::create($filename, function($excel) use ($data) {
+		    	$excel->sheet('ReportSMDStokist', function($sheet) use ($data)
+		    	{
+		    		$sheet->fromArray($data);
+		    	});
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
     public function isset($val)
     {
         return (isset($val) ? $val : "-");
@@ -1924,5 +2169,100 @@ class ReportController extends Controller
             }
             return rtrim(implode(',', $distList), ',');
         })->make(true);
+    }
+
+    public function SPGsalesSummary()
+    {
+        $sales = SalesSpgPasarSummary::whereNull('deleted_at')->groupBy('id_employee', 'id_pasar', 'date')->orderBy('date', 'ASC')->orderBy('id_employee', 'ASC')->orderBy('id_pasar', 'ASC');
+
+        // return $sales->get();
+        
+        return Datatables::of($sales)
+        // ->addColumn('area', function ($data) {
+        //     return @$data->pasar->subarea->area->name;
+        // })
+        // ->addColumn('nama_spg', function ($data) {
+        //     return @$data->employee->name;
+        // })
+        // ->addColumn('tanggal', function ($data) {
+        //     return Carbon::parse($data->date)->format('D, F d, Y');
+        // })
+        // ->addColumn('nama_pasar', function ($data) {
+        //     return @$data->pasar->name;
+        // })
+        // ->addColumn('nama_stokies', function ($data) {
+        //     return 'Under Construction';
+        // })
+        // ->addColumn('jumlah_beli', function ($data) {
+        //     return $data->getJumlahBeli();
+        // })
+        // ->addColumn('detail', function ($data) {
+            
+        //     return $data->getDetail();
+        //     // return $pf;
+        //     // return "<table class='table'>
+        //     //             <thead>
+        //     //                 <th>Sales CCL 65 ml (Pcs)</th>
+        //     //                 <th>Sales CCL 200 ml</th>
+        //     //             </thead>
+        //     //             <tbody>
+        //     //                 <tr>
+        //     //                     <td>100</td>
+        //     //                     <td>0</td>
+        //     //                 </tr>
+        //     //                 <tr>
+        //     //                     <td>20</td>
+        //     //                     <td>10</td>
+        //     //                 </tr>
+        //     //             </tbody>
+        //     //         </table>";
+        // })
+        ->rawColumns(['detail'])
+        ->make(true);
+        // return Datatables::of($sales)->make(true);
+    }
+
+    public function SPGsalesAchievement()
+    {
+        $sales = SalesSpgPasarAchievement::whereNull('deleted_at')
+                              ->groupBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), DB::raw('id_employee'))
+                              ->orderBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), 'ASC')
+                              ->orderBy('id_employee', 'ASC');
+
+        // return $sales->get();
+        
+        return Datatables::of($sales)
+        // ->addColumn('periode', function ($data) {
+        //     return Carbon::parse($data->date)->format('F Y');
+        // })
+        // ->addColumn('area', function ($data) {
+        //     return $data->employee->getAreaByPasar();
+        // })
+        // ->addColumn('nama_spg', function ($data) {
+        //     return $data->employee->name;
+        // })
+        // ->addColumn('hk', function ($data) {
+        //     // return $data->getHk();
+        // })
+        // ->addColumn('sum_of_jumlah', function ($data) {
+        //     return $data->getSumOfJumlah();
+        // })
+        // ->addColumn('sum_of_pf', function ($data) {
+        //     return $data->getSumOfPfValue();
+        // })
+        // ->addColumn('sum_of_total', function ($data) {
+        //     return $data->getSumOfTotalValue();
+        // })
+        // ->addColumn('eff_kontak', function ($data) {
+        //     return $data->getSumEffKontak();
+        // })
+        // ->addColumn('act_value', function ($data) {
+        //     return 'TEST';
+        // })
+        // ->addColumn('sales_per_kontak', function ($data) {
+        //     return 'TEST';
+        // })
+        ->make(true);
+        // return Datatables::of($sales)->make(true);
     }
 }

@@ -9,6 +9,8 @@ use App\Attendance;
 use App\AttendanceDetail;
 use App\AttendanceOutlet;
 use App\AttendancePasar;
+use App\AttendancePlace;
+use App\AttendanceBlock;
 use App\Sales;
 use App\DetailSales;
 use App\SalesMd;
@@ -24,6 +26,8 @@ use App\StockMdHeader;
 use App\StockMdDetail;
 use App\Distribution;
 use App\DistributionDetail;
+use App\DistributionMotoric;
+use App\DistributionMotoricDetail;
 use App\Cbd;
 use App\PlanDc;
 use App\DocumentationDc;
@@ -49,11 +53,6 @@ class HistoryController extends Controller
 			$user = $check['user'];
 			$res['code'] = 200;
 
-			if ($type == 'MTC') {
-				$hasDetail = 'attendanceDetail';
-			}else{
-				$hasDetail = 'attendanceOutlet';
-			}
 			$header = Attendance::where('id_employee', $user->id)
 			->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
@@ -74,6 +73,10 @@ class HistoryController extends Controller
 						$detail = AttendanceOutlet::where('id_attendance',$head->id)->get();
 					}else if( strtoupper($type) == 'GTC-SPG'  ){
 						$detail = AttendancePasar::where('id_attendance',$head->id)->get();
+					}else if( strtoupper($type) == 'GTC-DC'  ){
+						$detail = AttendancePlace::where('id_attendance',$head->id)->get();
+					}else if( strtoupper($type) == 'GTC-MOTORIC'  ){
+						$detail = AttendanceBlock::where('id_attendance',$head->id)->get();
 					}
 					$dataArr[] = array(
 						'id' 			=> $head->id,
@@ -89,6 +92,7 @@ class HistoryController extends Controller
 				$res['success'] = false;
 				$res['msg'] 	= "Attendance not Found.";
 			}
+
 		}else{
 			$res = $check;
 		}
@@ -138,11 +142,11 @@ class HistoryController extends Controller
 					}else if (strtoupper($type) == 'GTC-MD') {
 						$detail = SalesMdDetail::query();
 					}else if (strtoupper($type) == 'GTC-SPG') {
-						$detail = SalesSpgPasar::query();
+						$detail = SalesSpgPasarDetail::query();
 					}else if (strtoupper($type) == 'GTC-DC') {
-						$detail = SalesDc::query();
+						$detail = SalesDcDetail::query();
 					}else if (strtoupper($type) == 'GTC-SAMPLING') {
-						$detail = SamplingDc::query();
+						$detail = SamplingDcDetail::query();
 					}
 
 					$detail->where('id_sales',$head->id);
@@ -268,7 +272,7 @@ class HistoryController extends Controller
 		return response()->json($res);
 	}
 
-	public function distributionHistory($date = '')
+	public function distributionHistory($date = '', $type = 'MD')
 	{
 		$check = $this->authCheck();
 		if ($check['success'] == true) {
@@ -276,7 +280,15 @@ class HistoryController extends Controller
 			$user = $check['user'];
 			$res['code'] = 200;
 			
-			$header = Distribution::where('id_employee', $user->id)
+			if (strtoupper($type) == 'MOTORIC') {
+				$header = DistributionMotoric::query();
+				$detailTemplate = new DistributionMotoricDetail;
+			}else{
+				$header = Distribution::query();
+				$detailTemplate = new DistributionDetail;
+			}
+
+			$header = $header->where('id_employee', $user->id)
 			->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
 			})
@@ -291,7 +303,8 @@ class HistoryController extends Controller
 				$dataArr = array();
 				foreach ($header as $key => $head) {
 
-					$detail = DistributionDetail::where('id_distribution',$head->id)->get();
+					$detail = $detailTemplate;
+					$detail = $detail->where('id_distribution',$head->id)->get();
 
 					$dataArr[] = array(
 						'id' 			=> $head->id,

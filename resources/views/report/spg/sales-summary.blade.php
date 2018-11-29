@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report SPG Pasar")
+@section('title', "Report Sales SPG")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">SPG Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales Summary<small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -17,25 +17,24 @@
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
-        <div class="block-header p-0 mb-20">
+      <div class="block-header p-0 mb-20">
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.spg.attendance') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('export.distpf.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
-              <th class="text-center" style="width: 70px;"></th>
-              <th>Nama</th>
-              <th>Jabatan</th>
-              <th>Pasar</th> 
+              <th class="text-center" style="width: 70px;">No.</th>
               <th>Area</th>
-              <th>Sub Area</th>
+              <th>Nama SPG</th>
               <th>Tanggal</th>
-              <th>Check-in</th>
-              <th>Check-out</th>
+              <th>Nama Pasar</th>
+              <th>Nama Stokies/Grosir</th>
+              <th>Jumlah Konsumen Beli</th>
+              <th style="text-align: center;">Detail</th>
             </tr>
           </thead>
         </table>
@@ -51,9 +50,9 @@
 [data-notify="container"] {
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
-table.table thead tr th:first-child {
+/*table.table thead tr th:first-child {
   min-width: 5px;
-}
+}*/
 table.table thead tr th {
   min-width: 200px;
 }
@@ -70,17 +69,16 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.spg.attendance') !!}',
+      ajax: '{!! route('spg.pasar.sales.summary.data') !!}',
       columns: [
-      { data: 'id' },
-      { data: 'nama' },
-      { data: 'jabatan' },
-      { data: 'pasar' },
-      { data: 'area' },
-      { data: 'subarea' },
-      { data: 'tanggal' },
-      { data: 'checkin' },
-      { data: 'checkout' },
+      { data: 'id', name:'id', visible: false },
+      { data: 'area', name:'area' },
+      { data: 'nama_spg', name:'nama_spg' },
+      { data: 'tanggal', name:'tanggal' },
+      { data: 'nama_pasar', name:'nama_pasar' },
+      { data: 'nama_stokies', name:'nama_stokies' },
+      { data: 'jumlah_beli', name:'jumlah_beli' },
+      { data: 'detail', name:'detail' },
       ]
     });
   });

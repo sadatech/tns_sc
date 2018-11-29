@@ -8,6 +8,9 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use DB;
+use Carbon\Carbon;
+use App\Pasar;
 
 class Employee extends Model implements AuthenticatableContract, JWTSubject
 {
@@ -95,6 +98,180 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
         return $this->belongsTo('App\Timezone', 'id_timezone');
     }
 
+    /* Achievement MTC */
+
+    public function getTarget($data){
+        switch ($this->position->level) {
+            case 'spgmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT SUM(target_value) AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND id_store = ".$data['store']."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;    
+
+            case 'mdmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT SUM(target_value) AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;  
+
+            case 'tlmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT SUM(target_value) AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;       
+        }
+        
+    }
+
+    public function getActual($data){
+        switch ($this->position->level) {
+            case 'spgmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                        AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND id_store = ".$data['store']."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;
+
+            case 'mdmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                        AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;
+        }
+        
+    }
+
+    public function getActualPrevious($data){
+        switch ($this->position->level) {
+            case 'spgmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                        AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND id_store = ".$data['store']."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".Carbon::parse($data['date'])->subYear()->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;
+
+            case 'mdmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                        AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".Carbon::parse($data['date'])->subYear()->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;
+        }        
+    }
+
+    public function getAchievement($data){
+        $target = $this->getTarget($data);
+        return ($target > 0) ? round(($this->getActual($data)/$target)*100, 2).'%' : '0%';
+    }
+
+    public function getGrowth($data){
+        $previous = $this->getActualPrevious($data);
+        return ($previous > 0) ? round((($this->getActual($data)/$previous)-1)*100, 2).'%' : '0%';
+    }
+
+    public function getActualPf1($data){
+        switch ($this->position->level) {
+            case 'spgmtc':
+                $category = Pf::whereDate('from', '<=', $data['date']->format('Y-m-d'))
+                            ->whereDate('to', '>=', $data['date']->format('Y-m-d'))
+                            ->first()->id_category1;
+
+                $product_ids = ProductFokus::whereHas('Fokus', function ($query) use ($data){
+                                    return $query->where('id_channel', $data['id_channel']);
+                                })->whereHas('fokusproduct.product.subcategory', function ($query) use ($category){
+                                    return $query->where('id_category', $category);
+                                });
+                                // })->where(function ($query) use ($data){
+                                //     return $query->whereHas('fokusarea', function ($query2) use ($data){
+                                //         return $query2->where('id_area', $data['id_area']);
+                                //     })
+                                // });
+
+                return $product_ids->get();   
+                break;         
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                        AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND id_store = ".$data['store']."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;
+        }
+        
+    }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -118,6 +295,10 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     public function scopeFilter($query, QueryFilters $filters)
     {
         return $filters->apply($query);
+    }
+
+    public function getAreaByPasar(){
+        return implode(', ', array_unique(Pasar::with('subarea.area')->whereIn('id', $this->employeePasar->pluck('id_pasar')->toArray())->get()->pluck('subarea.area.name')->toArray()));
     }
 }
 

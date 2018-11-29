@@ -186,7 +186,7 @@ class PlandcController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
-            $store = Plandc::find($id);
+            $store = PlanDc::find($id);
             if ($request->input('employee')) {
                 foreach ($request->input('employee') as $emp) {
                     PlanEmployee::where('id_plandc', $id)->delete();
