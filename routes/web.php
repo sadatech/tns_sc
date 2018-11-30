@@ -573,6 +573,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd', $data);
 				})->name('report.summary')->middleware('auth');
 				Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDsummary')->name('export.summary.smd')->middleware('auth');
 
 			});
 

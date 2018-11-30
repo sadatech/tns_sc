@@ -1557,6 +1557,49 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
+    public function exportSMDsummary()
+    {
+        $employeePasar = EmployeePasar::with([
+            'employee','pasar','pasar.subarea.area',
+            'employee.position'
+        ])->select('employee_pasars.*');
+        if ($employeePasar->count() > 0) {
+            $report = array();
+            for ($i=1; $i <= Carbon::now()->day ; $i++) {
+                foreach ($employeePasar->get() as $data) {
+                    if ($data->employee->position->level == 'mdgtc') {
+                        $report[] = array(
+                            'area' => $data->pasar->subarea->area->name,
+                            'nama' => $data->employee->name,
+                            'jabatan' => $data->employee->position->name,
+                            'pasar' =>   $data->pasar->name,
+                            'stockist' => $this->getStockist($data, $i),
+                            'bulan' => Carbon::now()->month,
+                            'tanggal' => $i,
+                            'call' => ($this->getCall($data, $i) ?: "-"),
+                            'ro' => ($this->getRo($data, $i) ?: "-"),
+                            'cbd' => ($this->getCbd($data, $i) ?: "-"),
+                        );
+                    }
+                }
+            }
+            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($report) {
+                $excel->sheet('AttandanceSPGReport', function($sheet) use ($report)
+                {
+                    $sheet->fromArray($report);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
     public function SMDattendance()
     {
         $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month)->get();
@@ -1568,6 +1611,8 @@ class ReportController extends Controller
         $absen = array();
         $id = 1;
         foreach ($employee as $val) {
+            $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
+            $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
             $data[] = array(
                 'id' => $id++,
                 'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
@@ -1578,8 +1623,8 @@ class ReportController extends Controller
                 'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
                 'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
                 'tanggal' => Carbon::parse($val->checkin)->day,
-                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
-                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
+                'checkout' => $checkout." ".$val->attendance->employee->timezone->name
             );
         }
         // foreach ($employee as $value) {
@@ -1820,7 +1865,11 @@ class ReportController extends Controller
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
-            $img_url = asset('/uploads/plan')."/".$plan->photo;
+            if (isset($plan->photo)) {
+                $img_url = asset('/uploads/plan')."/".$plan->photo;
+            } else {
+                $img_url = asset('/').'no-image.jpg';
+            }
             return "<img src='".$img_url."' width='50px'/>";
         
         })
@@ -1983,6 +2032,9 @@ class ReportController extends Controller
         foreach ($dist as $key => $value) {
             $data[] = array(
                 'id' => $id++,
+                'id_outlet' => $value->id_outlet,
+                'id_employee' => $value->id_employee,
+                'date' => $value->date,
                 'nama' => $value->employee->name,
                 'pasar' => $value->outlet->employeePasar->pasar->name,
                 'tanggal' => Carbon::parse($value->date)->day,
@@ -1994,21 +2046,21 @@ class ReportController extends Controller
         foreach (Product::get() as $pdct) {
             $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
-                $distribution = DistributionDetail::where([
-                    'id_distribution' => $dist['id'],
-                    'id_product' => $pdct->id
-                ])->first();
-                // $html = "<table class='table table-bordered'>";
-                // $html .= "<tr>";
-                // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
-                // $html .= "<td>".$distribution['qty']."</td>";
-                // $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
-                // $html .= "<td>".$distribution['qty_actual']."</td>";
-                // $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
-                // $html .= "<td>".$distribution['satuan']."</td>";
-                // $html .= "</tr>";
-                // $html .= "</table>";
-                return $distribution['qty_actual']."&nbsp;".$distribution['satuan'];
+                $distribution = Distribution::where([
+                    'id_outlet' => $dist['id_outlet'],
+                    'id_employee' => $dist['id_employee'],
+                    'date' => $dist['date'],
+                ])->get(['id'])->toArray();
+
+                $getId = array_column($distribution,'id');
+                $detail = DistributionDetail::whereIn('id_distribution', $getId)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $satuan = array();
+                foreach ($detail as $value) {
+                     $satuan[] = $value->qty_actual."&nbsp;".$value->satuan;
+                } 
+                return implode(', ', $satuan);
             });
         }
         $dt->rawColumns($columns);
@@ -2023,7 +2075,9 @@ class ReportController extends Controller
         foreach ($sales as $value) {
             $data[] = array(
                 'id' => $id++,
-                'id_sales' => $value->id,
+                'id_outlet' => $value->id_outlet,
+                'id_employee' => $value->id_employee,
+                'date' => $value->date,
                 'nama' => $value->employee->name,
                 'pasar' => $value->outlet->employeePasar->pasar->name,
                 'tanggal' => $value->date,
@@ -2037,10 +2091,19 @@ class ReportController extends Controller
         foreach ($product as $pdct) {
             $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
-                $sale = \App\SalesMdDetail::where([
-                    'id_sales' => $sales['id_sales'],
-                    'id_product' => $pdct->id
-                ])->first();
+                $sale = \App\SalesMd::where([
+                    'id_employee' => $sales['id_employee'],
+                    'id_outlet' => $sales['id_outlet'],
+                    'date' => $sales['date'],
+                ])->get(['id'])->toArray();
+                $getIdSale = array_column($sale,'id');
+                $detail = \App\SalesMdDetail::whereIn('id_sales', $getIdSale)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $satuan = array();
+                foreach ($detail as $value) {
+                     $satuan[] = $value->qty_actual."&nbsp;".$value->satuan;
+                } 
                 // $html = "<table class='table table-bordered'>";
                 // $html .= "<tr>";
                 // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
@@ -2051,7 +2114,7 @@ class ReportController extends Controller
                 // $html .= "<td>".$sale['satuan']."</td>";
                 // $html .= "</tr>";
                 // $html .= "</table>";
-                return $sale['qty_actual']."&nbsp;".$sale['satuan'];
+                return implode(", ", $satuan);
             });
         }
         $dt->rawColumns($columns);
@@ -2335,7 +2398,9 @@ class ReportController extends Controller
         foreach ($sales as $key => $value) {
             $data[] = array(
                 'id' => $id++,
-                'id_sales' => $value->id,
+                'id_pasar' => $value->id_pasar,
+                'date' => $value->date,
+                'id_employee' => $value->id_employee,
                 'nama_spg' => $this->isset($value->employee->name),
                 'pasar' => $this->isset($value->pasar->name),
                 'tanggal' => $this->isset($value->date),
@@ -2350,15 +2415,20 @@ class ReportController extends Controller
         foreach ($product as $pdct) {
             $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
-                $sale = \App\SalesSpgPasarDetail::where([
-                    'id_sales' => $sales['id_sales'],
-                    'id_product' => $pdct->id
-                ])->first();
-                if ($sale != null) {
-                    return $sale['qty_actual']."&nbsp;".$sale['satuan'];
-                } else {
-                    return "-";
+                $sale = SalesSpgPasar::where([
+                    'id_employee' => $sales['id_employee'],
+                    'id_pasar' => $sales['id_pasar'],
+                    'date' => $sales['date'],
+                ])->get(['id'])->toArray();
+                $getIdSale = array_column($sale,'id');
+                $detail = \App\SalesSpgPasarDetail::whereIn('id_sales', $getIdSale)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $satuan = array();
+                foreach ($detail as $value) {
+                     $satuan[] = $value->qty_actual."&nbsp;".$value->satuan;
                 }
+                return implode(", ", $satuan);
             });
         }
         $dt->rawColumns($columns);
@@ -2384,11 +2454,12 @@ class ReportController extends Controller
         }
         return Datatables::of(collect($data))
         ->addColumn('action', function($stock) {
-            if (isset($stock['photo'])) {
+            if ($stock['photo'] != "-") {
                 $img_url = asset('/uploads/sales_recap')."/".$stock['photo'];
                 $oos = "<img src='".$img_url."' width='50px'/>";
             } else {
-                $oos = "-";
+                $img_url = asset('/')."no-image.jpg";
+                $oos = "<img src='".$img_url."' width='50px'/>";
             }
             return $oos;
         })->make(true);
@@ -2432,6 +2503,8 @@ class ReportController extends Controller
         $absen = array();
         $id = 1;
         foreach ($employee as $val) {
+            $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
+            $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
             $data[] = array(
                 'id' => $id++,
                 'area' => $this->isset($val->pasar->subarea->area->name),
@@ -2440,8 +2513,8 @@ class ReportController extends Controller
                 'jabatan' => $this->isset($val->attendance->employee->position->name),
                 'pasar' => $this->isset($val->pasar->name),
                 'tanggal' => Carbon::parse($val->checkin)->day,
-                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
-                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
+                'checkout' => $checkout." ".$val->attendance->employee->timezone->name
             );
         }
         return Datatables::of(collect($data))->make(true);
