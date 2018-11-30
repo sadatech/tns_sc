@@ -1863,7 +1863,11 @@ class ReportController extends Controller
         ->select('plan_dcs.*');
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
-            $img_url = asset('/uploads/plan')."/".$plan->photo;
+            if (isset($plan->photo)) {
+                $img_url = asset('/uploads/plan')."/".$plan->photo;
+            } else {
+                $img_url = asset('/').'no-image.jpg';
+            }
             return "<img src='".$img_url."' width='50px'/>";
         
         })
@@ -2427,11 +2431,12 @@ class ReportController extends Controller
         }
         return Datatables::of(collect($data))
         ->addColumn('action', function($stock) {
-            if (isset($stock['photo'])) {
+            if ($stock['photo'] != "-") {
                 $img_url = asset('/uploads/sales_recap')."/".$stock['photo'];
                 $oos = "<img src='".$img_url."' width='50px'/>";
             } else {
-                $oos = "-";
+                $img_url = asset('/')."no-image.jpg";
+                $oos = "<img src='".$img_url."' width='50px'/>";
             }
             return $oos;
         })->make(true);
