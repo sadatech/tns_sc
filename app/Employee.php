@@ -134,7 +134,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                         "
                         SELECT SUM(target_value) AS result
                         FROM sales_mtc_summary
-                        WHERE sub_area = ".$data['sub_area']."
+                        WHERE sub_area = '".$data['sub_area']."'
                         AND MONTH(date) = ".$data['date']->month."
                         AND YEAR(date) = ".$data['date']->year."
                         LIMIT 1
