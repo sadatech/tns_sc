@@ -40,6 +40,7 @@ class BlockController extends Controller
 				if (!empty(SubArea::find($request->subarea))) {
 					$insert = Block::create([
 						'id_subarea'	=> $request->subarea,
+						'id_employee'	=> $user->id,
 						'name'			=> $request->name,
 						'phone'			=> $request->phone,
 						'address'		=> $request->address,
@@ -117,9 +118,7 @@ class BlockController extends Controller
 				}else{
 					$activeStatus = "tidak aktif";
 				}
-				$block = Block::where('active', $active)->whereHas('employeePasar', function($query) use ($user) {
-					return $query->where('id_employee', $user->id);
-				})->get();
+				$block = Block::where('active', $active)->where('id_employee', $user->id)->get();
 				if ($block->count() > 0) {
 					$listBlock = [];
 					$res['success'] = true;

@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sampling Demo Cooking")
+@section('title', "Report Sales Motorik")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sampling Demo Cooking <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales Motorik <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -17,19 +17,19 @@
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
-        <div class="block-header p-0 mb-20">
+      <div class="block-header p-0 mb-20">
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('dc.sampling.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('report.motorik.sales.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama DC</th>
-              <th>Place</th>
+              <th>Nama Motorik</th>
+              <th>Block</th>
               <th>Tanggal</th>
               @foreach ($product as $pro)
               <th>{{ $pro->name }}</th>
@@ -66,16 +66,14 @@ table.table thead tr th {
     var table = $('#category').DataTable({
       processing: true,
       serverSide: true,
-      stateSave: true,
-      paging: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('dc.sampling.data') !!}',
+      ajax: '{!! route('report.motorik.sales.data') !!}',
       columns: [
-      { data: 'id' },
-      { data: 'nama' },
-      { data: 'place' },
-      { data: 'tanggal' },
+      { data: 'id', name:'' },
+      { data: 'nama', name:'Nama' },
+      { data: 'block', name:'Block' },
+      { data: 'tanggal', name:'Tanggal' },
       @foreach ($product as $pro)
       { data: 'product-{{ $pro->id }}' },
       @endforeach

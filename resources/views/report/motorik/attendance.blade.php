@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sampling Demo Cooking")
+@section('title', "Report Motorik Attandance")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sampling Demo Cooking <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Motorik Attandance <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -21,19 +21,22 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('dc.sampling.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('report.motorik.attendance.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama DC</th>
-              <th>Place</th>
+              <th>Nama</th>
+              <th>Jabatan</th>
+              <th>Block</th>
+              <th>Region</th>
+              <th>Area</th>
+              <th>Sub Area</th>
               <th>Tanggal</th>
-              @foreach ($product as $pro)
-              <th>{{ $pro->name }}</th>
-              @endforeach
+              <th>Check-in</th>
+              <th>Check-out</th>
             </tr>
           </thead>
         </table>
@@ -66,19 +69,20 @@ table.table thead tr th {
     var table = $('#category').DataTable({
       processing: true,
       serverSide: true,
-      stateSave: true,
-      paging: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('dc.sampling.data') !!}',
+      ajax: '{!! route('report.motorik.attendance.data') !!}',
       columns: [
       { data: 'id' },
       { data: 'nama' },
-      { data: 'place' },
+      { data: 'jabatan' },
+      { data: 'block' },
+      { data: 'region' },
+      { data: 'area' },
+      { data: 'subarea' },
       { data: 'tanggal' },
-      @foreach ($product as $pro)
-      { data: 'product-{{ $pro->id }}' },
-      @endforeach
+      { data: 'checkin' },
+      { data: 'checkout' },
       ]
     });
   });
