@@ -631,14 +631,22 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sampling')->group(function () {
 				Route::get('/', function(){
-					return view('report.democooking.sampling');
+					$getId = array_column(\App\SamplingDcDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.democooking.sampling', $data);
 				})->name('report.demo.sampling')->middleware('auth');
+				Route::get('/data', 'ReportController@DcSampling')->name('dc.sampling.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportDcSampling')->name('dc.sampling.export')->middleware('auth');
 			});
 
-			Route::prefix('salesDC')->group(function () {
+			Route::prefix('salesDC')->group(function(){
 				Route::get('/', function(){
-					return view('report.democooking.salesDC');
+					$getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.democooking.salesDC', $data);
 				})->name('report.demo.salesDC')->middleware('auth');
+				Route::get('/data', 'ReportController@DcSales')->name('dc.sales.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportDcSales')->name('dc.sales.export')->middleware('auth');
 			});
 
 			Route::prefix('activity')->group(function () {
