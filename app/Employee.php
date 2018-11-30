@@ -164,6 +164,23 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                     )[0]->result * 1;
             break;
 
+            case 'tlmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                        AS result
+                        FROM sales_mtc_summary
+                        WHERE
+                        sub_area = '".$data['sub_area']."'
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;            
+
             case 'mdmtc':
                 return 
                     DB::select(
@@ -195,6 +212,23 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                         FROM sales_mtc_summary
                         WHERE id_employee = ".$this->id."
                         AND id_store = ".$data['store']."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".Carbon::parse($data['date'])->subYear()->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;
+
+            case 'tlmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                        AS result
+                        FROM sales_mtc_summary
+                        WHERE 
+                        sub_area = '".$data['sub_area']."'
                         AND MONTH(date) = ".$data['date']->month."
                         AND YEAR(date) = ".Carbon::parse($data['date'])->subYear()->year."
                         LIMIT 1
