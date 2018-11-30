@@ -26,13 +26,13 @@
                 <table class="table table-responsive table-striped table-vcenter js-dataTable-full" id="planTable">
                 <thead>
                     <th style="width: 10%;"></th>
-                    <th style="width: 300px;">Employee</th>
+                    <th style="width: 300px;">Nama DC</th>
                     <th style="width: 10%;">Date</th>
-                    <th style="width: 10%;">Plan</th>
-                    <th style="width: 10%;">Stockist</th>
+                    <th style="width: 15%;">Plan</th>
+                    <th style="width: 15%;">Stockist</th>
                     <th>Channel</th>
-                    <th style="width: 10%;">Actual</th>
-                    <th style="width: 10%;">Photo</th>
+                    <th style="width: 15%;">Actual</th>
+                    <th style="width: 15%;">Photo</th>
                 </thead>
                 </table>
             </div>
@@ -88,7 +88,7 @@
             { data: 'stocklist', name: 'plan_dcs.stocklist'},
             { data: 'channel', name: 'plan_dcs.channel'},
             { data: 'actual', name: 'plan_dcs.actual' },
-            { data: 'photo', name: 'plan_dcs.photo' }
+            { data: 'action'}
             ]
         });
     });
