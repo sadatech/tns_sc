@@ -573,6 +573,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd', $data);
 				})->name('report.summary')->middleware('auth');
 				Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDsummary')->name('export.summary.smd')->middleware('auth');
 
 			});
 
@@ -654,6 +655,7 @@ Route::prefix('report')->group(function () {
 					return view('report.democooking.activity');
 				})->name('report.demo.activity')->middleware('auth');
 				Route::get('/data', 'ReportController@documentationDC')->name('dc.documentation.data')->middleware('auth');
+				Route::get('/export', 'ReportController@ExportdocumentationDC')->name('dc.documentation.export')->middleware('auth');
 			});
 
 			Route::prefix('cashAdvance')->group(function () {
