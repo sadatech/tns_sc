@@ -166,6 +166,8 @@ class HistoryController extends Controller
 						'outlet_pasar_name' 	=> $head->outlet->employeePasar->pasar->name ?? '',
 						'id_pasar' 		=> $head->id_pasar ?? '',
 						'pasar_name' 	=> $head->pasar->name ?? '',
+						'name_for_spg' 	=> $head->name ?? '',
+						'phone_for_spg' => $head->phone ?? '',
 						'place' 		=> $head->place ?? '',
 						'id_block' 		=> $head->id_block ?? '',
 						'block_name' 	=> $head->block->name ?? '',
