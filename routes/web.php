@@ -616,7 +616,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.sales-summary');
 				})->name('report.sales.summary.spg')->middleware('auth');
-				Route::get('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
+				Route::post('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
 			});
 		});
 
@@ -826,6 +826,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/employee-select2-for-report', 'EmployeeController@getDataWithFiltersForReport')->name('employee-select2-for-report');
 	Route::post('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
+	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');
 });
 
 Route::prefix('promoactivity')->group(function(){
@@ -838,6 +839,14 @@ Route::prefix('promoactivity')->group(function(){
 	Route::get('/delete/{id}','PromoActivityController@delete')->name('pa.delete')->middleware('auth');
 	Route::get('/exportXLS','PromoActivityController@exportXLS')->name('pa.exportXLS')->middleware('auth');
 	Route::post('/importXLS','PromoActivityController@importXLS')->name('pa.importXLS')->middleware('auth');
+});
+
+/**
+*	Necessary Data
+*/
+
+Route::prefix('data')->group(function () {
+	Route::post('/subcategory-product-data', 'ReportController@SPGsalesSummaryHeader')->name('subcategory-product-data');
 });
 
 Auth::routes();

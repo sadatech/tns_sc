@@ -4,6 +4,7 @@ namespace App;
 
 use App\Components\traits\DropDownHelper;
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class SubCategory extends Model
 {
@@ -21,5 +22,10 @@ class SubCategory extends Model
     public function products()
     {
     	return $this->hasMany('App\Product', 'id_subcategory');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }
