@@ -447,6 +447,7 @@ class ReportController extends Controller
                 ->whereHas('employee.position', function($query){
                     return $query->where('level', 'spgmtc');
                 })
+                ->groupBy(['id_employee','id_store'])
                 ->orderBy('id_employee', 'ASC');            
 
         // foreach ($data as $item) {
@@ -461,7 +462,7 @@ class ReportController extends Controller
 
         // }
 
-        // return response()->json($data);
+        // return response()->json($data->get());
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
@@ -527,6 +528,7 @@ class ReportController extends Controller
 
         $periode = Carbon::parse($request->periode);
         $data = Employee::filter($filters)
+                ->with('employeeSubArea.subarea')
                 ->whereHas('position', function($query){
                     return $query->where('level', 'tlmtc');
                 })
@@ -539,22 +541,22 @@ class ReportController extends Controller
             return $item->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
-            // return number_format($item->getActualPrevious(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]));
+            return number_format($item->getActualPrevious(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('actual_current', function($item) use ($periode) {
-            // return number_format($item->getActual(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]));
+            return number_format($item->getActual(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('target', function($item) use ($periode) {
-            // return number_format($item->getTarget(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]));
+            return number_format($item->getTarget(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('achievement', function($item) use ($periode) {
-            // return $item->getAchievement(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]);
+            return $item->getAchievement(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
         ->addColumn('growth', function($item) use ($periode) {
-            // return $item->getGrowth(['sub_area' => $item->employeeSubArea->subarea->name, 'date' => $periode]);
+            return $item->getGrowth(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
         ->addColumn('area', function($item) {
-            return $item->employeeSubArea->subarea;
+            return $item->employeeSubArea[0]->subarea->area->name;
         })
         ->make(true);     
     }
