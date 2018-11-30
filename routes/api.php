@@ -174,6 +174,7 @@ Route::prefix('block')->group(function () {
 	Route::post('/add', 'API\BlockController@store')->name('api.block.add');
 	Route::post('/edit/{id}', 'API\BlockController@update')->name('api.block.edit');
 	Route::get('/list/{id}', 'API\BlockController@list')->name('api.block.list');
+	Route::get('/disable/{id}/{status}', 'API\BlockController@disable')->name('api.block.disable');
 });
 
 // History
