@@ -56,7 +56,7 @@ Route::prefix('subarea')->group(function () {
 
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
-	Route::get('pf/list/{id_pasar}', 'API\ProductController@pfList')->name('api.product.pf.list');
+	Route::get('pf/list/{type}/{id}', 'API\ProductController@pfList')->name('api.product.pf.list');
 });
 
 Route::prefix('brand')->group(function () {
