@@ -2030,6 +2030,9 @@ class ReportController extends Controller
         foreach ($dist as $key => $value) {
             $data[] = array(
                 'id' => $id++,
+                'id_outlet' => $value->id_outlet,
+                'id_employee' => $value->id_employee,
+                'date' => $value->date,
                 'nama' => $value->employee->name,
                 'pasar' => $value->outlet->employeePasar->pasar->name,
                 'tanggal' => Carbon::parse($value->date)->day,
@@ -2041,21 +2044,21 @@ class ReportController extends Controller
         foreach (Product::get() as $pdct) {
             $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($dist) use ($pdct) {
-                $distribution = DistributionDetail::where([
-                    'id_distribution' => $dist['id'],
-                    'id_product' => $pdct->id
-                ])->first();
-                // $html = "<table class='table table-bordered'>";
-                // $html .= "<tr>";
-                // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
-                // $html .= "<td>".$distribution['qty']."</td>";
-                // $html .= "<td class='bg-gd-primary text-white'>Actual</td>";
-                // $html .= "<td>".$distribution['qty_actual']."</td>";
-                // $html .= "<td class='bg-gd-primary text-white'>Satuan</td>";
-                // $html .= "<td>".$distribution['satuan']."</td>";
-                // $html .= "</tr>";
-                // $html .= "</table>";
-                return $distribution['qty_actual']."&nbsp;".$distribution['satuan'];
+                $distribution = Distribution::where([
+                    'id_outlet' => $dist['id_outlet'],
+                    'id_employee' => $dist['id_employee'],
+                    'date' => $dist['date'],
+                ])->get(['id'])->toArray();
+
+                $getId = array_column($distribution,'id');
+                $detail = DistributionDetail::whereIn('id_distribution', $getId)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $satuan = array();
+                foreach ($detail as $value) {
+                     $satuan[] = $value->qty_actual."&nbsp;".$value->satuan;
+                } 
+                return implode(', ', $satuan);
             });
         }
         $dt->rawColumns($columns);
@@ -2070,7 +2073,9 @@ class ReportController extends Controller
         foreach ($sales as $value) {
             $data[] = array(
                 'id' => $id++,
-                'id_sales' => $value->id,
+                'id_outlet' => $value->id_outlet,
+                'id_employee' => $value->id_employee,
+                'date' => $value->date,
                 'nama' => $value->employee->name,
                 'pasar' => $value->outlet->employeePasar->pasar->name,
                 'tanggal' => $value->date,
@@ -2084,10 +2089,19 @@ class ReportController extends Controller
         foreach ($product as $pdct) {
             $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
-                $sale = \App\SalesMdDetail::where([
-                    'id_sales' => $sales['id_sales'],
-                    'id_product' => $pdct->id
-                ])->first();
+                $sale = \App\SalesMd::where([
+                    'id_employee' => $sales['id_employee'],
+                    'id_outlet' => $sales['id_outlet'],
+                    'date' => $sales['date'],
+                ])->get(['id'])->toArray();
+                $getIdSale = array_column($sale,'id');
+                $detail = \App\SalesMdDetail::whereIn('id_sales', $getIdSale)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $satuan = array();
+                foreach ($detail as $value) {
+                     $satuan[] = $value->qty_actual."&nbsp;".$value->satuan;
+                } 
                 // $html = "<table class='table table-bordered'>";
                 // $html .= "<tr>";
                 // $html .= "<td class='bg-gd-primary text-white'>Quantity</td>";
@@ -2098,7 +2112,7 @@ class ReportController extends Controller
                 // $html .= "<td>".$sale['satuan']."</td>";
                 // $html .= "</tr>";
                 // $html .= "</table>";
-                return $sale['qty_actual']."&nbsp;".$sale['satuan'];
+                return implode(", ", $satuan);
             });
         }
         $dt->rawColumns($columns);
@@ -2382,7 +2396,9 @@ class ReportController extends Controller
         foreach ($sales as $key => $value) {
             $data[] = array(
                 'id' => $id++,
-                'id_sales' => $value->id,
+                'id_pasar' => $value->id_pasar,
+                'date' => $value->date,
+                'id_employee' => $value->id_employee,
                 'nama_spg' => $this->isset($value->employee->name),
                 'pasar' => $this->isset($value->pasar->name),
                 'tanggal' => $this->isset($value->date),
@@ -2397,15 +2413,20 @@ class ReportController extends Controller
         foreach ($product as $pdct) {
             $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
-                $sale = \App\SalesSpgPasarDetail::where([
-                    'id_sales' => $sales['id_sales'],
-                    'id_product' => $pdct->id
-                ])->first();
-                if ($sale != null) {
-                    return $sale['qty_actual']."&nbsp;".$sale['satuan'];
-                } else {
-                    return "-";
+                $sale = SalesSpgPasar::where([
+                    'id_employee' => $sales['id_employee'],
+                    'id_pasar' => $sales['id_pasar'],
+                    'date' => $sales['date'],
+                ])->get(['id'])->toArray();
+                $getIdSale = array_column($sale,'id');
+                $detail = \App\SalesSpgPasarDetail::whereIn('id_sales', $getIdSale)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $satuan = array();
+                foreach ($detail as $value) {
+                     $satuan[] = $value->qty_actual."&nbsp;".$value->satuan;
                 }
+                return implode(", ", $satuan);
             });
         }
         $dt->rawColumns($columns);
