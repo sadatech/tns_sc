@@ -616,7 +616,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.sales-summary');
 				})->name('report.sales.summary.spg')->middleware('auth');
-				Route::get('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
+				Route::post('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
 			});
 		});
 
@@ -631,14 +631,22 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sampling')->group(function () {
 				Route::get('/', function(){
-					return view('report.democooking.sampling');
+					$getId = array_column(\App\SamplingDcDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.democooking.sampling', $data);
 				})->name('report.demo.sampling')->middleware('auth');
+				Route::get('/data', 'ReportController@DcSampling')->name('dc.sampling.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportDcSampling')->name('dc.sampling.export')->middleware('auth');
 			});
 
-			Route::prefix('salesDC')->group(function () {
+			Route::prefix('salesDC')->group(function(){
 				Route::get('/', function(){
-					return view('report.democooking.salesDC');
+					$getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.democooking.salesDC', $data);
 				})->name('report.demo.salesDC')->middleware('auth');
+				Route::get('/data', 'ReportController@DcSales')->name('dc.sales.data')->middleware('auth');
+				Route::get('/export', 'ReportController@exportDcSales')->name('dc.sales.export')->middleware('auth');
 			});
 
 			Route::prefix('activity')->group(function () {
@@ -818,6 +826,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/employee-select2-for-report', 'EmployeeController@getDataWithFiltersForReport')->name('employee-select2-for-report');
 	Route::post('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
+	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');
 });
 
 Route::prefix('promoactivity')->group(function(){
@@ -830,6 +839,14 @@ Route::prefix('promoactivity')->group(function(){
 	Route::get('/delete/{id}','PromoActivityController@delete')->name('pa.delete')->middleware('auth');
 	Route::get('/exportXLS','PromoActivityController@exportXLS')->name('pa.exportXLS')->middleware('auth');
 	Route::post('/importXLS','PromoActivityController@importXLS')->name('pa.importXLS')->middleware('auth');
+});
+
+/**
+*	Necessary Data
+*/
+
+Route::prefix('data')->group(function () {
+	Route::post('/subcategory-product-data', 'ReportController@SPGsalesSummaryHeader')->name('subcategory-product-data');
 });
 
 Auth::routes();
