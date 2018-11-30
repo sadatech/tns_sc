@@ -1555,6 +1555,49 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
+    public function exportSMDsummary()
+    {
+        $employeePasar = EmployeePasar::with([
+            'employee','pasar','pasar.subarea.area',
+            'employee.position'
+        ])->select('employee_pasars.*');
+        if ($employeePasar->count() > 0) {
+            $report = array();
+            for ($i=1; $i <= Carbon::now()->day ; $i++) {
+                foreach ($employeePasar->get() as $data) {
+                    if ($data->employee->position->level == 'mdgtc') {
+                        $report[] = array(
+                            'area' => $data->pasar->subarea->area->name,
+                            'nama' => $data->employee->name,
+                            'jabatan' => $data->employee->position->name,
+                            'pasar' =>   $data->pasar->name,
+                            'stockist' => $this->getStockist($data, $i),
+                            'bulan' => Carbon::now()->month,
+                            'tanggal' => $i,
+                            'call' => ($this->getCall($data, $i) ?: "-"),
+                            'ro' => ($this->getRo($data, $i) ?: "-"),
+                            'cbd' => ($this->getCbd($data, $i) ?: "-"),
+                        );
+                    }
+                }
+            }
+            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($report) {
+                $excel->sheet('AttandanceSPGReport', function($sheet) use ($report)
+                {
+                    $sheet->fromArray($report);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
     public function SMDattendance()
     {
         $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month)->get();
@@ -1566,6 +1609,8 @@ class ReportController extends Controller
         $absen = array();
         $id = 1;
         foreach ($employee as $val) {
+            $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
+            $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
             $data[] = array(
                 'id' => $id++,
                 'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
@@ -1576,8 +1621,8 @@ class ReportController extends Controller
                 'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
                 'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
                 'tanggal' => Carbon::parse($val->checkin)->day,
-                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
-                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
+                'checkout' => $checkout." ".$val->attendance->employee->timezone->name
             );
         }
         // foreach ($employee as $value) {
@@ -2430,6 +2475,8 @@ class ReportController extends Controller
         $absen = array();
         $id = 1;
         foreach ($employee as $val) {
+            $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
+            $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
             $data[] = array(
                 'id' => $id++,
                 'area' => $this->isset($val->pasar->subarea->area->name),
@@ -2438,8 +2485,8 @@ class ReportController extends Controller
                 'jabatan' => $this->isset($val->attendance->employee->position->name),
                 'pasar' => $this->isset($val->pasar->name),
                 'tanggal' => Carbon::parse($val->checkin)->day,
-                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
-                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
+                'checkout' => $checkout." ".$val->attendance->employee->timezone->name
             );
         }
         return Datatables::of(collect($data))->make(true);
