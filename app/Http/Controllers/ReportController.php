@@ -24,6 +24,7 @@ use App\Brand;
 use Auth;
 use DB;
 use Excel;
+use App\DocumentationDc;
 use App\StoreDistributor;
 use App\Employee;
 use App\EmployeePasar;
@@ -1566,19 +1567,22 @@ class ReportController extends Controller
         $absen = array();
         $id = 1;
         foreach ($employee as $val) {
-            $data[] = array(
-                'id' => $id++,
-                'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
-                'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
-                'nama' => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
-                'jabatan' => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
-                'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
-                'tanggal' => Carbon::parse($val->checkin)->day,
-                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
-                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
-            );
+            if ($val->attendance->employee->position->level == 'mdgtc')
+            {
+                $data[] = array(
+                    'id' => $id++,
+                    'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                    'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
+                    'nama' => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                    'jabatan' => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                    'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
+                    'tanggal' => Carbon::parse($val->checkin)->day,
+                    'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
+                    'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                );
+            }
         }
         // foreach ($employee as $value) {
         //     if (isset($value->employeePasar)) {
@@ -1812,7 +1816,7 @@ class ReportController extends Controller
     }
 
        // ************ DEMO COOKING ************ //
-       public function kunjunganDc()
+    public function kunjunganDc()
     {
         $plan = PlanDc::with('planEmployee')
         ->select('plan_dcs.*');
@@ -1908,13 +1912,15 @@ class ReportController extends Controller
         $data = array();
         $id = 1;
         foreach ($sales as $value) {
-            $data[] = array(
-                'id'        => $id++,
-                'id_sales'  => $value->id,
-                'nama'      => $value->employee->name,
-                'place'     => $value->place,
-                'tanggal'   => $value->date,
-            );
+            if ($value->employee->position->level == 'dc'){
+                $data[] = array(
+                    'id'        => $id++,
+                    'id_sales'  => $value->id,
+                    'nama'      => $value->employee->name,
+                    'place'     => $value->place,
+                    'tanggal'   => $value->date
+                );
+            }
         }
         $getId = array_column(\App\SamplingDcDetail::get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
@@ -1940,19 +1946,21 @@ class ReportController extends Controller
         if ($sales->count() > 0) {
             $product = array();
             foreach ($sales->get() as $key => $value) {
-                $detail = SamplingDcDetail::where('id_sales',$value->id)->get();
-                $data[] = array(
-                    'Nama Demo Cooking' => $value->employee->name,
-                    'Place'             => $value->place,
-                    'Date'              => $value->date,
-                );
-                $getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
-                $productList = \App\Product::whereIn('id', $getId)->get();
-                foreach ($productList as $pro) {
-                    $data[$key][$pro->name] = "-";
-                }
-                foreach ($detail as $det) {
-                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                if ($value->employee->position->level == 'dc') {
+                    $detail = SamplingDcDetail::where('id_sales',$value->id)->get();
+                    $data[] = array(
+                        'Nama Demo Cooking' => $value->employee->name,
+                        'Place'             => $value->place,
+                        'Date'              => $value->date,
+                    );
+                    $getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
                 }
             }
             $filename = "DemoCookingSales".Carbon::now().".xlsx";
@@ -1972,6 +1980,26 @@ class ReportController extends Controller
         }
     }
 
+    public function documentationDC()
+    {
+        $data = array();
+        $employee = DocumentationDc::whereMonth('date', Carbon::now()->month)->get();
+        $id = 1;
+        foreach ($employee as $val) {
+            if ($val->employee->position->level == 'dc') {
+                $data[] = array(
+                    'id'    => $id++,
+                    'name'  =>  $val->employee->name,
+                    'date'  => (isset($val->date) ? $val->date : ""),
+                    'place' => (isset($val->place) ? $val->place : ""),
+                    'type'  => (isset($val->type) ? $val->type : ""),
+                    'note'  => (isset($val->note) ? $val->note : "")
+                );
+            }
+        }
+        return Datatables::of(collect($data))->make(true);
+    }
+
     public function SMDdistpf()
     {
         $dist = Distribution::whereMonth('date',Carbon::now()->month)->get();
@@ -1979,13 +2007,15 @@ class ReportController extends Controller
         $product = array();
         $id = 1;
         foreach ($dist as $key => $value) {
+            if ($value->employee->position->level == 'mdgtc') {
             $data[] = array(
                 'id' => $id++,
                 'nama' => $value->employee->name,
-                'pasar' => $value->outlet->employeePasar->pasar->name,
+                'pasar' => (isset($value->outlet->employeePasar->pasar->name) ? $value->outlet->employeePasar->pasar->name : ""),
                 'tanggal' => Carbon::parse($value->date)->day,
-                'outlet' => $value->outlet->name
+                'outlet' => (isset($value->outlet->name) ? $value->outlet->name : "") 
             );
+        } 
         }
         $dt = Datatables::of(collect($data));
         $columns = array();
@@ -2019,14 +2049,16 @@ class ReportController extends Controller
         $data = array();
         $id = 1;
         foreach ($sales as $value) {
-            $data[] = array(
-                'id' => $id++,
-                'id_sales' => $value->id,
-                'nama' => $value->employee->name,
-                'pasar' => $value->outlet->employeePasar->pasar->name,
-                'tanggal' => $value->date,
-                'outlet' => $value->outlet->name,
-            );
+            if($value->employee->position->level == 'mdgtc'){
+                $data[] = array(
+                    'id' => $id++,
+                    'id_sales' => $value->id,
+                    'nama' => $value->employee->name,
+                    'pasar' => $value->outlet->employeePasar->pasar->name,
+                    'tanggal' => $value->date,
+                    'outlet' => $value->outlet->name,
+                );
+            }
         }
         $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
@@ -2062,15 +2094,17 @@ class ReportController extends Controller
         $data = array();
         $id = 1;
         foreach ($stock as $val) {
-            $data[] = array(
-                'id' => $id++,
-                'id_stock' => $val->id,
-                'name' => $val->employee->name,
-                'pasar' => $val->pasar->name,
-                'tanggal' => $val->date,
-                'week' => $val->week,
-                'stockist' => $val->stockist
-            );
+            if ($val->employee->position->level == 'mdgtc'){
+                $data[] = array(
+                    'id' => $id++,
+                    'id_stock' => $val->id,
+                    'name' => $val->employee->name,
+                    'pasar' => $val->pasar->name,
+                    'tanggal' => $val->date,
+                    'week' => $val->week,
+                    'stockist' => $val->stockist
+                );
+            }
         }
 
         $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
@@ -2150,13 +2184,15 @@ class ReportController extends Controller
         $dist = Distribution::whereMonth('date',Carbon::now()->month);
         if ($dist->count() > 0) {
 		    foreach ($dist->get() as $key => $val) {
-                $detail = DistributionDetail::where('id_distribution',$val->id)->get();
-		    	$data[] = array(
-                    'Employee'  => $val->employee->name,
-                    'Pasar'     => $val->outlet->employeePasar->pasar->name,
-                    'Tanggal'   => $val->date,
-                    'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
-		    	);
+                if($val->employee->position->level == 'mdgtc') {
+                    $detail = DistributionDetail::where('id_distribution',$val->id)->get();
+		    	    $data[] = array(
+                        'Employee'  => $val->employee->name,
+                        'Pasar'     => $val->outlet->employeePasar->pasar->name,
+                        'Tanggal'   => $val->date,
+                        'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
+                    );
+                }
             }
 
             $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
@@ -2190,18 +2226,20 @@ class ReportController extends Controller
         $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month);
         if ($employee->count() > 0) {
 		    foreach ($employee->get() as $val) {
-		    	$data[] = array(
-                    'region' => $val->outlet->employeePasar->pasar->name,
-                    'area' => $val->outlet->employeePasar->pasar->subarea->area->name,
-                    'subarea' => $val->outlet->employeePasar->pasar->subarea->name,
-                    'nama' => $val->attendance->employee->name,
-                    'jabatan' => $val->attendance->employee->position->name,
-                    'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                    'outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
-                    'tanggal' => Carbon::parse($val->checkin)->day,
-                    'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
-                    'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
-		    	);
+                if ($val->attendance->employee->position->level == 'mdgtc') {
+		    	    $data[] = array(
+                        'region' => $val->outlet->employeePasar->pasar->name,
+                        'area' => $val->outlet->employeePasar->pasar->subarea->area->name,
+                        'subarea' => $val->outlet->employeePasar->pasar->subarea->name,
+                        'nama' => $val->attendance->employee->name,
+                        'jabatan' => $val->attendance->employee->position->name,
+                        'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                        'outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
+                        'tanggal' => Carbon::parse($val->checkin)->day,
+                        'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
+                        'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                    );
+                }
             }
         
 		    $filename = "AttandanceReport".Carbon::now().".xlsx";
@@ -2226,16 +2264,18 @@ class ReportController extends Controller
         $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month);
         if ($employee->count() > 0) {
 		    foreach ($employee->get() as $val) {
-		    	$data[] = array(
-                'area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
-                'subarea'   => (isset($val->pasar->subarea->name) ?  $val->pasar->subarea->area->name : ""),
-                'nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
-                'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
-                'pasar'     => (isset($val->pasar->name) ? $val->pasar->name : ""),
-                'tanggal'   => Carbon::parse($val->checkin)->day,
-                'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
-                'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
-		    	);
+                if($val->attendance->employee->position->level == 'spggtc') {
+		    	    $data[] = array(
+                    'area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
+                    'subarea'   => (isset($val->pasar->subarea->name) ?  $val->pasar->subarea->area->name : ""),
+                    'nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                    'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                    'pasar'     => (isset($val->pasar->name) ? $val->pasar->name : ""),
+                    'tanggal'   => Carbon::parse($val->checkin)->day,
+                    'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
+                    'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                    );
+                }
             }
         
 		    $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
@@ -2260,20 +2300,22 @@ class ReportController extends Controller
         $sales = SalesMD::whereMonth('date', Carbon::now()->month);
         if ($sales->count() > 0) {
 		    foreach ($sales->get() as $key => $val) {
-                $detail = SalesMdDetail::where('id_sales',$val->id)->get();
-		    	$data[] = array(
-                    'Employee'  => $val->employee->name,
-                    'Pasar'     => $val->outlet->employeePasar->pasar->name,
-                    'Tanggal'   => $val->date,
-                    'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
-                );
-                $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
-                $productList = \App\Product::whereIn('id', $getId)->get();
-                foreach ($productList as $pro) {
-                    $data[$key][$pro->name] = "-";
-                }
-                foreach ($detail as $det) {
-                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                if ($val->employee->position->level == 'mdgtc'){
+                    $detail = SalesMdDetail::where('id_sales',$val->id)->get();
+		    	    $data[] = array(
+                        'Employee'  => $val->employee->name,
+                        'Pasar'     => $val->outlet->employeePasar->pasar->name,
+                        'Tanggal'   => $val->date,
+                        'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
+                    );
+                    $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
                 }
             }
         
@@ -2331,15 +2373,17 @@ class ReportController extends Controller
         $product = array();
         $id = 1;
         foreach ($sales as $key => $value) {
-            $data[] = array(
-                'id' => $id++,
-                'id_sales' => $value->id,
-                'nama_spg' => $this->isset($value->employee->name),
-                'pasar' => $this->isset($value->pasar->name),
-                'tanggal' => $this->isset($value->date),
-                'nama' => $this->isset($value->name),
-                'phone' => $this->isset($value->phone)
-            );
+            if ($value->employee->position->level = 'spggtc') {
+                $data[] = array(
+                    'id' => $id++,
+                    'id_sales' => $value->id,
+                    'nama_spg' => $this->isset($value->employee->name),
+                    'pasar' => $this->isset($value->pasar->name),
+                    'tanggal' => $this->isset($value->date),
+                    'nama' => $this->isset($value->name),
+                    'phone' => $this->isset($value->phone)
+                );
+            }
         }
         $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
@@ -2369,16 +2413,18 @@ class ReportController extends Controller
         $id = 1;
         $data = array();
         foreach ($rekap as $val) {
-            $data[] = array(
-                'id' => $id++,
-                'name' => (isset($val->employee->name) ? $val->employee->name : "-"),
-                'outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
-                'date' => (isset($val->date) ? $val->date : "-"),
-                'total_buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
-                'total_sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
-                'total_value' => (isset($val->total_value) ? $val->total_value : "-"),
-                'photo' => (isset($val->photo) ? $val->photo : "-")
-            );
+            if ($val->employee->position->level == 'spggtc') {
+                $data[] = array(
+                    'id' => $id++,
+                    'name' => (isset($val->employee->name) ? $val->employee->name : "-"),
+                    'outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
+                    'date' => (isset($val->date) ? $val->date : "-"),
+                    'total_buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
+                    'total_sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
+                    'total_value' => (isset($val->total_value) ? $val->total_value : "-"),
+                    'photo' => (isset($val->photo) ? $val->photo : "-")
+                );
+            }
         }
         return Datatables::of(collect($data))
         ->addColumn('action', function($stock) {
@@ -2397,14 +2443,16 @@ class ReportController extends Controller
         $rekap = SalesRecap::whereMonth('date', Carbon::now()->month);
         if ($rekap->count() > 0) {
             foreach ($rekap->get() as $val) {
-                $data[] = array(
-                    'Name' => (isset($val->employee->name) ? $val->employee->name : "-"),
-                    'Outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
-                    'Date' => (isset($val->date) ? $val->date : "-"),
-                    'Total Buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
-                    'Total Sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
-                    'Total Value' => (isset($val->total_value) ? $val->total_value : "-")
-                );
+                if ($val->employee->position->level == 'spggtc') {
+                    $data[] = array(
+                        'Name' => (isset($val->employee->name) ? $val->employee->name : "-"),
+                        'Outlet' => (isset($val->outlet->name) ? $val->outlet->name : "-"),
+                        'Date' => (isset($val->date) ? $val->date : "-"),
+                        'Total Buyer' => (isset($val->total_buyer) ? $val->total_buyer : "-"),
+                        'Total Sales' => (isset($val->total_sales) ? $val->total_sales : "-"),
+                        'Total Value' => (isset($val->total_value) ? $val->total_value : "-")
+                    );
+                }
             }
             $filename = "SPGRekap".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
@@ -2430,17 +2478,19 @@ class ReportController extends Controller
         $absen = array();
         $id = 1;
         foreach ($employee as $val) {
-            $data[] = array(
-                'id' => $id++,
-                'area' => $this->isset($val->pasar->subarea->area->name),
-                'subarea' => $this->isset($val->pasar->subarea->name),
-                'nama' => $this->isset($val->attendance->employee->name),
-                'jabatan' => $this->isset($val->attendance->employee->position->name),
-                'pasar' => $this->isset($val->pasar->name),
-                'tanggal' => Carbon::parse($val->checkin)->day,
-                'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
-                'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
-            );
+            if ($val->attendance->employee->position->level == 'spggtc') {
+                $data[] = array(
+                    'id' => $id++,
+                    'area' => $this->isset($val->pasar->subarea->area->name),
+                    'subarea' => $this->isset($val->pasar->subarea->name),
+                    'nama' => $this->isset($val->attendance->employee->name),
+                    'jabatan' => $this->isset($val->attendance->employee->position->name),
+                    'pasar' => $this->isset($val->pasar->name),
+                    'tanggal' => Carbon::parse($val->checkin)->day,
+                    'checkin' => Carbon::parse($val->checkin)->format('H:m:s'),
+                    'checkout' => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                );
+            }
         }
         return Datatables::of(collect($data))->make(true);
     }
@@ -2452,21 +2502,23 @@ class ReportController extends Controller
         if ($sales->count() > 0) {
             $product = array();
             foreach ($sales->get() as $key => $value) {
-                $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
-                $data[] = array(
-                    'Nama SPG' => $value->employee->name,
-                    'Pasar' => $value->pasar->name,
-                    'Date' => $value->date,
-                    'Nama Pemilik Pasar' => $value->name,
-                    'Phone Pemilik Pasar' => $value->phone
-                );
-                $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
-                $productList = \App\Product::whereIn('id', $getId)->get();
-                foreach ($productList as $pro) {
-                    $data[$key][$pro->name] = "-";
-                }
-                foreach ($detail as $det) {
-                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                if ($value->employee->position->level == 'spggtc') {
+                    $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
+                    $data[] = array(
+                        'Nama SPG'              => (isset($value->employee->name) ? $value->employee->name : ""),
+                        'Pasar'                 => (isset($value->pasar->name) ? $value->pasar->name : ""),
+                        'Date'                  => (isset($value->date) ? $value->date  : ""),
+                        'Nama Pemilik Pasar'    => (isset($value->name) ? $value->name : ""),
+                        'Phone Pemilik Pasar'   => (isset($value->phone) ? $value->phone : "")
+                    );
+                    $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
                 }
             }
             $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
@@ -2491,24 +2543,25 @@ class ReportController extends Controller
         $stock = StockMD::whereMonth('date', Carbon::now()->month);
         if ($stock->count() > 0) {
 		    foreach ($stock->get() as $key => $val) {
-                $detail = StockMdDetail::where('id_stock',$val->id)->get();
-		    	$data[] = array(
-                    'Name'      => $val->employee->name,
-                    'Pasar'     => $val->pasar->name,
-                    'Date'      => $val->date,
-                    'Week'      => $val->week,
-                    'Stockist'  => $val->stockist
-                );
-                $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
-                $productList = \App\Product::whereIn('id', $getId)->get();
-                foreach ($productList as $pro) {
-                    $data[$key][$pro->name] = "-";
-                }
-                foreach ($detail as $det) {
-                    $data[$key][$det->product->name] = $det->oos;
+                if ($val->employee->position->level == 'mdgtc') {
+                    $detail = StockMdDetail::where('id_stock',$val->id)->get();
+		    	    $data[] = array(
+                        'Name'      => (isset($val->employee->name) ? $val->employee->name : "-"),
+                        'Pasar'     => (isset($val->pasar->name) ? $val->pasar->name : "-"),
+                        'Date'      => (isset($val->date) ? $val->date : ""),
+                        'Week'      => (isset($val->week) ? $val->week : ""),
+                        'Stockist'  => (isset($val->stockist) ? $val->stockist : "-")
+                    );
+                    $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->oos;
+                    }
                 }
             }
-        
 		    $filename = "ReportSMDStokist".Carbon::now().".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
 		    	$excel->sheet('ReportSMDStokist', function($sheet) use ($data)
