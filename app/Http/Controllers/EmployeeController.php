@@ -347,7 +347,7 @@ class EmployeeController extends Controller
 				$employee->status = $request->input('status');
 			}
 			if ($request->input('position') == Position::where(['level' => 'tlmtc'])->first()->id) {
-				$employee->id_subarea = $request->input('subarea');
+				$employee->employeeSubArea->id_subarea = $request->input('subarea');
 			}
 			if ($request->input('password')) {
 				$employee->password = bcrypt($request->input('password'));
