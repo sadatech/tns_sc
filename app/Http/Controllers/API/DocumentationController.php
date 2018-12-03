@@ -36,12 +36,12 @@ class DocumentationController extends Controller
 
 			if ($image2 	= $request->file('photo2')) {
 				$photo2 	= time()."_".$image2->getClientOriginalName();
-				$image2->move($path, $photo1);
+				$image2->move($path, $photo2);
 			}
 
 			if ($image3 	= $request->file('photo3')) {
 				$photo3 	= time()."_".$image3->getClientOriginalName();
-				$image3->move($path, $photo1);
+				$image3->move($path, $photo3);
 			}
 
 			$insert 	= DocumentationDc::create([

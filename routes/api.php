@@ -117,8 +117,7 @@ Route::prefix('cbd')->group(function () {
 });
 
 Route::prefix('distribution')->group(function () {
-	Route::post('/add', 'API\DistributionController@store')->name('api.distribution.add');
-	Route::post('/add/{type}', 'API\DistributionController@store')->name('api.distribution.add.motoric');
+	Route::post('/add/{type?}', 'API\DistributionController@store')->name('api.distribution.add');
 });
 
 Route::prefix('faq')->group(function () {
