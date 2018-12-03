@@ -1981,26 +1981,34 @@ class ReportController extends Controller
         foreach ($sales as $value) {
             if ($value->employee->position->level == 'dc'){
                 $data[] = array(
-                    'id'        => $id++,
-                    'id_sales'  => $value->id,
-                    'nama'      => $value->employee->name,
-                    'place'     => (isset($value->place) ? $value->place : ""),
-                    'tanggal'   => (isset($value->date) ? $value->date : "")
+                    'id'            => $id++,
+                    'id_sales'      => $value->id,
+                    'id_employee'   => $value->id_employee,
+                    'nama'          => $value->employee->name,
+                    'place'         => (isset($value->place) ? $value->place : ""),
+                    'date'       => (isset($value->date) ? $value->date : "")
                 );
             }
         }
-        $getId = array_column(\App\SamplingDcDetail::get(['id_product'])->toArray(),'id_product');
-        $product = \App\Product::whereIn('id', $getId)->get();
         $dt = Datatables::of(collect($data));
         $columns = array();
-        foreach ($product as $pdct) {
+        foreach (Product::get() as $pdct) {
             $columns[] = 'product-'.$pdct->id;
             $dt->addColumn('product-'.$pdct->id, function($sales) use ($pdct) {
-                $sale = \App\SalesDcDetail::where([
-                    'id_sales' => $sales['id_sales'],
-                    'id_product' => $pdct->id
-                ])->first();
-                return $sale['qty_actual']."&nbsp;".$sale['satuan'];
+                $sampling = SamplingDc::where([
+                    'id_employee' => $sales['id_employee'],
+                    'date'        => $sales['date'],
+                ])->get(['id'])->toArray();
+
+                $getId = array_column($sampling,'id');
+                $detail = SamplingDcDetail::whereIn('id_sales', $getId)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $satuan = array();
+                foreach ($detail as $value) {
+                     $satuan[] = $value->qty_actual."&nbsp;".$value->satuan;
+                } 
+                return implode(', ', $satuan);
             });
         }
         $dt->rawColumns($columns);
