@@ -294,9 +294,6 @@
         @endif
         $(function() {
           $('#promoTable').DataTable({
-            columnDefs: [
-        { type: 'currency', targets: 4 }
-       ],
             processing: true,
             drawCallback: function(){
               $('.js-swal-delete').on('click', function(){
@@ -356,19 +353,5 @@
         $(".js-edit").select2({ 
           dropdownParent: $("#editModal")
         });
-        jQuery.extend( jQuery.fn.dataTableExt.oSort, {
-	"currency-pre": function ( a ) {
-		a = (a==="-") ? 0 : a.replace( /[^\d\-\.]/g, "" );
-		return parseFloat( a );
-	},
-
-	"currency-asc": function ( a, b ) {
-		return a - b;
-	},
-
-	"currency-desc": function ( a, b ) {
-		return b - a;
-	}
-} );
       </script>
       @endsection
