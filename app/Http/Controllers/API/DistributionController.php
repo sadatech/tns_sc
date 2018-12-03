@@ -71,7 +71,7 @@ class DistributionController extends Controller
 
 						$detail->updateOrCreate(
 							[
-								'id_distribution'		=> $distribution_id,
+								'id_distribution'		=> $distributionId,
 								'id_product'	=> $product->id,
 								'satuan'		=> $product->satuan,
 							],
