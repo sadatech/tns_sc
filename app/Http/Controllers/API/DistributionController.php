@@ -10,6 +10,7 @@ use App\DistributionDetail;
 use App\DistributionMotoric;
 use App\DistributionMotoricDetail;
 use App\Outlet;
+use App\Block;
 use JWTAuth;
 use Config;
 use DB;
