@@ -9,6 +9,7 @@ use App\ProductFokus;
 use App\FokusArea;
 use App\FokusChannel;
 use App\Pasar;
+use App\SubArea;
 use Carbon\Carbon;
 use Config;
 use JWTAuth;
@@ -68,7 +69,7 @@ class ProductController extends Controller
 		return response()->json($res);
 	}
 
-	public function pfList($id_pasar)
+	public function pfList($type, $id)
 	{
 		try {
 			$res['success'] = false;
@@ -77,7 +78,7 @@ class ProductController extends Controller
 					$res['msg'] = "User not found.";
 				} else {
 					$today 	= Carbon::today()->toDateString();
-					$area 	= Pasar::find($id_pasar)->first()->subarea->id_area;
+					$area 	= (strtoupper($type) == 'PASAR') ? Pasar::where('id',$id)->first()->subarea->id_area : SubArea::where('id',$id)->first()->id_area;
 					
 					$pf 	= ProductFokus::with(['fokusproduct.product'])
 					->whereHas('Fokus.channel', function($query)
