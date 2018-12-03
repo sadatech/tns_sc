@@ -56,7 +56,7 @@ class SalesMotoricController extends Controller
 
 		$sales = $sales->firstOrCreate([
 			'id_employee'	=> $user->id,
-			'place'			=> $data->place,
+			'id_block'			=> $data->block,
 			'date'			=> $date,
 			'week'			=> $date->weekOfMonth,
 		]);

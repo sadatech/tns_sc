@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Components\traits\ApiAuthHelper;
 use App\Block;
+use App\SubArea;
 use Carbon\Carbon;
 use JWTAuth;
 use Config;

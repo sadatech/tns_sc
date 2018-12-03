@@ -56,7 +56,7 @@ Route::prefix('subarea')->group(function () {
 
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
-	Route::get('pf/list/{id_pasar}', 'API\ProductController@pfList')->name('api.product.pf.list');
+	Route::get('pf/list/{type}/{id}', 'API\ProductController@pfList')->name('api.product.pf.list');
 });
 
 Route::prefix('brand')->group(function () {
@@ -117,8 +117,7 @@ Route::prefix('cbd')->group(function () {
 });
 
 Route::prefix('distribution')->group(function () {
-	Route::post('/add', 'API\DistributionController@store')->name('api.distribution.add');
-	Route::post('/add/{type}', 'API\DistributionController@store')->name('api.distribution.add.motoric');
+	Route::post('/add/{type?}', 'API\DistributionController@store')->name('api.distribution.add');
 });
 
 Route::prefix('faq')->group(function () {
@@ -174,6 +173,7 @@ Route::prefix('block')->group(function () {
 	Route::post('/add', 'API\BlockController@store')->name('api.block.add');
 	Route::post('/edit/{id}', 'API\BlockController@update')->name('api.block.edit');
 	Route::get('/list/{id}', 'API\BlockController@list')->name('api.block.list');
+	Route::get('/disable/{id}/{status}', 'API\BlockController@disable')->name('api.block.disable');
 });
 
 // History

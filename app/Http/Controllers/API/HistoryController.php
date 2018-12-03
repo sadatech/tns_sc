@@ -163,8 +163,11 @@ class HistoryController extends Controller
 						'store_name'	=> $head->store->name1 ?? '',
 						'id_outlet' 	=> $head->id_outlet ?? '',
 						'outlet_name' 	=> $head->outlet->name ?? '',
+						'outlet_pasar_name' 	=> $head->outlet->employeePasar->pasar->name ?? '',
 						'id_pasar' 		=> $head->id_pasar ?? '',
 						'pasar_name' 	=> $head->pasar->name ?? '',
+						'name_for_spg' 	=> $head->name ?? '',
+						'phone_for_spg' => $head->phone ?? '',
 						'place' 		=> $head->place ?? '',
 						'id_block' 		=> $head->id_block ?? '',
 						'block_name' 	=> $head->block->name ?? '',
@@ -289,7 +292,7 @@ class HistoryController extends Controller
 		return response()->json($res);
 	}
 
-	public function distributionHistory($date = '', $type = 'MD')
+	public function distributionHistory($type = 'MD', $date = '')
 	{
 		$check = $this->authCheck();
 		if ($check['success'] == true) {
@@ -328,6 +331,7 @@ class HistoryController extends Controller
 						'id_employee' 	=> $head->id_employee,
 						'id_outlet' 	=> $head->id_outlet ?? '',
 						'outlet_name' 	=> $head->outlet->name ?? '',
+						'outlet_pasar_name' 	=> $head->outlet->employeePasar->pasar->name ?? '',
 						'id_pasar' 		=> $head->id_pasar ?? '',
 						'pasar_name' 	=> $head->pasar->name ?? '',
 						'id_block' 		=> $head->id_block ?? '',
