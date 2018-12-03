@@ -75,7 +75,7 @@ table.table thead tr th {
       { data: 'id' },
       { data: 'nama' },
       { data: 'place' },
-      { data: 'tanggal' },
+      { data: 'date' },
       @foreach ($product as $pro)
       { data: 'product-{{ $pro->id }}' },
       @endforeach
