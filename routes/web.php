@@ -654,6 +654,8 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.democooking.activity');
 				})->name('report.demo.activity')->middleware('auth');
+				Route::get('/data', 'ReportController@documentationDC')->name('dc.documentation.data')->middleware('auth');
+				Route::get('/export', 'ReportController@ExportdocumentationDC')->name('dc.documentation.export')->middleware('auth');
 			});
 
 			Route::prefix('cashAdvance')->group(function () {
