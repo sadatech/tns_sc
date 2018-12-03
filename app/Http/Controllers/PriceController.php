@@ -41,49 +41,44 @@ class PriceController extends Controller
 
     public function store(Request $request)
     {
-        $limit=[
-            'price'         => 'required',
-            'id_product'    => 'required|numeric',
-            'rilis'         => 'required'
-        ];
-        $validator = Validator($request->all(), $limit);
-
-        if ($validator->fails()) {
+        $data = $request->all();
+        if (($validator = Price::validate($data))->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
-        } else {
-            $priceModel = Price::firstOrNew([
-                'id_product' => $request->id_product,
-                'rilis' => $request->rilis,
-            ]);
-            $priceModel->price = $request->price;
-
-            $message = '<i class="em em-confetti_ball mr-2"></i>';
-            $message .= !$priceModel->isNewRecord() ? 'Berhasil memperbarui Price Product!' : 'Berhasil menambah Price Product!';
-
-            $priceModel->save();
-
-            return redirect()->back()->with([
-                'type' => 'success',
-                'title' => 'Sukses!<br/>',
-                'message'=> $message
-            ]);
         }
+        if (Price::hasActivePF($data)) {
+            $this->alert['type'] = 'warning';
+            $this->alert['title'] = 'Warning!<br/>';
+            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Price sudah ada!';
+        } else {
+            DB::transaction(function () use($data) {
+                $product = Price::create($data);
+            });
+            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah price!';
+        }
+        return redirect()->back()->with($this->alert);
     }
 
     public function update(Request $request, $id) 
     {
-      $price = Price::find($id);
-        $price->price         = $request->get('price');
-        $price->rilis         = $request->get('rilis');
-        $price->id_product    = $request->get('product');
+        $product = Price::findOrFail($id);
+        $data = $request->all();
+        if (($validator = Price::validate($data))->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        if (Price::hasActivePF($data, $product->id)) {
+                $this->alert['type'] = 'warning';
+                $this->alert['title'] = 'Warning!<br/>';
+                $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Price sudah ada!';
+            } else {
+            DB::transaction(function () use($product, $data) {
 
-        $price->save();
-        return redirect()->back()
-        ->with([
-            'type'    => 'success',
-            'title'   => 'Sukses!<br/>',
-            'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah price product!'
-        ]);
+                $product->fill($data)->save();
+            });
+            $this->alert['type'] = 'success';
+            $this->alert['title'] = 'Berhasil!<br/>';
+            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah produk fokus!';
+        }
+        return redirect()->back()->with($this->alert);
     }
 
     public function delete($id)
