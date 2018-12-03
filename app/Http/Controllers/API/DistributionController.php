@@ -44,7 +44,7 @@ class DistributionController extends Controller
 			}
 
 			if ( !empty($data->date) && !empty($data->product) && ($status == true) ) {
-				DB::transaction(function () use ($data, $user, &$res) {
+				DB::transaction(function () use ($data, $user, &$res, $type) {
 					$date 	= Carbon::parse($data->date);
 
 					if (strtoupper($type) == 'MOTORIC') {
