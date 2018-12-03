@@ -329,7 +329,7 @@
             { data: 'employee.name', name: 'employee.name'},
             { data: 'hk', name: 'hk' },
             { data: 'rilis', name: 'rilis' },
-            { data: 'value_sales', name: 'value_sales' },
+            { data: 'values', name: 'value_sales' },
             { data: 'ec', name: 'ec' },
             { data: 'cbd', name: 'cbd' },
             { data: 'action', name: 'action' }
