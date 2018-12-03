@@ -292,7 +292,7 @@ class HistoryController extends Controller
 		return response()->json($res);
 	}
 
-	public function distributionHistory($date = '', $type = 'MD')
+	public function distributionHistory($type = 'MD', $date = '')
 	{
 		$check = $this->authCheck();
 		if ($check['success'] == true) {
