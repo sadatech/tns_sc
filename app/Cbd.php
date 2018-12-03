@@ -19,4 +19,11 @@ class Cbd extends Model
     {
         return $this->belongsTo('App\Outlet', 'id_outlet');
     }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['outlet_name'] = $this->outlet->name;
+        $array['photo1_url'] = !empty($this->photo) ? ('uploads/cbd/'.$this->photo) : '';
+        return $array;
+    }
 }
