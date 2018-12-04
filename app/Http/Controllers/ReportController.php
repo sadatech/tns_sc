@@ -485,7 +485,7 @@ class ReportController extends Controller
             return $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
         })
         ->addColumn('store_name', function($item) use ($periode) {
-            return number_format($item->employee->getActualPf(['store' => $item->id_store, 'date' => $periode]));
+            return $item->store->name1.' -> '.$item->employee->getActualPf(['store' => $item->id_store, 'date' => $periode]);
             return $item->store->name1;
             return $item->employee->getActualPf1(['id_channel' => $item->store->account->id_channel, 'date' => $periode]);
         })

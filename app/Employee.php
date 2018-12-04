@@ -267,14 +267,10 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     public function getActualPf($data){
         switch ($this->position->level) {
             case 'spgmtc':
-                return 
-                    DB::select(
-                        "
-                        SELECT 
-                        SUM(total_actual * IF(target_value > 0, 1, 0) * IF(
+                $pf = "* IF(
                             (SELECT 
                                 IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
-                                   IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = 1) > 0,1,0)
+                                   IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
                                 ) as area
                                 FROM `product_fokuses`
                                 INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
@@ -284,13 +280,19 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                                     AND fokus_channels.id_channel = sales_mtc_summary.id_channel
                                     AND sales_mtc_summary.date BETWEEN product_fokuses.from AND product_fokuses.to
                              ) > 0,
-                            1, 0))
-                            AS result
+                            1, 0)";
+                // $pf = '';
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
+                        AS result
                         FROM sales_mtc_summary
                         WHERE id_employee = ".$this->id."
                         AND id_store = ".$data['store']."
                         AND MONTH(date) = ".$data['date']->month."
-                        AND YEAR(date) = ".Carbon::parse($data['date'])->subYear()->year."
+                        AND YEAR(date) = ".$data['date']->year."
                         LIMIT 1
                         "
                     )[0]->result * 1;
