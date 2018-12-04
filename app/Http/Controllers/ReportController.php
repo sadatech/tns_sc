@@ -900,13 +900,14 @@ class ReportController extends Controller
                                                     ->where('detail_display_shares.id_category',$category->id)
                                                     ->where('detail_display_shares.id_brand',$brand->id)
                                                     ->first();
+                    if ($detail_data) {
+                        $data[$category->id.'_'.$brand->id.'_tier'] = $detail_data->tier;
+                        $data[$category->id.'_'.$brand->id.'_depth'] = $detail_data->depth;
 
-                    $data[$category->id.'_'.$brand->id.'_tier'] = $detail_data->tier;
-                    $data[$category->id.'_'.$brand->id.'_depth'] = $detail_data->depth;
+                        $data[$category->id.'_total_tier'] += $detail_data->tier;
+                        $data[$category->id.'_total_depth'] += $detail_data->depth;
 
-                    $data[$category->id.'_total_tier'] += $detail_data->tier;
-                    $data[$category->id.'_total_depth'] += $detail_data->depth;
-
+                    }
                 }
             }
 
