@@ -43,7 +43,7 @@ class AttendanceController extends Controller
         // ->select('attendance_outlets.*','checkin');
         $employees = DB::table('employees')
         ->join('positions', 'employees.id_position', '=', 'positions.id')
-        ->where('positions.level', '=', 'mdmtc')
+        ->where('positions.level', 'mdmtc')->orWhere('positions.level','spgmtc')
         ->select('employees.*','level');
 
         $employee = Employee::all();
