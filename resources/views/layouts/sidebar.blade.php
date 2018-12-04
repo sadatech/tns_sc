@@ -158,6 +158,9 @@
                             <!-- <li>
                                 <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
                             </li> -->
+                            <li>
+                                <a class="{{ request()->is('product/fokusSpg') ? 'active' : '' }}" href="{{ route('fokusSpg') }}">Fokus SPG Pasar</a>
+                            </li>
                             <!-- <li>
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
