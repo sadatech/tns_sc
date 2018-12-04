@@ -2069,11 +2069,24 @@ class ReportController extends Controller
                     'date'  => (isset($val->date) ? $val->date : ""),
                     'place' => (isset($val->place) ? $val->place : ""),
                     'type'  => (isset($val->type) ? $val->type : ""),
-                    'note'  => (isset($val->note) ? $val->note : "")
+                    'note'  => (isset($val->note) ? $val->note : ""),
+                    'photo1' => (isset($val->photo1) ? $val->photo1: ""),
+                    'photo2' => (isset($val->photo2) ? $val->photo2: ""),
+                    'photo3' => (isset($val->photo3) ? $val->photo3: ""),
                 );
             }
         }
-        return Datatables::of(collect($data))->make(true);
+        return Datatables::of(collect($data))
+        ->addColumn('action', function($employee) {
+            if ($employee['photo1'] != "") {
+                $img_url = asset('/uploads/documentation')."/".$employee['photo1'];
+                $foto = "<img src='".$img_url."' width='50px'/>";
+            } else {
+                $img_url = "";
+                $foto = "<img src='".$img_url."' width='50px'/>";
+            }
+            return $foto;
+        })->make(true);
     }
 
     public function ExportdocumentationDC()
