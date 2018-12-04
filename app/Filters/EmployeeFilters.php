@@ -13,4 +13,10 @@ class EmployeeFilters extends QueryFilters
     public function employee($value) {
         return (!$this->requestAllData($value)) ? $this->builder->where('name', 'like', '%'.$value.'%')->orWhere('nik', 'like', '%'.$value.'%') : null;
     }
+
+    public function roleGroup($value){
+    	return $this->builder->whereHas('position', function ($query) use ($value){
+    		return $query->whereIn('level', $value);
+    	});
+    }
 }

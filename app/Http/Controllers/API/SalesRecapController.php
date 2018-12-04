@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Components\traits\ApiAuthHelper;
-use App\SalesRecap;
-use App\Outlet;
-use DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 use JWTAuth;
 use Config;
-use Carbon\Carbon;
+use Image;
+use DB;
+use App\Outlet;
+use App\SalesRecap;
 
 class SalesRecapController extends Controller
 {
@@ -49,6 +50,8 @@ class SalesRecapController extends Controller
 						$photo 	= time()."_".$image->getClientOriginalName();
 						$path 	= 'uploads/sales_recap';
 						$image->move($path, $photo);
+						$image_compress = Image::make($path.'/'.$photo)->orientate();
+						$image_compress->save($path.'/'.$photo, 50);
 					}
 					$sales = SalesRecap::updateOrCreate(
 						[
@@ -58,8 +61,8 @@ class SalesRecapController extends Controller
 						],
 						[
 							'total_buyer'	=> $request->total_buyer,
-							'total_sales'	=> $request->total_buyer,
-							'total_value'	=> $request->total_buyer,
+							'total_sales'	=> $request->total_sales,
+							'total_value'	=> $request->total_value,
 							'photo' 		=> $photo,
 						]
 					);

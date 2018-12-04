@@ -4,9 +4,13 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Components\traits\ApiAuthHelper;
 use App\Distribution;
 use App\DistributionDetail;
+use App\DistributionMotoric;
+use App\DistributionMotoricDetail;
 use App\Outlet;
+use App\Block;
 use JWTAuth;
 use Config;
 use DB;
@@ -14,85 +18,88 @@ use Carbon\Carbon;
 
 class DistributionController extends Controller
 {
+	use ApiAuthHelper;
+
 	public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
 
-	public function store(Request $request)
+	public function store(Request $request, $type = 'MD')
 	{
-		$data = json_decode($request->getContent());
-		try {
-			$res['success'] = false;
-			$res['code'] = 200;
+		
+		$check = $this->authCheck();
+
+		if ($check['success'] == true) {
 			
-			if (JWTAuth::getToken() != null) {
-				if (!$user = JWTAuth::parseToken()->authenticate()) {
-					$res['msg'] = "User not found.";
-				} else {
-					$outlet = Outlet::where('id', $data->outlet)->get();
-					if ( !empty($data->date) && !empty($data->outlet) && !empty($data->product) && ($outlet->count() > 0) ) {
-						DB::transaction(function () use ($data, $user, &$res) {
-							$date 	= Carbon::parse($data->date);
-							$checkDistribution = Distribution::where([
-								'id_employee'	=> $user->id,
-								'id_outlet'		=> $data->outlet,
-								'date'			=> $date,
-							])->first();
-							if (!$checkDistribution) {
-								$distribution = Distribution::create([
-									'id_employee'	=> $user->id,
-									'id_outlet'		=> $data->outlet,
-									'date'			=> $date,
-								]);
-								$distributionId = $distribution->id;
-							} else {
-								$distributionId	= $checkDistribution->id;
-							}
-							if (isset($distributionId)) {
-								$distributionDetail = array();
-								foreach ($data->product as $product) {
-									$detail = DistributionDetail::where([
-										'id_distribution'	=> $distributionId,
-										'id_product'		=> $product->id,
-									])->first();
-									if (!$detail) {
-										DistributionDetail::create([
-											'id_distribution'	=> $distributionId,
-											'id_product'		=> $product->id,
-											'qty'				=> $product->qty,
-											'qty_actual'		=> $product->qty_actual,
-											'satuan'			=> $product->satuan,
-										]);
-									}else{
-										$detail->value = $product->value;
-										$detail->save();
-									}
-								}
-								$res['success'] = true;
-								$res['msg'] 	= "Berhasil melakukan distribution.";
-							}
-						});
-					}else{
-						$res['success'] = false;
-						$res['msg'] 	= "Gagal melakukan distribution.";
-					}
-				}
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data = json_decode($request->getContent());
+
+			if (strtoupper($type) == 'MOTORIC') {
+				$status = ( Block::where('id', $data->block)->get()->count() > 0 ) ? true : false;
 			}else{
-				$res['msg'] = "User not found.";
+				$status = ( Outlet::where('id', $data->outlet)->get()->count() > 0 ) ? true : false;
 			}
-		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-			$res['msg'] = "Token Expired.";
 
-		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-			$res['msg'] = "Token Invalid.";
+			if ( !empty($data->date) && !empty($data->product) && ($status == true) ) {
+				DB::transaction(function () use ($data, $user, &$res, $type) {
+					$date 	= Carbon::parse($data->date);
 
-		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-			$res['msg'] = "Token Absent.";
+					if (strtoupper($type) == 'MOTORIC') {
+						$distribution = DistributionMotoric::firstOrCreate([
+							'id_employee'	=> $user->id,
+							'id_block'		=> $data->block,
+							'date'			=> $date,
+						]);
+						$distributionDetailTemplate = new DistributionMotoricDetail;
+					}else{
+						$distribution = Distribution::firstOrCreate([
+							'id_employee'	=> $user->id,
+							'id_outlet'		=> $data->outlet,
+							'date'			=> $date,
+						]);
+						$distributionDetailTemplate = new DistributionDetail;
+					}
+
+					$distributionId = $distribution->id;
+
+					foreach ($data->product as $product) {
+
+						$detail = $distributionDetailTemplate;
+
+						$detail->updateOrCreate(
+							[
+								'id_distribution'		=> $distributionId,
+								'id_product'	=> $product->id,
+								'satuan'		=> $product->satuan,
+							],
+							[
+								'qty'			=> \DB::raw("qty + ".$product->qty),
+								'qty_actual'	=> \DB::raw("qty_actual + ".$product->qty_actual),
+							]
+						);
+
+					}
+
+					$res['success'] = true;
+					$res['msg'] 	= "Berhasil melakukan distribution.";
+
+				});
+			}else{
+				$res['success'] = false;
+				$res['msg'] 	= "Gagal melakukan distribution.";
+			}
+
+		}else{
+			$res = $check;
 		}
 
 		$code = $res['code'];
 		unset($res['code']);
+		
 		return response()->json($res, $code);
 	}
+
 }

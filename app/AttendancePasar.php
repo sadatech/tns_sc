@@ -27,7 +27,7 @@ class AttendancePasar extends Model
 
 	public function toArray(){
         $array = parent::toArray();
-        $array['pasar_name'] = $this->pasar->name;
+        $array['pasar_name'] = $this->pasar->name ?? null;
         return $array;
     }
 }

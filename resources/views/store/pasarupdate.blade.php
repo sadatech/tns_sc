@@ -70,7 +70,7 @@
                 <button type="submit" class="btn btn-alt-success">
                     <i class="fa fa-save"></i> Save
                 </button>
-                <button type="submit" class="btn btn-alt-secondary"><a href="{{ route('pasar') }}">Back</a></button>
+                <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Back</a>
             </div>
         </form>
     </div>

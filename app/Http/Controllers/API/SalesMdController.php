@@ -37,8 +37,7 @@ class SalesMdController extends Controller
 				$res['code']= 200;
 			} else {
 				DB::transaction(function () use ($data, $user, &$res) {
-					$date 	= Carbon::parse($data->date);
-					$res 	= $this->sales($date, $user, $data->outlet, $data->product, $data->type);
+					$res 	= $this->sales($user, $data);
 				});
 			}
 		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
@@ -111,17 +110,20 @@ class SalesMdController extends Controller
 		return response()->json($res, $code);	
 	}
 
-	public function sales($date, $user, $request_outlet, $request_product, $type)
+	public function sales($user, $data)
 	{
+
+		$date 	= Carbon::parse($data->date);
+
 		$checkSales = SalesMd::where([
 			'id_employee'	=> $user->id,
-			'id_outlet'		=> $request_outlet,
+			'id_outlet'		=> $data->outlet,
 			'date'			=> $date,
-			'type'			=> $type,
+			'type'			=> $data->type,
 		])->first();
 
 		$outlet = Outlet::where([
-			'id' => $request_outlet,
+			'id' => $data->outlet,
 		])->first();
 
 		if ($outlet) {
@@ -129,16 +131,16 @@ class SalesMdController extends Controller
 			if (!$checkSales) {
 				$sales = SalesMd::create([
 					'id_employee'	=> $user->id,
-					'id_outlet'		=> $request_outlet,
+					'id_outlet'		=> $data->outlet,
 					'date'			=> $date,
 					'week'			=> $date->weekOfMonth,
-					'type'			=> $type,
+					'type'			=> $data->type,
 				]);
 				$sales_id = $sales->id;
 			} else {
 				$sales_id = $checkSales->id;
 			}
-			foreach ($request_product as $product) {
+			foreach ($data->product as $product) {
 				$checkSalesDetail = SalesMdDetail::where([
 					'id_sales'		=> $sales_id,
 					'id_product'	=> $product->id,
@@ -178,7 +180,7 @@ class SalesMdController extends Controller
 			$res['msg'] 	= "Berhasil melakukan sales.";
 		}else{
 			$res['success'] = false;
-			$res['msg'] 	= "Gagal melakukan sales.";
+			$res['msg'] 	= "Gagal melakukan sales. (Outlet not found)";
 		}
 		$res['code']= 200;
 		return $res;
