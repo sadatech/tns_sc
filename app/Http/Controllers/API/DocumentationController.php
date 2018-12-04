@@ -8,6 +8,7 @@ use App\Components\traits\ApiAuthHelper;
 use App\DocumentationDc;
 use Config;
 use JWTAuth;
+use Image;
 use Carbon\Carbon;
 
 class DocumentationController extends Controller
@@ -32,16 +33,22 @@ class DocumentationController extends Controller
 			if ($image1 	= $request->file('photo1')) {
 				$photo1 	= time()."_".$image1->getClientOriginalName();
 				$image1->move($path, $photo1);
+				$image_compress = Image::make($path.'/'.$photo1)->orientate();
+				$image_compress->save($path.'/'.$photo1, 50);
 			}
 
 			if ($image2 	= $request->file('photo2')) {
 				$photo2 	= time()."_".$image2->getClientOriginalName();
 				$image2->move($path, $photo2);
+				$image_compress = Image::make($path.'/'.$photo2)->orientate();
+				$image_compress->save($path.'/'.$photo2, 50);
 			}
 
 			if ($image3 	= $request->file('photo3')) {
 				$photo3 	= time()."_".$image3->getClientOriginalName();
 				$image3->move($path, $photo3);
+				$image_compress = Image::make($path.'/'.$photo3)->orientate();
+				$image_compress->save($path.'/'.$photo3, 50);
 			}
 
 			$insert 	= DocumentationDc::create([
