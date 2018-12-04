@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Yajra\Datatables\Datatables;
 use App\MtcReportTemplate;
+use Exception;
 
 class TargetController extends Controller
 {
