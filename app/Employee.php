@@ -270,7 +270,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                 $pf = "* IF(
                             (SELECT 
                                 IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
-                                   IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = 1) > 0,1,0)
+                                   IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
                                 ) as area
                                 FROM `product_fokuses`
                                 INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
