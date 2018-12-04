@@ -24,39 +24,39 @@
           </div>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableArea">
+        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
         <thead>
-          <th class="text-center" style="width: 70px;">no</th>
-          <th>AREA</th>
-          @foreach ($categories as $category)
-          <th>{{ $category->name }}</th>
-          @endforeach
-        </thead>
-        </table>
+          <tr>
+            <th rowspan="3" style="vertical-align: middle; text-align: center;">REGION</th>
+            <th rowspan="3" style="vertical-align: middle; text-align: center;">AREA</th>
+            <th rowspan="3" style="vertical-align: middle; text-align: center;">TL</th>
+            <th rowspan="3" style="vertical-align: middle; text-align: center;">NAMA SPG</th>
+            <th rowspan="3" style="vertical-align: middle; text-align: center;">JABATAN</th>
+            <th rowspan="3" style="vertical-align: middle; text-align: center;">OUTLET</th>
+            <th rowspan="3" style="vertical-align: middle; text-align: center;">ACCOUNT</th>
+            @foreach ($categories as $category)
+            <th colspan="{{ ($jml_brand + 1)*2 }}" style="vertical-align: middle; text-align: center;">{{ $category->name }}</th>
+            @endforeach
+          </tr>
+          <tr>
+            @foreach ($categories as $category)
+              @foreach ($brands as $brand)
+                <th colspan="2" style="vertical-align: middle; text-align: center;">{{ $brand->name }}</th>
+              @endforeach
+                <th colspan="2" style="vertical-align: middle; text-align: center;">Total</th>
+            @endforeach
+          </tr>
+          <tr>
+            @foreach ($categories as $category)
+              @foreach ($brands as $brand)
+                <th style="vertical-align: middle; text-align: center;">tier</th>
+                <th style="vertical-align: middle; text-align: center;">depth</th>
+              @endforeach
+              <th style="vertical-align: middle; text-align: center;">tier</th>
+              <th style="vertical-align: middle; text-align: center;">depth</th>
+            @endforeach
+          </tr>
 
-      </div>
-    </div>
-  </div>
-
-  <div class="block block-themed"> 
-    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
-        <h3 class="block-title">Datatables</h3>
-    </div>
-    <div class="block">        
-      <div class="block-content block-content-full">
-          <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
-          </div>
-        </div>
-
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableAccount">
-        <thead>
-          <th class="text-center" style="width: 70px;">no</th>
-          <th>ACCOUNT</th>
-          @foreach ($categories as $category)
-          <th>{{ $category->name }}</th>
-          @endforeach
         </thead>
         </table>
 
@@ -156,36 +156,32 @@
       });
       @endif
       $(function() {
-          $('#reportTableArea').DataTable({
+          $('#reportTable').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('availability.dataArea') !!}',
+              ajax: '{!! route('display_share.dataSpg') !!}',
               columns: [
-                { data: 'test0', name: 'test0'},
-                { data: 'test1', name: 'test1'},
-                { data: 'test2', name: 'test2'},
-                { data: 'test3', name: 'test3'},
+                { data: 'region_name', name: 'region_name'},
+                { data: 'area_name', name: 'area_name'},
+                { data: 'tl_name', name: 'tl_name'},
+                { data: 'emp_name', name: 'emp_name'},
+                { data: 'jabatan', name: 'jabatan'},
+                { data: 'store_name', name: 'store_name'},
+                { data: 'account_name', name: 'account_name'},
+                @foreach($categories as $category)
+                  @foreach($brands as $brand)
+                    {data: '{{ $category->id }}_{{ $brand->id }}_tier', name: '{{ $category->id }}_{{ $brand->id }}_tier', searchable: false, sortable: false},
+                    {data: '{{ $category->id }}_{{ $brand->id }}_depth', name: '{{ $category->id }}_{{ $brand->id }}_depth', searchable: false, sortable: false},
+                  @endforeach
+                  {data: '{{ $category->id }}_total_tier', name: '{{ $category->id }}_total_tier', searchable: false, sortable: false},
+                  {data: '{{ $category->id }}_total_depth', name: '{{ $category->id }}_total_depth', searchable: false, sortable: false},
+                @endforeach
               ],
               "scrollX":        true, 
               "scrollCollapse": true,
           });
       });
 
-      $(function() {
-          $('#reportTableAccount').DataTable({
-              processing: true,
-              serverSide: true,
-              ajax: '{!! route('availability.dataAccount') !!}',
-              columns: [
-                { data: 'test0', name: 'test0'},
-                { data: 'test1', name: 'test1'},
-                { data: 'test2', name: 'test2'},
-                { data: 'test3', name: 'test3'},
-              ],
-              "scrollX":        true, 
-              "scrollCollapse": true,
-          });
-      });
 
   </script>
 @endsection

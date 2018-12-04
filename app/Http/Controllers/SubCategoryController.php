@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Product;
 use App\Category;
 use App\SubCategory;
+use App\Filters\SubCategoryFilters;
 
 class SubCategoryController extends Controller
 {
@@ -49,6 +50,11 @@ class SubCategoryController extends Controller
             <button data-url=".route('sub-category.delete', $subcategory->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })->make(true);
     }
+
+    public function getDataWithFilters(SubCategoryFilters $filters){
+        $data = SubCategory::filter($filters)->get();
+        return $data;
+    }    
 
     public function store(Request $request)
     {

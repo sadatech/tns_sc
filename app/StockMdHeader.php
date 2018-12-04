@@ -22,6 +22,12 @@ class StockMdHeader extends Model
 
     public function stockDetail()
     {
-    	return $this->hasMany('App\StockMdDetail', 'id_stock');
+        return $this->hasMany('App\StockDetail', 'id_stock');
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['pasar_name'] = $this->pasar->name;
+        return $array;
     }
 }

@@ -231,7 +231,6 @@
                 });
             },
             ajax: '{!! route('employee.data.pasar') !!}',
-            serverSide: true,
             columns: [
             { data: 'action', name: 'action' },
             { data: 'nik', name: 'nik' },
@@ -245,7 +244,7 @@
             { data: 'gender', name: 'gender' },
             { data: 'education', name: 'education' },
             { data: 'birthdate', name: 'birthdate' },
-            { data: 'position', name: 'position' },
+            { data: 'position', name: 'position' }
             ]
         });
     });

@@ -20,7 +20,7 @@ class SmdController extends Controller
     public function baca()
     {
         $data['employee']      = Employee::where(['isResign' => false])
-        ->whereIn('id_position', [3,4])
+        ->where('id_position', 4)
         ->get();
         return view('target.smd', $data);
     }
@@ -30,6 +30,9 @@ class SmdController extends Controller
         $target = TargetGtc::with('employee')
         ->select('target_gtcs.*');
         return Datatables::of($target)
+        ->addColumn('values', function($target){
+            return number_format($target->value_sales,2,',','.');
+        })
         ->addColumn('action', function ($target) {
             $data = array(
                 'id'            => $target->id,

@@ -24,6 +24,7 @@
           </div>
         </div>
 
+        <center><h3>AREA</h3></center>
         <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableArea">
         <thead>
           <th class="text-center" style="width: 70px;">no</th>
@@ -34,22 +35,9 @@
         </thead>
         </table>
 
-      </div>
-    </div>
-  </div>
-
-  <div class="block block-themed"> 
-    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
-        <h3 class="block-title">Datatables</h3>
-    </div>
-    <div class="block">        
-      <div class="block-content block-content-full">
-          <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
-          </div>
+        <div class="block-header p-0 mb-20">
         </div>
-
+        <center><h3>ACCOUNT</h3></center>
         <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableAccount">
         <thead>
           <th class="text-center" style="width: 70px;">no</th>
@@ -161,10 +149,11 @@
               serverSide: true,
               ajax: '{!! route('availability.dataArea') !!}',
               columns: [
-                { data: 'test0', name: 'test0'},
-                { data: 'test1', name: 'test1'},
-                { data: 'test2', name: 'test2'},
-                { data: 'test3', name: 'test3'},
+                { data: 'id', name: 'id'},
+                { data: 'area', name: 'area'},
+                @foreach($categories as $category)
+                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
+                @endforeach
               ],
               "scrollX":        true, 
               "scrollCollapse": true,
@@ -177,10 +166,11 @@
               serverSide: true,
               ajax: '{!! route('availability.dataAccount') !!}',
               columns: [
-                { data: 'test0', name: 'test0'},
-                { data: 'test1', name: 'test1'},
-                { data: 'test2', name: 'test2'},
-                { data: 'test3', name: 'test3'},
+                { data: 'id', name: 'id'},
+                { data: 'area', name: 'area'},
+                @foreach($categories as $category)
+                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
+                @endforeach
               ],
               "scrollX":        true, 
               "scrollCollapse": true,

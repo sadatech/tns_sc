@@ -38,7 +38,7 @@ class PasarController extends Controller
 	public function data()
 	{
 		$employee = Employee::where(['isResign' => false])
-		->whereIn('id_position', [3,4])
+		->whereIn('id_position', [3,4,8])
 		->with(['agency', 'position', 'employeePasar', 'timezone'])
 		->select('employees.*');
 		return Datatables::of($employee)
@@ -92,7 +92,7 @@ class PasarController extends Controller
 	public function export()
 	{
 		$emp = Employee::where(['isResign' => false])
-		->whereIn('id_position', [3,4])
+		->whereIn('id_position', [3,4,8])
 		->orderBy('created_at', 'DESC')
 		->get();
 		$dataBrand = array();

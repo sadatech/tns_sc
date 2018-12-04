@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Components\traits\DropDownHelper;
 
 class Category extends Model
 {
+    use DropDownHelper;
     protected $fillable = [
         'name', 'description'
     ];

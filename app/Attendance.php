@@ -19,9 +19,24 @@ class Attendance extends Model
     {
         return $this->hasMany('App\AttendanceDetail', 'id_attendance');
     }
-
+  
     public function attendanceOutlet()
     {
         return $this->hasMany('App\AttendanceOutlet', 'id_attendance');
+    }
+
+    public function attendancePasar()
+    {
+        return $this->hasMany('App\AttendancePasar', 'id_attendance');
+    }
+
+    public function attendancePlace()
+    {
+        return $this->hasMany('App\AttendancePlace', 'id_attendance');
+    }
+
+    public function attendanceBlock()
+    {
+        return $this->hasMany('App\AttendanceBlock', 'id_attendance');
     }
 }

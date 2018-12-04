@@ -60,24 +60,33 @@
         {!! csrf_field() !!}
         <div class="block-content">
           <div class="form-group">
-              <a href="{{ route('account.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+              <a href="{{ route('targetsmd.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
           </div>
           <h5> Sample Data :</h5>
           <table class="table table-bordered table-vcenter">
             <thead>
               <tr>
-                  <td><b>account</b></td>
-                  <td><b>channel</b></td>
+                  <td><b>Employee</b></td>
+                  <td><b>HK</b></td>
+                  <td><b>Value</b></td>
+                  <td><b>ECPF</b></td>
+                  <td><b>CBD</b></td>
               </tr>
             </thead>
             <tbody>
               <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
+                  <td>Employee 1</td>
+                  <td>HK 1</td>
+                  <td>Value 1</td>
+                  <td>ECPF 1</td>
+                  <td>CBD 1</td>
               </tr>
               <tr>
-                  <td>Name Account 1</td>
-                  <td>Name Channel 1</td>
+                  <td>Employee 2</td>
+                  <td>HK 2</td>
+                  <td>Value 2</td>
+                  <td>ECPF 2</td>
+                  <td>CBD 2</td>
               </tr>
             </tbody>
           </table>
@@ -320,7 +329,7 @@
             { data: 'employee.name', name: 'employee.name'},
             { data: 'hk', name: 'hk' },
             { data: 'rilis', name: 'rilis' },
-            { data: 'value_sales', name: 'value_sales' },
+            { data: 'values', name: 'value_sales' },
             { data: 'ec', name: 'ec' },
             { data: 'cbd', name: 'cbd' },
             { data: 'action', name: 'action' }

@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sales SMD Pasar")
+@section('title', "Report SPG Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sales SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">SPG Pasar <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -21,7 +21,7 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.sales.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('export.spg.attendance') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
@@ -29,9 +29,13 @@
             <tr>
               <th class="text-center" style="width: 70px;"></th>
               <th>Nama</th>
-              <th>Pasar</th>
+              <th>Jabatan</th>
+              <th>Pasar</th> 
+              <th>Area</th>
+              <th>Sub Area</th>
               <th>Tanggal</th>
-              <th>Outlet</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
             </tr>
           </thead>
         </table>
@@ -66,13 +70,17 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.sales.smd') !!}',
+      ajax: '{!! route('data.spg.attendance') !!}',
       columns: [
       { data: 'id' },
       { data: 'nama' },
+      { data: 'jabatan' },
       { data: 'pasar' },
+      { data: 'area' },
+      { data: 'subarea' },
       { data: 'tanggal' },
-      { data: 'outlet' },
+      { data: 'checkin' },
+      { data: 'checkout' },
       ]
     });
   });

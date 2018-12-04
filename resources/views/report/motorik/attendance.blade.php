@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Distributor PF")
+@section('title', "Report Motorik Attandance")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Distributor PF <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Motorik Attandance <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -17,24 +17,26 @@
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
-      <div class="block-header p-0 mb-20">
+        <div class="block-header p-0 mb-20">
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.distpf.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a href="{{ route('report.motorik.attendance.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama SMD</th>
-              <th>Pasar</th>
+              <th>Nama</th>
+              <th>Jabatan</th>
+              <th>Block</th>
+              <th>Region</th>
+              <th>Area</th>
+              <th>Sub Area</th>
               <th>Tanggal</th>
-              <th>Outlet</th>
-              @foreach(\App\Product::get() as $product)
-              <th>{{ $product->name }}</th>
-              @endforeach
+              <th>Check-in</th>
+              <th>Check-out</th>
             </tr>
           </thead>
         </table>
@@ -69,16 +71,18 @@ table.table thead tr th {
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('data.distpf.smd') !!}',
+      ajax: '{!! route('report.motorik.attendance.data') !!}',
       columns: [
-      { data: 'id', name:'' },
-      { data: 'nama', name:'Nama' },
-      { data: 'pasar', name:'Pasar' },
-      { data: 'tanggal', name:'Tanggal' },
-      { data: 'outlet', name:'Outlet' },
-      @foreach(\App\Product::get() as $product)
-      { data: 'product-{{ $product->id }}' },
-      @endforeach
+      { data: 'id' },
+      { data: 'nama' },
+      { data: 'jabatan' },
+      { data: 'block' },
+      { data: 'region' },
+      { data: 'area' },
+      { data: 'subarea' },
+      { data: 'tanggal' },
+      { data: 'checkin' },
+      { data: 'checkout' },
       ]
     });
   });

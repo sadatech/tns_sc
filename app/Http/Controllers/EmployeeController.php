@@ -10,6 +10,7 @@ use DB;
 use Auth;
 use File;
 use Excel;
+use App\PlanEmployee;
 use App\TargetGtc;
 use Carbon\Carbon;
 use App\Position;
@@ -67,6 +68,9 @@ class EmployeeController extends Controller
 		$data['subarea'] 	= SubArea::get();
 		$data['store_selected'] = json_encode(EmployeeStore::where(['employee_stores.id_employee' => $id])->join('stores','stores.id','employee_stores.id_store')->select(DB::raw("concat(stores.id,'|',stores.name1) as stores_item"))->get()->toArray());
 		$data['pasar_selected'] = json_encode(EmployeePasar::where(['employee_pasars.id_employee' => $id])->join('pasars','pasars.id','employee_pasars.id_pasar')->select(DB::raw("concat(pasars.id,'|',pasars.name) as pasars_item"))->get()->toArray());
+		$data['area_selected'] = json_encode(EmployeeSubArea::where(['employee_sub_areas.id_employee' => $id])->join('sub_areas','sub_areas.id','employee_sub_areas.id_subarea')->select(DB::raw("concat(sub_areas.id,'|',sub_areas.name,'|') as subarea_item"))->get()->toArray());
+		$data['isTl'] = (isset(EmployeeSubArea::where('id_employee', $id)->first()->isTl) ? EmployeeSubArea::where('id_employee', $id)->first()->isTl : 0);
+		// dd($data);
 		if ($data['emp']->isResign) {
 			return redirect()->route('employee');
 		} else {
@@ -78,13 +82,13 @@ class EmployeeController extends Controller
 	{
 		$data=$request->all();
 		$limit=[
-			'foto_ktp' 		=> 'max:10000|required|mimes:jpeg,jpg,bmp,png',
+			'foto_ktp' 		=> 'max:10000',
 			'foto_tabungan' => 'max:10000|mimes:jpeg,jpg,bmp,png',
 			'name' 			=> 'required',
 			'password' 		=> 'required',
 			'position' 		=> 'required',
 			'agency' 		=> 'required|numeric',
-			'email' 		=> 'email|required',
+			'email' 		=> 'email|required|unique:employees',
 			'phone' 		=> 'required|numeric|unique:employees',
 			'nik' 			=> 'required|unique:employees',
 			'ktp' 			=> 'required|numeric|unique:employees',
@@ -96,9 +100,11 @@ class EmployeeController extends Controller
 		];
 		$validator = Validator($data, $limit);
 		if ($validator->fails()){
-			return redirect()->back()
-			->withErrors($validator)
-			->withInput();
+			return response()->json([
+				'type' 		=> 'danger',
+				'title' 	=> 'Error!<br/>',
+				'message'	=> implode("<br>", $validator->messages()->all())
+			]);
 		} else {
 			$ktp = $data['foto_ktp'];
 			$foto_ktp = Str::random().time()."_".rand(1,99999).".".$ktp->getClientOriginalExtension();
@@ -144,7 +150,7 @@ class EmployeeController extends Controller
 					'joinAt' 		=> $request->input('joinAt'),
 					'foto_ktp' 		=> $foto_ktp,
 					'foto_tabungan' => $foto_tabungan,
-					'foto_profile' => $foto_profile,
+					'foto_profile' 	=> $foto_profile,
 					'id_position' 	=> $request->input('position'),
 					'id_timezone' 	=> $request->input('timezone'),
 					'id_agency' 	=> $request->input('agency')
@@ -155,8 +161,7 @@ class EmployeeController extends Controller
 							'id_store' 		=> $request->input('store'),
 							'id_employee' 	=> $insert->id,
 						]);
-						return redirect()->route('employee')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -170,8 +175,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_stores')->insert($dataStore);
-						return redirect()->route('employee')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -185,8 +189,7 @@ class EmployeeController extends Controller
 							);
 						}
 						DB::table('employee_pasars')->insert($dataPasar);
-						return redirect()->route('employee.pasar')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -194,15 +197,21 @@ class EmployeeController extends Controller
 					} else if (!empty($request->input('subarea'))) {
 						$dataSubArea = array();
 						foreach ($request->input('subarea') as $subarea) {
+							if (isset(\App\Position::where(['level' => 'tlmtc'])->first()->id)) {
+								$isTl = true;
+							} else if ($request->input('tl') == true) {
+								$isTl = true;
+							} else {
+								$isTl = false;
+							}
 							$dataSubArea[] = array(
 								'id_employee' 	=> $insert->id,
-								'isTl'			=> $request->input('tl'),
+								'isTl'			=> $isTl,
 								'id_subarea' 	=> $subarea
 							);
 						}
 						DB::table('employee_sub_areas')->insert($dataSubArea);
-						return redirect()->route('employee.dc')
-						->with([
+						return response()->json([
 							'type' 		=> 'success',
 							'title' 	=> 'Sukses!<br/>',
 							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
@@ -210,8 +219,7 @@ class EmployeeController extends Controller
 					}
 				}
 			} else {
-				return redirect()->route('employee')
-				->with([
+				return response()->json([
 					'type' 		=> 'danger',
 					'title' 	=> 'Terjadi Kesalahan!<br/>',
 					'message'	=> '<i class="em em-thinking_face mr-2"></i>Position tidak tersedia!'
@@ -339,7 +347,7 @@ class EmployeeController extends Controller
 				$employee->status = $request->input('status');
 			}
 			if ($request->input('position') == Position::where(['level' => 'tlmtc'])->first()->id) {
-				$employee->id_subarea = $request->input('subarea');
+				$employee->employeeSubArea->id_subarea = $request->input('subarea');
 			}
 			if ($request->input('password')) {
 				$employee->password = bcrypt($request->input('password'));
@@ -429,14 +437,16 @@ class EmployeeController extends Controller
 	public function delete($id)
 	{
 		{
-			$emp = Employee::find($id);
-			$sub = TargetGtc::where(['id_employee' => $emp->id])->count();
-			if (!$sub < 1) {
+			$emp 		= Employee::find($id);
+			$gtc 		= TargetGtc::where(['id_employee' => $emp->id])->count();
+			$dc 		= PlanEmployee::where(['id_employee' => $emp->id])->count();
+			$jumlah= $gtc + $dc;
+			if (!$jumlah < 1) {
 				return redirect()->back()
 				->with([
 					'type'    => 'danger',
 					'title'   => 'Gagal!<br/>',
-					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di TargetSMD!'
+					'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di TargetSMD, Plan DemoCooking!'
 				]);
 			} else {
 				$emp->delete();
@@ -497,7 +507,7 @@ class EmployeeController extends Controller
 			})->download();
 		} else {
 			return redirect()->back()
-			>with([
+			->with([
 				'type'   => 'danger',
 				'title'  => 'Gagal Unduh!<br/>',
 				'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'

@@ -2,11 +2,11 @@
 @section('title', "Update Plan Demo Cooking")
 @section('content')
 <div class="content">
-        <h2 class="content-heading pt-10">Plan Demo Cooking <small>Update</small></h2>
-        <div class="container">
-            <div class="block">
-                <div class="block-content">
-            <form action="{{action('PlandcController@update', $plan->id) }}" method="post" enctype="multipart/form-data">
+    <h2 class="content-heading pt-10">Plan Demo Cooking <small>Update</small></h2>
+    <div class="container">
+        <div class="block">
+            <div class="block-content">
+                <form action="{{action('PlandcController@update', $plan->id) }}" method="post" enctype="multipart/form-data">
                 {!! csrf_field() !!}
                 {{ method_field('PUT')}}
                 <div class="block-content">
@@ -57,13 +57,13 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Stockist</label>
-                                <input type="text" class="form-control" name="stocklist" value="{{ $plan->stocklist }}" required>
+                                <input type="text" class="form-control" name="stocklist" value="{{ $plan->stocklist }}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label>Channel</label>
-                                <select class="form-control form-control-lg" id='channel' name="channel" required>
+                                <select class="form-control form-control-lg" id='channel' name="channel">
                                     <option value="" disabled selected>Choose your Channel</option>
                                     <option value="MTC" @if ($plan->channel == "MTC") {{ 'selected' }} @endif>MTC</option>
                                     <option value="GTC" @if ($plan->channel == "GTC") {{ 'selected' }} @endif>GTC</option>
@@ -73,15 +73,15 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12">
-                                <label>Lokasi</label>
-                                <textarea type="text" class="form-control" name="lokasi" required>{{ $plan->lokasi }}</textarea>
+                                <label>Plan</label>
+                                <textarea class="form-control" name="plan" required>{{ $plan->plan }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-alt-success">
                                 <i class="fa fa-save"></i> Save
                             </button>
-                            <button type="submit" class="btn btn-alt-secondary"><a href="{{ route('planDc') }}">Back</a></button>
+                            <a href="{{ url()->previous() }}" class="btn btn-alt-secondary" data-dismiss="modal">Back</a>
                         </div>
                     </div>
                 </form>       
@@ -89,6 +89,11 @@
         </div>     
     </div>
 </div>
+@endsection
+
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 @endsection
 
 @section('script')
@@ -147,7 +152,7 @@
                 "</tr>");
         }else{
             console.log("Data Already Exist! data: "+employeeSplit[1]);
-            notif('Warning',': Please the select Store first','warning');
+            notif('Warning',': Please the select Employee DC first','warning');
         }
     }
 

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SalesSpgPasarDetail extends Model
 {
     protected $fillable = [
-        'id_sales', 'id_product', 'qty', 'qty_actual', 'satuan', 'is_pf'
+        'id_sales', 'id_product', 'qty', 'qty_actual', 'satuan', 'is_pf', 'is_target'
     ];
 
     public function sales()
@@ -18,6 +18,12 @@ class SalesSpgPasarDetail extends Model
     public function product()
     {
         return $this->belongsTo('App\Product', 'id_product');
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['product_name'] = $this->product->name;
+        return $array;
     }
 
 }

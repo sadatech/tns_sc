@@ -9,7 +9,7 @@ class DataPrice extends Model
     protected $table = 'data_price';
 
     protected $fillable = [
-        'id_store', 'id_employee', 'date'
+        'id_store', 'id_employee', 'date', 'week'
     ];
 
     public function detail_data_price(){

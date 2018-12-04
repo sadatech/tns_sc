@@ -9,6 +9,7 @@ use App\ProductFokus;
 use App\FokusArea;
 use App\FokusChannel;
 use App\Pasar;
+use App\SubArea;
 use Carbon\Carbon;
 use Config;
 use JWTAuth;
@@ -22,27 +23,19 @@ class ProductController extends Controller
 
 	public function list(Request $request)
 	{
-		return response()->json(Product::get()->toArray());
 		try {
 			$res['success'] = false;
 			if (JWTAuth::getToken() != null) {
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					if (!empty($request->input('subcategory'))) {
-						$where = [
-							'id_brand' 			=> $request->input('brand'),
-							'id_subcategory' 	=> $request->input('subcategory')
-						];
-					}else{
-						$where = [
-							'id_brand' 			=> $request->input('brand')
-						];
-					}
-					$product 	= Product::where($where)->get();
+					$product = Product::whereIdBrand($request->input('brand'));
+					$product->when(!empty($request->input('subcategory')), function ($q) use ($request){
+						return $q->whereIdSubcategory($request->input('subcategory'));
+					});
 					if ($product->count() > 0) {
 						$dataArr = array();
-						foreach ($product as $key => $pro) {
+						foreach ($product->get() as $key => $pro) {
 							$dataArr[] = array(
 								'id' 			=> $pro->id,
 								'name' 			=> $pro->name,
@@ -76,7 +69,7 @@ class ProductController extends Controller
 		return response()->json($res);
 	}
 
-	public function pfList($id_pasar)
+	public function pfList($type, $id)
 	{
 		try {
 			$res['success'] = false;
@@ -85,13 +78,14 @@ class ProductController extends Controller
 					$res['msg'] = "User not found.";
 				} else {
 					$today 	= Carbon::today()->toDateString();
-					$area 	= Pasar::find($id_pasar)->first()->subarea->id_area;
+					$area 	= (strtoupper($type) == 'PASAR') ? Pasar::where('id',$id)->first()->subarea->id_area : SubArea::where('id',$id)->first()->id_area;
 					
 					$pf 	= ProductFokus::with(['fokusproduct.product'])
 					->whereHas('Fokus.channel', function($query)
 					{
 						return $query->where('name','GTC');
-					})->whereRaw("'$today' BETWEEN product_fokuses.from and product_fokuses.to")->get();
+					})->whereRaw("'$today' BETWEEN product_fokuses.from and product_fokuses.to")
+					->get();
 
 					$product= [];
 					foreach ($pf as $key => $value) {

@@ -4,8 +4,14 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Components\traits\ApiAuthHelper;
 use App\Attendance;
 use App\AttendanceDetail;
+use App\AttendanceOutlet;
+use App\AttendancePasar;
+use App\AttendancePlace;
+use App\AttendanceBlock;
+use App\Cbd;
 use Carbon\Carbon;
 use JWTFactory;
 use JWTAuth;
@@ -13,221 +19,292 @@ use Config;
 
 class AttendanceController extends Controller
 {
-	public function absen(Request $request)
+	use ApiAuthHelper;
+	
+	public function __construct()
 	{
-		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
-			if (!$user = JWTAuth::parseToken()->authenticate()) {
-				$res['success'] = false;
-				$res['msg'] = "User not found.";
-				$code = 200;
-			} else {
-				if ($request->input('keterangan') == 'Check-in') {
+		Config::set('auth.providers.users.model', \App\Employee::class);
+	}
+
+	public function absen(Request $request, $type = 'MTC')
+	{
+		$check = $this->authCheck();
+
+		if ($check['success'] == true) {
+			
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			if ($request->input('keterangan') == 'Check-in') {
+				if (strtoupper($type) == 'MTC') {
 					$attendance = AttendanceDetail::where([
 						'id_store' => $request->input('store'),
 						'id_place' => $request->input('place')
-					])->whereDate('created_at', '=', Carbon::today()->toDateString())
-					->with(['attendance' => function($query) use ($user) {
-						$query->where([
-							'id_employee' => $user->id,
-							'keterangan' => 'Check-in',
-						]);
-					}])->count();
-					if ($attendance > 0) {
-						$res['success'] = false;
-						$res['msg'] = "Sudah melakukan absensi di tempat yang sama.";
-						$code = 200;
-					} else {
-						$insert = Attendance::create([
-							'id_employee' => $user->id,
-							'keterangan' => $request->input('keterangan'),
-							'date' => Carbon::now()
-						]);
-						if ($insert) {	
+					]);
+				}else if (strtoupper($type) == 'GTC-MD') {
+					$attendance = AttendanceOutlet::where([
+						'id_outlet' => $request->input('outlet')
+					]);		
+				}else if (strtoupper($type) == 'GTC-SPG') {
+					$attendance = AttendancePasar::where([
+						'id_pasar' => $request->input('pasar')
+					]);			
+				}else if (strtoupper($type) == 'GTC-DC') {
+					$attendance = AttendancePlace::where([
+						'id_place' => $request->input('place')
+					]);
+				}else if (strtoupper($type) == 'GTC-MOTORIC') {
+					$attendance = AttendanceBlock::where([
+						'id_block' => $request->input('block')
+					]);
+				}
+
+				$attendance->whereHas('attendance', function($query) use ($user) {
+					$query->where([
+						'id_employee' => $user->id,
+						'keterangan' => 'Check-in',
+					])->whereDate('date', '=', Carbon::today()->toDateString());
+				});
+
+				if ($attendance->count() > 0) {
+					$res['success'] = false;
+					$res['msg'] = "Sudah melakukan absensi di tempat yang sama.";
+					$code = 200;
+				} else {
+					$insert = Attendance::create([
+						'id_employee' => $user->id,
+						'keterangan' => $request->input('keterangan'),
+						'date' => Carbon::now()
+					]);
+					if ($insert) {
+						if (strtoupper($type) == 'MTC') {
 							$insertAtt = AttendanceDetail::create([
 								'id_attendance' => $insert->id,
-								'id_store' => $request->input('store'),
-								'id_place' => $request->input('place'),
-								'checkin' => Carbon::now()
+								'id_store' 		=> $request->input('store'),
+								'id_place' 		=> $request->input('place'),
+								'checkin' 		=> Carbon::now()
 							]);
-							if ($insertAtt) {
-								$res['success'] = true;
-								$res['msg'] = "Berhasil melakukan absensi.";
-								$code = 200;
-							} else {
-								$res['success'] = false;
-								$res['msg'] = "Gagal melakukan absensi.";
-								$code = 200;
-							}
+						}else if (strtoupper($type) == 'GTC-MD') {
+							$insertAtt = AttendanceOutlet::create([
+								'id_attendance' => $insert->id,
+								'id_outlet' 	=> $request->input('outlet'),
+								'checkin' 		=> Carbon::now()
+							]);
+						}else if (strtoupper($type) == 'GTC-SPG') {
+							$insertAtt = AttendancePasar::create([
+								'id_attendance' => $insert->id,
+								'id_pasar' 		=> $request->input('pasar'),
+								'checkin' 		=> Carbon::now()
+							]);
+						}else if (strtoupper($type) == 'GTC-DC') {
+							$insertAtt = AttendancePlace::create([
+								'id_attendance' => $insert->id,
+								'id_place' 		=> $request->input('place'),
+								'checkin' 		=> Carbon::now()
+							]);
+						}else if (strtoupper($type) == 'GTC-MOTORIC') {
+							$insertAtt = AttendanceBlock::create([
+								'id_attendance' => $insert->id,
+								'id_block' 		=> $request->input('block'),
+								'checkin' 		=> Carbon::now()
+							]);
+						}
+
+						if ($insertAtt) {
+							$res['success'] = true;
+							$res['msg'] = "Berhasil melakukan absensi.";
+							$code = 200;
 						} else {
 							$res['success'] = false;
 							$res['msg'] = "Gagal melakukan absensi.";
 							$code = 200;
 						}
+					} else {
+						$res['success'] = false;
+						$res['msg'] = "Gagal melakukan absensi.";
+						$code = 200;
+					}
+				}
+			} else {
+				$att = Attendance::where([
+					'id_employee' => $user->id,
+				])
+				->where(function($q)
+				{
+					return $q->orWhere([
+						'keterangan' => 'Check-in',
+						'keterangan' => 'Cuti',
+						'keterangan' => 'Sakit',
+						'keterangan' => 'Off'
+					]);
+				})
+				->whereDate('date', '=', Carbon::today()->toDateString())->first();
+				if (isset($att->id)) {
+					$res['success'] = false;
+					$res['msg'] = "Kamu sudah melakukan absen hari ini.";
+					$code = 200;
+				} else {
+					$insert = Attendance::create([
+						'id_employee' => $user->id,
+						'keterangan' => $request->input('keterangan'),
+						'date' => Carbon::now()
+					]);
+					if ($insert) {
+						$res['success'] = true;
+						$res['msg'] = "Berhasil";
+						$code = 200;
+					} else {
+						$res['success'] = false;
+						$res['msg'] = "Gagal melakukan absensi.";
+						$code = 200;
+					}
+				}
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+		return response()->json($res, $code);
+	}
+
+	public function checkout(Request $request, $type = 'MTC')
+	{
+		$check = $this->authCheck();
+
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])
+			->whereDate('date', '=', Carbon::today()->toDateString())->orderBy('id','desc')->first();
+			if (isset($attId->id)) {
+
+				if (strtoupper($type) == 'MTC') {
+					$absen = AttendanceDetail::where(['id_attendance' => $attId->id])->first();
+				}else if (strtoupper($type) == 'GTC-MD') {
+					$absen = AttendanceOutlet::where(['id_attendance' => $attId->id])->first();
+				}else if (strtoupper($type) == 'GTC-SPG') {
+					$absen = AttendancePasar::where(['id_attendance' => $attId->id])->first();
+				}else if (strtoupper($type) == 'GTC-DC') {
+					$absen = AttendancePlace::where(['id_attendance' => $attId->id])->first();
+				}else if (strtoupper($type) == 'GTC-MOTORIC') {
+					$absen = AttendanceBlock::where(['id_attendance' => $attId->id])->first();
+				}
+
+				if (isset($absen->checkout) == null) {
+					$absen->checkout = Carbon::now();
+					if ($absen->save()) {
+						$res['success'] = true;
+						$res['msg'] = "Berhasil melakukan check-out.";
+						$code = 200;
+					} else {
+						$res['success'] = false;
+						$res['msg'] = "Gagal melakukan check-out.";
+						$code = 200;
 					}
 				} else {
-					$att = Attendance::where([
-						'id_employee' => $user->id,
-						'keterangan' => 'Check-in'
-					])
-					->orWhere('keterangan', '=', 'Cuti')
-					->orWhere('keterangan', '=', 'Off')
-					->orWhere('keterangan', '=', 'Sakit')
-					->whereDate('date', '=', Carbon::today()->toDateString())->first();
-					if (isset($att->id)) {
-						$res['success'] = false;
-						$res['msg'] = "Kamu sudah melakukan absen hari ini.";
-						$code = 200;
-					} else {
-						$insert = Attendance::create([
-							'id_employee' => $user->id,
-							'keterangan' => $request->input('keterangan'),
-							'date' => Carbon::now()
-						]);
-						if ($insert) {
-							$res['success'] = true;
-							$res['msg'] = "Berhasil";
-							$code = 200;
-						} else {
-							$res['success'] = false;
-							$res['msg'] = "Gagal melakukan absensi.";
-							$code = 200;
-						}
-					}
+					$res['success'] = false;
+					$res['msg'] = "Sudah melakukan checkout untuk hari ini.";
+					$code = 200;
 				}
 			}
-		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-			$res['success'] = false;
-			$res['msg'] = "Token Expired.";
-			$code = $e->getStatusCode();
-		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-			$res['success'] = false;
-			$res['msg'] = "Token Invalid.";
-			$code = $e->getStatusCode();
-		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-			$res['success'] = false;
-			$res['msg'] = "Token Absent.";
-			$code = $e->getStatusCode();
+
+		}else{
+			$res = $check;
 		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
 		return response()->json($res, $code);
 	}
 
-	public function checkout(Request $request)
+	public function status($type = 'MTC')
 	{
-		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
-			if (!$user = JWTAuth::parseToken()->authenticate()) {
-				$res['msg'] = "User not found.";
-				$code = $e->getStatusCode();
-			} else {
-				$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])
-				->whereDate('date', '=', Carbon::today()->toDateString())->first();
-				if (isset($attId->id)) {
-					$absen = AttendanceDetail::where(['id_attendance' => $attId->id])->first();
-					if (isset($absen->checkout) == null) {
-						$absen->checkout = Carbon::now();
-						if ($absen->save()) {
-							$res['success'] = true;
-							$res['msg'] = "Berhasil melakukan check-out.";
-							$code = 200;
-						} else {
-							$res['success'] = false;
-							$res['msg'] = "Gagal melakukan check-out.";
-							$code = 200;
-						}
-					} else {
-						$res['success'] = false;
-						$res['msg'] = "Sudah melakukan checkout untuk hari ini.";
-						$code = 200;
-					}
-				}
-			}
-		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-			$res['msg'] = "Token Expired.";
-			$code = $e->getStatusCode();
+		$check = $this->authCheck();
 
-		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-			$res['msg'] = "Token Invalid.";
-			$code = $e->getStatusCode();
+		if ($check['success'] == true) {
 
-		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-			$res['msg'] = "Token Absent.";
-			$code = $e->getStatusCode();
-		}
-		return response()->json($res, $code);
-	}
+			$user = $check['user'];
+			$res['code'] = 200;
 
-	public function status()
-	{
-		try {
-			Config::set('auth.providers.users.model', \App\Employee::class);
-			if (!$user = JWTAuth::parseToken()->authenticate()) {
-				$res['msg'] = "User not found.";
-			} else {
-				$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->orderBy('created_at', 'DESC')->first();
-				if (isset($attId->id)) {
+			$attId = Attendance::where(['id_employee' => $user->id, 'keterangan' => 'Check-in'])->whereDate('date', '=', Carbon::today()->toDateString())->orderBy('created_at', 'DESC')->first();
+			if (isset($attId->id)) {
+				if (strtoupper($type) == 'MTC') {
 					$attendance = AttendanceDetail::where(['id_attendance' => $attId->id])->first();
-					if (!empty($attendance)) {
-						if ($attendance->checkout == null) {
-							$res['success'] = true;
-							$res['msg'] = "Kamu belum checkout ditoko sebelumnya.";
+					$lokasi = 'toko';
+				}else if (strtoupper($type) == 'GTC-MD') {
+					$attendance = AttendanceOutlet::where(['id_attendance' => $attId->id])->first();
+					$lokasi = 'outlet';
+				}else if (strtoupper($type) == 'GTC-SPG') {
+					$attendance = AttendancePasar::where(['id_attendance' => $attId->id])->first();
+					$lokasi = 'pasar';
+				}else if (strtoupper($type) == 'GTC-DC') {
+					$attendance = AttendancePlace::where(['id_attendance' => $attId->id])->first();
+					$lokasi = 'distributor';
+				}else if (strtoupper($type) == 'GTC-MOTORIC') {
+					$attendance = AttendanceBlock::where(['id_attendance' => $attId->id])->first();
+					$lokasi = 'block';
+				}
 
-							if (isset($attendance->id_store)) {
-								$id_store = $attendance->id_store;
-							} else {
-								$id_store = null;
-							} 
-							if (isset($attendance->store->name1)) {
-								$store = $attendance->store->name1;
-							} else {
-								$store = null;
-							}
-							if (isset($attendance->id_place)) {
-								$id_place = $attendance->id_place;
-							} else {
-								$id_place = null;
-							}
-							if (isset($attendance->place->name)) {
-								$place = $attendance->place->name;
-							} else {
-								$place = null;
-							}
+				if (!empty($attendance)) {
+					$code 			= 200;
+					$res['success'] = true;
+					$res['msg'] 	= "Kamu belum checkout di $lokasi sebelumnya.";
 
-							$res['id_store'] = $id_store;
-							$res['store_name'] = $store;
-							$res['id_place'] = $id_place;
-							$res['place_name'] = $place;
-							$res['time'] = $attendance->checkin;
-							$code = 200;
-						} else {
-							$res['success'] = false;
-							$res['msg'] = "Sudah melakukan checkout.";
-							$code = 200;
+					if ($attendance->checkout == null) {
+						if (strtoupper($type) == 'MTC') {
+							$res['id_store'] 	= (isset($attendance->id_store) ? $attendance->id_store : null);
+							$res['store_name'] 	= (isset($attendance->store->name1) ? $attendance->store->name1 : null);
+							$res['id_place'] 	= (isset($attendance->id_place) ? $attendance->id_place : null);
+							$res['place_name'] 	= (isset($attendance->place->name) ? $place = $attendance->place->name : null );
+							$res['time'] 		= $attendance->checkin;
+						}else if (strtoupper($type) == 'GTC-MD') {
+							$res['id_outlet'] 	= (isset($attendance->id_outlet) ? $attendance->id_outlet : null);
+							$res['name'] 		= (isset($attendance->outlet->name) ? $attendance->outlet->name : null);
+							$res['time'] 		= $attendance->checkin;
+
+							$cbd 				= Cbd::where('id_outlet',$attendance->id_outlet)->where('id_employee',$user->id)->whereDate('date', '=', Carbon::today()->toDateString())->count();
+							$res['cbd'] 		= ($cbd > 0 ? 'true' : 'false');
+						}else if (strtoupper($type) == 'GTC-SPG') {
+							$res['id_pasar']	= (isset($attendance->id_pasar) ? $attendance->id_pasar : null);
+							$res['name'] 		= (isset($attendance->pasar->name) ? $attendance->pasar->name : null);
+							$res['time'] 		= $attendance->checkin;
+						}else if (strtoupper($type) == 'GTC-DC') {
+							$res['id_place']	= (isset($attendance->id_place) ? $attendance->id_place : null);
+							$res['name'] 		= (isset($attendance->place->name) ? $attendance->place->name : null);
+							$res['time'] 		= $attendance->checkin;
+						}else if (strtoupper($type) == 'GTC-MOTORIC') {
+							$res['id_block']	= (isset($attendance->id_block) ? $attendance->id_block : null);
+							$res['name'] 		= (isset($attendance->block->name) ? $attendance->block->name : null);
+							$res['time'] 		= $attendance->checkin;
 						}
 					} else {
 						$res['success'] = false;
-						$res['msg'] = "Belum melakukan check-in.";
+						$res['msg'] = "Sudah melakukan checkout.";
 						$code = 200;
 					}
 				} else {
 					$res['success'] = false;
 					$res['msg'] = "Belum melakukan check-in.";
 					$code = 200;
-
 				}
+			} else {
+				$res['success'] = false;
+				$res['msg'] = "Belum melakukan check-in.";
+				$code = 200;
+
 			}
-		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-			$res['msg'] = "Token Expired.";
-			$code = $e->getStatusCode();
-
-		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-			$res['msg'] = "Token Invalid.";
-			$code = $e->getStatusCode();
-
-		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-			$res['msg'] = "Token Absent.";
-			$code = $e->getStatusCode();
+		}else{
+			$res = $check;
 		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
 		return response()->json($res, $code);
 	}
 }
