@@ -25,7 +25,7 @@
               <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
             </div>
           </div>
-          <button type="submit" class="btn btn-outline-primary btn-square mt-10">Filter Data</button>
+          <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
         </form>
       </div>
     </div>
