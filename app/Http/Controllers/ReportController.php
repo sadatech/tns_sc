@@ -1603,9 +1603,10 @@ class ReportController extends Controller
         }
     }
 
-    public function SMDattendance()
+    public function SMDattendance(Request $request)
     {
-        $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month)->get();
+        $employee = AttendanceOutlet::whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         // $employee = Employee::where('id_position', \App\Position::where('level', 'mdgtc')->first()->id)
         // ->with('employeePasar')
         // ->select('employees.*')
