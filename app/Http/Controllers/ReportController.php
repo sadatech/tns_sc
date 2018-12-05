@@ -23,6 +23,7 @@ use App\EmployeeSubArea;
 use App\Brand;
 use Auth;
 use DB;
+use App\Block;
 use Excel;
 use App\DocumentationDc;
 use App\StoreDistributor;
@@ -1800,6 +1801,38 @@ class ReportController extends Controller
         }
     }
 
+    public function MotorikHeader(Request $request){
+
+        $periode = $request->periode;
+        
+        $products = SalesMotoric::whereHas('block', function($query) use ($request){
+                        return $query->where('id_block', $request->id_block);
+                    })->whereDate('date', $periode)->get();
+
+        $block = Block::where('id', $request->id_block)->first()->name;
+
+        // $th = "";
+        // $array_column = array();
+
+        // foreach ($products as $item) {
+        //     $th .= "<th>Sales ".$item->product->name."</th>";
+        //     array_push($array_column, ['data'=>'product_'.$item->product->id, 'name'=>'product_'.$item->product->id ]);
+        // }
+
+        // $th .= "<th>Sales Other</th><th>Sales Product Fokus</th><th>Total Value</th>";
+        // array_push($array_column, 
+        //     ['data'=>'nama', 'name'=>'sales_other'],
+        //     ['data'=>'sales_pf', 'name'=>'sales_pf'],
+        //     ['data'=>'total_value', 'name'=>'total_value']
+        // );
+
+        // return 
+        // [
+        //     "th" => $th,
+        //     "columns" => $array_column
+        // ];
+    }
+
     public function MotorikSales()
     {
         $sales = SalesMotoric::whereMonth('date', Carbon::now()->month)->get();
@@ -1812,7 +1845,7 @@ class ReportController extends Controller
                     'id_sales'  => $value->id,
                     'nama'      => (isset($value->employee->name) ? $value->employee->name : ""),
                     'block'     => (isset($value->block->name) ? $value->block->name : ""),
-                    'tanggal'   => (isset($value->date) ? $value->date : ""),
+                    'date'   => (isset($value->date) ? $value->date : ""),
                 );
             }
         }
@@ -1878,7 +1911,7 @@ class ReportController extends Controller
     public function kunjunganDc()
     {
         $plan = PlanDc::with('planEmployee')
-        ->select('plan_dcs.*');
+        ->select('plan_dcs.*')->whereMonth('date', Carbon::now()->month);
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
             if (isset($plan->photo)) {
