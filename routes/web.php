@@ -526,7 +526,7 @@ Route::prefix('report')->group(function () {
 			Route::get('attendanceSMD', function(){
 				return view('report.attendance-smd');
 			})->name('report.attendance.smd')->middleware('auth');
-			Route::get('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
+			Route::post('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
 			Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 			Route::get('/attendance/export', 'ReportController@exportAttandance')->name('export.attendance.smd.pasar')->middleware('auth');
 
