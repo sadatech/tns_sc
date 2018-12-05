@@ -93,4 +93,33 @@ class PriceController extends Controller
             ]);
     }
     
+    public function exportXLS()
+    {
+        $price = Price::orderBy('created_at', 'DESC');
+        if ($price->count() > 0) {
+            $data = array();
+            foreach ($price->get() as $val) {
+                $data[] = array(
+                    'Product'       => $val->product->name,
+                    'SubCategory'   => $val->product->subCategory,
+                    'Price'         => (isset($val->price) ? $val->price : "-"),
+                    'Rilis'         => (isset($val->rilis) ? $val->rilis : "-")
+                );
+            }
+            $filename = "Market_".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('Market', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
 }

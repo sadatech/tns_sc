@@ -135,7 +135,7 @@ class SmdController extends Controller
                 'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
             ]);
         } else {
-            return redirect()->route('employee')
+            return redirect()->back()
             ->with([
                 'type'      => 'danger',
                 'title'     => 'Terjadi Kesalahan!<br/>',
