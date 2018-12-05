@@ -485,6 +485,7 @@ class ReportController extends Controller
             return $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
         })
         ->addColumn('store_name', function($item) use ($periode) {
+            return $item->store->name1.' -> '.$item->employee->getActualPf(['store' => $item->id_store, 'date' => $periode]);
             return $item->store->name1;
             return $item->employee->getActualPf1(['id_channel' => $item->store->account->id_channel, 'date' => $periode]);
         })
@@ -899,13 +900,14 @@ class ReportController extends Controller
                                                     ->where('detail_display_shares.id_category',$category->id)
                                                     ->where('detail_display_shares.id_brand',$brand->id)
                                                     ->first();
+                    if ($detail_data) {
+                        $data[$category->id.'_'.$brand->id.'_tier'] = $detail_data->tier;
+                        $data[$category->id.'_'.$brand->id.'_depth'] = $detail_data->depth;
 
-                    $data[$category->id.'_'.$brand->id.'_tier'] = $detail_data->tier;
-                    $data[$category->id.'_'.$brand->id.'_depth'] = $detail_data->depth;
+                        $data[$category->id.'_total_tier'] += $detail_data->tier;
+                        $data[$category->id.'_total_depth'] += $detail_data->depth;
 
-                    $data[$category->id.'_total_tier'] += $detail_data->tier;
-                    $data[$category->id.'_total_depth'] += $detail_data->depth;
-
+                    }
                 }
             }
 
@@ -1601,9 +1603,10 @@ class ReportController extends Controller
         }
     }
 
-    public function SMDattendance()
+    public function SMDattendance(Request $request)
     {
-        $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month)->get();
+        $employee = AttendanceOutlet::whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         // $employee = Employee::where('id_position', \App\Position::where('level', 'mdgtc')->first()->id)
         // ->with('employeePasar')
         // ->select('employees.*')

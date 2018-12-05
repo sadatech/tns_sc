@@ -41,6 +41,11 @@ class AttendanceController extends Controller
         // ->join('employees', 'attendances.id_employee', '=', 'employees.id')
         // ->join('outlets', 'attendance_outlets.id_outlet', '=', 'outlets.id')
         // ->select('attendance_outlets.*','checkin');
+        $employees = DB::table('employees')
+        ->join('positions', 'employees.id_position', '=', 'positions.id')
+        ->where('positions.level', '=', 'mdmtc')
+        ->select('employees.*','level');
+
         $employee = Employee::all();
       
         return Datatables::of($employee)
@@ -57,7 +62,7 @@ class AttendanceController extends Controller
             return $employee->checkout;
         })
         ->addColumn('role', function($employee) {
-            return $employee->position->name;
+            return $employee->position->level;
         })
         // ->addColumn('keterangan', function($attendanceOutlet) {
         //     return implode(',',$attendanceOutlet->attendance->keterangan->toArray());
@@ -72,18 +77,18 @@ class AttendanceController extends Controller
             return $attendance = Attendance::where('keterangan','masuk')->where('id_employee',$employee->id)->count();
         })
 
-        ->addColumn('attendance_detail',function($employee){
+        ->addColumn('attendance_detail',function($employees){
             $array = [];
             $month = Carbon::parse()->format('m');
             $day = Carbon::now()->format('d');
             $year = Carbon::parse()->format('Y');
             $maxMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
             
-            $attendance = Attendance::where('id_employee', $employee->id)->get();
+            $attendance = Attendance::where('id_employee', $employees->id)->get();
             for($i=1; $i <= $maxMonth; $i++){    
                 // if($i <= $day){
                if ($attendance->count() > 0) {
-                    $attendance__ = Attendance::where('id_employee', $employee->id)->whereYear('date',$year)->whereMonth('date',$month)->whereDay('date',$i)->get();
+                    $attendance__ = Attendance::where('id_employee', $employees->id)->whereYear('date',$year)->whereMonth('date',$month)->whereDay('date',$i)->get();
                 if ($attendance__->count() > 0) {
                     # code...
                     foreach ($attendance__ as $key) {
@@ -100,7 +105,7 @@ class AttendanceController extends Controller
                             } 
                             if ($key->keterangan == 'masuk') {
                                     $data = array(
-                                    'name' => $employee->name,
+                                    'name' => $employees->name,
                                     'attandaceDetail' => $attendanceCollection,
                                     'attendance' => $key
                                 );
