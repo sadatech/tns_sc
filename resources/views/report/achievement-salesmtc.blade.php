@@ -61,6 +61,12 @@
             <th class="text-center">Target</th>
             <th class="text-center">% Ach</th>
             <th class="text-center">Growth</th>
+            <th class="text-center">Achievement Fokus 1</th>
+            <th class="text-center">Target Fokus 1</th>
+            <th class="text-center">% Achievement</th>
+            <th class="text-center">Achievement Fokus 2</th>
+            <th class="text-center">Target Fokus 2</th>
+            <th class="text-center">% Achievement</th>
             <th>Area</th>
           </thead>
         </table>
@@ -201,6 +207,12 @@
                 { data: 'target', name: 'target'},
                 { data: 'achievement', name: 'achievement'},
                 { data: 'growth', name: 'growth'},
+                { data: 'achievement_focus1', name: 'achievement_focus1'},
+                { data: 'target_focus1', name: 'target_focus1'},
+                { data: 'percentage_focus1', name: 'percentage_focus1'},
+                { data: 'achievement_focus2', name: 'achievement_focus2'},
+                { data: 'target_focus2', name: 'target_focus2'},
+                { data: 'percentage_focus2', name: 'percentage_focus2'},
                 { data: 'area', name: 'area'}];
 
         var tl_paramFilter = [tl_table, $('#'+tl_table), tl_url, tl_tableColumns, tl_columnDefs, tl_order];
