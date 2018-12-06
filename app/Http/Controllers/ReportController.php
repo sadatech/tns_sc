@@ -2123,9 +2123,10 @@ class ReportController extends Controller
         }
     }
 
-    public function SMDdistpf()
+    public function SMDdistpf(Request $request)
     {
-        $dist = Distribution::whereMonth('date',Carbon::now()->month)->get();
+        $dist = Distribution::whereMonth('date',substr($request->input('periode'), 0, 2))
+        ->whereYear('date',substr($request->input('periode'), 3))->get();
         $data = array();
         $product = array();
         $id = 1;
@@ -2169,9 +2170,10 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function SMDsales()
+    public function SMDsales(Request $request)
     {
-        $sales = SalesMD::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SalesMD::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $data = array();
         $id = 1;
         foreach ($sales as $value) {
@@ -2225,9 +2227,10 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function SMDstockist()
+    public function SMDstockist(Request $request)
     {
-        $stock = StockMD::whereMonth('date', Carbon::now()->month)->get();
+        $stock = StockMD::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $data = array();
         $id = 1;
         foreach ($stock as $val) {
