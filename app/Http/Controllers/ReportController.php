@@ -1906,9 +1906,10 @@ class ReportController extends Controller
         })->make(true);
     }
 
-    public function DcSales()
+    public function DcSales(Request $request)
     {
-        $sales = SalesDc::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SalesDc::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $data = array();
         $id = 1;
         foreach ($sales as $value) {
@@ -2063,10 +2064,11 @@ class ReportController extends Controller
         }
     }
 
-    public function documentationDC()
+    public function documentationDC(Request $request)
     {
         $data = array();
-        $employee = DocumentationDc::whereMonth('date', Carbon::now()->month)->get();
+        $employee = DocumentationDc::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $id = 1;
         foreach ($employee as $val) {
             if ($val->employee->position->level == 'dc') {
@@ -2621,9 +2623,10 @@ class ReportController extends Controller
         }
     }
 
-    public function SPGattendance()
+    public function SPGattendance(Request $request)
     {
-        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month)->get();
+        $employee = AttendancePasar::whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         $data = array();
         $absen = array();
         $id = 1;

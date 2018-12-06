@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
-use Auth;
+use Illuminate\Support\Facades\Input;
 use DB;
+use Auth;
+use File;
+use Excel;
+use Carbon\Carbon;
 use App\Price;
 use App\Product;
 
@@ -101,7 +105,7 @@ class PriceController extends Controller
             foreach ($price->get() as $val) {
                 $data[] = array(
                     'Product'       => $val->product->name,
-                    'SubCategory'   => $val->product->subCategory,
+                    'SubCategory'   => (isset($val->product->subCategory->name) ? $val->product->subCategory->name : "-"),
                     'Price'         => (isset($val->price) ? $val->price : "-"),
                     'Rilis'         => (isset($val->rilis) ? $val->rilis : "-")
                 );
@@ -122,4 +126,79 @@ class PriceController extends Controller
             ]);
         }
     }
+
+    public function importXLS(Request $request)
+    {
+        try {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+
+            if($request->hasFile('file')) {
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
+                    try {
+                        DB::beginTransaction();
+                        if (!empty($results->all())) {
+                            foreach($results as $row)
+                            {
+                                $rowRules = [
+                                    'product'  => 'required',
+                                    'price'		=> 'required|numeric',	
+                                    'rilis'		=> 'required'
+                                ];
+                                $validator = Validator($row->toArray(), $rowRules);
+                                if ($validator->fails()) {
+                                    continue;
+                                } else {
+                                     Price::create([
+                                        'id_product'    => \App\Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['product']))."'")->first()->id,
+                                        'price'         => $row['price'],
+                                        'rilis'         => \PHPExcel_Style_NumberFormat::toFormattedString($row['rilis'], 'YYYY-MM-DD'),
+
+                                    ]);
+                                }
+                            }
+                            DB::commit();
+                        } else {
+                            throw new Exception("Error Processing Request", 1);
+                        }
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return redirect()->back()->with([
+                            'type' => 'danger',
+                            'title' => 'Gagal!<br/>',
+                            'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah Target SMD Pasar!'
+                        ]);
+                    }
+                }, false);
+                return redirect()->back()->with([
+                    'type' => 'success',
+                    'title' => 'Sukses!<br/>',
+                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Target SMD Pasar!'
+                ]);
+            } else {
+                DB::rollback();
+                return redirect()->back()->with([
+                    'type' => 'danger',
+                    'title' => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>File harus di isi!'
+                ]);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with([
+                'type' => 'danger',
+                'title' => 'Gagal!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
+            ]);
+        }
+    }
+
+
 }
