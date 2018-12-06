@@ -2641,7 +2641,9 @@ class ReportController extends Controller
 
     public function SPGattendance(Request $request)
     {
-        $employee = AttendancePasar::whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        $employee = AttendancePasar::whereHas('attendance.employee', function($query) use ($request){
+            return $query->where('id_employee', $request->input('employee'));
+        })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
         ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         $data = array();
         $absen = array();

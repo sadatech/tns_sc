@@ -67,13 +67,17 @@ class ProductFokus extends Model
     {
         $x = DB::table('fokus_products')->join('products', 'fokus_products.id_product', '=', 'products.id')->where('name', '<>', '')->get();
         $z = DB::table('fokus_channels')->join('channels', 'fokus_channels.id_channel', '=', 'channels.id')->where('name', '<>', '')->get();
-        $p = DB::table('fokus_areas')->join('areas', 'fokus_areas.id_area', '=', 'areas.id')->where('name', '<>', '')->get();
         // $xp = DB::table('products')->join('fokus_products', 'products.id', '=', 'fokus_products.id_product')->get();
         // $y = count(collect($x, $request->input('channel'))->get('id'));
         $q = $x->whereIn('id_product', $data['product'])->count();
         $h = $z->whereIn('id_channel', $data['channel'])->count();
-        $a = $p->whereIn('id_area', $data['area'])->count();
+        // $channel = Channel::whereRaw("TRIM(UPPER(name)) = '". strtoupper($data['channel'])."'")->count();
+        $fokus = ProductFokus::where('id', '!=', $self_id)
+        ->where(function($query) use ($data){
+            $query->whereBetween('from', [$data['from'], $data['to']]);
+            $query->orWhereBetween('to', [$data['from'], $data['to']]);
+        })->count();
 
-        return $a > 0 && $q > 0 && $h > 0;
+        return $fokus > 0 && $q > 0 && $h > 0;
     }
 }

@@ -50,6 +50,15 @@ Route::prefix('store')->group(function () {
 		})->name('pasar.download-template')->middleware('auth');
 	});
 
+	// Route Pages
+	Route::prefix('root')->group(function(){
+		Route::get('/', 'RouteController@baca')->name('root')->middleware('auth');
+		Route::get('/data', 'RouteController@data')->name('root.data')->middleware('auth');
+		Route::post('/create', 'RouteController@store')->name('root.add')->middleware('auth');
+		Route::put('/update/{id}', 'RouteController@update')->name('root.update')->middleware('auth');
+		Route::get('/delete/{id}', 'RouteController@delete')->name('root.delete')->middleware('auth');
+	});
+
 	//Sub Area Pages
 	Route::prefix('subarea')->group(function(){
 		Route::get('/', 'SubareaController@baca')->name('subarea')->middleware('auth');
