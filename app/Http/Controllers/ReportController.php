@@ -2527,9 +2527,10 @@ class ReportController extends Controller
 
 
     // ************ SPG PASAR ************ //
-    public function SPGsales()
+    public function SPGsales(Request $request)
     {
-        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SalesSpgPasar::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         $data = array();
         $product = array();
         $id = 1;
@@ -2575,9 +2576,11 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function SPGrekap()
+    public function SPGrekap(Request $request)
     {
-        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month)->get();
+
+        $rekap = SalesRecap::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $id = 1;
         $data = array();
         foreach ($rekap as $val) {
