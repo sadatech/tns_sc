@@ -1389,7 +1389,7 @@ class ReportController extends Controller
 
 
     // ************ SMD PASAR ************ //
-    public function SMDpasar()
+    public function SMDpasar(Request $request)
     {
         $employeePasar = EmployeePasar::with([
             'employee','pasar','pasar.subarea.area',
@@ -1397,7 +1397,15 @@ class ReportController extends Controller
         ])->select('employee_pasars.*');
         $report = array();
         $id = 1;
-        for ($i=1; $i <= Carbon::now()->day ; $i++) {
+        $periode = $request->input('periode');
+        if (Carbon::now()->month == substr($periode, 0, 2)) {
+            $date = Carbon::now();
+            $day = $date->day;
+        } else {
+            $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
+            $day = $date->endOfMonth()->day;
+        }
+        for ($i=1; $i <= $day; $i++) {
             foreach ($employeePasar->get() as $data) {
                 if ($data->employee->position->level == 'mdgtc') {
                     $report[] = array(
@@ -1409,12 +1417,12 @@ class ReportController extends Controller
                         'nama' => $data->employee->name,
                         'jabatan' => $data->employee->position->name,
                         'pasar' =>   $data->pasar->name,
-                        'stockist' => $this->getStockist($data, $i),
-                        'bulan' => Carbon::now()->month,
+                        'stockist' => $this->getStockist($data, $periode, $i),
+                        'bulan' => $date->month,
                         'tanggal' => $i,
-                        'call' => $this->getCall($data, $i),
-                        'ro' => $this->getRo($data, $i),
-                        'cbd' => $this->getCbd($data, $i),
+                        'call' => $this->getCall($data, $periode, $i),
+                        'ro' => $this->getRo($data, $periode, $i),
+                        'cbd' => $this->getCbd($data, $periode, $i),
                     );
                 }
             }
@@ -1455,7 +1463,6 @@ class ReportController extends Controller
         });
         $dt->addColumn('vpf', function($report) {
             $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
-            // $date = Carbon::now()->format('Y')."-".$report['bulan']."-15";
             $sale = DB::table('sales_mds')
             ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
             ->join('products', 'sales_md_details.id_product', '=', 'products.id')
@@ -2268,7 +2275,7 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function getCbd($data, $day)
+    public function getCbd($data, $periode, $day)
     {
         $date = Carbon::now()->format('Y-m-').$day;
         $cbd = \App\Cbd::where([
@@ -2278,9 +2285,11 @@ class ReportController extends Controller
         return $cbd;
     }
 
-    public function getStockist($data, $day)
+    public function getStockist($data, $periode, $day)
     {
-        $date = Carbon::now()->format('Y-m-').$day;
+        $year = substr($periode, 3);
+        $month = substr($periode, 0,2);
+        $date = Carbon::parse($year."-".$month."-".$day);
         $stock = StockMD::where([
             'id_pasar' => $data['id_pasar'],
             'date' => $date
@@ -2288,9 +2297,11 @@ class ReportController extends Controller
         return (isset($stock->stockist) ? $stock->stockist : "Tidak ada");
     }
 
-    public function getCall($data, $day)
+    public function getCall($data, $periode, $day)
     {
-        $date = Carbon::now()->format('Y-m-').$day;
+        $year = substr($periode, 3);
+        $month = substr($periode, 0,2);
+        $date = Carbon::parse($year."-".$month."-".$day);
         $call = DB::table('attendances')
         ->join('attendance_outlets', 'attendances.id', '=', 'attendance_outlets.id_attendance')
         ->where([
@@ -2314,9 +2325,11 @@ class ReportController extends Controller
         return $call->count();
     }
 
-    public function getRo($data, $day)
+    public function getRo($data, $periode, $day)
     {
-        $date = Carbon::now()->format('Y-m-').$day;
+        $year = substr($periode, 3);
+        $month = substr($periode, 0,2);
+        $date = Carbon::parse($year."-".$month."-".$day);
         $ro = Outlet::where([
             'id_employee_pasar' => $data['id'],
             'active' => true
