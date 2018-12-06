@@ -47,7 +47,7 @@ class SalesSpgPasarSummary extends SalesSpgPasar
         $products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
                              ->whereDate('to', '>=', Carbon::parse($this->date))
                              ->where('id_employee', $this->id_employee)
-                             ->pluck('id');
+                             ->pluck('id_product');
 
         // $products = ProductFokusSpg::whereHas('product', function($query) use ($id_cat){
         //                 return $query->where('id_subcategory', $id_cat);

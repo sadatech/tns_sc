@@ -13,6 +13,8 @@ class ProductFokus extends Model
 {
     use DropDownHelper;
     use ValidationHelper;
+    
+    protected $table = 'product_fokuses';
 
     protected $fillable = [
         'from', 'to'

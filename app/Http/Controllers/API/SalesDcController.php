@@ -63,12 +63,18 @@ class SalesDcController extends Controller
 			$salesDetailTemplate = new SamplingDcDetail;
 		}
 
-		$sales = $sales->firstOrCreate([
-			'id_employee'	=> $user->id,
-			'place'			=> $data->place,
-			'date'			=> $date,
-			'week'			=> $date->weekOfMonth,
-		]);
+		$sales = $sales->firstOrCreate(
+			[
+				'id_employee'	=> $user->id,
+				'place'			=> $data->place,
+				'date'			=> $date,
+				'week'			=> $date->weekOfMonth,
+			],
+			[
+				'icip_icip'			=> $data->icip_icip,
+				'effective_contact'	=> $data->effective_contact,
+			]
+		);
 
 		$sales_id = $sales->id;
 		
