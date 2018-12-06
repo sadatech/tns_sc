@@ -13,6 +13,24 @@
   @endif
   <div class="block block-themed"> 
     <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+      <h3 class="block-title">Filter</h3>
+    </div>
+    <div class="block">        
+      <div class="block-content block-content-full">
+        <form method="post" id="filter">
+          <div class="row">
+            <div class="col-md-6">
+              <label>Periode:</label>
+              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="block block-themed" id="table-block" style="display: none"> 
+    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
       <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
@@ -45,6 +63,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
 [data-notify="container"] {
@@ -60,16 +79,51 @@ table.table thead tr th {
 @endsection
 
 @section('script')
+<script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
-  $(function() {
-    var table = $('#category').DataTable({
+    $(".js-datepicker").datepicker( {
+    format: "mm/yyyy",
+    viewMode: "months",
+    autoclose: true,
+    minViewMode: "months"
+  });
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+  $('#filter').submit(function(e) {
+    Codebase.layout('header_loader_on');
+    e.preventDefault();
+    var table = null;
+    var url = '{!! route('spg.pasar.recap.data') !!}';
+    table = $('#category').DataTable({
       processing: true,
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('spg.pasar.recap.data') !!}',
+      ajax: {
+        url: url + "?" + $("#filter").serialize(),
+        type: 'POST',
+        dataType: 'json',
+        dataSrc: function(res) {
+          Codebase.layout('header_loader_off');
+          if (res.data == 0) {
+            $('#table-block').hide();
+            swal("Error!", "Data is empty!", "error");
+            return res.data;
+          } else {
+            $('#table-block').show();
+            return res.data;
+          }
+        },
+        error: function (data) {
+          Codebase.layout('header_loader_off');
+          swal("Error!", "Failed to load Data!", "error");
+        },
+      },
       columns: [
           { data: 'id' },
           { data: 'name' },
@@ -79,7 +133,8 @@ table.table thead tr th {
           { data: 'total_sales' },
           { data: 'total_value' },
           { data: 'action' },
-      ]
+      ],
+      bDestroy: true
     });
   });
 </script>
