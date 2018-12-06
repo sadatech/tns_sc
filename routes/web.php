@@ -553,7 +553,7 @@ Route::prefix('report')->group(function () {
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd.stockist', $data);
 				})->name('report.stockist')->middleware('auth');
-				Route::get('/data', 'ReportController@SMDstockist')->name('data.smd.stockist')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDstockist')->name('data.smd.stockist')->middleware('auth');
 				Route::get('/export', 'ReportController@exportSMDstocking')->name('export.smd.stockist')->middleware('auth');
 			});
 
@@ -563,7 +563,7 @@ Route::prefix('report')->group(function () {
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd.sales',$data);
 				})->name('report.sales.pasar')->middleware('auth');
-				Route::get('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDsales')->name('data.sales.smd')->middleware('auth');
 				Route::get('/export', 'ReportController@exportMdPasar')->name('export.sales.smd')->middleware('auth');
 			});
 
@@ -579,7 +579,7 @@ Route::prefix('report')->group(function () {
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd.distpf',$data);
 				})->name('report.dist.pf')->middleware('auth');
-				Route::get('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDdistpf')->name('data.distpf.smd')->middleware('auth');
 				Route::get('/export', 'ReportController@exportSmdDist')->name('export.distpf.smd')->middleware('auth');
 			});
 
@@ -589,7 +589,7 @@ Route::prefix('report')->group(function () {
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd', $data);
 				})->name('report.summary')->middleware('auth');
-				Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 				Route::get('/export', 'ReportController@exportSMDsummary')->name('export.summary.smd')->middleware('auth');
 
 			});
