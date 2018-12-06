@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Components\traits\WeekHelper;
 use App\Availability;
 use App\DetailAvailability;
 use JWTAuth;
@@ -13,6 +14,8 @@ use Carbon\Carbon;
 
 class AvailabilityController extends Controller
 {
+	use WeekHelper;
+	
 	public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
@@ -45,7 +48,7 @@ class AvailabilityController extends Controller
 							$modelAvailability->id_store = $data->store;
 							$modelAvailability->id_employee = $user->id;
 							$modelAvailability->date = $date;
-							$modelAvailability->week = $data->week;
+							$modelAvailability->week = $this->getWeek($date);
 							$modelAvailability->save();
 							foreach ($data->product as $product) {
 								$modelDetailAvailability = new DetailAvailability;

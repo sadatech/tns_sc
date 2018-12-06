@@ -44,7 +44,7 @@ class SalesSpgPasarSummary extends SalesSpgPasar
     }
 
     public function getProductFocusListAttribute(){
-    	$products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
+        $products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
                              ->whereDate('to', '>=', Carbon::parse($this->date))
                              ->where('id_employee', $this->id_employee)
                              ->pluck('id_product');
@@ -54,10 +54,10 @@ class SalesSpgPasarSummary extends SalesSpgPasar
         //             })->where('id_employee', $this->id_employee)->whereDate('from', '<=', Carbon::parse($this->date))->whereDate('to', '>=', Carbon::parse($this->date))->get();
 
         return array_unique($products->toArray());
-    }  
+    }
 
     public function getDetailAttribute(){
-    	// return [1=>100,3=>200];
+        // return [1=>100,3=>200];
     	$result = array();
     	$products = ProductFokusSpg::whereDate('from', '<=', Carbon::parse($this->date))
                              ->whereDate('to', '>=', Carbon::parse($this->date))
@@ -65,12 +65,10 @@ class SalesSpgPasarSummary extends SalesSpgPasar
                              // ->where('id_product', $id_product)
                              ->get();
 
-                             // return $products
-
         foreach ($products as $item) {
 
         	$data = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
-                                ->join('prices', function($join){
+                                ->leftJoin('prices', function($join){
                                     return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product)"));
                                 })
                                 ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
@@ -90,7 +88,7 @@ class SalesSpgPasarSummary extends SalesSpgPasar
     	return SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
                             // ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
                             ->join('prices', function($join){
-                                return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null)"));
+                                return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null LIMIT 1)"));
                             })
                             ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
                             // ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
@@ -104,7 +102,7 @@ class SalesSpgPasarSummary extends SalesSpgPasar
     public function getSalesOtherValueAttribute(){
     	return @(SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
                             ->join('prices', function($join){
-                                return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null)"));
+                                return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null LIMIT 1)"));
                             })
                             ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
                             // ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
@@ -118,7 +116,7 @@ class SalesSpgPasarSummary extends SalesSpgPasar
     public function getSalesPfAttribute(){
     	return @(SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
                             ->join('prices', function($join){
-                                return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null)"));
+                                return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null LIMIT 1)"));
                             })
                             ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
                             ->where('sales_spg_pasars.id_employee', $this->id_employee)
@@ -210,5 +208,5 @@ class SalesSpgPasarSummary extends SalesSpgPasar
     //     $tresult = $thead."</thead>".$tbody."</tr></tbody></table>";
 
     //     return $tresult;
-    // } 
+    // }
 }

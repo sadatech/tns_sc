@@ -10,6 +10,7 @@ use App\SalesMtcSummary;
 use App\MtcReportTemplate;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Collection;
+use App\Components\traits\WeekHelper;
 use App\Category;
 use App\Area;
 use App\Account;
@@ -76,6 +77,7 @@ use App\ProductFokusSpg;
 
 class ReportController extends Controller
 {
+    use WeekHelper;
     protected $reportHelper;
 
     public function __construct(ReportHelper $reportHelper)
@@ -470,6 +472,8 @@ class ReportController extends Controller
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
+            return $this->getWeek(Carbon::parse('2018-12-31'));
+            return Carbon::now()->day;
             return $item->employee->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
@@ -484,11 +488,28 @@ class ReportController extends Controller
         ->addColumn('achievement', function($item) use ($periode) {
             return $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
         })
+        ->addColumn('target_focus1', function($item) use ($periode) {
+            return number_format($item->employee->getTarget1(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus1', function($item) use ($periode) {
+            return number_format($item->employee->getActualPf1(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus1', function($item) use ($periode) {
+            return $item->employee->getAchievementPf1(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('target_focus2', function($item) use ($periode) {
+            return number_format($item->employee->getTarget2(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus2', function($item) use ($periode) {
+            return number_format($item->employee->getActualPf2(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus2', function($item) use ($periode) {
+            return $item->employee->getAchievementPf2(['store' => $item->id_store, 'date' => $periode]);
+        })
         ->addColumn('growth', function($item) use ($periode) {
             return $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
         })
         ->addColumn('store_name', function($item) use ($periode) {
-            return $item->store->name1.' -> '.$item->employee->getActualPf(['store' => $item->id_store, 'date' => $periode]);
             return $item->store->name1;
             return $item->employee->getActualPf1(['id_channel' => $item->store->account->id_channel, 'date' => $periode]);
         })
@@ -1942,6 +1963,8 @@ class ReportController extends Controller
                     'id_sales'  => $value->id,
                     'nama'      => (isset($value->employee->name) ? $value->employee->name : ""),
                     'place'     => (isset($value->place) ? $value->place : ""),
+                    'icip_icip'         => $value->icip_icip ?? "",
+                    'effective_contact' => $value->effective_contact ?? "",
                     'tanggal'   => (isset($value->date) ? $value->date : ""),
                 );
             }
@@ -2569,9 +2592,10 @@ class ReportController extends Controller
 
 
     // ************ SPG PASAR ************ //
-    public function SPGsales()
+    public function SPGsales(Request $request)
     {
-        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SalesSpgPasar::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         $data = array();
         $product = array();
         $id = 1;
@@ -2617,9 +2641,11 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function SPGrekap()
+    public function SPGrekap(Request $request)
     {
-        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month)->get();
+
+        $rekap = SalesRecap::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $id = 1;
         $data = array();
         foreach ($rekap as $val) {
@@ -2799,8 +2825,6 @@ class ReportController extends Controller
     {
         return (isset($val) ? $val : "-");
     }
-
-    use \App\Traits\ExportSPGPasarSalesSummaryTrait;
 
     public function SPGsalesSummary_exportXLS($id_subcategory, $filterMonth)
     {
