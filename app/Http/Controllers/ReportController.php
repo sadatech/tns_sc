@@ -1620,9 +1620,20 @@ class ReportController extends Controller
             $employee->whereHas('attendance.employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
             });
-        } else if ($request->has('periode')) {
+        } 
+         if ($request->has('periode')) {
             $employee->whereMonth('checkin', substr($request->input('periode'), 0, 2));
             $employee->whereYear('checkin', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $employee->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
+         if ($request->has('area')) {
+            $employee->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            });
         }
         $data = array();
         $absen = array();
@@ -2144,12 +2155,26 @@ class ReportController extends Controller
 
     public function SMDdistpf(Request $request)
     {
-        $dist = Distribution::whereMonth('date',substr($request->input('periode'), 0, 2))
-        ->whereYear('date',substr($request->input('periode'), 3))->get();
+        
+        $dist = Distribution::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $dist->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $dist->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $dist->whereYear('date', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $dist->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
         $data = array();
         $product = array();
         $id = 1;
-        foreach ($dist as $key => $value) {
+        foreach ($dist->get() as $key => $value) {
             if ($value->employee->position->level == 'mdgtc') {
             $data[] = array(
                 'id'            => $id++,
@@ -2191,11 +2216,24 @@ class ReportController extends Controller
 
     public function SMDsales(Request $request)
     {
-        $sales = SalesMD::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $sales = Distribution::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $sales->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
         $data = array();
         $id = 1;
-        foreach ($sales as $value) {
+        foreach ($sales->get() as $value) {
             if($value->employee->position->level == 'mdgtc'){
                 $data[] = array(
                     'id'            => $id++,
