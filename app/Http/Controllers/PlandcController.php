@@ -13,6 +13,7 @@ use File;
 use Excel;
 use Validator;
 use App\Employee;
+use App\PropertiDc;
 use Carbon\Carbon;
 
 class PlandcController extends Controller
@@ -21,6 +22,26 @@ class PlandcController extends Controller
     {
         $data['employee']       = Employee::where('id_position', 5 )->get();
         return view('plandc.plandc', $data);
+    }
+
+    public function readProperti()
+    {
+        return view('plandc.properti');
+    }
+
+    public function dataProperti()
+    {
+        $properti = PropertiDc::get();
+        return Datatables::of($properti)
+        ->addColumn('action', function ($properti) {
+            $data = array(
+                'id'            => $properti->id,
+                'item'          => $properti->item
+            );
+            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square'><i class='si si-pencil'></i></button>
+            <button data-url=".route('properti.delete', $properti->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
+        })->make(true);
+
     }
 
     public function readUpdate($id)
@@ -137,6 +158,65 @@ class PlandcController extends Controller
         }
     }
 
+    public function importProperti(Request $request)
+    {
+        $this->validate($request, [
+            'file'      => 'required'
+        ]);
+        $transaction = DB::transaction(function () use ($request) {
+            $file = Input::file('file')->getClientOriginalName();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+            if ($extension != 'xlsx' && $extension !=  'xls') {
+                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+            }
+            if($request->hasFile('file')){
+                $file = $request->file('file')->getRealPath();
+                $ext = '';
+                
+                Excel::filter('chunk')
+                ->selectSheetsByIndex(0)
+                ->load($file)
+                ->formatDates(true)
+                ->chunk(250, function($results) use ($request)
+                {
+                    foreach($results as $row)   
+                    {
+                        $rowRules = [
+                            'item'   => 'required'
+                        ];
+                        $validator = Validator::make($row->toArray(), $rowRules);
+                        if ($validator->fails()) {
+                            continue;
+                        } else {
+                            $insert = PropertiDc::create([
+                                'item'              => $row['item']
+                            ]);
+                            }
+                        }
+                },false);
+            }
+            return 'success';
+        });
+
+        if ($transaction == 'success') {
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import Properti Dc!'
+            ]);
+        }else{
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+            ]);
+        }
+    }
+
     public function exportXLS()
     {
         $PlanDc = PlanDc::orderBy('created_at', 'DESC');
@@ -158,7 +238,34 @@ class PlandcController extends Controller
             }
             $filename = "PlanDemoCooking_".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
-                $excel->sheet('Store', function($sheet) use ($data)
+                $excel->sheet('PlanDemoCooking', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportProperti()
+    {
+        $PlanDc = PropertiDc::orderBy('created_at', 'DESC');
+        if ($PlanDc->count() > 0) {
+            $dataEmp = array();
+            foreach ($PlanDc->get() as $val) {
+                $data[] = array(
+                    'Item'              => $val->item
+                );
+            }
+            $filename = "PropertiDc".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('PropertiDc', function($sheet) use ($data)
                 {
                     $sheet->fromArray($data);
                 });
@@ -211,9 +318,89 @@ class PlandcController extends Controller
         }
     }
 
+    public function storeProperti(Request $request)
+    {
+        $data=$request->all();
+        $limit=[
+            'item'          => 'required',
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+        } else {
+            $check = PropertiDc::whereRaw("TRIM(UPPER(item)) = '". strtoupper($request->input('item'))."'")->count();
+            if ($check < 1) {
+                PropertiDc::create([
+                    'item'       => $request->input('item'),
+                ]);
+                return redirect()->back()
+                ->with([
+                    'type'   => 'success',
+                    'title'  => 'Sukses!<br/>',
+                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah properti Dc!'
+                ]);
+            } else {
+                return redirect()->back()
+                ->with([
+                    'type'   => 'warning',
+                    'title'  => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Properti DC sudah ada!'
+                ]);
+            }
+        }
+    }
+
+    public function updateProperti(Request $request, $id) 
+    {
+        $data=$request->all();
+        $limit=[
+            'item'           => 'required'
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+        } else {
+            $check = PropertiDc::whereRaw("TRIM(UPPER(item)) = '". strtoupper($request->input('item'))."'")->count();
+            if ($check < 1) {
+                $store = PropertiDc::find($id);
+                $store->item             = $request->input('item');
+                $store->save();
+                return redirect()->back()
+                ->with([
+                    'type'    => 'success',
+                    'title'   => 'Sukses!<br/>',
+                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Properti Dc!'
+                ]);
+            } else {
+                return redirect()->back()
+                ->with([
+                    'type'   => 'warning',
+                    'title'  => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Properti DC sudah ada!'
+                ]);
+            }
+        }
+    }
+
     public function delete($id)
     {
         $plan = PlanDc::find($id);
+            $plan->delete();
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+            ]);
+    }
+
+    public function deleteProperti($id)
+    {
+        $plan = PropertiDc::find($id);
             $plan->delete();
             return redirect()->back()
             ->with([
