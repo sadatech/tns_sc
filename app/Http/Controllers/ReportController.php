@@ -1615,16 +1615,19 @@ class ReportController extends Controller
 
     public function SMDattendance(Request $request)
     {
-        $employee = AttendanceOutlet::whereMonth('checkin', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
-        // $employee = Employee::where('id_position', \App\Position::where('level', 'mdgtc')->first()->id)
-        // ->with('employeePasar')
-        // ->select('employees.*')
-        // ->get();
+        $employee = AttendanceOutlet::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $employee->whereHas('attendance.employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } else if ($request->has('periode')) {
+            $employee->whereMonth('checkin', substr($request->input('periode'), 0, 2));
+            $employee->whereYear('checkin', substr($request->input('periode'), 3));
+        }
         $data = array();
         $absen = array();
         $id = 1;
-        foreach ($employee as $val) {
+        foreach ($employee->get() as $val) {
             if ($val->attendance->employee->position->level == 'mdgtc')
             {
                 $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
