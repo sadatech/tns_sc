@@ -31,6 +31,8 @@
               <th>Nama DC</th>
               <th>Place</th>
               <th>Tanggal</th>
+              <th>Icip Icip</th>
+              <th>Effective Contact</th>
               @foreach ($product as $pro)
               <th>{{ $pro->name }}</th>
               @endforeach
@@ -76,6 +78,8 @@ table.table thead tr th {
       { data: 'nama' },
       { data: 'place' },
       { data: 'tanggal' },
+      { data: 'icip_icip' },
+      { data: 'effective_contact' },
       @foreach ($product as $pro)
       { data: 'product-{{ $pro->id }}' },
       @endforeach
