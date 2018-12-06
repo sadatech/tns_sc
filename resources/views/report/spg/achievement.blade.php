@@ -21,7 +21,7 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.distpf.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a id="btnExportAchievement" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
@@ -87,6 +87,22 @@ table.table thead tr th {
       { data: 'sales_per_kontak', name:'sales_per_kontak' },
       ]
     });
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $("#btnExportAchievement").on("click", function(){
+      $.ajax({
+        url: "{{ route('spg.pasar.sales.achievement.data.exportXLS') }}",
+        type: "post",
+        success: function(e){
+          alert(e.result);
+        }
+      });
+    })
   });
 </script>
 @endsection

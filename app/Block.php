@@ -1,11 +1,18 @@
 <?php
 
 namespace App;
+use App\Components\traits\DropDownHelper;
+use App\Filters\QueryFilters;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Block extends Model
 {
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
+    }
+    
     protected $fillable = [
 		'id_subarea', 'id_employee', 'name', 'address', 'phone', 'active'
     ];
