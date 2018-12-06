@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Cbd;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Config;
 use JWTAuth;
+use Image;
+use App\Cbd;
 
 class CbdController extends Controller
 {
@@ -60,6 +61,8 @@ class CbdController extends Controller
 						$photo 	= time()."_".$image->getClientOriginalName();
 						$path 	= 'uploads/cbd';
 						$image->move($path, $photo);
+						$image_compress = Image::make($path.'/'.$photo)->orientate();
+						$image_compress->save($path.'/'.$photo, 50);
 					}
 					$insert = CBD::create([
 						'id_employee'	=> $user->id,

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Components\traits\ApiAuthHelper;
-use App\PlanDc;
-use App\PlanEmployee;
-use Config;
-use JWTAuth;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
+use JWTAuth;
+use Config;
+use Image;
+use App\PlanEmployee;
+use App\PlanDc;
 
 class PlanController extends Controller
 {
@@ -30,6 +31,8 @@ class PlanController extends Controller
 				$photo 	= time()."_".$image->getClientOriginalName();
 				$path 	= 'uploads/plan';
 				$image->move($path, $photo);
+				$image_compress = Image::make($path.'/'.$photo)->orientate();
+				$image_compress->save($path.'/'.$photo, 50);
 			}
 			$date 	= Carbon::now()->toDateString();
 			$user = $check['user'];

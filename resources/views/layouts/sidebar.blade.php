@@ -127,6 +127,10 @@
                      <li>
                         <a class="{{ request()->is('planDc') ? 'active' : '' }}" href="{{ route('planDc') }}"><i class="fa fa-pied-piper"></i><span class="sidebar-mini-hide">Plan Dc</span></a>
                     </li>
+                    {{-- PropertiDc  --}}
+                     <li>
+                        <a class="{{ request()->is('propertiDc') ? 'active' : '' }}" href="{{ route('propertiDc') }}"><i class="fa fa-suitcase"></i><span class="sidebar-mini-hide">Properti Dc</span></a>
+                    </li>
                     {{-- Product --}}
                     <li class="{{ request()->is('product/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Product(s)</span></a>
@@ -158,6 +162,9 @@
                             <!-- <li>
                                 <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
                             </li> -->
+                            <li>
+                                <a class="{{ request()->is('product/fokusSpg') ? 'active' : '' }}" href="{{ route('fokusSpg') }}">Fokus SPG Pasar</a>
+                            </li>
                             <!-- <li>
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
@@ -341,7 +348,7 @@
                             </li>
                             {{-- SALES MTC REVIEW --}}
                             <li>
-                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
+                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Achievement MTC</span></a>
                             </li>
                             {{-- Display Share--}}
                             <li>

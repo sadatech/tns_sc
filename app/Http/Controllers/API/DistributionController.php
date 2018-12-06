@@ -10,6 +10,7 @@ use App\DistributionDetail;
 use App\DistributionMotoric;
 use App\DistributionMotoricDetail;
 use App\Outlet;
+use App\Block;
 use JWTAuth;
 use Config;
 use DB;
@@ -43,7 +44,7 @@ class DistributionController extends Controller
 			}
 
 			if ( !empty($data->date) && !empty($data->product) && ($status == true) ) {
-				DB::transaction(function () use ($data, $user, &$res) {
+				DB::transaction(function () use ($data, $user, &$res, $type) {
 					$date 	= Carbon::parse($data->date);
 
 					if (strtoupper($type) == 'MOTORIC') {
@@ -70,7 +71,7 @@ class DistributionController extends Controller
 
 						$detail->updateOrCreate(
 							[
-								'id_distribution'		=> $distribution_id,
+								'id_distribution'		=> $distributionId,
 								'id_product'	=> $product->id,
 								'satuan'		=> $product->satuan,
 							],
