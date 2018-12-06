@@ -10,6 +10,7 @@ use App\SalesMtcSummary;
 use App\MtcReportTemplate;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Collection;
+use App\Components\traits\WeekHelper;
 use App\Category;
 use App\Area;
 use App\Account;
@@ -76,6 +77,7 @@ use App\ProductFokusSpg;
 
 class ReportController extends Controller
 {
+    use WeekHelper;
     protected $reportHelper;
 
     public function __construct(ReportHelper $reportHelper)
@@ -470,6 +472,8 @@ class ReportController extends Controller
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
+            return $this->getWeek(Carbon::parse('2018-12-31'));
+            return Carbon::now()->day;
             return $item->employee->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
@@ -484,11 +488,28 @@ class ReportController extends Controller
         ->addColumn('achievement', function($item) use ($periode) {
             return $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
         })
+        ->addColumn('target_focus1', function($item) use ($periode) {
+            return number_format($item->employee->getTarget1(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus1', function($item) use ($periode) {
+            return number_format($item->employee->getActualPf1(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus1', function($item) use ($periode) {
+            return $item->employee->getAchievementPf1(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('target_focus2', function($item) use ($periode) {
+            return number_format($item->employee->getTarget2(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus2', function($item) use ($periode) {
+            return number_format($item->employee->getActualPf2(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus2', function($item) use ($periode) {
+            return $item->employee->getAchievementPf2(['store' => $item->id_store, 'date' => $periode]);
+        })
         ->addColumn('growth', function($item) use ($periode) {
             return $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
         })
         ->addColumn('store_name', function($item) use ($periode) {
-            return $item->store->name1.' -> '.$item->employee->getActualPf(['store' => $item->id_store, 'date' => $periode]);
             return $item->store->name1;
             return $item->employee->getActualPf1(['id_channel' => $item->store->account->id_channel, 'date' => $periode]);
         })
@@ -1930,6 +1951,8 @@ class ReportController extends Controller
                     'id_sales'  => $value->id,
                     'nama'      => (isset($value->employee->name) ? $value->employee->name : ""),
                     'place'     => (isset($value->place) ? $value->place : ""),
+                    'icip_icip'         => $value->icip_icip ?? "",
+                    'effective_contact' => $value->effective_contact ?? "",
                     'tanggal'   => (isset($value->date) ? $value->date : ""),
                 );
             }
