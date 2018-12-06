@@ -50,6 +50,8 @@ use App\DistributionMotoricDetail;
 use App\SalesMd as SalesMD;
 use App\JobTrace;
 use App\Jobs\ExportJob;
+use App\Jobs\ExportSPGPasarAchievementJob;
+use App\Jobs\ExportSPGPasarSalesSummaryJob;
 use App\Product;
 use App\SalesSpgPasar;
 use App\SalesMotoricDetail;
@@ -1613,16 +1615,19 @@ class ReportController extends Controller
 
     public function SMDattendance(Request $request)
     {
-        $employee = AttendanceOutlet::whereMonth('checkin', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
-        // $employee = Employee::where('id_position', \App\Position::where('level', 'mdgtc')->first()->id)
-        // ->with('employeePasar')
-        // ->select('employees.*')
-        // ->get();
+        $employee = AttendanceOutlet::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $employee->whereHas('attendance.employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } else if ($request->has('periode')) {
+            $employee->whereMonth('checkin', substr($request->input('periode'), 0, 2));
+            $employee->whereYear('checkin', substr($request->input('periode'), 3));
+        }
         $data = array();
         $absen = array();
         $id = 1;
-        foreach ($employee as $val) {
+        foreach ($employee->get() as $val) {
             if ($val->attendance->employee->position->level == 'mdgtc')
             {
                 $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
@@ -2757,7 +2762,30 @@ class ReportController extends Controller
         return (isset($val) ? $val : "-");
     }
 
-    
+    use \App\Traits\ExportSPGPasarSalesSummaryTrait;
+
+    public function SPGsalesSummary_exportXLS($id_subcategory, $filterMonth)
+    {
+        $result = DB::transaction(function() use ($id_subcategory, $filterMonth){
+            try
+            {
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->nama . " " . Carbon::parse($filterMonth)->format("M-Y"),
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportSPGPasarSalesSummaryJob($JobTrace, [$id_subcategory, $filterMonth]));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
 
     public function SPGsalesSummary(Request $request)
     {
@@ -2787,9 +2815,9 @@ class ReportController extends Controller
 
         /* SALES PER PRODUCT(S) */
         foreach ($products as $column) {
-            $dt->addColumn('product_'.$column->id, function($item) use ($column) {
+            $dt->addColumn('product_'.$column->product->id, function($item) use ($column) {
                 // return $item->detail;
-                return array_key_exists($column->id, $item->detail) ? number_format($item->detail[$column->id]) : 0;
+                return array_key_exists($column->product->id, $item->detail) ? number_format($item->detail[$column->product->id]) : 0;
             });
         }
 
@@ -2884,6 +2912,29 @@ class ReportController extends Controller
             "th" => $th,
             "columns" => $array_column
         ];
+    }
+
+    public function SPGsalesAchievement_exportXLS()
+    {
+        $result = DB::transaction(function(){
+            try
+            {
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "SPG Pasar - Report Achievement",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportSPGPasarAchievementJob($JobTrace));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
     public function SPGsalesAchievement()
