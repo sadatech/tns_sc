@@ -2757,8 +2757,6 @@ class ReportController extends Controller
         return (isset($val) ? $val : "-");
     }
 
-    use \App\Traits\ExportSPGPasarSalesSummaryTrait;
-
     public function SPGsalesSummary_exportXLS($id_subcategory, $filterMonth)
     {
         $result = DB::transaction(function() use ($id_subcategory, $filterMonth){
