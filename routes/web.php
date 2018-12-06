@@ -593,6 +593,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.achievement');
 				})->name('report.achievement.spg')->middleware('auth');
 				Route::get('/data', 'ReportController@SPGsalesAchievement')->name('spg.pasar.sales.achievement.data')->middleware('auth');
+				Route::post('/exportXLS', 'ReportController@SPGsalesAchievement_exportXLS')->name('spg.pasar.sales.achievement.data.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -618,6 +619,7 @@ Route::prefix('report')->group(function () {
 					return view('report.spg.sales-summary');
 				})->name('report.sales.summary.spg')->middleware('auth');
 				Route::post('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
+				Route::post('/exportXLS/{subCategory?}/{date?}', 'ReportController@SPGsalesSummary_exportXLS')->name('spg.pasar.sales.summary.data.exportxls')->middleware('auth');
 			});
 		});
 
