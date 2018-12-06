@@ -23,6 +23,7 @@ use App\EmployeeSubArea;
 use App\Brand;
 use Auth;
 use DB;
+use App\Block;
 use Excel;
 use App\DocumentationDc;
 use App\StoreDistributor;
@@ -1669,11 +1670,12 @@ class ReportController extends Controller
     }
 
     // ************ MOTORIK ************ //
-    public function Motorikattendance()
+    public function Motorikattendance(Request $request)
     {
-        $employee = AttendanceBlock::whereMonth('checkin', Carbon::now()->month)->get();;
-        $absen = array();
+        $employee = AttendanceBlock::whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         $id = 1;
+        $data = array();
         foreach ($employee as $val) {
             if ($val->attendance->employee->position->level == 'motoric') {
                 $data[] = array(
@@ -1730,9 +1732,10 @@ class ReportController extends Controller
         }
     }
 
-    public function motorikDistPF()
+    public function motorikDistPF(Request $request)
     {
-        $dist = DistributionMotoric::whereMonth('date',Carbon::now()->month)->get();
+        $dist = DistributionMotoric::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $data = array();
         $product = array();
         $id = 1;
@@ -1803,9 +1806,10 @@ class ReportController extends Controller
         }
     }
 
-    public function MotorikSales()
+    public function MotorikSales(Request $request)
     {
-        $sales = SalesMotoric::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SalesMotoric::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $data = array();
         $id = 1;
         foreach ($sales as $value) {
@@ -1815,7 +1819,7 @@ class ReportController extends Controller
                     'id_sales'  => $value->id,
                     'nama'      => (isset($value->employee->name) ? $value->employee->name : ""),
                     'block'     => (isset($value->block->name) ? $value->block->name : ""),
-                    'tanggal'   => (isset($value->date) ? $value->date : ""),
+                    'date'   => (isset($value->date) ? $value->date : ""),
                 );
             }
         }
@@ -1878,10 +1882,10 @@ class ReportController extends Controller
     }
 
        // ************ DEMO COOKING ************ //
-    public function kunjunganDc()
+    public function kunjunganDc(Request $request)
     {
-        $plan = PlanDc::with('planEmployee')
-        ->select('plan_dcs.*');
+        $plan = PlanDc::with('planEmployee')->whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         return Datatables::of($plan)
         ->addColumn('action', function ($plan) {
             if (isset($plan->photo)) {
@@ -1976,9 +1980,10 @@ class ReportController extends Controller
         }
     }
 
-    public function DcSampling()
+    public function DcSampling(Request $request)
     {
-        $sales = SamplingDc::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SamplingDc::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $data = array();
         $id = 1;
         foreach ($sales as $value) {
