@@ -10,6 +10,11 @@ class SubArea extends Model
     protected $fillable = [
 		'name', 'id_area'
     ];
+
+    public function route()
+    {
+    	return $this->hasMany('App\Route', 'id_route');
+    }  
     
     public function area()
     {
