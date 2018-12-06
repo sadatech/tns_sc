@@ -13,6 +13,8 @@ class ProductFokus extends Model
 {
     use DropDownHelper;
     use ValidationHelper;
+    
+    protected $table = 'product_fokuses';
 
     protected $fillable = [
         'from', 'to'
@@ -71,10 +73,10 @@ class ProductFokus extends Model
         $h = $z->whereIn('id_channel', $data['channel'])->count();
         // $channel = Channel::whereRaw("TRIM(UPPER(name)) = '". strtoupper($data['channel'])."'")->count();
         $fokus = ProductFokus::where('id', '!=', $self_id)
-                                ->where(function($query) use ($data){
-                                    $query->whereBetween('from', [$data['from'], $data['to']]);
-                                    $query->orWhereBetween('to', [$data['from'], $data['to']]);
-                                })->count();
+        ->where(function($query) use ($data){
+            $query->whereBetween('from', [$data['from'], $data['to']]);
+            $query->orWhereBetween('to', [$data['from'], $data['to']]);
+        })->count();
 
         return $fokus > 0 && $q > 0 && $h > 0;
     }

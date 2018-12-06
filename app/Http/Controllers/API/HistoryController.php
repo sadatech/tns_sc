@@ -62,7 +62,7 @@ class HistoryController extends Controller
 			->when($date == '', function ($q){
 				$now 	= Carbon::now();
 				$year 	= $now->year;
-				$month 	= $now->month;
+				$month 	= $now->month-1;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})->orderBy('id','desc')->get();
 
@@ -70,16 +70,27 @@ class HistoryController extends Controller
 				$dataArr = array();
 				foreach ($header as $key => $head) {
 					if (strtoupper($type) == 'MTC') {
-						$detail = AttendanceDetail::where('id_attendance',$head->id)->get();
+						$detail = AttendanceDetail::where('id_attendance',$head->id)->with('attendance.employee.timezone')->get();
 					}else if( strtoupper($type) == 'GTC-MD'  ){
-						$detail = AttendanceOutlet::where('id_attendance',$head->id)->get();
+						$detail = AttendanceOutlet::where('id_attendance',$head->id)->with('attendance.employee.timezone')->get();
 					}else if( strtoupper($type) == 'GTC-SPG'  ){
-						$detail = AttendancePasar::where('id_attendance',$head->id)->get();
+						$detail = AttendancePasar::where('id_attendance',$head->id)->with('attendance.employee.timezone')->get();
 					}else if( strtoupper($type) == 'GTC-DC'  ){
-						$detail = AttendancePlace::where('id_attendance',$head->id)->get();
+						$detail = AttendancePlace::where('id_attendance',$head->id)->with('attendance.employee.timezone')->get();
 					}else if( strtoupper($type) == 'GTC-MOTORIC'  ){
-						$detail = AttendanceBlock::where('id_attendance',$head->id)->get();
+						$detail = AttendanceBlock::where('id_attendance',$head->id)->with('attendance.employee.timezone')->get();
 					}
+
+					foreach ($detail as $key2 => $value2) {//timezone
+						$detail[$key2]['checkin_old'] 	= $detail[$key2]['checkin'];
+						$detail[$key2]['checkout_old'] 	= $detail[$key2]['checkout'];
+
+						$detail[$key2]['checkin'] 	= Carbon::parse($value2->checkin)->setTimezone($value2->attendance->employee->timezone->timezone)->format('Y-m-d H:i:s');
+						$detail[$key2]['checkout'] 	= ($value2->checkout ? Carbon::parse($value2->checkout)->setTimezone($value2->attendance->employee->timezone->timezone)->format('Y-m-d H:i:s') : "-");
+						
+						unset($detail[$key2]['attendance']);
+					}
+
 					$dataArr[] = array(
 						'id' 			=> $head->id,
 						'id_employee' 	=> $head->id_employee,
@@ -292,7 +303,7 @@ class HistoryController extends Controller
 		return response()->json($res);
 	}
 
-	public function distributionHistory($date = '', $type = 'MD')
+	public function distributionHistory($type = 'MD', $date = '')
 	{
 		$check = $this->authCheck();
 		if ($check['success'] == true) {

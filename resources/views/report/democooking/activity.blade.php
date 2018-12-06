@@ -33,6 +33,7 @@
               <th>Place</th>
               <th>Type</th>
               <th>Note</th>
+              <th>Photo1</th>
             </tr>
           </thead>
         </table>
@@ -76,7 +77,8 @@ table.table thead tr th {
       { data: 'date' },
       { data: 'place' },
       { data: 'type' },
-      { data: 'note' }
+      { data: 'note' },
+      { data: 'action' }
       ]
     });
   });
