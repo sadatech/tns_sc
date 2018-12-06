@@ -75,6 +75,8 @@ trait ExportSPGPasarAchievementTrait
                 $sheet->row(2, function($row){
                     $row->setAlignment("center");
                     $row->setValignment("center");
+                    $row->setFontWeight('bold');
+                    $row->setFontSize(16);
                 });
 
                 //
