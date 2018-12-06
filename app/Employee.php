@@ -24,6 +24,40 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     protected $hidden = [
         'password'
     ];
+
+    public function pfQuery($month, $year, $focus = '')
+    {
+        $pf = "* IF(
+                (SELECT 
+                    IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
+                       IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
+                    ) as area
+                    FROM `product_fokuses`
+                    INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
+                    LEFT JOIN fokus_channels on product_fokuses.id = fokus_channels.id_pf
+                    WHERE 
+                        fokus_products.id_product = sales_mtc_summary.id_product
+                        AND fokus_channels.id_channel = sales_mtc_summary.id_channel
+                        AND sales_mtc_summary.date BETWEEN product_fokuses.from AND product_fokuses.to
+                 ) > 0,
+                1, 0)";
+
+        if ($focus != '') {
+            $pf = "* IF(
+                    (SELECT 
+                        id_category$focus
+                        FROM `pfs`
+                        WHERE 
+                            MONTH(date) = ".$month."
+                            AND YEAR(date) = ".$year."
+                        ORDER BY pfs.id desc
+                        LIMIT 1
+                     ) = sales_mtc_summary.id_category,
+                    1, 0)".$pf;
+        }
+
+        return $pf;
+    }
     
     public function resigns()
     {
@@ -146,31 +180,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getTarget1($data){
-        $pf1 = "* IF(
-                    (SELECT 
-                        id_category1
-                        FROM `pfs`
-                        WHERE 
-                            MONTH(date) = ".$data['date']->month."
-                            AND YEAR(date) = ".$data['date']->year."
-                        ORDER BY pfs.id desc
-                        LIMIT 1
-                     ) = sales_mtc_summary.id_category,
-                    1, 0)";
-        $pf = "$pf1 * IF(
-                    (SELECT 
-                        IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
-                           IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
-                        ) as area
-                        FROM `product_fokuses`
-                        INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
-                        LEFT JOIN fokus_channels on product_fokuses.id = fokus_channels.id_pf
-                        WHERE 
-                            fokus_products.id_product = sales_mtc_summary.id_product
-                            AND fokus_channels.id_channel = sales_mtc_summary.id_channel
-                            AND sales_mtc_summary.date BETWEEN product_fokuses.from AND product_fokuses.to
-                     ) > 0,
-                    1, 0)";
+        $pf = $this->pfQuery($data['date']->month, $data['date']->year, '1');
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -206,7 +216,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                 return 
                     DB::select(
                         "
-                        SELECT SUM(target_value) AS result
+                        SELECT SUM(target_value $pf) AS result
                         FROM sales_mtc_summary
                         WHERE sub_area = '".$data['sub_area']."'
                         AND MONTH(date) = ".$data['date']->month."
@@ -220,31 +230,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getTarget2($data){
-        $pf1 = "* IF(
-                    (SELECT 
-                        id_category2
-                        FROM `pfs`
-                        WHERE 
-                            MONTH(date) = ".$data['date']->month."
-                            AND YEAR(date) = ".$data['date']->year."
-                        ORDER BY pfs.id desc
-                        LIMIT 1
-                     ) = sales_mtc_summary.id_category,
-                    1, 0)";
-        $pf = "$pf1 * IF(
-                    (SELECT 
-                        IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
-                           IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
-                        ) as area
-                        FROM `product_fokuses`
-                        INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
-                        LEFT JOIN fokus_channels on product_fokuses.id = fokus_channels.id_pf
-                        WHERE 
-                            fokus_products.id_product = sales_mtc_summary.id_product
-                            AND fokus_channels.id_channel = sales_mtc_summary.id_channel
-                            AND sales_mtc_summary.date BETWEEN product_fokuses.from AND product_fokuses.to
-                     ) > 0,
-                    1, 0)";
+        $pf = $this->pfQuery($data['date']->month, $data['date']->year, '2');
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -413,20 +399,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getActualPf($data){
-        $pf = "* IF(
-                    (SELECT 
-                        IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
-                           IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
-                        ) as area
-                        FROM `product_fokuses`
-                        INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
-                        LEFT JOIN fokus_channels on product_fokuses.id = fokus_channels.id_pf
-                        WHERE 
-                            fokus_products.id_product = sales_mtc_summary.id_product
-                            AND fokus_channels.id_channel = sales_mtc_summary.id_channel
-                            AND sales_mtc_summary.date BETWEEN product_fokuses.from AND product_fokuses.to
-                     ) > 0,
-                    1, 0)";
+        $pf = $this->pfQuery($data['date']->month, $data['date']->year);
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -450,7 +423,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                     DB::select(
                         "
                         SELECT 
-                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                            SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
                         AS result
                         FROM sales_mtc_summary
                         WHERE
@@ -482,31 +455,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getActualPf1($data){
-        $pf1 = "* IF(
-                    (SELECT 
-                        id_category1
-                        FROM `pfs`
-                        WHERE 
-                            MONTH(date) = ".$data['date']->month."
-                            AND YEAR(date) = ".$data['date']->year."
-                        ORDER BY pfs.id desc
-                        LIMIT 1
-                     ) = sales_mtc_summary.id_category,
-                    1, 0)";
-        $pf = "$pf1 * IF(
-                    (SELECT 
-                        IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
-                           IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
-                        ) as area
-                        FROM `product_fokuses`
-                        INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
-                        LEFT JOIN fokus_channels on product_fokuses.id = fokus_channels.id_pf
-                        WHERE 
-                            fokus_products.id_product = sales_mtc_summary.id_product
-                            AND fokus_channels.id_channel = sales_mtc_summary.id_channel
-                            AND sales_mtc_summary.date BETWEEN product_fokuses.from AND product_fokuses.to
-                     ) > 0,
-                    1, 0)";
+        $pf = $this->pfQuery($data['date']->month, $data['date']->year, '1');
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -530,7 +479,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                     DB::select(
                         "
                         SELECT 
-                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                            SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
                         AS result
                         FROM sales_mtc_summary
                         WHERE
@@ -602,31 +551,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getActualPf2($data){
-        $pf1 = "* IF(
-                    (SELECT 
-                        id_category2
-                        FROM `pfs`
-                        WHERE 
-                            MONTH(date) = ".$data['date']->month."
-                            AND YEAR(date) = ".$data['date']->year."
-                        ORDER BY pfs.id desc
-                        LIMIT 1
-                     ) = sales_mtc_summary.id_category,
-                    1, 0)";
-        $pf = "$pf1 * IF(
-                    (SELECT 
-                        IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf) = 0, 1, 
-                           IF((select count(*) from fokus_areas WHERE product_fokuses.id = fokus_areas.id_pf AND fokus_areas.id_area = sales_mtc_summary.id_area) > 0,1,0)
-                        ) as area
-                        FROM `product_fokuses`
-                        INNER JOIN fokus_products ON product_fokuses.id = fokus_products.id_pf
-                        LEFT JOIN fokus_channels on product_fokuses.id = fokus_channels.id_pf
-                        WHERE 
-                            fokus_products.id_product = sales_mtc_summary.id_product
-                            AND fokus_channels.id_channel = sales_mtc_summary.id_channel
-                            AND sales_mtc_summary.date BETWEEN product_fokuses.from AND product_fokuses.to
-                     ) > 0,
-                    1, 0)";
+        $pf = $this->pfQuery($data['date']->month, $data['date']->year, '2');
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -650,7 +575,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                     DB::select(
                         "
                         SELECT 
-                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                            SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
                         AS result
                         FROM sales_mtc_summary
                         WHERE

@@ -578,6 +578,24 @@ class ReportController extends Controller
         ->addColumn('achievement', function($item) use ($periode) {
             return $item->getAchievement(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
+        ->addColumn('target_focus1', function($item) use ($periode) {
+            return number_format($item->getTarget1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus1', function($item) use ($periode) {
+            return number_format($item->getActualPf1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus1', function($item) use ($periode) {
+            return $item->getAchievementPf1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+        })
+        ->addColumn('target_focus2', function($item) use ($periode) {
+            return number_format($item->getTarget2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus2', function($item) use ($periode) {
+            return number_format($item->getActualPf2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus2', function($item) use ($periode) {
+            return $item->getAchievementPf2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+        })
         ->addColumn('growth', function($item) use ($periode) {
             return $item->getGrowth(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
