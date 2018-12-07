@@ -1907,9 +1907,17 @@ class ReportController extends Controller
        // ************ DEMO COOKING ************ //
     public function kunjunganDc(Request $request)
     {
-        $plan = PlanDc::with('planEmployee')->whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
-        return Datatables::of($plan)
+        $plan = PlanDc::with('planEmployee')->orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $plan->whereHas('planEmployee.employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $plan->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $plan->whereYear('date', substr($request->input('periode'), 3));
+        } 
+        return Datatables::of($plan->get())
         ->addColumn('action', function ($plan) {
             if (isset($plan->photo)) {
                 $img_url = asset('/uploads/plan')."/".$plan->photo;
@@ -1931,11 +1939,19 @@ class ReportController extends Controller
 
     public function DcSales(Request $request)
     {
-        $sales = SalesDc::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $sales = SalesDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         $data = array();
         $id = 1;
-        foreach ($sales as $value) {
+        foreach ($sales->get() as $value) {
             if ($value->employee->position->level == 'dc') {
                 $data[] = array(
                     'id'        => $id++,
@@ -2006,11 +2022,19 @@ class ReportController extends Controller
 
     public function DcSampling(Request $request)
     {
-        $sales = SamplingDc::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $sales = SamplingDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         $data = array();
         $id = 1;
-        foreach ($sales as $value) {
+        foreach ($sales->get() as $value) {
             if ($value->employee->position->level == 'dc'){
                 $data[] = array(
                     'id'            => $id++,
@@ -2090,10 +2114,21 @@ class ReportController extends Controller
     public function documentationDC(Request $request)
     {
         $data = array();
-        $employee = DocumentationDc::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $employee = DocumentationDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $employee->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $employee->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $employee->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if ($request->has('type')) {
+            $employee->where('type', $request->input('type'));
+        } 
         $id = 1;
-        foreach ($employee as $val) {
+        foreach ($employee->get() as $val) {
             if ($val->employee->position->level == 'dc') {
                 $data[] = array(
                     'id'    => $id++,
@@ -2286,11 +2321,24 @@ class ReportController extends Controller
 
     public function SMDstockist(Request $request)
     {
-        $stock = StockMD::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $stock = StockMD::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $stock->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $stock->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $stock->whereYear('date', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $stock->whereHas('pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
         $data = array();
         $id = 1;
-        foreach ($stock as $val) {
+        foreach ($stock->get() as $val) {
             if ($val->employee->position->level == 'mdgtc'){
                 $data[] = array(
                     'id'        => $id++,
