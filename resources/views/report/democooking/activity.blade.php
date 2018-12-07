@@ -21,7 +21,7 @@
           <div class="row">
             <div class="col-md-4">
               <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" type="text" value="{{ Carbon\Carbon::now()->format('m/Y') }}" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
             </div>
             <div class="col-md-4">
               <label>Employee:</label>
@@ -29,7 +29,7 @@
             </div>
             <div class="col-md-4">
               <label>Type</label>
-              <select class="form-control" name="type">
+              <select class="form-control" id="typeFilter" name="type">
                   <option value="" disabled selected>Choose your Type</option>
                   <option value="activity">Activity</option>
                   <option value="sampling">Sampling</option>
@@ -37,6 +37,7 @@
             </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
+          <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
         </form>
       </div>
     </div>
@@ -97,6 +98,10 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+ $('#reset').click(function(){
+    $('.js-datepicker').val(null);
+    $('#filterEmployee,#typeFilter').val(null).trigger('change');
+  });
 $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
