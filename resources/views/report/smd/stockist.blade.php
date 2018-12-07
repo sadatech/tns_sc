@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sales SMD Pasar")
+@section('title', "Report Stockist SMD Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sales SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Stockist SMD Pasar <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -19,9 +19,17 @@
       <div class="block-content block-content-full">
         <form method="post" id="filter">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label>Periode:</label>
               <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+            </div>
+            <div class="col-md-4">
+              <label>Employee:</label>
+              <select class="form-control" id="filterEmployee" name="employee"></select>
+            </div>
+            <div class="col-md-4">
+              <label>Pasar:</label>
+              <select class="form-control" id="filterPasar" name="pasar"></select>
             </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
@@ -80,10 +88,29 @@ table.table thead tr th {
 @endsection
 
 @section('script')
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+$('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterPasar').select2(setOptions('{{ route("pasar-select2") }}', 'Choose your Pasar', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",

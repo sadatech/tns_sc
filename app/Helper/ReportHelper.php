@@ -297,7 +297,7 @@ class ReportHelper
     }
 
     public function exportSalesMtc(SummaryFilters $filters){
-        return 
+        return
         (new FastExcel(\App\MtcReportTemplate::filter($filters)))->download('testing.xlsx', function ($item) {
             return [
                 'PERIODE' => $item->getSummary('periode'),

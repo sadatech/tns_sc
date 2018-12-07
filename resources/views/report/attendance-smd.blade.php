@@ -22,14 +22,25 @@
           <div class="row">
             <div class="col-md-6">
               <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}" required>
             </div>
             <div class="col-md-6">
               <label>Employee:</label>
               <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
           </div>
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <label>Pasar:</label>
+              <select class="form-control" id="filterPasar" name="pasar"></select>
+            </div>
+            <div class="col-md-6">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
+          </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
+          <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
         </form>
       </div>
     </div>
@@ -93,7 +104,29 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+  $('#reset').click(function(){
+    $('.js-datepicker').val(null);
+    $('#filterEmployee,#filterPasar,#filterArea').val(null).trigger('change');
+  });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterPasar').select2(setOptions('{{ route("pasar-select2") }}', 'Choose your Pasar', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {

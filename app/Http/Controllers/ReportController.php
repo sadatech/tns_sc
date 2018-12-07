@@ -10,6 +10,7 @@ use App\SalesMtcSummary;
 use App\MtcReportTemplate;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Collection;
+use App\Components\traits\WeekHelper;
 use App\Category;
 use App\Area;
 use App\Account;
@@ -76,6 +77,7 @@ use App\ProductFokusSpg;
 
 class ReportController extends Controller
 {
+    use WeekHelper;
     protected $reportHelper;
 
     public function __construct(ReportHelper $reportHelper)
@@ -470,6 +472,8 @@ class ReportController extends Controller
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
+            return $this->getWeek(Carbon::parse('2018-12-31'));
+            return Carbon::now()->day;
             return $item->employee->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
@@ -484,11 +488,28 @@ class ReportController extends Controller
         ->addColumn('achievement', function($item) use ($periode) {
             return $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
         })
+        ->addColumn('target_focus1', function($item) use ($periode) {
+            return number_format($item->employee->getTarget1(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus1', function($item) use ($periode) {
+            return number_format($item->employee->getActualPf1(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus1', function($item) use ($periode) {
+            return $item->employee->getAchievementPf1(['store' => $item->id_store, 'date' => $periode]);
+        })
+        ->addColumn('target_focus2', function($item) use ($periode) {
+            return number_format($item->employee->getTarget2(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus2', function($item) use ($periode) {
+            return number_format($item->employee->getActualPf2(['store' => $item->id_store, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus2', function($item) use ($periode) {
+            return $item->employee->getAchievementPf2(['store' => $item->id_store, 'date' => $periode]);
+        })
         ->addColumn('growth', function($item) use ($periode) {
             return $item->employee->getGrowth(['store' => $item->id_store, 'date' => $periode]);
         })
         ->addColumn('store_name', function($item) use ($periode) {
-            return $item->store->name1.' -> '.$item->employee->getActualPf(['store' => $item->id_store, 'date' => $periode]);
             return $item->store->name1;
             return $item->employee->getActualPf1(['id_channel' => $item->store->account->id_channel, 'date' => $periode]);
         })
@@ -556,6 +577,24 @@ class ReportController extends Controller
         })
         ->addColumn('achievement', function($item) use ($periode) {
             return $item->getAchievement(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+        })
+        ->addColumn('target_focus1', function($item) use ($periode) {
+            return number_format($item->getTarget1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus1', function($item) use ($periode) {
+            return number_format($item->getActualPf1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus1', function($item) use ($periode) {
+            return $item->getAchievementPf1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+        })
+        ->addColumn('target_focus2', function($item) use ($periode) {
+            return number_format($item->getTarget2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('achievement_focus2', function($item) use ($periode) {
+            return number_format($item->getActualPf2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+        })
+        ->addColumn('percentage_focus2', function($item) use ($periode) {
+            return $item->getAchievementPf2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
         ->addColumn('growth', function($item) use ($periode) {
             return $item->getGrowth(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
@@ -1620,9 +1659,20 @@ class ReportController extends Controller
             $employee->whereHas('attendance.employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
             });
-        } else if ($request->has('periode')) {
+        } 
+         if ($request->has('periode')) {
             $employee->whereMonth('checkin', substr($request->input('periode'), 0, 2));
             $employee->whereYear('checkin', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $employee->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
+         if ($request->has('area')) {
+            $employee->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            });
         }
         $data = array();
         $absen = array();
@@ -1896,9 +1946,17 @@ class ReportController extends Controller
        // ************ DEMO COOKING ************ //
     public function kunjunganDc(Request $request)
     {
-        $plan = PlanDc::with('planEmployee')->whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
-        return Datatables::of($plan)
+        $plan = PlanDc::with('planEmployee')->orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $plan->whereHas('planEmployee.employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $plan->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $plan->whereYear('date', substr($request->input('periode'), 3));
+        } 
+        return Datatables::of($plan->get())
         ->addColumn('action', function ($plan) {
             if (isset($plan->photo)) {
                 $img_url = asset('/uploads/plan')."/".$plan->photo;
@@ -1918,18 +1976,29 @@ class ReportController extends Controller
         })->make(true);
     }
 
-    public function DcSales()
+    public function DcSales(Request $request)
     {
-        $sales = SalesDc::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SalesDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         $data = array();
         $id = 1;
-        foreach ($sales as $value) {
+        foreach ($sales->get() as $value) {
             if ($value->employee->position->level == 'dc') {
                 $data[] = array(
                     'id'        => $id++,
                     'id_sales'  => $value->id,
                     'nama'      => (isset($value->employee->name) ? $value->employee->name : ""),
                     'place'     => (isset($value->place) ? $value->place : ""),
+                    'icip_icip'         => $value->icip_icip ?? "",
+                    'effective_contact' => $value->effective_contact ?? "",
                     'tanggal'   => (isset($value->date) ? $value->date : ""),
                 );
             }
@@ -1994,11 +2063,19 @@ class ReportController extends Controller
 
     public function DcSampling(Request $request)
     {
-        $sales = SamplingDc::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $sales = SamplingDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         $data = array();
         $id = 1;
-        foreach ($sales as $value) {
+        foreach ($sales->get() as $value) {
             if ($value->employee->position->level == 'dc'){
                 $data[] = array(
                     'id'            => $id++,
@@ -2075,12 +2152,24 @@ class ReportController extends Controller
         }
     }
 
-    public function documentationDC()
+    public function documentationDC(Request $request)
     {
         $data = array();
-        $employee = DocumentationDc::whereMonth('date', Carbon::now()->month)->get();
+        $employee = DocumentationDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $employee->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $employee->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $employee->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if ($request->has('type')) {
+            $employee->where('type', $request->input('type'));
+        } 
         $id = 1;
-        foreach ($employee as $val) {
+        foreach ($employee->get() as $val) {
             if ($val->employee->position->level == 'dc') {
                 $data[] = array(
                     'id'    => $id++,
@@ -2142,12 +2231,26 @@ class ReportController extends Controller
 
     public function SMDdistpf(Request $request)
     {
-        $dist = Distribution::whereMonth('date',substr($request->input('periode'), 0, 2))
-        ->whereYear('date',substr($request->input('periode'), 3))->get();
+        
+        $dist = Distribution::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $dist->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $dist->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $dist->whereYear('date', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $dist->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
         $data = array();
         $product = array();
         $id = 1;
-        foreach ($dist as $key => $value) {
+        foreach ($dist->get() as $key => $value) {
             if ($value->employee->position->level == 'mdgtc') {
             $data[] = array(
                 'id'            => $id++,
@@ -2189,11 +2292,24 @@ class ReportController extends Controller
 
     public function SMDsales(Request $request)
     {
-        $sales = SalesMD::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $sales = Distribution::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $sales->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
         $data = array();
         $id = 1;
-        foreach ($sales as $value) {
+        foreach ($sales->get() as $value) {
             if($value->employee->position->level == 'mdgtc'){
                 $data[] = array(
                     'id'            => $id++,
@@ -2246,11 +2362,24 @@ class ReportController extends Controller
 
     public function SMDstockist(Request $request)
     {
-        $stock = StockMD::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $stock = StockMD::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $stock->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $stock->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $stock->whereYear('date', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $stock->whereHas('pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
         $data = array();
         $id = 1;
-        foreach ($stock as $val) {
+        foreach ($stock->get() as $val) {
             if ($val->employee->position->level == 'mdgtc'){
                 $data[] = array(
                     'id'        => $id++,
@@ -2529,9 +2658,10 @@ class ReportController extends Controller
 
 
     // ************ SPG PASAR ************ //
-    public function SPGsales()
+    public function SPGsales(Request $request)
     {
-        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month)->get();
+        $sales = SalesSpgPasar::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         $data = array();
         $product = array();
         $id = 1;
@@ -2577,9 +2707,11 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function SPGrekap()
+    public function SPGrekap(Request $request)
     {
-        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month)->get();
+
+        $rekap = SalesRecap::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3))->get();
         $id = 1;
         $data = array();
         foreach ($rekap as $val) {
@@ -2642,9 +2774,12 @@ class ReportController extends Controller
         }
     }
 
-    public function SPGattendance()
+    public function SPGattendance(Request $request)
     {
-        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month)->get();
+        $employee = AttendancePasar::whereHas('attendance.employee', function($query) use ($request){
+            return $query->where('id_employee', $request->input('employee'));
+        })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
         $data = array();
         $absen = array();
         $id = 1;

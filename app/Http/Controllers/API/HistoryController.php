@@ -181,6 +181,8 @@ class HistoryController extends Controller
 						'phone_for_spg' => $head->phone ?? '',
 						'place' 		=> $head->place ?? '',
 						'id_block' 		=> $head->id_block ?? '',
+						'icip_icip' 			=> $head->icip_icip ?? '',
+						'effevtive_contact' 	=> $head->effevtive_contact ?? '',
 						'block_name' 	=> $head->block->name ?? '',
 						'date' 			=> $head->date,
 						'keterangan' 	=> $head->keterangan,
