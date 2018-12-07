@@ -27,10 +27,6 @@
               <label>Employee:</label>
               <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
-            <div class="col-md-4">
-              <label>Outlet:</label>
-              <select class="form-control" id="filterOutlet" name="employee"></select>
-            </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
           <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
