@@ -30,6 +30,9 @@ class SmdController extends Controller
         $target = TargetGtc::with('employee')
         ->select('target_gtcs.*');
         return Datatables::of($target)
+        ->addColumn('values', function($target){
+            return number_format($target->value_sales,2,',','.');
+        })
         ->addColumn('action', function ($target) {
             $data = array(
                 'id'            => $target->id,
@@ -132,7 +135,7 @@ class SmdController extends Controller
                 'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
             ]);
         } else {
-            return redirect()->route('employee')
+            return redirect()->back()
             ->with([
                 'type'      => 'danger',
                 'title'     => 'Terjadi Kesalahan!<br/>',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Components\traits\WeekHelper;
 use App\DisplayShare;
 use App\DetailDisplayShare;
 use JWTAuth;
@@ -13,6 +14,8 @@ use Carbon\Carbon;
 
 class DisplayShareController extends Controller
 {
+    use WeekHelper;
+
     public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
@@ -61,7 +64,7 @@ class DisplayShareController extends Controller
                                             'id_store' => $content['store'],
                                             'id_employee' => $employee->id,
                                             'date' => Carbon::now(),
-                                            'week' => $content['week'],
+                                            'week' => $this->getWeek(Carbon::now()->toDateString()),
                                         ]);
 
 

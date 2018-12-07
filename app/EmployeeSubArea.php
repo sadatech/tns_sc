@@ -17,6 +17,11 @@ class EmployeeSubArea extends Model
     
     public function subarea()
     {
-		return $this->belongsTo('App\SubArea', 'id_subarea');
+        return $this->belongsTo('App\SubArea', 'id_subarea');
+    }
+
+    public function tes()
+    {
+        return $this->belongsTo('App\SubArea', 'id_subarea');
     }
 }

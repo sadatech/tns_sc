@@ -74,6 +74,9 @@
                                 <a class="{{ request()->is('store/subarea') ? 'active' : '' }}" href="{{ route('subarea') }}">Sub Area</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Root</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('store/channel') ? 'active' : '' }}" href="{{ route('channel') }}">Channel</a>
                             </li>
                             <li>
@@ -127,6 +130,10 @@
                      <li>
                         <a class="{{ request()->is('planDc') ? 'active' : '' }}" href="{{ route('planDc') }}"><i class="fa fa-pied-piper"></i><span class="sidebar-mini-hide">Plan Dc</span></a>
                     </li>
+                    {{-- PropertiDc  --}}
+                     <li>
+                        <a class="{{ request()->is('propertiDc') ? 'active' : '' }}" href="{{ route('propertiDc') }}"><i class="fa fa-suitcase"></i><span class="sidebar-mini-hide">Properti Dc</span></a>
+                    </li>
                     {{-- Product --}}
                     <li class="{{ request()->is('product/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Product(s)</span></a>
@@ -155,9 +162,15 @@
                             <li>
                                 <a class="{{ request()->is('product/fokus') ? 'active' : '' }}" href="{{ route('fokus') }}">Fokus</a>
                             </li>
+                             <li>
+                                <a class="{{ request()->is('product/fokusGTC') ? 'active' : '' }}" href="{{ route('fokusGTC') }}">Fokus GTC</a>
+                            </li>
                             <!-- <li>
                                 <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
                             </li> -->
+                            <li>
+                                <a class="{{ request()->is('product/fokusSpg') ? 'active' : '' }}" href="{{ route('fokusSpg') }}">Fokus SPG Pasar</a>
+                            </li>
                             <!-- <li>
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
@@ -302,25 +315,27 @@
                                     </li>
                                 </ul>
                             </li>
+                        </ul>
+                        <ul>
                             {{-- MOTORIK --}}
                             <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motorik</span></a>
                                 <ul>
-                                    {{-- ATTENDANCE MOTORIK --}}
-                                    <li>
-                                        <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
-                                    </li>
-                                    {{-- DIST PF MOTORIK --}}
-                                    <li>
-                                        <a class="{{ request()->is('report/gtc/motorik/distPF') ? 'active' : '' }}" href="{{ route('report.motorik.distPF') }}"><span class="sidebar-mini-hide">Dist PF</span></a>
-                                    </li>
-                                    {{-- SALES MOTORIK --}}
-                                    <li>
-                                        <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
-                                    </li>
-                                </ul>
+                            {{-- ATTENDANCE MOTORIK --}}
+                            <li>
+                                <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                            </li>
+                            {{-- DIST PF MOTORIK --}}
+                            <li>
+                                <a class="{{ request()->is('report/gtc/motorik/distPF') ? 'active' : '' }}" href="{{ route('report.motorik.distPF') }}"><span class="sidebar-mini-hide">Dist PF</span></a>
+                            </li>
+                            {{-- SALES MOTORIK --}}
+                            <li>
+                                <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
                             </li>
                         </ul>
+                    </li>
+                </ul>
 
                       
                     </li>
@@ -339,7 +354,7 @@
                             </li>
                             {{-- SALES MTC REVIEW --}}
                             <li>
-                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
+                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Achievement MTC</span></a>
                             </li>
                             {{-- Display Share--}}
                             <li>

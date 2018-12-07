@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Promo;
-use App\PromoDetail;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use JWTAuth;
 use Config;
+use Image;
 use DB;
+use App\PromoDetail;
+use App\Promo;
 
 class PromoController extends Controller
 {
@@ -34,16 +35,22 @@ class PromoController extends Controller
 						$imageName 	= time()."_".$image->getClientOriginalName();
 						$path 		= 'uploads/promo';
 						$image->move($path, $imageName);
+						$image_compress = Image::make($path.'/'.$imageName)->orientate();
+						$image_compress->save($path.'/'.$imageName, 50);
 					}
 					if ($image = $request->file('image2')) {
 						$imageName2 = time()."_".$image->getClientOriginalName();
 						$path 		= 'uploads/promo';
 						$image->move($path, $imageName2);
+						$image_compress = Image::make($path.'/'.$imageName2)->orientate();
+						$image_compress->save($path.'/'.$imageName2, 50);
 					}
 					if ($image = $request->file('image3')) {
 						$imageName3 = time()."_".$image->getClientOriginalName();
 						$path 		= 'uploads/promo';
 						$image->move($path, $imageName3);
+						$image_compress = Image::make($path.'/'.$imageName3)->orientate();
+						$image_compress->save($path.'/'.$imageName3, 50);
 					}
 					$promo = Promo::create([
 						'id_employee' 	=> $user->id,

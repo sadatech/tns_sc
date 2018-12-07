@@ -27,13 +27,20 @@ use App\Employee;
 use App\EmployeePasar;
 use App\EmployeeSubArea;
 use App\Pasar;
+use App\Block;
 use App\EmployeeStore;
 use App\Filters\EmployeeFilters;
+use App\Filters\BlockFilters;
 
 class EmployeeController extends Controller
 {
 	public function getDataWithFilters(EmployeeFilters $filters){
 		$data = Employee::filter($filters)->where('isResign', 0)->get();
+		return $data;
+	}
+
+	public function getDataWithFiltersBlock(BlockFilters $filters){
+		$data = Block::filter($filters)->get();
 		return $data;
 	}
 
@@ -347,7 +354,7 @@ class EmployeeController extends Controller
 				$employee->status = $request->input('status');
 			}
 			if ($request->input('position') == Position::where(['level' => 'tlmtc'])->first()->id) {
-				$employee->id_subarea = $request->input('subarea');
+				$employee->employeeSubArea->id_subarea = $request->input('subarea');
 			}
 			if ($request->input('password')) {
 				$employee->password = bcrypt($request->input('password'));
