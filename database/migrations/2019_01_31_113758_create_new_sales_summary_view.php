@@ -24,6 +24,7 @@ class CreateNewSalesSummaryView extends Migration
                     areas.id AS id_area,
                     products.id AS id_product,
                     channels.id AS id_channel,
+                    categories.id AS id_category,
                     channels.name AS channel,
                     mtc_report_templates.date,
                     DATE_FORMAT(mtc_report_templates.date, '%M %Y') AS periode,

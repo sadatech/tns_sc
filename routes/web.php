@@ -630,7 +630,7 @@ Route::prefix('report')->group(function () {
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.spg.sales', $data);
 				})->name('report.sales.spg')->middleware('auth');
-				Route::get('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
+				Route::post('/data', 'ReportController@SPGsales')->name('spg.pasar.sales.data')->middleware('auth');
 				Route::get('/export', 'ReportController@exportSpgSales')->name('spg.pasar.sales.export')->middleware('auth');
 			});
 
@@ -638,7 +638,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.recap');
 				})->name('report.recap.spg')->middleware('auth');
-				Route::get('/data', 'ReportController@SPGrekap')->name('spg.pasar.recap.data')->middleware('auth');
+				Route::post('/data', 'ReportController@SPGrekap')->name('spg.pasar.recap.data')->middleware('auth');
 				Route::get('/export', 'ReportController@exportSPGrekap')->name('spg.pasar.recap.export')->middleware('auth');
 			});
 
@@ -646,7 +646,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.sales-summary');
 				})->name('report.sales.summary.spg')->middleware('auth');
-				Route::post('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
+				Route::get('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
 				Route::post('/exportXLS/{subCategory?}/{date?}', 'ReportController@SPGsalesSummary_exportXLS')->name('spg.pasar.sales.summary.data.exportxls')->middleware('auth');
 			});
 		});

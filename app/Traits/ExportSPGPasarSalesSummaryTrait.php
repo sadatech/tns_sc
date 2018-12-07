@@ -53,8 +53,11 @@ trait ExportSPGPasarSalesSummaryTrait
                 {
                     foreach ($sales_data->product_focus_list as $sales_data_product_focus_list) 
                     {
-                        array_push($dtObj["tmpDtDynamic"], time());
-                        array_push($dtObj["listHeader"], Product::where("id", $sales_data_product_focus_list)->first()->name);
+                        if (!in_array(Product::where("id", $sales_data_product_focus_list)->first()->name, $dtObj["listHeader"]))
+                        {
+                            array_push($dtObj["tmpDtDynamic"], time());
+                            array_push($dtObj["listHeader"], Product::where("id", $sales_data_product_focus_list)->first()->name);
+                        }
                     }
                 }
                 $dtObj["listHeader"] = array_merge($dtObj["listHeader"], ["Sales Other", "Sales Product Fokus", "Total Value", "Keterangan"]);
@@ -85,9 +88,13 @@ trait ExportSPGPasarSalesSummaryTrait
                     ];
                     foreach ($sales_data->detail as $sales_data_product_focus_list) 
                     {
-                        array_push($dtObj["dataValue"][$sales_key], ($sales_data_product_focus_list));
+                        array_push($dtObj["dataValue"][$sales_key], number_format($sales_data_product_focus_list));
                     }
-                    $dtObj["dataValue"][$sales_key] = array_merge($dtObj["dataValue"][$sales_key], [$sales_data->sales_other, $sales_data->sales_pf, $sales_data->total_value, ""]);
+                    $dtObj["dataValue"][$sales_key] = array_merge($dtObj["dataValue"][$sales_key], [
+                        number_format($sales_data->sales_other),
+                        number_format($sales_data->sales_pf),
+                        number_format($sales_data->total_value),
+                        ""]);
                 }
 
                 // create title
@@ -146,7 +153,8 @@ trait ExportSPGPasarSalesSummaryTrait
                 $startRow = 3;
                 foreach ($dtObj["dataValue"] as $__dataValue)
                 {
-                    $sheet->row(($startRow + 1), $__dataValue);
+                    $startRow++;
+                    $sheet->row($startRow, $__dataValue);
                 }
 
                 // center tanggal

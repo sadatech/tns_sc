@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class AttendanceOutlet extends Model
 {
@@ -36,5 +37,10 @@ class AttendanceOutlet extends Model
         $array = parent::toArray();
         $array['outlet_name'] = $this->outlet->name;
         return $array;
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }
