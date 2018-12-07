@@ -110,9 +110,9 @@ class PriceController extends Controller
                     'Rilis'         => (isset($val->rilis) ? $val->rilis : "-")
                 );
             }
-            $filename = "Market_".Carbon::now().".xlsx";
+            $filename = "PriceProduct_".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
-                $excel->sheet('Market', function($sheet) use ($data)
+                $excel->sheet('PriceProduct', function($sheet) use ($data)
                 {
                     $sheet->fromArray($data);
                 });
@@ -173,14 +173,14 @@ class PriceController extends Controller
                         return redirect()->back()->with([
                             'type' => 'danger',
                             'title' => 'Gagal!<br/>',
-                            'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah Target SMD Pasar!'
+                            'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah Target Product!'
                         ]);
                     }
                 }, false);
                 return redirect()->back()->with([
                     'type' => 'success',
                     'title' => 'Sukses!<br/>',
-                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Target SMD Pasar!'
+                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Price Product!'
                 ]);
             } else {
                 DB::rollback();
