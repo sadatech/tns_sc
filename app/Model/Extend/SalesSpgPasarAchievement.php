@@ -24,7 +24,7 @@ class SalesSpgPasarAchievement extends SalesSpgPasar
         return $this->employee->name;
     }
 
-   	public function getHkAttribute(){
+       public function getHkAttribute(){
         return SalesSpgPasar::whereMonth('date', Carbon::parse($this->date)->month)
                             ->whereYear('date', Carbon::parse($this->date)->year)
                             ->groupBy('date')
@@ -52,7 +52,7 @@ class SalesSpgPasarAchievement extends SalesSpgPasar
         $data = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
                                 // ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
                                 ->join('prices', function($join){
-                                    return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null)"));
+                                    return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null LIMIT 1)"));
                                 })
                                 ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
                                 // ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
@@ -72,7 +72,7 @@ class SalesSpgPasarAchievement extends SalesSpgPasar
         $data = SalesSpgPasar::join('sales_spg_pasar_details', 'sales_spg_pasars.id', 'sales_spg_pasar_details.id_sales')
                                 // ->join('prices', 'prices.id_product', 'sales_spg_pasar_details.id_product')
                                 ->join('prices', function($join){
-                                    return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null)"));
+                                    return $join->on('prices.id_product', 'sales_spg_pasar_details.id_product')->where('prices.rilis', DB::raw("(SELECT MAX(rilis) FROM prices WHERE id_product = sales_spg_pasar_details.id_product AND deleted_at is null LIMIT 1)"));
                                 })
                                 ->whereDate('sales_spg_pasars.date', Carbon::parse($this->date))
                                 // ->whereDate('prices.rilis', '<=', Carbon::parse($this->date))
