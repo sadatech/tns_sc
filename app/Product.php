@@ -53,6 +53,11 @@ class Product extends Model
     	return $this->hasMany('App\FokusProduct', 'id_product');
     }
 
+    public function fokusGTC()
+    {
+    	return $this->hasMany('App\ProductFokusGtc', 'id_product');
+    }
+
     public function subcategory()
     {
         return $this->belongsTo('App\SubCategory', 'id_subcategory');
