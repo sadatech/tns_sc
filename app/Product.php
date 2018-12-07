@@ -77,6 +77,11 @@ class Product extends Model
         return $this->hasMany('App\ProductMeasure', 'id_product');
     }
 
+    public function fokusMtc()
+    {
+        return $this->hasMany('App\ProductFokusMtc', 'id_product');
+    }
+
     public function sku_units()
     {
         return $this->hasMany(ProductUnit::class);
