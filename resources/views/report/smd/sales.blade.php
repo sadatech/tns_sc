@@ -110,15 +110,6 @@ $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choo
       })
     }
   }));
-  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
-    return filterData('name', params.term);
-  }, function (data, params) {
-    return {
-      results: $.map(data, function (obj) {                                
-        return {id: obj.id, text: obj.name}
-      })
-    }
-  }));
     $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
