@@ -112,9 +112,9 @@
 </div>
 
 {{-- ADD PRODUCT MODAL --}}
-@include('product._form_focus', ['action' => route('fokus.add'), 'id' => 'tambahModal'])
-
-@include('product._form_focus', ['id' => 'editModal', 'type' => 'edit'])
+@include('product._form_focus_mtc', ['id' => 'editModal', 'type' => 'edit'])
+{{-- MODAL ADD FOCUS --}}
+@include('product._form_focus_mtc', ['id' => 'tambahModal', 'action' => route('fokusMtc.add')])
 @endsection
 
 @section('css')

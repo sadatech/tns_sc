@@ -39,130 +39,91 @@ class ProductFokusMtcController extends Controller
 	public function data()
 	{
 		$fokus = ProductFokusMtc::get();
-		$data = array();
+		$product = array();
 		$id = 1;
 		foreach ($fokus as $doto) {
-			$data[] = array([
+			$product[] = array(
 				'id' => $id++,
 				'id_pf' => $doto->id,
-				'from' => $doto->id,
-				'to' => $doto->id,
+				'id_channel' => $doto->id_channel,
+				'id_area' => $doto->id_area,
+				'id_product' => $doto->id_product,
+				'from' => $doto->from,
+				'until' => $doto->to,
 				'product' => (isset($doto->product->name) ? $doto->product->name : "-"),
 				'channel' => (isset($doto->channel->name) ? $doto->channel->name : "-"),
 				'area' => (isset($doto->area->name) ? $doto->area->name : "-"),
-			]);
+			);
 		}
-		return Datatables::of(collect($data))
-		->addColumn('action', function ($fokus) {
-			$product = ProductFokusMtc::where('id', $fokus['id'])->first();
+		return Datatables::of($product)
+		->addColumn('action', function ($product) {
 			$data = array(
-				'id'            => $fokus['id'],
-				'product'       => FokusProductMtc::where('id_pf',$product->id)->pluck('id_product'),
-				'area'          => FokusArea::where('id_pf',$product->id)->pluck('id_area'),
-				'from'          => $product->from,
-				'to'          	=> $product->to,
-				'channel'       => FokusChannel::where('id_pf',$product->id)->pluck('id_channel')
+				'id'            => $product['id_pf'],
+				'product'     	=> (isset($product['id_product']) ? $product['id_product'] : ""),
+				'channel'     	=> (isset($product['id_channel']) ? $product['id_channel'] : ""),
+				'area'     	    => (isset($product['id_area']) ? $product['id_area'] : ""),
+				'from'          => $product['from'],
+				'to'          	=> $product['until']
 			);
 			return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-			<button data-url=".route('fokus.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
-		})
-		->make(true);
+			<button data-url=".route('fokusMtc.delete', $product['id_pf'])." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+		})->make(true);
 	}
 
 	public function store(Request $request)
 	{
 		$data = $request->all();
-		$validator = ProductFokusMtc::validator($data);
-		if ($validator->fails()) {
-			return redirect()->back()
-			->withErrors($validator)
-			->withInput();
+
+		if (($validator = ProductFokusMtc::validate($data))->fails()) {
+			return redirect()->back()->withErrors($validator)->withInput();
+		}
+
+		$from = explode('/', $data['from']);
+		$data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
+		$to = explode('/', $data['to']);
+		$data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
+
+		if (ProductFokusMtc::hasActivePF($data)) {
+			$this->alert['type'] = 'warning';
+			$this->alert['title'] = 'Warning!<br/>';
+			$this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus MTC sudah ada!';
 		} else {
 			ProductFokusMtc::create($data);
-			$alert['type']		= 'success';
-			$alert['title']		= 'Sukses!<br/>';
-			$alert['message']	= '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Product Fokus!';
+			$this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus MTC!';
 		}
 		return redirect()->back()->with($this->alert);
 	}
 
 	public function update(Request $request, $id)
 	{
-		$data=$request->all();
-		$limit=[
-			'from'          => 'required',
-			'to'            => 'required',
-			'product'       => 'required',
-			'channel'       => 'required'
-		];
-		$validator = Validator($data, $limit);
-		if ($validator->fails()){
-			return redirect()->back()
-			->withErrors($validator)
-			->withInput();
-		} else {
-			$fokus = ProductFokus::find($id);
-			if ($request->input('product')) {
-				foreach ($request->input('product') as $product) {
-					FokusProduct::where('id_pf', $id)->delete();
-					$dataProduct[] = array(
-						'id_product'        => $product,
-						'id_pf'             => $id,
-					);
-				}
-				DB::table('fokus_products')->insert($dataProduct);
-			}
-			if ($request->input('channel')) {
-				foreach ($request->input('channel') as $channel) {
-					FokusChannel::where('id_pf', $id)->delete();
-					$dataChannel[] = array(
-						'id_channel'        => $channel,
-						'id_pf'             => $id,
-					);
-				}
-				DB::table('fokus_channels')->insert($dataChannel);
-			}
-			if (!empty($request->input('area'))) {
-				foreach ($request->input('area') as $area) {
-					FokusChannel::where('id_pf', $id)->delete();
-					$dataArea[] = array(
-						'id_pf'         => $fokus->id,
-						'id_area'       => $area
-					);
-				}
-				DB::table('fokus_areas')->insert($dataArea);
-			}
+		$data = $request->all();
+		$product = ProductFokusMtc::findOrFail($id);
 
-
-                // if ($request->input('to')) {
-                //     $to = Carbon::createFromFormat('d/m/Y','28/'.$request->input('to'))->endOfMonth()->format('d/m/Y');
-                // } else {
-                //     $to = null;
-                // }
-                // if ($request->input('from')) {
-                //     $from = Carbon::createFromFormat('d/m/Y','01/'.$request->input('from'))->endOfMonth()->format('m/Y');
-                // } else {
-                //     $from = null;
-                // }
-			$from = explode('/', $data['from']); 
-			$to = explode('/', $data['to']);
-			$data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
-			$data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
-			$fokus->fill($data)->save();
-			return redirect()->back()
-			->with([
-				'type'    => 'success',
-				'title'   => 'Sukses!<br/>',
-				'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Product Fokus!'
-			]);
+		if (($validator = $product->validate($data))->fails()) {
+			return redirect()->back()->withErrors($validator)->withInput();
 		}
+
+		$from = explode('/', $data['from']); 
+		$to = explode('/', $data['to']);
+		$data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
+		$data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
+
+		if (ProductFokusMtc::hasActivePF($data, $product->id)) {
+			$this->alert['type'] = 'warning';
+			$this->alert['title'] = 'Warning!<br/>';
+			$this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus MTC sudah ada!';
+		} else {
+			$product->fill($data)->save();
+			$this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus MTC!';
+		}
+		return redirect()->back()->with($this->alert);
 	}
 
 
 
 	public function delete($id)
 	{
-		$product = ProductFokus::find($id);
+		$product = ProductFokusMtc::find($id);
 		$product->delete();
 		return redirect()->back()
 		->with([
