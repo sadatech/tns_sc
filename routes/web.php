@@ -331,6 +331,10 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'PriceController@update')->name('price.update')->middleware('auth');
 		Route::get('/export', 'PriceController@exportXLS')->name('price.export')->middleware('auth');
 		Route::get('/delete/{id}', 'PriceController@delete')->name('price.delete')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/PriceImport.xlsx'));
+		})->name('price.download-template')->middleware('auth');
 	});
 
 	//Promo Pages
