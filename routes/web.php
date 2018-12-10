@@ -361,6 +361,20 @@ Route::prefix('product')->group(function () {
 		})->name('fokus.download-template')->middleware('auth');
 	});
 
+	Route::prefix('fokus-mtc')->group(function () {
+		Route::get('/', 'ProductFokusMtcController@baca')->name('fokusMtc')->middleware('auth');
+		Route::get('/data', 'ProductFokusMtcController@data')->name('fokusMtc.data')->middleware('auth');
+		Route::post('/create', 'ProductFokusMtcController@store')->name('fokusMtc.add')->middleware('auth');
+		Route::put('/update/{id}', 'ProductFokusMtcController@update')->name('fokusMtc.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductFokusMtcController@delete')->name('fokusMtc.delete')->middleware('auth');
+		Route::get('/export', 'ProductFokusMtcController@export')->name('fokusMtc.export')->middleware('auth');
+		Route::post('/import', 'ProductFokusMtcController@importXLS')->name('fokusMtc.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/ProductFokusImport.xlsx'));
+		})->name('fokusMtc.download-template')->middleware('auth');
+	});
+
 	//Fokus MD Pages
 	Route::prefix('fokusMD')->group(function () {
 		Route::get('/', 'ProductFokusMdController@baca')->name('fokusMD')->middleware('auth');
@@ -378,13 +392,13 @@ Route::prefix('product')->group(function () {
 
 	//Fokus GTC Pages
 	Route::prefix('fokusGTC')->group(function () {
-		Route::get('/', 'ProductFokusGTCController@baca')->name('fokusGTC')->middleware('auth');
-		Route::get('/data', 'ProductFokusGTCController@data')->name('fokusGTC.data')->middleware('auth');
-		Route::post('/create', 'ProductFokusGTCController@store')->name('fokusGTC.add')->middleware('auth');
-		Route::post('/import', 'ProductFokusGTCController@import')->name('fokusGTC.import')->middleware('auth');
-		Route::get('/export', 'ProductFokusGTCController@export')->name('fokusGTC.export')->middleware('auth');
-		Route::put('/update/{id}', 'ProductFokusGTCController@update')->name('fokusGTC.update')->middleware('auth');
-		Route::get('/delete/{id}', 'ProductFokusGTCController@delete')->name('fokusGTC.delete')->middleware('auth');
+		Route::get('/', 'ProductFokusGtcController@baca')->name('fokusGTC')->middleware('auth');
+		Route::get('/data', 'ProductFokusGtcController@data')->name('fokusGTC.data')->middleware('auth');
+		Route::post('/create', 'ProductFokusGtcController@store')->name('fokusGTC.add')->middleware('auth');
+		Route::post('/import', 'ProductFokusGtcController@import')->name('fokusGTC.import')->middleware('auth');
+		Route::get('/export', 'ProductFokusGtcController@export')->name('fokusGTC.export')->middleware('auth');
+		Route::put('/update/{id}', 'ProductFokusGtcController@update')->name('fokusGTC.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductFokusGtcController@delete')->name('fokusGTC.delete')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/FokusMDImport.xlsx'));
