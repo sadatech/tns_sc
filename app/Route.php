@@ -17,6 +17,6 @@ class Route extends Model
  	
  	public function block()
     {
-    	return $this->hasMany('App\Block', 'id_block');
+    	return $this->hasMany('App\Block', 'id_route');
     }   
 }
