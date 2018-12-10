@@ -58,6 +58,11 @@ class Product extends Model
         return $this->belongsTo('App\SubCategory', 'id_subcategory');
     }
 
+    public function productcategory()
+    {
+        return $this->subcategory->category();
+    }
+
     public function brand()
     {
         return $this->belongsTo('App\Brand', 'id_brand');

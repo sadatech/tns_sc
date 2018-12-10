@@ -36,9 +36,16 @@ class ProductFokusSpgController extends Controller
         $product = ProductFokusSpg::with('product')->with('employee')
         ->select('product_fokus_spgs.*');
         return Datatables::of($product)
+        ->addColumn('category_product', function($product) {
+            $category = $product->product->subcategory->category->name;
+            $product = $product->product->name;
+            $category_product = $category.' - '.$product;
+            return $category_product;
+        })
         ->addColumn('action', function ($product) {
             $data = array(
                 'id'            => $product->id,
+                'category'      => $product->product->subcategory->category->id,
                 'employee'      => $product->employee->id,
                 'product'     	=> $product->product->id,
                 'from'          => $product->from,
@@ -101,16 +108,16 @@ class ProductFokusSpgController extends Controller
             $data['to'][$key] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
         }
 
-        if (ProductFokusSpg::hasActivePF($data, $product->id)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus SPG sudah ada!';
-        } else {
+        // if (ProductFokusSpg::hasActivePF($data, $product->id)) {
+        //     $this->alert['type'] = 'warning';
+        //     $this->alert['title'] = 'Warning!<br/>';
+        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus SPG sudah ada!';
+        // } else {
 
-            $productNot = ProductFokusSpg::where('id_employee',$data['id_employee'])->whereNotIn('id_product', $data['id_product'])->pluck('product_fokus_spgs.id');
-            foreach ($productNot as $produk_id) {
-                ProductFokusSpg::where('id', $produk_id)->delete();
-            }
+            // $productNot = ProductFokusSpg::where('id_employee',$data['id_employee'])->whereNotIn('id_product', $data['id_product'])->pluck('product_fokus_spgs.id');
+            // foreach ($productNot as $produk_id) {
+            //     ProductFokusSpg::where('id', $produk_id)->delete();
+            // }
 
             foreach ($data['id_product'] as $key => $id_product){
                 $pfSpg = ProductFokusSpg::where('id_employee', $data['id_employee'])->where('id_product',$id_product)->first();
@@ -122,7 +129,7 @@ class ProductFokusSpgController extends Controller
                     ]);
             }
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus SPG!';
-        }
+        // }
 
         return redirect()->back()->with($this->alert);
     }
