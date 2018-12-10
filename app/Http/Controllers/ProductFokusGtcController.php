@@ -27,7 +27,7 @@ class ProductFokusGtcController extends Controller
     {
         $data['product']  = Product::get();
         $data['area']   = Area::get();
-        return view('product.productGTC', $data);
+        return view('product.productGtc', $data);
     }
 
     public function data()
