@@ -107,7 +107,7 @@ class BlockController extends Controller
 							'phone' 		=> $data->phone,
 							'address'		=> $data->address,
 							'id_route' 		=> $data->id_route,
-							'route_name' 	=> $data->route->name,
+							'route_name' 	=> $data->route->name ?? null,
 						);
 					}
 					$res['block'] = $listBlock;
