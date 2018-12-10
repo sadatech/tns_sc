@@ -331,6 +331,10 @@ Route::prefix('product')->group(function () {
 		Route::put('/update/{id}', 'PriceController@update')->name('price.update')->middleware('auth');
 		Route::get('/export', 'PriceController@exportXLS')->name('price.export')->middleware('auth');
 		Route::get('/delete/{id}', 'PriceController@delete')->name('price.delete')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/PriceImport.xlsx'));
+		})->name('price.download-template')->middleware('auth');
 	});
 
 	//Promo Pages
@@ -366,6 +370,21 @@ Route::prefix('product')->group(function () {
 		Route::get('/export', 'ProductFokusMdController@export')->name('fokusMD.export')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusMdController@update')->name('fokusMD.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusMdController@delete')->name('fokusMD.delete')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/FokusMDImport.xlsx'));
+		})->name('fokusMD.download-template')->middleware('auth');
+	});
+
+	//Fokus GTC Pages
+	Route::prefix('fokusGTC')->group(function () {
+		Route::get('/', 'ProductFokusGTCController@baca')->name('fokusGTC')->middleware('auth');
+		Route::get('/data', 'ProductFokusGTCController@data')->name('fokusGTC.data')->middleware('auth');
+		Route::post('/create', 'ProductFokusGTCController@store')->name('fokusGTC.add')->middleware('auth');
+		Route::post('/import', 'ProductFokusGTCController@import')->name('fokusGTC.import')->middleware('auth');
+		Route::get('/export', 'ProductFokusGTCController@export')->name('fokusGTC.export')->middleware('auth');
+		Route::put('/update/{id}', 'ProductFokusGTCController@update')->name('fokusGTC.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductFokusGTCController@delete')->name('fokusGTC.delete')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/FokusMDImport.xlsx'));

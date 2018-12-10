@@ -2660,12 +2660,25 @@ class ReportController extends Controller
     // ************ SPG PASAR ************ //
     public function SPGsales(Request $request)
     {
-        $sales = SalesSpgPasar::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
+        $sales = SalesSpgPasar::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+        if ($request->has('pasar')) {
+            $sales->whereHas('pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
+        if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         $data = array();
         $product = array();
         $id = 1;
-        foreach ($sales as $key => $value) {
+        foreach ($sales->get() as $key => $value) {
             if ($value->employee->position->level = 'spggtc') {
                 $data[] = array(
                     'id' => $id++,
@@ -2709,12 +2722,19 @@ class ReportController extends Controller
 
     public function SPGrekap(Request $request)
     {
-
-        $rekap = SalesRecap::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('date', substr($request->input('periode'), 3))->get();
+        $rekap = SalesRecap::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $rekap->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+        if ($request->has('periode')) {
+            $rekap->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $rekap->whereYear('date', substr($request->input('periode'), 3));
+        }
         $id = 1;
         $data = array();
-        foreach ($rekap as $val) {
+        foreach ($rekap->get() as $val) {
             if ($val->employee->position->level == 'spggtc') {
                 $data[] = array(
                     'id' => $id++,
