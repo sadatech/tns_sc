@@ -52,7 +52,7 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.distpf.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="summaryTable">
@@ -194,6 +194,16 @@ table.table thead tr th {
           //   "ordering": false
           // });
 
+        $("#btnDownloadXLS").on("click", function(){
+          $.ajax({
+            url: $(this).attr("target-url"),
+            type: "post",
+            success: function(e){
+              alert(e.result);
+            }
+          });
+        });
+
     });
       
 
@@ -230,6 +240,8 @@ table.table thead tr th {
         },
         success:function(response) {
           console.log(response);
+
+          $("#btnDownloadXLS").attr("target-url", "{{ route('spg.pasar.sales.summary.data.exportxls') }}" + "/" + $('#filterSubCategory').val() + "/" + $('#filterMonth').val());
 
           // filteringReportWithoutSearch([table, $('#'+table), url, tableColumns, columnDefs, order, exportButton]);
 

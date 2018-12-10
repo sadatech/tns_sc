@@ -157,78 +157,79 @@ class ProductFokusController extends Controller
         return redirect()->back()->with($this->alert);
     }
 
-    public function update(Request $request, $id) 
+    public function update(Request $request, $id)
     {
-        $data = $request->all();
-        $product = ProductFokus::findOrFail($id);
-
-        if (($validator = $product->validate($data))->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+        $data=$request->all();
+        $limit=[
+            'from'          => 'required',
+            'to'            => 'required',
+            'product'       => 'required',
+            'channel'       => 'required'
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+        } else {
+            $fokus = ProductFokus::find($id);
+                if ($request->input('product')) {
+                    foreach ($request->input('product') as $product) {
+                        FokusProduct::where('id_pf', $id)->delete();
+                        $dataProduct[] = array(
+                            'id_product'        => $product,
+                            'id_pf'             => $id,
+                        );
+                    }
+                    DB::table('fokus_products')->insert($dataProduct);
+                }
+                if ($request->input('channel')) {
+                    foreach ($request->input('channel') as $channel) {
+                        FokusChannel::where('id_pf', $id)->delete();
+                        $dataChannel[] = array(
+                            'id_channel'        => $channel,
+                            'id_pf'             => $id,
+                        );
+                    }
+                    DB::table('fokus_channels')->insert($dataChannel);
+                }
+                if (!empty($request->input('area'))) {
+                    foreach ($request->input('area') as $area) {
+                        FokusChannel::where('id_pf', $id)->delete();
+                        $dataArea[] = array(
+                            'id_pf'         => $fokus->id,
+                            'id_area'       => $area
+                        );
+                    }
+                    DB::table('fokus_areas')->insert($dataArea);
+                }
+              
+        
+                // if ($request->input('to')) {
+                //     $to = Carbon::createFromFormat('d/m/Y','28/'.$request->input('to'))->endOfMonth()->format('d/m/Y');
+                // } else {
+                //     $to = null;
+                // }
+                // if ($request->input('from')) {
+                //     $from = Carbon::createFromFormat('d/m/Y','01/'.$request->input('from'))->endOfMonth()->format('m/Y');
+                // } else {
+                //     $from = null;
+                // }
+                $from = explode('/', $data['from']); 
+                $to = explode('/', $data['to']);
+                $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
+                $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
+                $fokus->fill($data)->save();
+                return redirect()->back()
+                ->with([
+                    'type'    => 'success',
+                    'title'   => 'Sukses!<br/>',
+                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Product Fokus!'
+                ]);
         }
-
-        $from = explode('/', $data['from']); 
-        $to = explode('/', $data['to']);
-        $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
-        $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
-
-        // if (ProductFokus::hasActivePF($data, $product->id)) {
-        //     $this->alert['type'] = 'warning';
-        //     $this->alert['title'] = 'Warning!<br/>';
-        //     $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus sudah ada!';
-        // } else {
-        DB::transaction(function () use($product, $data) {
-            $channel = $data['channel'];
-            unset($data['channel']);
-            $sku = $data['product'];
-            unset($data['sku']);
-            $area = (isset($data['area']) ? $data['area'] : null);
-            unset($data['area']);
-            $product->fill($data)->save();
-
-            $oldChanel = $product->fokus->pluck('id_channel');
-            $deleteChannel = $oldChanel->diff($channel);
-            $oldProduct = $product->fokus->pluck('id_product');
-            $deleteProduct = $oldProduct->diff($sku);
-            foreach ($deleteProduct as $deleteProduct) {
-                FokusProduct::where([
-                    'id_pf'         => $product->id,
-                    'id_product'    => $deleteProduct])->delete(); 
-            }
-
-            foreach ($sku as $product_id) {
-                FokusProduct::updateOrCreate([
-                    'id_pf'         => $product->id,
-                    'id_product'    => $product_id
-                ]);
-            }
-            FokusArea::where([
-                'id_pf'         => $product->id])->delete(); 
-            if (!empty($area)) {
-                foreach ($area as $area_id) {
-                    FokusArea::updateOrCreate([
-                        'id_pf'         => $product->id,
-                        'id_area'       => $area_id
-                    ]);
-                } 
-            }
-            foreach ($deleteChannel as $deleted_id) {
-                FokusChannel::where([
-                    'id_pf'         => $product->id,
-                    'id_channel'    => $deleted_id])->delete(); 
-            }
-
-            foreach ($channel as $channel_id) {
-                FokusChannel::updateOrCreate([
-                    'id_pf'         => $product->id,
-                    'id_channel'       => $channel_id
-                ]);
-            }
-        });
-        $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah product fokus!';
-        // }
-
-        return redirect()->back()->with($this->alert);
     }
+ 
+   
 
     public function delete($id)
     {
