@@ -727,6 +727,13 @@ Route::prefix('report')->group(function () {
 				})->name('report.demo.cashAdvance')->middleware('auth');
 			});
 
+			Route::prefix('inventori')->group(function(){
+				Route::get('/', function(){
+					return view('report.democooking.inventori');
+				})->name('report.demo.inventori')->middleware('auth');
+				Route::any('/data', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
+			});
+
 		});
 
 		// Motorik Report
