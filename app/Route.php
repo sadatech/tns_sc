@@ -14,5 +14,9 @@ class Route extends Model
     {
         return $this->belongsTo('App\SubArea', 'id_subarea');
     }
-    
+ 	
+ 	public function block()
+    {
+    	return $this->hasMany('App\Block', 'id_block');
+    }   
 }
