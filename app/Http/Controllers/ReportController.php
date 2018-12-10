@@ -74,6 +74,8 @@ use App\Model\Extend\SalesSpgPasarAchievement;
 use App\Model\Extend\SalesSpgPasarSummary;
 use App\SubCategory;
 use App\ProductFokusSpg;
+use App\ReportInventori;
+use App\PropertiDc;
 
 class ReportController extends Controller
 {
@@ -2287,6 +2289,22 @@ class ReportController extends Controller
                 'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
             ]);
         }
+    }
+
+    public function inventoriDC()
+    {
+        $data = ReportInventori::get();
+        return Datatables::of(collect($data))
+        ->addColumn("employee", function($item){
+            return Employee::where("id", $item->id_employee)->first()->name;
+        })
+        ->addColumn("item", function($item){
+            return PropertiDc::where("id", $item->id_properti_dc)->first()->item;
+        })
+        ->addColumn("dokumentasi", function($item){
+            return (isset($item->photo) ? "<img src='".$item->photo."'>" : "-");
+        })
+        ->make(true);
     }
 
     public function SMDdistpf(Request $request)

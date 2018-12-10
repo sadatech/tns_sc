@@ -313,6 +313,10 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/demo/cashAdvance') ? 'active' : '' }}" href="{{ route('report.demo.cashAdvance') }}"><span class="sidebar-mini-hide">Cash Advance</span></a>
                                     </li>
+                                    {{-- Inventori --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/demo/inventori') ? 'active' : '' }}" href="{{ route('report.demo.inventori') }}"><span class="sidebar-mini-hide">Inventori</span></a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
