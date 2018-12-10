@@ -81,7 +81,7 @@ class ProductController extends Controller
 					$area 	= (strtoupper($type) == 'PASAR') ? Pasar::where('id',$id)->first()->subarea->id_area : SubArea::where('id',$id)->first()->id_area;
 					
 					$pf 	= ProductFokusGtc::with(['product'])
-					->whereRaw("'$today' BETWEEN product_fokus_gtcs.from and to")
+					->whereRaw("'$today' BETWEEN product_fokus_gtcs.from and product_fokus_gtcs.to")
 					->where( function($query) use ($area)
 					{
 						return $query->whereNull('id_area')->orWhere('id_area', $area);
