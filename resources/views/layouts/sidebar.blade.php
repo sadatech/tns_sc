@@ -165,9 +165,12 @@
                              <li>
                                 <a class="{{ request()->is('product/fokusGTC') ? 'active' : '' }}" href="{{ route('fokusGTC') }}">Fokus GTC</a>
                             </li>
-                            <!-- <li>
+                             <li>
+                                <a class="{{ request()->is('product/fokus-mtc') ? 'active' : '' }}" href="{{ route('fokusMtc') }}">Fokus MTC</a>
+                            </li>
+                            {{-- <li>
                                 <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
-                            </li> -->
+                            </li> --}}
                             <li>
                                 <a class="{{ request()->is('product/fokusSpg') ? 'active' : '' }}" href="{{ route('fokusSpg') }}">Fokus SPG Pasar</a>
                             </li>
