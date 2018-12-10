@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Product;
-use App\ProductFokus;
+use App\ProductFokusGtc;
 use App\FokusArea;
 use App\FokusChannel;
 use App\Pasar;
@@ -80,29 +80,17 @@ class ProductController extends Controller
 					$today 	= Carbon::today()->toDateString();
 					$area 	= (strtoupper($type) == 'PASAR') ? Pasar::where('id',$id)->first()->subarea->id_area : SubArea::where('id',$id)->first()->id_area;
 					
-					$pf 	= ProductFokus::with(['fokusproduct.product'])
-					->whereHas('Fokus.channel', function($query)
+					$pf 	= ProductFokusGtc::with(['product'])
+					->whereRaw("'$today' BETWEEN product_fokus_gtcs.from and to")
+					->where( function($query) use ($area)
 					{
-						return $query->where('name','GTC');
-					})->whereRaw("'$today' BETWEEN product_fokuses.from and product_fokuses.to")
+						return $query->whereNull('id_area')->orWhere('id_area', $area);
+					})
 					->get();
 
 					$product= [];
 					foreach ($pf as $key => $value) {
-						$areas__ = FokusArea::where('id_pf',$value->id)->get();
-						if ($areas__->count() == 0) {
-							foreach ($value->fokusproduct as $value2) {
-								$product[] = $value2->product;
-							}
-						}else{
-							foreach ($areas__ as $key2 => $value2) {
-								if ($value2->id_area == $area) {
-									foreach ($value->fokusproduct as $value3) {
-										$product[] = $value3->product;
-									}
-								}
-							}
-						}
+						$product[] = $value->product;
 					}
 					if (sizeof($product) > 0) {
 						$dataArr = array();
