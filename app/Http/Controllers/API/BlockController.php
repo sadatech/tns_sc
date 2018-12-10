@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Components\traits\ApiAuthHelper;
 use App\Block;
-use App\SubArea;
+use App\Route;
 use Carbon\Carbon;
 use JWTAuth;
 use Config;
@@ -24,13 +24,13 @@ class BlockController extends Controller
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
-			if (empty($request->name) || empty($request->subarea) ) {
+			if (empty($request->name) || empty($request->route) ) {
 				$res['success'] = false;
-				$res['msg'] = "Sub Area and Name cannot be empty.";
+				$res['msg'] = "Root and Name cannot be empty.";
 			} else {
-				if (!empty(SubArea::find($request->subarea))) {
+				if (!empty(Route::find($request->route))) {
 					$insert = Block::create([
-						'id_subarea'	=> $request->subarea,
+						'id_route'	=> $request->route,
 						'id_employee'	=> $user->id,
 						'name'			=> $request->name,
 						'phone'			=> $request->phone,
@@ -46,7 +46,7 @@ class BlockController extends Controller
 					}
 				} else {
 					$res['success'] = false;
-					$res['msg'] 	= "Sub Area tidak bisa ditermukan.";
+					$res['msg'] 	= "Root undefined.";
 				}
 			}
 		}else{
@@ -106,8 +106,8 @@ class BlockController extends Controller
 							'name' 			=> $data->name,
 							'phone' 		=> $data->phone,
 							'address'		=> $data->address,
-							'id_subarea' 	=> $data->subarea->id,
-							'subarea_name' 	=> $data->subarea->name,
+							'id_route' 	=> $data->route->id,
+							'route_name' 	=> $data->route->name,
 						);
 					}
 					$res['block'] = $listBlock;
