@@ -24,8 +24,13 @@ class Area extends Model
     
     public function subareas()
     {
-    	return $this->hasMany('App\SubArea', 'id_area');
+        return $this->hasMany('App\SubArea', 'id_area');
     }  
+    
+    public function fokusMtc()
+    {
+        return $this->hasMany('App\ProductFokusMtc', 'id_area');
+    }
 
     public function productfocus()
     {

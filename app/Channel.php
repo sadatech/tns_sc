@@ -24,6 +24,11 @@ class Channel extends Model
 
     public function Fokus()
     {
-    	return $this->hasMany('App\FokusChannel', 'id_channel');
+        return $this->hasMany('App\FokusChannel', 'id_channel');
+    }
+
+    public function fokusMtc()
+    {
+        return $this->hasMany('App\ProductFokusMtc', 'id_channel');
     }
 }
