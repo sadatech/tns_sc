@@ -106,7 +106,7 @@ class BlockController extends Controller
 							'name' 			=> $data->name,
 							'phone' 		=> $data->phone,
 							'address'		=> $data->address,
-							'id_route' 	=> $data->route->id,
+							'id_route' 		=> $data->id_route,
 							'route_name' 	=> $data->route->name,
 						);
 					}
