@@ -735,6 +735,66 @@ class ReportController extends Controller
 
     // *********** AVAILABILITY ****************** //
 
+    public function availabilityRow(){
+        $data['categories'] = Category::get();
+        return view('report.availability', $data);
+    }
+
+    public function availabilityAccountRowData(){
+
+        $categories = Category::get();
+
+        $totaltanggal = Carbon::now()->daysInMonth;
+        $account = 1;
+        $stores = Store::where('id_account',$account)->get();
+        $datas = new Collection();
+        $i = 1;
+        while ( $i<=$totaltanggal ) {
+            foreach ($stores as $store) {
+                $item['date'] = $i;
+                $item['store'] = $store->name1;
+                $item['account'] = $store->account->name;
+                $item['subarea'] = $store->subarea->name;
+            $datas->push($item);
+            }
+            $i++;
+        }
+
+        foreach($datas as $data) {
+            foreach ($categories as $category) {
+                    $item[$category->id] = $category->name;
+                //     $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+                //                     ->join('categories','sub_categories.id_category', 'categories.id')
+                //                     ->where('categories.id',$category)
+                //                     ->select('products.*')->get();
+                // foreach ($products as $brand) {
+                //     $data[$category->id.'_'.$products->id] = $products->name;
+                //     // $data[$category->id.'_'.$products->id.'_depth'] = '-';
+                //     // $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
+                //     //                                 ->where('detail_display_shares.id_category',$category->id)
+                //     //                                 ->where('detail_display_shares.id_products',$products->id)
+                //     //                                 ->first();
+                //     // if ($detail_data) {
+                //     //     $data[$category->id.'_'.$products->id.'_tier'] = $detail_data->tier;
+                //     //     $data[$category->id.'_'.$products->id.'_depth'] = $detail_data->depth;
+
+                //     //     $data[$category->id.'_total_tier'] += $detail_data->tier;
+                //     //     $data[$category->id.'_total_depth'] += $detail_data->depth;
+
+                //     // }
+                // }
+            $data->push($item);
+            }
+
+        } 
+        // $datas = 
+        return response()->json($datas);
+
+        return Datatables::of($data)->make(true);
+        // return response()->json($data);
+    }
+
+
     public function availabilityIndex(){
         $data['categories'] = Category::get();
         return view('report.availability', $data);
