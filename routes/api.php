@@ -187,6 +187,12 @@ Route::prefix('route')->group(function () {
 	Route::get('/list', 'API\RouteController@list')->name('api.route.list');
 });
 
+// Property DC
+Route::prefix('property_dc')->group(function () {
+	Route::get('/list', 'API\PropertyDcController@list')->name('api.route.list');
+});
+
+
 // History
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
