@@ -35,7 +35,7 @@ class AttendanceOutlet extends Model
 
     public function toArray(){
         $array = parent::toArray();
-        $array['outlet_name'] = $this->outlet->name;
+        $array['outlet_name'] = $this->outlet->name ?? null;
         return $array;
     }
 
