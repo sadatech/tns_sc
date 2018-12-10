@@ -263,8 +263,9 @@ class AttendanceController extends Controller
 							$res['place_name'] 	= (isset($attendance->place->name) ? $place = $attendance->place->name : null );
 							$res['time'] 		= $attendance->checkin;
 						}else if (strtoupper($type) == 'GTC-MD') {
-							$res['id_outlet'] 	= (isset($attendance->id_outlet) ? $attendance->id_outlet : null);
-							$res['name'] 		= (isset($attendance->outlet->name) ? $attendance->outlet->name : null);
+							$res['id_outlet'] 	= $attendance->id_outlet ?? null;
+							$res['id_pasar'] 	= $attendance->outlet->employeePasar->id_pasar ?? null;
+							$res['name'] 		= $attendance->outlet->name ?? null;
 							$res['time'] 		= $attendance->checkin;
 
 							$cbd 				= Cbd::where('id_outlet',$attendance->id_outlet)->where('id_employee',$user->id)->whereDate('date', '=', Carbon::today()->toDateString())->count();
@@ -278,8 +279,9 @@ class AttendanceController extends Controller
 							$res['name'] 		= (isset($attendance->place->name) ? $attendance->place->name : null);
 							$res['time'] 		= $attendance->checkin;
 						}else if (strtoupper($type) == 'GTC-MOTORIC') {
-							$res['id_block']	= (isset($attendance->id_block) ? $attendance->id_block : null);
-							$res['name'] 		= (isset($attendance->block->name) ? $attendance->block->name : null);
+							$res['id_outlet']	= $attendance->id_block ?? null;
+							$res['id_pasar']	= $attendance->block->id_route ?? null;
+							$res['name'] 		= $attendance->block->name ?? null;
 							$res['time'] 		= $attendance->checkin;
 						}
 					} else {

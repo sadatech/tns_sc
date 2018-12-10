@@ -13,6 +13,29 @@
   @endif
   <div class="block block-themed"> 
     <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+      <h3 class="block-title">Filter</h3>
+    </div>
+    <div class="block">        
+      <div class="block-content block-content-full">
+        <form method="post" id="filter">
+          <div class="row">
+            <div class="col-md-4">
+              <label>Periode:</label>
+              <input class="js-datepicker form-control" value="{{ Carbon\Carbon::now()->format('m/Y') }}" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+            </div>
+            <div class="col-md-4">
+              <label>Employee:</label>
+              <select class="form-control" id="filterEmployee" name="employee"></select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
+          <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="block block-themed" id="table-block" style="display: none"> 
+    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
       <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
@@ -44,6 +67,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
 [data-notify="container"] {
@@ -59,28 +83,77 @@ table.table thead tr th {
 @endsection
 
 @section('script')
+<script src="{{ asset('js/select2-handler.js') }}"></script>
+<script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+<script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
-  $(function() {
-    var table = $('#category').DataTable({
+$('#reset').click(function(){
+    $('.js-datepicker').val(null);
+    $('#filterEmployee').val(null).trigger('change');
+  });
+$('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $(".js-datepicker").datepicker( {
+    format: "mm/yyyy",
+    viewMode: "months",
+    autoclose: true,
+    minViewMode: "months"
+  });
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+  $('#filter').submit(function(e) {
+    Codebase.layout('header_loader_on');
+    e.preventDefault();
+    var table = null;
+    var url = '{!! route('dc.sampling.data') !!}';
+    table = $('#category').DataTable({
       processing: true,
       serverSide: true,
-      stateSave: true,
-      paging: true,
       scrollX: true,
       scrollY: "300px",
-      ajax: '{!! route('dc.sampling.data') !!}',
+      ajax: {
+        url: url + "?" + $("#filter").serialize(),
+        type: 'POST',
+        dataType: 'json',
+        dataSrc: function(res) {
+          Codebase.layout('header_loader_off');
+          if (res.data == 0) {
+            $('#table-block').hide();
+            swal("Error!", "Data is empty!", "error");
+            return res.data;
+          } else {
+            $('#table-block').show();
+            return res.data;
+          }
+        },
+        error: function (data) {
+          Codebase.layout('header_loader_off');
+          swal("Error!", "Failed to load Data!", "error");
+        },
+      },
       columns: [
-      { data: 'id' },
-      { data: 'nama' },
-      { data: 'place' },
-      { data: 'date' },
-      @foreach ($product as $pro)
-      { data: 'product-{{ $pro->id }}' },
-      @endforeach
-      ]
+        { data: 'id' },
+        { data: 'nama' },
+        { data: 'place' },
+        { data: 'date' },
+        @foreach ($product as $pro)
+        { data: 'product-{{ $pro->id }}' },
+        @endforeach
+      ],
+      bDestroy: true
     });
   });
 </script>
-@endsection
+@endsection 

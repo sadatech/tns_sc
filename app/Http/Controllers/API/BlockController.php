@@ -1,46 +1,36 @@
 <?php
-
 namespace App\Http\Controllers\API;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Components\traits\ApiAuthHelper;
 use App\Block;
-use App\SubArea;
+use App\Route;
 use Carbon\Carbon;
 use JWTAuth;
 use Config;
 use DB;
-
 class BlockController extends Controller
 {
-
 	use ApiAuthHelper;
-
 	public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
-
 	public function store(Request $request)
 	{
 		
 		$check = $this->authCheck();
-
 		if ($check['success'] == true) {
-
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
-
-			if (empty($request->name) || empty($request->subarea) ) {
+			if (empty($request->name) || empty($request->route) ) {
 				$res['success'] = false;
-				$res['msg'] = "Sub Area and Name cannot be empty.";
+				$res['msg'] = "Root and Name cannot be empty.";
 			} else {
-
-				if (!empty(SubArea::find($request->subarea))) {
+				if (!empty(Route::find($request->route))) {
 					$insert = Block::create([
-						'id_subarea'	=> $request->subarea,
+						'id_route'	=> $request->route,
 						'id_employee'	=> $user->id,
 						'name'			=> $request->name,
 						'phone'			=> $request->phone,
@@ -56,30 +46,23 @@ class BlockController extends Controller
 					}
 				} else {
 					$res['success'] = false;
-					$res['msg'] 	= "Sub Area tidak bisa ditermukan.";
+					$res['msg'] 	= "Root undefined.";
 				}
 			}
-
 		}else{
 			$res = $check;
 		}
-
 		$code = $res['code'];
 		unset($res['code']);
-
 		return response()->json($res, $code);
 	}
-
 	public function update(Request $request, $id)
 	{
 		$check = $this->authCheck();
-
 		if ($check['success'] == true) {
-
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
-
 			$update = Block::where('id',$id)->update([
 				'name'		=> $request->name,
 				'phone'		=> $request->phone,
@@ -96,23 +79,17 @@ class BlockController extends Controller
 		}else{
 			$res = $check;
 		}
-
 		$code = $res['code'];
 		unset($res['code']);
-
 		return response()->json($res, $code);
 	}
-
 	public function list($active = 1)
 	{
 		$check = $this->authCheck();
-
 		if ($check['success'] == true) {
-
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
-
 			if ($active == 1 || $active == 2) {
 				if ($active == 1) {
 					$activeStatus = "aktif";
@@ -129,8 +106,8 @@ class BlockController extends Controller
 							'name' 			=> $data->name,
 							'phone' 		=> $data->phone,
 							'address'		=> $data->address,
-							'id_subarea' 	=> $data->subarea->id,
-							'subarea_name' 	=> $data->subarea->name,
+							'id_route' 	=> $data->route->id,
+							'route_name' 	=> $data->route->name,
 						);
 					}
 					$res['block'] = $listBlock;
@@ -138,32 +115,24 @@ class BlockController extends Controller
 					$res['success'] = false;
 					$res['msg'] = "Kamu tidak mempunyai Block $activeStatus.";
 				}
-
 			} else {
 				$res['success'] = false;
 				$res['msg'] = "Tipe Block tidak diketahui.";
 			}
-
 		}else{
 			$res = $check;
 		}
-
 		$code = $res['code'];
 		unset($res['code']);
-
 		return response()->json($res, $code);
 	}
-
 	public function disable($id, $status)
 	{
 		$check = $this->authCheck();
-
 		if ($check['success'] == true) {
-
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
-
 			if (empty($id)) {
 				$res['success'] = false;
 				$res['msg'] = "Please select block.";
@@ -198,10 +167,8 @@ class BlockController extends Controller
 		}else{
 			$res = $check;
 		}
-
 		$code = $res['code'];
 		unset($res['code']);
-
 		return response()->json($res, $code);
 	}
 }

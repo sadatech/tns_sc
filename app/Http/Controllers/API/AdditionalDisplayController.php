@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Components\traits\WeekHelper;
 use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
 use JWTAuth;
@@ -13,6 +14,8 @@ use Carbon\Carbon;
 
 class AdditionalDisplayController extends Controller
 {
+    use WeekHelper;
+
     public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
@@ -65,7 +68,7 @@ class AdditionalDisplayController extends Controller
                                             'id_store' => $request['store'],
                                             'id_employee' => $employee->id,
                                             'date' => Carbon::now(),
-                                            'week' => $request['week'],
+                                            'week' => $this->getWeek(Carbon::now()->toDateString()),
                                         ]);
 
                         if ($request['foto_additional'] != null)
