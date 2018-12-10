@@ -11,15 +11,15 @@ class SubArea extends Model
 		'name', 'id_area'
     ];
 
-    public function route()
-    {
-    	return $this->hasMany('App\Route', 'id_route');
-    }  
-    
     public function area()
     {
         return $this->belongsTo('App\Area', 'id_area');
     }
+    
+    public function route()
+    {
+        return $this->hasMany('App\Route', 'id_subarea');
+    }  
 
     public function stores()
     {
