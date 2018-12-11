@@ -2247,6 +2247,33 @@ class ReportController extends Controller
         ->make(true);
     }
 
+    public function inventoriDCAdd(Request $req)
+    {
+        $PropertiDcs = PropertiDc::get();
+        $result = DB::transaction(function() use ($PropertiDcs, $req){
+            foreach ($PropertiDcs as $PropertiDc)
+            {
+                $countReportInventori = ReportInventori::where("id_employee", $req->id_employee)->where("id_properti_dc", $PropertiDc->id)->count();
+                if ($countReportInventori == 0)
+                {
+                    ReportInventori::create([
+                        "no_polisi"       => strtoupper($req->no_polisi),
+                        "id_employee"     => $req->id_employee,
+                        "id_properti_dc"  => $PropertiDc->id,
+                        "quantity"        => 0,
+                        "actual"          => 0
+                    ]);
+                }
+            }
+        });
+
+        return redirect(route('report.demo.inventori'))->with([
+                'type'   => 'success',
+                'title'  => 'Berhasil<br/>',
+                'message'=> '<i class="em em-confetti_ball mr-2"></i>Data berhasil diperbarui!'
+        ]);
+    }
+
     public function SMDdistpf(Request $request)
     {
         

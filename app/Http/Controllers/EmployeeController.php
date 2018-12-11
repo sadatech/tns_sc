@@ -49,6 +49,16 @@ class EmployeeController extends Controller
 		return $data;
 	}
 
+	public function getDataIsTL()
+	{
+		$data = Employee::where("id_position", 5)
+		->whereHas("employeeSubArea", function($query){
+			$query->where("isTl", 1);
+		})
+		->get();
+		return $data;
+	}
+
 	public function baca()
 	{
 		return view('employee.employee');
