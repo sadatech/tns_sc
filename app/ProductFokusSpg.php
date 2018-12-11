@@ -63,7 +63,8 @@ class ProductFokusSpg extends Model
     public static function hasActivePF($data, $self_id = null)
     {
         foreach ($data['id_product'] as $key => $id_product){
-            $products = ProductFokusSpg::where('id_product', $id_product)
+            $products = ProductFokusSpg::where('deleted_at',null)
+                                    ->where('id_product', $id_product)
                                     ->where('id_employee', $data['id_employee'])
                                     ->where('id', '!=', $self_id)
                                     // ->where(function($query) use ($data,$key){
