@@ -18,7 +18,7 @@ class ReportInventoriController extends Controller
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
-	public function store(Request $request)
+	public function store(Request $request, $id)
 	{
 		
 		$check = $this->authCheck();
@@ -39,9 +39,7 @@ class ReportInventoriController extends Controller
 						$image_compress = Image::make($path.'/'.$photo)->orientate();
 						$image_compress->save($path.'/'.$photo, 50);
 					}
-					$insert = ReportInventori::create([
-						'id_properti_dc'	=> $request->properti_dc,
-						'id_employee'		=> $user->id,
+					$insert = ReportInventori::where('id',$id)->update([
 						'quantity'			=> $request->quantity,
 						'actual'			=> $request->actual,
 						'status'			=> $request->status,
@@ -73,7 +71,9 @@ class ReportInventoriController extends Controller
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
+
 			$reportInventory = ReportInventori::where('id_employee', $user->id)->get();
+
 			if ($reportInventory->count() > 0) {
 				$listReportInventory = [];
 				$res['success'] = true;
