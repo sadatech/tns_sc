@@ -74,6 +74,8 @@ use App\Model\Extend\SalesSpgPasarAchievement;
 use App\Model\Extend\SalesSpgPasarSummary;
 use App\SubCategory;
 use App\ProductFokusSpg;
+use App\ReportInventori;
+use App\PropertiDc;
 
 class ReportController extends Controller
 {
@@ -776,6 +778,66 @@ class ReportController extends Controller
     }
 
     // *********** AVAILABILITY ****************** //
+
+    public function availabilityRow(){
+        $data['categories'] = Category::get();
+        return view('report.availability', $data);
+    }
+
+    public function availabilityAccountRowData(){
+
+        $categories = Category::get();
+
+        $totaltanggal = Carbon::now()->daysInMonth;
+        $account = 1;
+        $stores = Store::where('id_account',$account)->get();
+        $datas = new Collection();
+        $i = 1;
+        while ( $i<=$totaltanggal ) {
+            foreach ($stores as $store) {
+                $item['date'] = $i;
+                $item['store'] = $store->name1;
+                $item['account'] = $store->account->name;
+                $item['subarea'] = $store->subarea->name;
+            $datas->push($item);
+            }
+            $i++;
+        }
+
+        foreach($datas as $data) {
+            foreach ($categories as $category) {
+                    $item[$category->id] = $category->name;
+                //     $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+                //                     ->join('categories','sub_categories.id_category', 'categories.id')
+                //                     ->where('categories.id',$category)
+                //                     ->select('products.*')->get();
+                // foreach ($products as $brand) {
+                //     $data[$category->id.'_'.$products->id] = $products->name;
+                //     // $data[$category->id.'_'.$products->id.'_depth'] = '-';
+                //     // $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
+                //     //                                 ->where('detail_display_shares.id_category',$category->id)
+                //     //                                 ->where('detail_display_shares.id_products',$products->id)
+                //     //                                 ->first();
+                //     // if ($detail_data) {
+                //     //     $data[$category->id.'_'.$products->id.'_tier'] = $detail_data->tier;
+                //     //     $data[$category->id.'_'.$products->id.'_depth'] = $detail_data->depth;
+
+                //     //     $data[$category->id.'_total_tier'] += $detail_data->tier;
+                //     //     $data[$category->id.'_total_depth'] += $detail_data->depth;
+
+                //     // }
+                // }
+            $data->push($item);
+            }
+
+        } 
+        // $datas = 
+        return response()->json($datas);
+
+        return Datatables::of($data)->make(true);
+        // return response()->json($data);
+    }
+
 
     public function availabilityIndex(){
         $data['categories'] = Category::get();
@@ -2229,6 +2291,22 @@ class ReportController extends Controller
         }
     }
 
+    public function inventoriDC()
+    {
+        $data = ReportInventori::get();
+        return Datatables::of(collect($data))
+        ->addColumn("employee", function($item){
+            return Employee::where("id", $item->id_employee)->first()->name;
+        })
+        ->addColumn("item", function($item){
+            return PropertiDc::where("id", $item->id_properti_dc)->first()->item;
+        })
+        ->addColumn("dokumentasi", function($item){
+            return (isset($item->photo) ? "<img src='".$item->photo."'>" : "-");
+        })
+        ->make(true);
+    }
+
     public function SMDdistpf(Request $request)
     {
         
@@ -2660,12 +2738,25 @@ class ReportController extends Controller
     // ************ SPG PASAR ************ //
     public function SPGsales(Request $request)
     {
-        $sales = SalesSpgPasar::whereMonth('date', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
+        $sales = SalesSpgPasar::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+        if ($request->has('pasar')) {
+            $sales->whereHas('pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        } 
+        if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         $data = array();
         $product = array();
         $id = 1;
-        foreach ($sales as $key => $value) {
+        foreach ($sales->get() as $key => $value) {
             if ($value->employee->position->level = 'spggtc') {
                 $data[] = array(
                     'id' => $id++,
@@ -2715,12 +2806,7 @@ class ReportController extends Controller
                 return $q->where('id_employee', $request->input('employee'));
             });
         } 
-        if ($request->has('outlet')) {
-            $rekap->whereHas('outlet', function($q) use ($request){
-                return $q->where('id_outlet', $request->input('outlet'));
-            });
-        } 
-         if ($request->has('periode')) {
+        if ($request->has('periode')) {
             $rekap->whereMonth('date', substr($request->input('periode'), 0, 2));
             $rekap->whereYear('date', substr($request->input('periode'), 3));
         }
