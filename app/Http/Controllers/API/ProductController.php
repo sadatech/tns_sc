@@ -9,7 +9,7 @@ use App\ProductFokusGtc;
 use App\FokusArea;
 use App\FokusChannel;
 use App\Pasar;
-use App\SubArea;
+use App\Route;
 use Carbon\Carbon;
 use Config;
 use JWTAuth;
@@ -78,7 +78,7 @@ class ProductController extends Controller
 					$res['msg'] = "User not found.";
 				} else {
 					$today 	= Carbon::today()->toDateString();
-					$area 	= (strtoupper($type) == 'PASAR') ? Pasar::where('id',$id)->first()->subarea->id_area : SubArea::where('id',$id)->first()->id_area;
+					$area 	= (strtoupper($type) == 'PASAR') ? Pasar::where('id',$id)->first()->subarea->id_area : Route::where('id',$id)->first()->subarea->id_area;
 					
 					$pf 	= ProductFokusGtc::with(['product'])
 					->whereRaw("'$today' BETWEEN product_fokus_gtcs.from and product_fokus_gtcs.to")

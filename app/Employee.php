@@ -673,5 +673,11 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     public function getAreaByPasar(){
         return implode(', ', array_unique(Pasar::with('subarea.area')->whereIn('id', $this->employeePasar->pluck('id_pasar')->toArray())->get()->pluck('subarea.area.name')->toArray()));
     }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['foto_profil_url'] = !empty($this->foto_profil) ? asset($this->foto_profil) : '';
+        return $array;
+    }
 }
 
