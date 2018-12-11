@@ -49,9 +49,9 @@ Route::prefix('dashboard')->group(function () {
 Route::prefix('data')->group(function () {
 	Route::get('/dashboard', 'DashboardController@dashboard')->name('data.dashboard')->middleware('auth');
 	Route::get('/gtc-smd', 'DashboardController@gtc_smd')->name('data.gtc_smd')->middleware('auth');
-	Route::get('/gtc-spg', 'DashboardController@gtc_spg')->name('data.gtc_smd')->middleware('auth');
-	Route::get('/gtc-dc', 'DashboardController@gtc_dc')->name('data.gtc_smd')->middleware('auth');
-	Route::get('/gtc-motorik', 'DashboardController@gtc_motorik')->name('data.gtc_smd')->middleware('auth');
+	Route::get('/gtc-spg', 'DashboardController@gtc_spg')->name('data.gtc_spg')->middleware('auth');
+	Route::get('/gtc-dc', 'DashboardController@gtc_dc')->name('data.gtc_dc')->middleware('auth');
+	Route::get('/gtc-motorik', 'DashboardController@gtc_motorik')->name('data.gtc_motorik')->middleware('auth');
 });
 
 /**

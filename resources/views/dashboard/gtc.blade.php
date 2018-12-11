@@ -14,7 +14,7 @@
                     <a class="nav-link {{ request()->is('dashboard/gtc/demo-cooking') ? 'active' : '' }}" href="{{ route('dashboard.gtc.dc') }}">Demo Cooking</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('dashboard/gtc/motorik') ? 'active' : '' }}" href="{{ route('dashboard.gtc.motorik') }}">Motorik</a>
+                    <a class="nav-link {{ request()->is('dashboard/gtc/motorik') ? 'active' : '' }}" href="{{ route('dashboard.gtc.motorik') }}">Motoris</a>
                 </li>
             </ul>
             <div class="block-content tab-content">
