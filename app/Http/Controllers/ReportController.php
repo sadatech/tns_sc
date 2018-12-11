@@ -53,6 +53,7 @@ use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Jobs\ExportSPGPasarAchievementJob;
 use App\Jobs\ExportSPGPasarSalesSummaryJob;
+use App\Jobs\ExportDCReportInventoriJob;
 use App\Product;
 use App\SalesSpgPasar;
 use App\SalesMotoricDetail;
@@ -2332,6 +2333,29 @@ class ReportController extends Controller
                 'title'  => 'Berhasil<br/>',
                 'message'=> '<i class="em em-confetti_ball mr-2"></i>Data berhasil diperbarui!'
         ]);
+    }
+
+    public function inventoriDCExportXLS()
+    {
+        $result = DB::transaction(function(){
+            try
+            {
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "Demo Cooking - Report Inventori " . " " . Carbon::now()->format("d-M-Y"),
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportDCReportInventoriJob($JobTrace));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
     public function SMDdistpf(Request $request)
