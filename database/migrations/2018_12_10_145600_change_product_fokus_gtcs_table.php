@@ -14,7 +14,7 @@ class ChangeProductFokusGtcsTable extends Migration
         });
 
         Schema::table('product_fokus_gtcs', function (Blueprint $table) {
-             $table->unsignedInteger('id_area')->after('id-product')->nullable();
+             $table->unsignedInteger('id_area')->after('id_product')->nullable();
              $table->foreign('id_area')->references('id')->on('areas')->onUpdate('cascade')->onDelete('cascade');
         });
     }
