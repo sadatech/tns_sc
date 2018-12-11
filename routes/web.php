@@ -10,10 +10,49 @@
 |
 */
 
-Route::get('/', 'DashboardController@dashboard')->name('dashboard')->middleware('auth');
+Route::get('/', function(){
+	return view('dashboard.home');
+})->name('dashboard')->middleware('auth');
 
+Route::prefix('dashboard')->group(function () {
+	Route::get('/', function(){
+		return view('dashboard.home');
+	})->name('dashboard')->middleware('auth');
+	
+	Route::prefix('gtc')->group(function () {
+		Route::get('/', function(){
+			return view('dashboard.gtc.smd');
+		})->name('dashboard.gtc')->middleware('auth');
 
-Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard')->middleware('auth');
+		Route::get('/smd', function(){
+			return view('dashboard.gtc.smd');
+		})->name('dashboard.gtc.smd')->middleware('auth');
+
+		Route::get('/spg', function(){
+			return view('dashboard.gtc.spg');
+		})->name('dashboard.gtc.spg')->middleware('auth');
+
+		Route::get('/demo-cooking', function(){
+			return view('dashboard.gtc.dc');
+		})->name('dashboard.gtc.dc')->middleware('auth');
+
+		Route::get('/motorik', function(){
+			return view('dashboard.gtc.motorik');
+		})->name('dashboard.gtc.motorik')->middleware('auth');
+	});
+	
+	Route::get('/mtc', function(){
+		return view('dashboard.mtc');
+	})->name('dashboard.mtc')->middleware('auth');
+});
+
+Route::prefix('data')->group(function () {
+	Route::get('/dashboard', 'DashboardController@dashboard')->name('data.dashboard')->middleware('auth');
+	Route::get('/gtc-smd', 'DashboardController@gtc_smd')->name('data.gtc_smd')->middleware('auth');
+	Route::get('/gtc-spg', 'DashboardController@gtc_spg')->name('data.gtc_spg')->middleware('auth');
+	Route::get('/gtc-dc', 'DashboardController@gtc_dc')->name('data.gtc_dc')->middleware('auth');
+	Route::get('/gtc-motorik', 'DashboardController@gtc_motorik')->name('data.gtc_motorik')->middleware('auth');
+});
 
 /**
 *	Store Master Data
@@ -731,7 +770,8 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.democooking.inventori');
 				})->name('report.demo.inventori')->middleware('auth');
-				Route::any('/data', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
+				Route::post('/data', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
+				Route::post('/add', 'ReportController@inventoriDCAdd')->name('dc.inventori.data.add')->middleware('auth');
 			});
 
 		});
@@ -748,8 +788,8 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('distPF')->group(function () {
 				Route::get('/', function(){
-				$getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
-				$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					$getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.motorik.distPF', $data);
 				})->name('report.motorik.distPF')->middleware('auth');
 				Route::post('/data', 'ReportController@motorikDistPF')->name('report.motorik.distPF.data')->middleware('auth');
@@ -902,6 +942,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/block-select2', 'EmployeeController@getDataWithFiltersBlock')->name('block-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
 	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');
+	Route::post('/employee-is-tl-select2', 'EmployeeController@getDataIsTL')->name('employee-is-tl-select2');
 	Route::get('/product-byCategory-select2/{param}', 'ProductController@getProductByCategory')->name('product-byCategory-select2');
 });
 
