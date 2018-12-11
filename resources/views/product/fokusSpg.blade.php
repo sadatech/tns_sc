@@ -105,7 +105,7 @@
 </div>
 
 {{-- MODAL EDIT FOCUS --}}
-@include('product._form_focus_spg', ['id' => 'editModal', 'type' => 'edit'])
+@include('product._form_focus_spg_edit', ['id' => 'editModal', 'type' => 'edit'])
 
 {{-- MODAL ADD FOCUS --}}
 @include('product._form_focus_spg', ['id' => 'tambahModal', 'action' => route('fokusSpg.add')])
@@ -125,6 +125,7 @@
 
 @section('script')
   <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ asset('js/select2-handler.js') }}"></script>
   <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
@@ -182,11 +183,12 @@
               columns: [
 	            { data: 'id', name: 'id' },
                 { data: 'employee.name', name: 'employee.name'},
-                { data: 'product.name', name: 'product.name'},
+                { data: 'category_product', name: 'category_product'},
                 { data: 'from', name: 'from' },
                 { data: 'to', name: 'to' },
 	            { data: 'action', name: 'action' },
-              ]
+              ],
+              "columnDefs" : [{"className": "text-center", "targets" : [3,4,5]}],
           });
       });
   </script>
