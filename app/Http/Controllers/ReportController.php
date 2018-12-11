@@ -2397,7 +2397,7 @@ class ReportController extends Controller
 
     public function SMDsales(Request $request)
     {
-        $sales = Distribution::orderBy('created_at', 'DESC');
+        $sales = SalesMd::orderBy('created_at', 'DESC');
         if ($request->has('employee')) {
             $sales->whereHas('employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));

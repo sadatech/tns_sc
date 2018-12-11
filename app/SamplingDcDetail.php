@@ -12,7 +12,7 @@ class SamplingDcDetail extends Model
 
     public function sampling()
     {
-        return $this->belongsTo('App\SamplingDc', 'id_sampling');
+        return $this->belongsTo('App\SamplingDc', 'id_sales');
     }
 
     public function product()
