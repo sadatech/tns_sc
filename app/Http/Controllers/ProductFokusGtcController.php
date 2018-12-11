@@ -35,6 +35,14 @@ class ProductFokusGtcController extends Controller
         $product = ProductFokusGtc::with(['product', 'area'])
         ->select('product_fokus_gtcs.*');
         return Datatables::of($product)
+        ->addColumn('area', function($product) {
+			if (isset($product->area)) {
+				$area = $product->area->name;
+			} else {
+				$area = "ALL";
+			}
+			return $area;
+		})
         ->addColumn('action', function ($product) {
             $data = array(
                 'id'            => $product->id,
@@ -50,27 +58,68 @@ class ProductFokusGtcController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->all();
-
-        if (($validator = ProductFokusGtc::validate($data))->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $from = explode('/', $data['from']);
-        $data['from'] = \Carbon\Carbon::create($from[1], $from[0])->startOfMonth()->toDateString();
-        $to = explode('/', $data['to']);
-        $data['to'] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
-
-        if (ProductFokusGtc::hasActivePF($data)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus MD sudah ada!';
+        // dd($request->all());
+        $data=$request->all();
+        $limit=[
+            'from'        => 'required',
+            'product'     => 'required',
+            'to'          => 'required',
+        ];
+        $validator = Validator($data, $limit);
+        if ($validator->fails()){
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
         } else {
-            ProductFokusGtc::create($data);
-            $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus MD!';
-        }
+            if ($request->input('from')) {
+                $from = Carbon::createFromFormat('d/m/Y','01/'.$request->input('from'))->startOfMonth()->format('d/m/Y');
+            } else {
+                $from = null;
+            }
+            if ($request->input('to')) {
+                $to = Carbon::createFromFormat('d/m/Y','23/'.$request->input('to'))->endOfMonth()->format('d/m/Y');
+            } else {
+                $to = null;
+            }
 
-        return redirect()->back()->with($this->alert);
+            $checkProduct = Product::whereIn('id', $request->input('product'))->first();
+            $checkArea = (isset(Area::where('id', $request->input('area'))->first()->id) ? Area::where('id',$request->input('area'))->first()->id : null);
+            $checkAll = ProductFokusGtc::where(function($query) use ($from, $to){
+                $query->whereBetween('from', [$from, $to]);
+                $query->orWhereBetween('to', [$to, $from]);
+            })
+            // ->where(function($query) use ($checkProduct, $checkArea){
+            //     $query->whereIn('id_product', [$checkProduct->id, (isset($checkArea->id) ? $$checkArea->id : null)]);
+            //     $query->whereIn('id_area', [(isset($checkArea->id) ? $$checkArea->id : null), $checkProduct->id]);
+            // })
+            ->where(['id_product' => $checkProduct->id])
+            ->where(['id_area' => (isset($checkArea->id) ? $checkArea->id : null)])
+            ->count();
+            // dd($checkAll);
+            if ($checkAll < 1){
+                foreach ($request->input('product') as $product) {
+                    ProductFokusGtc::create([
+                            'id_product' 	=> $product,
+                            'id_area' 	    => $request->input('area') ? $request->input('area') : null,
+                            'from' 			=> $from,
+                            'to' 			=> $to
+                    ]);
+                }
+                return redirect()->back()
+                ->with([
+                    'type'    => 'success',
+                    'title'   => 'Sukses!<br/>',
+                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Product Fokus GTC!'
+                ]);
+            } else {
+                return redirect()->back()
+                ->with([
+                    'type'   => 'warning',
+                    'title'  => 'Warning!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Product Fokus GTC sudah ada!'
+                ]);
+            }
+        }
     }
 
     public function update(Request $request, $id) 
