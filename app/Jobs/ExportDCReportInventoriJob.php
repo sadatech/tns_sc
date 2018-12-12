@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use Exception;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
