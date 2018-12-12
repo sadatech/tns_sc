@@ -80,7 +80,6 @@ class ReportInventoriController extends Controller
 				foreach ($reportInventory as $data) {
 					$listReportInventory[] = array(
 						'id' 				=> $data->id,
-						'name' 				=> $data->name,
 						'quantity' 			=> $data->quantity,
 						'actual'			=> $data->actual,
 						'status'			=> $data->status,
