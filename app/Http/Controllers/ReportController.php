@@ -53,6 +53,7 @@ use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Jobs\ExportSPGPasarAchievementJob;
 use App\Jobs\ExportSPGPasarSalesSummaryJob;
+use App\Jobs\ExportDCReportInventoriJob;
 use App\Product;
 use App\SalesSpgPasar;
 use App\SalesMotoricDetail;
@@ -2334,6 +2335,29 @@ class ReportController extends Controller
         ]);
     }
 
+    public function inventoriDCExportXLS()
+    {
+        $result = DB::transaction(function(){
+            try
+            {
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "Demo Cooking - Report Inventori " . " " . Carbon::now()->format("d-M-Y"),
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportDCReportInventoriJob($JobTrace));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
     public function SMDdistpf(Request $request)
     {
         
@@ -2397,7 +2421,7 @@ class ReportController extends Controller
 
     public function SMDsales(Request $request)
     {
-        $sales = Distribution::orderBy('created_at', 'DESC');
+        $sales = SalesMd::orderBy('created_at', 'DESC');
         if ($request->has('employee')) {
             $sales->whereHas('employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
