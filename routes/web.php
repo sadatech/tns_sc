@@ -722,9 +722,12 @@ Route::prefix('report')->group(function () {
 			});
 
 			Route::prefix('cashAdvance')->group(function () {
-				Route::get('/', function(){
-					return view('report.democooking.cash');
-				})->name('report.demo.cashAdvance')->middleware('auth');
+				Route::get('/', 'CashAdvanceController@index')->name('report.demo.cashAdvance')->middleware('auth');
+				Route::post('/import', 'CashAdvanceController@import')->name('report.demo.import')->middleware('auth');
+				Route::get('/download-template', function()
+				{
+					return response()->download(public_path('assets/CashAdvanceImport.xlsx'));
+				})->name('report.demo.download-template')->middleware('auth');
 			});
 
 			Route::prefix('inventori')->group(function(){
