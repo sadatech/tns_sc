@@ -45,7 +45,7 @@ class ReportInventoriController extends Controller
 						'status'			=> $request->status,
 						'photo'				=> isset($photo) ? $path.'/'.$photo : null,
 					]);
-					if ($insert->id) {
+					if ($insert) {
 						$res['success'] = true;
 						$res['msg'] 	= "Success add Report Inventory.";
 					} else {
