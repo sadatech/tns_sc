@@ -10,11 +10,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 use App\JobTrace;
-use App\Traits\ExportSPGPasarAchievementTrait;
+use App\Traits\ExportDCReportInventoriTrait;
 
-class ExportSPGPasarAchievementJob implements ShouldQueue
+class ExportDCReportInventoriJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportSPGPasarAchievementTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportDCReportInventoriTrait;
 
     protected $trace;
 
@@ -44,9 +44,8 @@ class ExportSPGPasarAchievementJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->SPGPasarAchievementExportTrait(), // return excel file location
+            'results' => $this->DCReportInventoriExportTrait(), // return excel file location
         ]);
-
     }
 
     /**
