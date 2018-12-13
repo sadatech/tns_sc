@@ -72,12 +72,12 @@ class ProductFokusGtcController extends Controller
             ->withInput();
         } else {
             if ($request->input('from')) {
-                $from = Carbon::createFromFormat('d/m/Y','01/'.$request->input('from'))->startOfMonth()->format('d/m/Y');
+                $from = Carbon::createFromFormat('d/m/Y','01/'.$request->input('from'))->startOfMonth()->format('Y-m-d');
             } else {
                 $from = null;
             }
             if ($request->input('to')) {
-                $to = Carbon::createFromFormat('d/m/Y','23/'.$request->input('to'))->endOfMonth()->format('d/m/Y');
+                $to = Carbon::createFromFormat('d/m/Y','23/'.$request->input('to'))->endOfMonth()->format('Y-m-d');
             } else {
                 $to = null;
             }
