@@ -12,7 +12,7 @@ use App\ProductFokusSpg;
 
 trait ExportSPGPasarSalesSummaryTrait
 {
-	public function SPGPasarSalesSummaryExportTrait($id_subcategory, $filterMonth)
+	public function SPGPasarSalesSummaryExportTrait($id_subcategory, $filterMonth, $filecode)
 	{
         $periode = Carbon::parse($filterMonth)->format('Y-m-d');
 
@@ -37,7 +37,7 @@ trait ExportSPGPasarSalesSummaryTrait
         ->orderBy('id_pasar', 'ASC')->get();
 
         // Export Excel
-        $filename = "Report_Harian_SPG_" . str_replace(" ", "_", $sub_category_detail->name)."_".Carbon::parse($filterMonth)->format("M-Y");
+        $filename = "SPG Pasar - Report Harian " . str_replace(" ", "_", $sub_category_detail->name)." - ".Carbon::parse($filterMonth)->format("M-Y") . " (".$filecode.")";
         Excel::create($filename, function($excel) use ($sales, $sub_category_detail){
             $excel->sheet("Summary", function($sheet) use ($sales, $sub_category_detail){
 
