@@ -1,6 +1,7 @@
 <?php
-
 namespace App\Jobs;
+
+use Exception;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -22,7 +23,7 @@ class ExportSPGPasarSalesSummaryJob implements ShouldQueue
      *
      * @var int
      */
-    // public $tries = 5;
+    public $tries = 5;
 
     /**
      * Create a new job instance.
