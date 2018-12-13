@@ -718,7 +718,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.sales-summary');
 				})->name('report.sales.summary.spg')->middleware('auth');
-				Route::get('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
+				Route::post('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
 				Route::post('/exportXLS/{subCategory?}/{date?}', 'ReportController@SPGsalesSummary_exportXLS')->name('spg.pasar.sales.summary.data.exportxls')->middleware('auth');
 			});
 		});

@@ -9,14 +9,14 @@ use App\Model\Extend\SalesSpgPasarAchievement;
 trait ExportSPGPasarAchievementTrait
 {
 
-	public function SPGPasarAchievementExportTrait()
+	public function SPGPasarAchievementExportTrait($filecode)
 	{
         $sales = SalesSpgPasarAchievement::whereNull('deleted_at')
         ->groupBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), DB::raw('id_employee'))
         ->orderBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), 'ASC')
         ->orderBy('id_employee', 'ASC');
         //
-        $filename = "SPG Pasar - Report Achievement (@".str_replace("-", null, crc32(md5(time()))).")";
+        $filename = "SPG Pasar - Report Achievement (".$filecode.")";
         $store = Excel::create($filename, function($excel) use ($sales){
             $excel->sheet("Achievement", function($sheet) use ($sales){
 

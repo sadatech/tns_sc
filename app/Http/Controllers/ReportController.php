@@ -3048,13 +3048,14 @@ class ReportController extends Controller
         $result = DB::transaction(function() use ($id_subcategory, $filterMonth){
             try
             {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->nama . " " . Carbon::parse($filterMonth)->format("M-Y"),
+                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->name . " " . Carbon::parse($filterMonth)->format("M-Y") . " " .$filecode,
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSPGPasarSalesSummaryJob($JobTrace, [$id_subcategory, $filterMonth]));
+                dispatch(new ExportSPGPasarSalesSummaryJob($JobTrace, [$id_subcategory, $filterMonth, $filecode]));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
@@ -3198,13 +3199,14 @@ class ReportController extends Controller
         $result = DB::transaction(function(){
             try
             {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "SPG Pasar - Report Achievement",
+                    'title' => "SPG Pasar - Report Achievement " . $filecode,
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSPGPasarAchievementJob($JobTrace));
+                dispatch(new ExportSPGPasarAchievementJob($JobTrace, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
