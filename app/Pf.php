@@ -26,9 +26,14 @@ class Pf extends Model
     }
 
 
-    public function category()
+    public function category1()
     {
-        return $this->belongsTo('App\Category', 'id_category');
+        return $this->belongsTo('App\SubCategory', 'id_category1');
+    }
+
+    public function category2()
+    {
+        return $this->belongsTo('App\SubCategory', 'id_category2');
     }
 
     public static function hasActivePF($data, $self_id = null)
