@@ -16,7 +16,7 @@ trait ExportDCReportInventoriTrait
 		$data = [];
 
 		// 
-        $filename = "DC-Report_Inventori_" . Carbon::now()->format("d-M-Y");
+        $filename = "DC - Report Inventori (#".str_replace("-", null, crc32(md5(time()))).")";
         $store = Excel::create($filename, function($excel) use (&$data){
 	        foreach (ReportInventori::groupBy("id_employee")->get() as $ReportInventori)
 	        {

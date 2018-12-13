@@ -186,15 +186,15 @@
                             <li>
                                 <a class="{{ request()->is('target/mtc') ? 'active' : '' }}" href="{{ route('mtc') }}">MTC</a>
                             </li>
-                            <li>
+                            <!--<li>
                                 <a class="{{ request()->is('target/dc') ? 'active' : '' }}" href="{{ route('target.dc') }}">Demo Cooking</a>
-                            </li>
+                            </li>-->
                             <li>
                                 <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
                             </li>
-                            <li>
+                            <!--<li>
                                 <a class="{{ request()->is('target/spg') ? 'active' : '' }}" href="{{ route('target.spg') }}">SPG Pasar</a>
-                            </li>
+                            </li>-->
                         </ul>
                     </li>
                     <li>
