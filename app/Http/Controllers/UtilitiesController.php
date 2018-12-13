@@ -20,8 +20,6 @@ class UtilitiesController extends Controller
     public function reportDownloadData(JobTraceFilters $filters){
     	$data = JobTrace::filter($filters);
 
-        // return response()->json($data->get());
-
         return Datatables::of($data)
             ->addColumn('request_by', function ($item) {
                 return @$item->user->name;

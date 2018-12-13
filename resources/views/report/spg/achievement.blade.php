@@ -99,7 +99,10 @@ table.table thead tr th {
         url: "{{ route('spg.pasar.sales.achievement.data.exportXLS') }}",
         type: "post",
         success: function(e){
-          alert(e.result);
+          swal("Success!", e.result, "success");
+        },
+        error: function(){
+          swal("Error!", e.result, "error");
         }
       });
     })

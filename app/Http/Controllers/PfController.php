@@ -6,30 +6,31 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use DB;
 use App\Category;
+use App\SubCategory;
 use App\Pf;
 
 class PfController extends Controller
 {
     public function read()
     {
-        $data['category'] = Category::get();
+        $data['category'] = SubCategory::get();
         return view('product.pf', $data);
     }
 
     public function data()
     {
-        $product = Pf::with('category')
+        $product = Pf::with(['category1', 'category2'])
         ->select('pfs.*');
         return Datatables::of($product)
         ->addColumn('category1', function($product) {
-            return \App\Category::where('id', $product->id_category1)->first()->name;
+            return SubCategory::where('id', $product->id_category1)->first()->name;
         })
         ->addColumn('category2', function($product) {
-            return \App\Category::where('id', $product->id_category2)->first()->name;
+            return SubCategory::where('id', $product->id_category2)->first()->name;
         })
         ->addColumn('action', function ($product) {
-            $category1 = Category::where('id', $product->id_category1)->first()->id;
-            $category2 = Category::where('id', $product->id_category2)->first()->id;
+            $category1 = SubCategory::where('id', $product->id_category1)->first()->id;
+            $category2 = SubCategory::where('id', $product->id_category2)->first()->id;
             $data = array(
                 'id'            => $product->id,
                 'category1'     => $category1,
@@ -78,7 +79,6 @@ class PfController extends Controller
         }
 
         DB::transaction(function () use($product, $data) {
-
             $product->fill($data)->save();
         });
 

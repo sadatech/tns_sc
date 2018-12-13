@@ -45,7 +45,7 @@
     <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
+                <div class="block-header bg-gd-sun p-10">
                     <h3 class="block-title"><i class="fa fa-edit"></i> Update Product Fokus</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
