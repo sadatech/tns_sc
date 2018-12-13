@@ -53,6 +53,7 @@
                     </h3>
                     <div class="block-option">
                         <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                        <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
                     </div>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="cashDcTable">
@@ -92,6 +93,45 @@
         </div>
     </div>
 
+</div>
+
+<div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-gd-sun p-10">
+          <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import <i>Data Product</i></h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('report.demo.import') }}">
+        {{ csrf_field() }}
+        <div class="block-content">
+          <div class="form-group">
+            <a href="{{ route('product.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+          </div>
+          <div class="form-group col-md-12">
+            <label>Upload Your Data Cash Advance:</label>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+                <label class="custom-file-label">Choose file Excel</label>
+                <code> *Type File Excel</code>
+            </div>
+           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-alt-success">
+            <i class="fa fa-save"></i> Import
+          </button>
+          <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 @endsection
 

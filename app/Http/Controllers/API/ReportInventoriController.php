@@ -45,7 +45,7 @@ class ReportInventoriController extends Controller
 						'status'			=> $request->status,
 						'photo'				=> isset($photo) ? $path.'/'.$photo : null,
 					]);
-					if ($insert->id) {
+					if ($insert) {
 						$res['success'] = true;
 						$res['msg'] 	= "Success add Report Inventory.";
 					} else {
@@ -80,7 +80,6 @@ class ReportInventoriController extends Controller
 				foreach ($reportInventory as $data) {
 					$listReportInventory[] = array(
 						'id' 				=> $data->id,
-						'name' 				=> $data->name,
 						'quantity' 			=> $data->quantity,
 						'actual'			=> $data->actual,
 						'status'			=> $data->status,

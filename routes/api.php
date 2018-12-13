@@ -178,7 +178,7 @@ Route::prefix('block')->group(function () {
 
 // Report Inventory
 Route::prefix('report_inventory')->group(function () {
-	Route::post('/add/{id}', 'API\ReportInventoriController@store')->name('api.report_inventory.add');
+	Route::post('/update/{id}', 'API\ReportInventoriController@store')->name('api.report_inventory.update');
 	Route::get('/list', 'API\ReportInventoriController@list')->name('api.report_inventory.list');
 });
 
