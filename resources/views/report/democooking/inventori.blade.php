@@ -160,7 +160,10 @@
         url: $(this).attr("target-url"),
         type: "post",
         success: function(e){
-          alert(e.result);
+          swal("Success!", e.result, "success");
+        },
+        error: function(){
+          swal("Error!", e.result, "error");
         }
       });
     });

@@ -4,6 +4,7 @@ namespace App\Traits;
 use Carbon\Carbon;
 use DB;
 use Excel;
+use PHPExcel_Worksheet_Drawing;
 
 use App\ReportInventori;
 use App\EmployeeSubArea;
@@ -11,12 +12,12 @@ use App\EmployeeSubArea;
 trait ExportDCReportInventoriTrait
 {
 
-	public function DCReportInventoriExportTrait()
+	public function DCReportInventoriExportTrait($filecode)
 	{
 		$data = [];
 
 		// 
-        $filename = "DC - Report Inventori (#".str_replace("-", null, crc32(md5(time()))).")";
+        $filename = "DC - Report Inventori (".$filecode.")";
         $store = Excel::create($filename, function($excel) use (&$data){
 	        foreach (ReportInventori::groupBy("id_employee")->get() as $ReportInventori)
 	        {
@@ -43,6 +44,7 @@ trait ExportDCReportInventoriTrait
 	                // list value
 	                $startVal = 9;
 	                $dtObj["allHeightObj"] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+	                $dtObj["imgCoordinate"] = [];
 	                $g = 0;
 	                foreach ($dtObj["dataDB"]->get() as $dataDB_data)
 	                {
@@ -53,8 +55,16 @@ trait ExportDCReportInventoriTrait
 	                        $dataDB_data->quantity,
 	                        $dataDB_data->actual,
 	                        (isset($dataDB_data->status) ? $dataDB_data->status : "-"),
-	                        (isset($dataDB_data->photo) ? $dataDB_data->photo : "-")
+	                        (isset($dataDB_data->photo) ? null : "-")
 	                    ];
+	                	$dtObj["imgCoordinate"][$startVal]["Drawing"] = new PHPExcel_Worksheet_Drawing;
+	                	if (isset($dataDB_data->photo))
+	                	{
+	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setPath(public_path("/../../public_html/".($dataDB_data->photo)));
+	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setCoordinates("F".($startVal - 1));
+	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setWorksheet($sheet);
+	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setWidth(40);
+	                	}
 	                    $startVal++;
 	                    $dtObj["allHeightObj"][] = $startVal;
 	                    $dtObj["allHeight"] = $startVal;
@@ -96,6 +106,7 @@ trait ExportDCReportInventoriTrait
 
 		        	$sheet->row(3, ["NoPolisi", $ReportInventori->no_polisi]);
 		        	$sheet->row(3, function($row){
+		        		$row->setAlignment("left");
 	                    $row->setFontWeight('bold');
 	                    $row->setFontSize(12);
 		        	});
@@ -192,7 +203,7 @@ trait ExportDCReportInventoriTrait
 
         })->store("xlsx", public_path("export/report"), true);
 
-        return asset("export/report") . "/" . $filename . ".xlsx";
+       return asset("export/report") . "/" . $filename . ".xlsx";
 	}
 
 }
