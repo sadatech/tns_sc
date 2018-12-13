@@ -16,7 +16,7 @@ trait ExportSPGPasarAchievementTrait
         ->orderBy(DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date))"), 'ASC')
         ->orderBy('id_employee', 'ASC');
         //
-        $filename = "SPG Pasar - Report Achievement (#".str_replace("-", null, crc32(md5(time()))).")";
+        $filename = "SPG Pasar - Report Achievement (@".str_replace("-", null, crc32(md5(time()))).")";
         $store = Excel::create($filename, function($excel) use ($sales){
             $excel->sheet("Achievement", function($sheet) use ($sales){
 

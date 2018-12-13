@@ -16,7 +16,7 @@ class ExportDCReportInventoriJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportDCReportInventoriTrait;
 
-    protected $trace;
+    protected $trace, $filecode;
 
     /**
      * The number of times the job may be attempted.
@@ -30,9 +30,10 @@ class ExportDCReportInventoriJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(JobTrace $trace)
+    public function __construct(JobTrace $trace, $filecode)
     {
         $this->trace = $trace;
+        $this->filecode = $filecode;
     }
 
     /**
@@ -44,7 +45,7 @@ class ExportDCReportInventoriJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->DCReportInventoriExportTrait(), // return excel file location
+            'results' => $this->DCReportInventoriExportTrait($this->filecode), // return excel file location
         ]);
     }
 

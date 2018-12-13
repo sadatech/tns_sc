@@ -2303,8 +2303,9 @@ class ReportController extends Controller
             return PropertiDc::where("id", $item->id_properti_dc)->first()->item;
         })
         ->addColumn("dokumentasi", function($item){
-            return (isset($item->photo) ? "<img src='".$item->photo."'>" : "-");
+            return (isset($item->photo) ? "<img src='".asset($item->photo)."' style='min-width: 149px;max-width: 150px;'>" : "-");
         })
+        ->rawColumns(["dokumentasi"])
         ->make(true);
     }
 
@@ -2340,13 +2341,14 @@ class ReportController extends Controller
         $result = DB::transaction(function(){
             try
             {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "Demo Cooking - Report Inventori " . " " . Carbon::now()->format("d-M-Y"),
+                    'title' => "Demo Cooking - Report Inventori " . $filecode,
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportDCReportInventoriJob($JobTrace));
+                dispatch(new ExportDCReportInventoriJob($JobTrace, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
