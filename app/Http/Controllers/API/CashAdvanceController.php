@@ -90,7 +90,7 @@ class CashAdvanceController extends Controller
 			unset($check['user']);
 			$res = $check;
 			
-			$cash = CashAdvance::where('id_employee', $user->id)->get();
+			$cash = CashAdvance::where('id_employee', $user->id)->orderBy('id','desc')->get();
 			if ($cash->count() > 0) {
 				$listCash = [];
 				$res['success'] = true;
