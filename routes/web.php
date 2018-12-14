@@ -766,7 +766,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/download-template', function()
 				{
 					return response()->download(public_path('assets/CashAdvanceImport.xlsx'));
-				})->name('report.demo.download-template')->middleware('auth');
+				})->name('report.dc.cash.download-template')->middleware('auth');
 			});
 
 			Route::prefix('inventori')->group(function(){

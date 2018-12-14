@@ -10,8 +10,7 @@ use Excel;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use App\ProductKnowledge;
-use App\Position;
+use App\CashAdvance;
 use DB;
 class CashAdvanceController extends Controller
 {
@@ -30,7 +29,6 @@ class CashAdvanceController extends Controller
         $this->validate($request, [
             'file' =>   'required'
         ]);
-        return $request->all();
 
         $transaction = DB::transaction(function () use ($request) {
             $file = Input::file('file')->getClientOriginalName();
@@ -44,60 +42,58 @@ class CashAdvanceController extends Controller
                 $file = $request->file('file')->getRealPath();
                 $ext = '';
                 
-                Excel::filter('chunk')->selectSheetsByIndex(2)->load($file)->chunk(250, function($results)
+                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
                     foreach($results as $key => $row)
                     {
-                        if ($key > 8) {
-                            # code...
-                        echo "$row<hr>";
+                        if ($key > 5 and $row->a != '') {
+                            $period = explode('-', $request->periode);
+                            $period = $period[0].'-'.$period[1];
+                            $create = CashAdvance::create([
+                                'id_employee'       => $request->id_employee,
+                                'id_area'           => $request->id_area,
+                                'date'              => !empty($row->a) ? $period.'-'.$row->a: null,
+                                'description'       => $row->b ?? null,
+                                'km_begin'          => $row->c ?? null,
+                                'km_end'            => $row->d ?? null,
+                                'km_distance'       => $row->e ?? null,
+                                'tpd'               => $row->f ?? null,
+                                'hotel'             => $row->g ?? null,
+                                'bbm'               => $row->h ?? null,
+                                'parking_and_toll'  => $row->i ?? null,
+                                'raw_material'      => $row->j ?? null,
+                                'property'          => $row->k ?? null,
+                                'permission'        => $row->l ?? null,
+                                'bus'               => $row->m ?? null,
+                                'sipa'              => $row->n ?? null,
+                                'taxibike'          => $row->o ?? null,
+                                'rickshaw'          => $row->p ?? null,
+                                'taxi'              => $row->q ?? null,
+                                'other_currency'    => $row->r ?? null,
+                                'other_description' => $row->s ?? null,
+                                'total_cost'        => $row->t ?? null,
+                            ]);
                         }
-                        if ($row->b == "Grand Total") {
-                            break;
-                        }
-                        // $dataProduct['subcategory_name']    = $row->subcategory;
-                        // $dataProduct['category_name']       = $row->category;
-                        // $id_subcategory = $this->findSub($dataProduct);
-
-                        // $data1 = SubCategory::where(['id' => $id_subcategory])->first();
-                        // $check = Product::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->sku))."'")
-                        // ->where(['id_subcategory' => $data1->id])->count();
-                        // if ($check < 1) {
-                        //     $getType = ProductStockType::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->type))."'")->first()->id;
-                        //     $insert = Product::create([
-                        //         'id_brand'          => 1,
-                        //         'id_subcategory'    => $id_subcategory,
-                        //         'code'              => $row->code,
-                        //         'name'              => $row->sku,
-                        //         'carton'            => (isset($row->carton) ? $row->carton : "-"),
-                        //         'pack'              => (isset($row->pack) ? $row->pack : "1"),
-                        //         'pcs'               => 1,
-                        //         'stock_type_id'     => ($getType ? $getType : 1),
-                        //         'panel'             => ($row->panel ? $row->panel : "yes")
-                        //     ]);
-                        // } else {
-                        //     return false;
-                        // }
                     }
                 },false);
             }
             return 'success';
         });
 
-        // if ($transaction == 'success') {
-        //     return redirect()->back()
-        //     ->with([
-        //         'type'      => 'success',
-        //         'title'     => 'Sukses!<br/>',
-        //         'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
-        //     ]);
-        // }else{
-        //     return redirect()->back()
-        //     ->with([
-        //         'type'    => 'danger',
-        //         'title'   => 'Gagal!<br/>',
-        //         'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
-        //     ]);
-        // }
+        if ($transaction == 'success') {
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
+            ]);
+        }else{
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+            ]);
+        }
     }
 }

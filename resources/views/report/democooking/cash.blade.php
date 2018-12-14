@@ -112,11 +112,15 @@
         {{ csrf_field() }}
         <div class="block-content">
           <div class="form-group">
-            <a href="{{ route('product.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+            <a href="{{ route('report.dc.cash.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
           </div>
             <div class="text-center form-group col-md-12 text-sm-left">
                 <label>Area:</label>
                 <select id="areaModal" class="inputFilter" name="id_area"></select>
+            </div>
+            <div class="text-center form-group col-md-12 text-sm-left">
+                <label>Employee:</label>
+                <select id="employeeModal" class="inputFilter" name="id_employee"></select>
             </div>
             <div class="text-center form-group col-md-12 text-sm-left monthModal">
                 <label>Period:</label>
@@ -176,7 +180,22 @@ table.table thead tr th {
 
 <script type="text/javascript">
     $(document).ready(function(){
-
+      @if(session('type'))
+        $.notify({
+            title: '<strong>{!! session('title') !!}</strong>',
+            message: '{!! session('message') !!}'
+        }, {
+            type: '{!! session('type') !!}',
+            animate: {
+                enter: 'animated zoomInDown',
+                exit: 'animated zoomOutUp'
+            },
+            placement: {
+                from: 'top',
+                align: 'center'
+            }
+        });
+      @endif
         /**
          * Ajax CSRF
          */
@@ -220,6 +239,17 @@ table.table thead tr th {
           }));
 
         $('#areaModal').select2(setOptions('{{ route("area-select2") }}', 'Select Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj){
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+        $('#employeeModal').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
+          filters['roleGroup'] = ['dc'];
             return filterData('name', params.term);
           }, function (data, params) {
             return {

@@ -192,6 +192,12 @@ Route::prefix('property_dc')->group(function () {
 	Route::get('/list', 'API\PropertyDcController@list')->name('api.route.list');
 });
 
+// Block
+Route::prefix('cash_advance')->group(function () {
+	Route::post('/add', 'API\CashAdvanceController@store')->name('api.cash_advance.add');
+	Route::get('/list', 'API\CashAdvanceController@list')->name('api.cash_advance.list');
+});
+
 
 // History
 Route::prefix('history')->group(function () {
