@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\CashAdvance;
 use DB;
+
 class CashAdvanceController extends Controller
 {
     /**
@@ -96,4 +97,28 @@ class CashAdvanceController extends Controller
             ]);
         }
     }
+
+    public function data(Request $req)
+    {
+        $CashAdvance = CashAdvance::where("id_area", $req->id_area)
+        ->whereMonth("date", Carbon::parse($req->periode)->format("m"))
+        ->whereYear("date", Carbon::parse($req->periode)->format("Y"))
+        ->get();
+
+        return Datatables::of($CashAdvance)
+        ->addColumn("tgl", function($item){
+            return Carbon::parse($item->date)->format("d");
+        })
+        ->make(true);
+    }
+
+    use \App\Traits\ExportDCReportCashAdvanceTrait;
+
+    public function exportXLS($id_area, $filterPeriode)
+    {
+        $data = $this->DCReportCashAdvanceExportTrait($id_area, $filterPeriode, "ss");
+
+        return $data;
+    }
+
 }
