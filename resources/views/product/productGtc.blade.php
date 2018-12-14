@@ -122,24 +122,34 @@
             </select>
           </div>
           <div class="row">
-            <div class="form-group col-md-12">
-                <label>Area</label>
-                <select class="js-select2 form-control" style="width: 100%" name="area">
-                  <option disabled selected>Choose your Area</option>
-                  @foreach($area as $data)
-                    <option value="{{ $data->id }}">{{ $data->name }}</option>
-                  @endforeach
+            <div class="col-md-12">
+              <div class="custom-control custom-checkbox custom-control-inline">
+                  <input class="custom-control-input" type="checkbox" id="example-inline-checkbox2" checked>
+                  <label class="custom-control-label" for="example-inline-checkbox2">ALL</label>
+              </div>
+              <div id="test">
+                <select id="coba" class="js-select2 form-control" style="width: 100%" name="area">
+                  <option value="">Choose Area</option>
+                    @foreach ($area as $dis)
+                    <option value="{{ $dis->id }}">{{ $dis->name }}</option>
+                    @endforeach
                 </select>
+              </div>
             </div>
-            <div class="form-group col-md-6">
-                <label>Month From</label>
-                <input class="js-datepicker form-control date1" data-date-format="mm/yyyy" type="text" placeholder="dd/yyyy" name="from" data-month-highlight="true" required>
+          </div>
+          <br/>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Month From</label>
+              <input class="form-control date1" type="text" placeholder="Month From" data-date-format="mm/yyyy" name="from" data-month-highlight="true" required>
             </div>
-            <div class="form-group col-md-6">
-                <label>Month Until</label>
-                <input class="js-datepicker form-control date1" type="text" data-date-format="mm/yyyy" name="to" data-month-highlight="true" placeholder="dd/yyyy">
+            <div class="col-md-6">
+              <label>Month Until</label>
+              <input class="form-control date1" type="text" placeholder="Month Until" data-date-format="mm/yyyy" name="to" data-month-highlight="true" required>
             </div>
+          </div>
         </div>
+        <br/>
         <div class="modal-footer">
           <button type="submit" class="btn btn-alt-success">
             <i class="fa fa-save"></i> Save
@@ -169,6 +179,20 @@
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script type="text/javascript">
+      $('#test').hide();
+      $("#example-inline-checkbox2").change(function() {
+          if ($(this).removeAttr("checked")) {
+            $('#test').show();
+          }
+      });
+
+      $("#example-inline-checkbox2").change(function() {
+          if ($(this).prop("checked")) {
+            $('#test').hide();
+            $('#coba').val(null).trigger('change');
+          }
+      });
+  
       $(".date1").datepicker( {
         format: "mm/yyyy",
         viewMode: "months",
