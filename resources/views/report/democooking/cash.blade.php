@@ -112,7 +112,7 @@
         {{ csrf_field() }}
         <div class="block-content">
           <div class="form-group">
-            <a href="{{ route('product.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+            <a href="{{ route('report.dc.cash.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
           </div>
             <div class="text-center form-group col-md-12 text-sm-left">
                 <label>Area:</label>

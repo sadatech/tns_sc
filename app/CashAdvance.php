@@ -14,11 +14,16 @@ class CashAdvance extends Model
     }
     
     protected $fillable = [
-		'id_employee', 'id_area', 'date', 'description', 'km_begin', 'km_end', 'km_distance', 'tpd', 'hotel', 'bbm', 'parking_and_toll', 'raw_material', 'property', 'permission', 'bus', 'sipa', 'taxibike', 'rickshaw', 'taxi','other_currency', 'other_description', 'total_cost'
+		'id_employee', 'id_area', 'date', 'description', 'km_begin', 'km_end', 'km_distance', 'tpd', 'hotel', 'bbm', 'parking_and_toll', 'raw_material', 'property', 'permission', 'bus', 'sipa', 'taxibike', 'rickshaw', 'taxi','other_cost', 'other_description', 'total_cost'
     ];
 
     public function employee()
     {
         return $this->belongsTo('App\Employee', 'id_employee');
+    }
+
+    public function area()
+    {
+        return $this->belongsTo('App\Area', 'id_area');
     }
 }
