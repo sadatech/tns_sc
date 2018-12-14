@@ -34,7 +34,7 @@ class CreateCashAdvancesTable extends Migration
             $table->double('taxibike')->default(0);
             $table->double('rickshaw')->default(0);
             $table->double('taxi')->default(0);
-            $table->double('other_currency')->default(0);
+            $table->double('other_cost')->default(0);
             $table->text('other_description')->nullable();
             $table->double('total_cost')->default(0);
 
