@@ -114,6 +114,15 @@
           <div class="form-group">
             <a href="{{ route('product.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
           </div>
+            <div class="text-center form-group col-md-12 text-sm-left">
+                <label>Area:</label>
+                <select id="areaModal" class="inputFilter" name="id_area"></select>
+            </div>
+            <div class="text-center form-group col-md-12 text-sm-left monthModal">
+                <label>Period:</label>
+                <input type="text" id="monthModal" class="form-control" placeholder="Periode">
+                <input type="hidden" id="period" name="periode">
+            </div>
           <div class="form-group col-md-12">
             <label>Upload Your Data Cash Advance:</label>
             <div class="custom-file">
@@ -187,11 +196,30 @@ table.table thead tr th {
             autoclose: true,
         });
         $('#filterMonth').val(moment().format("MMMM Y"));
+        $('#monthModal').datetimepicker({
+            format: "MM yyyy",
+            startView: "3",
+            minView: "3",
+            autoclose: true,
+        }).on('changeDate', function(ev){
+          $('#period').val(moment(ev.date).format('Y-MM-DD'));
+        });
+        
 
         /**
          * Filter Area Select2
          */
         $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Select Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj){
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+        $('#areaModal').select2(setOptions('{{ route("area-select2") }}', 'Select Area', function (params) {
             return filterData('name', params.term);
           }, function (data, params) {
             return {
