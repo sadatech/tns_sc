@@ -30,31 +30,25 @@ class ReportInventoriController extends Controller
 				$res['success'] = false;
 				$res['msg'] = "Property DC cannot be empty.";
 			} else {
-				if (!empty(PropertiDc::find($request->properti_dc))) {
-
-					if ($image 	= $request->file('photo')) {
-						$photo 	= time()."_".$image->getClientOriginalName();
-						$path 	= 'uploads/report_inventory';
-						$image->move($path, $photo);
-						$image_compress = Image::make($path.'/'.$photo)->orientate();
-						$image_compress->save($path.'/'.$photo, 50);
-					}
-					$insert = ReportInventori::where('id',$id)->update([
-						'quantity'			=> $request->quantity,
-						'actual'			=> $request->actual,
-						'status'			=> $request->status,
-						'photo'				=> isset($photo) ? $path.'/'.$photo : null,
-					]);
-					if ($insert->id) {
-						$res['success'] = true;
-						$res['msg'] 	= "Success add Report Inventory.";
-					} else {
-						$res['success'] = false;
-						$res['msg'] 	= "Failed to add Report Inventory.";
-					}
+				if ($image 	= $request->file('photo')) {
+					$photo 	= time()."_".$image->getClientOriginalName();
+					$path 	= 'uploads/report_inventory';
+					$image->move($path, $photo);
+					$image_compress = Image::make($path.'/'.$photo)->orientate();
+					$image_compress->save($path.'/'.$photo, 50);
+				}
+				$insert = ReportInventori::where('id',$id)->update([
+					'quantity'			=> $request->quantity,
+					'actual'			=> $request->actual,
+					'status'			=> $request->status,
+					'photo'				=> isset($photo) ? $path.'/'.$photo : null,
+				]);
+				if ($insert) {
+					$res['success'] = true;
+					$res['msg'] 	= "Success add Report Inventory.";
 				} else {
 					$res['success'] = false;
-					$res['msg'] 	= "Property DC undefined.";
+					$res['msg'] 	= "Failed to add Report Inventory.";
 				}
 			}
 		}else{
@@ -80,14 +74,13 @@ class ReportInventoriController extends Controller
 				foreach ($reportInventory as $data) {
 					$listReportInventory[] = array(
 						'id' 				=> $data->id,
-						'name' 				=> $data->name,
 						'quantity' 			=> $data->quantity,
 						'actual'			=> $data->actual,
 						'status'			=> $data->status,
 						'photo'				=> $data->photo,
 						'photo_url'			=> $data->photo ? asset($data->photo) : null,
 						'id_properti_dc' 	=> $data->properti->id,
-						'properti_dc_name' 	=> $data->properti->name,
+						'properti_dc_name' 	=> $data->properti->item,
 					);
 				}
 				$res['reportInventory'] = $listReportInventory;

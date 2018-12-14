@@ -718,7 +718,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.spg.sales-summary');
 				})->name('report.sales.summary.spg')->middleware('auth');
-				Route::get('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
+				Route::post('/data', 'ReportController@SPGsalesSummary')->name('spg.pasar.sales.summary.data')->middleware('auth');
 				Route::post('/exportXLS/{subCategory?}/{date?}', 'ReportController@SPGsalesSummary_exportXLS')->name('spg.pasar.sales.summary.data.exportxls')->middleware('auth');
 			});
 		});
@@ -761,9 +761,12 @@ Route::prefix('report')->group(function () {
 			});
 
 			Route::prefix('cashAdvance')->group(function () {
-				Route::get('/', function(){
-					return view('report.democooking.cash');
-				})->name('report.demo.cashAdvance')->middleware('auth');
+				Route::get('/', 'CashAdvanceController@index')->name('report.demo.cashAdvance')->middleware('auth');
+				Route::post('/import', 'CashAdvanceController@import')->name('report.demo.import')->middleware('auth');
+				Route::get('/download-template', function()
+				{
+					return response()->download(public_path('assets/CashAdvanceImport.xlsx'));
+				})->name('report.demo.download-template')->middleware('auth');
 			});
 
 			Route::prefix('inventori')->group(function(){
@@ -772,6 +775,7 @@ Route::prefix('report')->group(function () {
 				})->name('report.demo.inventori')->middleware('auth');
 				Route::post('/data', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
 				Route::post('/add', 'ReportController@inventoriDCAdd')->name('dc.inventori.data.add')->middleware('auth');
+				Route::any('/exportXLS', 'ReportController@inventoriDCExportXLS')->name('dc.inventori.data.exportXLS')->middleware('auth');
 			});
 
 		});
