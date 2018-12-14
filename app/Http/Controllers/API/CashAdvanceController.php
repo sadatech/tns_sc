@@ -81,7 +81,7 @@ class CashAdvanceController extends Controller
 				$res['success'] = true;
 				foreach ($cash as $data) {
 					$listCash[] = array(
-						'id_employee'		=> $data->id,
+						'id'				=> $data->id,
 						'id_area'			=> $data->id_area,
 						'date'              => $data->date,
 						'description'       => $data->description ?? null,
