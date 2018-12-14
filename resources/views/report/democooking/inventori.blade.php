@@ -49,7 +49,7 @@
                 </h3>
                 <div class="block-option">
                     <!-- <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button> -->
-                    <a href="{{ route('properti.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                    <a target-url="{{ route('dc.inventori.data.exportXLS') }}" id="btnDownloadXLS" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                 </div>
             </div>
             <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
@@ -155,6 +155,19 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+    $("#btnDownloadXLS").on("click", function(){
+      $.ajax({
+        url: $(this).attr("target-url"),
+        type: "post",
+        success: function(e){
+          swal("Success!", e.result, "success");
+        },
+        error: function(){
+          swal("Error!", e.result, "error");
+        }
+      });
+    });
+
     $('#filterEmployee').select2(setOptions('{{ route("employee-is-tl-select2") }}', 'Select Employee', function (params) {
         return filterData('name', params.term);
     }, function (data, params) {
