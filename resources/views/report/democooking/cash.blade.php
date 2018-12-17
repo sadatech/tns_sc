@@ -60,6 +60,7 @@
                     <thead>
                         <tr>
                             <th rowspan="2" style="vertical-align: middle; width: 20px !important;">Tgl.</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Employee</th>
                             <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Keterangan</th>
                             <th colspan="3" style="vertical-align: middle; text-align: center; width: 200px !important;">KM pada saat pengisian BBM</th>
                             <th rowspan="2" style="vertical-align: middle; width: 200px !important;">TPD</th>
@@ -328,6 +329,7 @@ table.table thead tr th {
                 // "rowId": "id",
                 "columns": [
                   { data: 'tgl', name: 'tgl' },
+                  { data: 'employee', name: 'employee' },
                   { data: 'description', name: 'description'},
                   { data: 'km_begin', name: 'km_begin'},
                   { data: 'km_end', name: 'km_end'},

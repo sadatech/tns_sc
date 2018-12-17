@@ -113,6 +113,9 @@ class CashAdvanceController extends Controller
         ->addColumn("tgl", function($item){
             return Carbon::parse($item->date)->format("d");
         })
+        ->addColumn("employee", function($item){
+            return $item->employee->name;
+        })
         ->make(true);
     }
 
