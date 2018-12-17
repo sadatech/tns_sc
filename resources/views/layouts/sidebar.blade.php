@@ -286,10 +286,10 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Summary</span></a>
                                     </li>
-                                    {{-- Achievement--}}
-                                    {{-- <li>
-                                        <a class="{{ request()->is('report/gtc/achievement') ? 'active' : '' }}" href="{{ route('report.achievement') }}"><span class="sidebar-mini-hide">Achievement</span></a>
-                                    </li> --}}
+                                    {{-- SALES SUMMARY --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/sales-summary') ? 'active' : '' }}" href="{{ route('report.sales.summary.smd') }}"><span class="sidebar-mini-hide">Sales Summary</span></a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

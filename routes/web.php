@@ -687,6 +687,13 @@ Route::prefix('report')->group(function () {
 
 			});
 
+			Route::prefix('sales-summary')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.sales-summary');
+				})->name('report.sales.summary.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDsalesSummary')->name('smd.pasar.sales.summary.data')->middleware('auth');
+			});
+
 		});
 
 		// SPG PASAR
@@ -980,6 +987,7 @@ Route::prefix('promoactivity')->group(function(){
 
 Route::prefix('data')->group(function () {
 	Route::post('/subcategory-product-data', 'ReportController@SPGsalesSummaryHeader')->name('subcategory-product-data');
+	Route::post('/product-fokus-gtc-data', 'ReportController@SMDsalesSummaryHeader')->name('product-fokus-gtc-data');
 });
 
 
