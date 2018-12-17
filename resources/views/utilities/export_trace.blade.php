@@ -232,7 +232,10 @@
             "columns": tableColumns,
             "columnDefs": columnDefs,
             "order": order,
-            "autoWidth": false
+            "autoWidth": false,
+            colReorder: {
+                realtime: true
+            }
           });
 
     });

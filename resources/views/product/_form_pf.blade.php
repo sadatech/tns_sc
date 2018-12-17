@@ -24,9 +24,9 @@ $type = $type ?? '';
                 <div class="block-content">
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label>Category 1</label>
+                            <label>Sub Category 1</label>
                             <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_category1" id="{{$type}}Category1" required >
-                                <option value="" disabled selected>Choose your Category 1</option>
+                                <option value="" disabled selected>Choose your Sub Category 1</option>
                                 @foreach($category as $data)
                                 <option value="{{ $data->id }}">{{ $data->name }}</option>
                                 @endforeach
@@ -35,9 +35,9 @@ $type = $type ?? '';
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                        <label>Category 2</label>
+                        <label>Sub Category 2</label>
                         <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_category2" id="{{$type}}Category2" required>
-                            <option value="" disabled selected>Choose your Category 2</option>
+                            <option value="" disabled selected>Choose your Sub Category 2</option>
                             @foreach($category as $data)
                             <option value="{{ $data->id }}">{{ $data->name }}</option>
                             @endforeach

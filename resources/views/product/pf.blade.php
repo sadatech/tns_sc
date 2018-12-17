@@ -27,8 +27,8 @@
                 <table class="table table-striped table-vcenter js-dataTable-full" id="promoTable">
                 <thead>
                     <th class="text-center" style="width: 70px;"></th>
-                    <th>Category 1</th>
-                    <th>Category 2</th>
+                    <th>Sub Category 1</th>
+                    <th>Sub Category 2</th>
                     <th>Month From</th>
                     <th>Month Until</th>
                     <th class="text-center" style="width: 15%;"> Action</th>

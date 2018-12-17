@@ -49,10 +49,12 @@ use App\DistributionMotoric;
 use App\DistributionDetail;
 use App\DistributionMotoricDetail;
 use App\SalesMd as SalesMD;
+use App\Cbd;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Jobs\ExportSPGPasarAchievementJob;
 use App\Jobs\ExportSPGPasarSalesSummaryJob;
+use App\Jobs\ExportDCReportInventoriJob;
 use App\Product;
 use App\SalesSpgPasar;
 use App\SalesMotoricDetail;
@@ -74,6 +76,8 @@ use App\Model\Extend\SalesSpgPasarAchievement;
 use App\Model\Extend\SalesSpgPasarSummary;
 use App\SubCategory;
 use App\ProductFokusSpg;
+use App\ReportInventori;
+use App\PropertiDc;
 
 class ReportController extends Controller
 {
@@ -776,6 +780,66 @@ class ReportController extends Controller
     }
 
     // *********** AVAILABILITY ****************** //
+
+    public function availabilityRow(){
+        $data['categories'] = Category::get();
+        return view('report.availability', $data);
+    }
+
+    public function availabilityAccountRowData(){
+
+        $categories = Category::get();
+
+        $totaltanggal = Carbon::now()->daysInMonth;
+        $account = 1;
+        $stores = Store::where('id_account',$account)->get();
+        $datas = new Collection();
+        $i = 1;
+        while ( $i<=$totaltanggal ) {
+            foreach ($stores as $store) {
+                $item['date'] = $i;
+                $item['store'] = $store->name1;
+                $item['account'] = $store->account->name;
+                $item['subarea'] = $store->subarea->name;
+            $datas->push($item);
+            }
+            $i++;
+        }
+
+        foreach($datas as $data) {
+            foreach ($categories as $category) {
+                    $item[$category->id] = $category->name;
+                //     $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+                //                     ->join('categories','sub_categories.id_category', 'categories.id')
+                //                     ->where('categories.id',$category)
+                //                     ->select('products.*')->get();
+                // foreach ($products as $brand) {
+                //     $data[$category->id.'_'.$products->id] = $products->name;
+                //     // $data[$category->id.'_'.$products->id.'_depth'] = '-';
+                //     // $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
+                //     //                                 ->where('detail_display_shares.id_category',$category->id)
+                //     //                                 ->where('detail_display_shares.id_products',$products->id)
+                //     //                                 ->first();
+                //     // if ($detail_data) {
+                //     //     $data[$category->id.'_'.$products->id.'_tier'] = $detail_data->tier;
+                //     //     $data[$category->id.'_'.$products->id.'_depth'] = $detail_data->depth;
+
+                //     //     $data[$category->id.'_total_tier'] += $detail_data->tier;
+                //     //     $data[$category->id.'_total_depth'] += $detail_data->depth;
+
+                //     // }
+                // }
+            $data->push($item);
+            }
+
+        } 
+        // $datas = 
+        return response()->json($datas);
+
+        return Datatables::of($data)->make(true);
+        // return response()->json($data);
+    }
+
 
     public function availabilityIndex(){
         $data['categories'] = Category::get();
@@ -2229,6 +2293,74 @@ class ReportController extends Controller
         }
     }
 
+    public function inventoriDC()
+    {
+        $data = ReportInventori::get();
+        return Datatables::of(collect($data))
+        ->addColumn("employee", function($item){
+            return Employee::where("id", $item->id_employee)->first()->name;
+        })
+        ->addColumn("item", function($item){
+            return PropertiDc::where("id", $item->id_properti_dc)->first()->item;
+        })
+        ->addColumn("dokumentasi", function($item){
+            return (isset($item->photo) ? "<img src='".asset($item->photo)."' style='min-width: 149px;max-width: 150px;'>" : "-");
+        })
+        ->rawColumns(["dokumentasi"])
+        ->make(true);
+    }
+
+    public function inventoriDCAdd(Request $req)
+    {
+        $PropertiDcs = PropertiDc::get();
+        $result = DB::transaction(function() use ($PropertiDcs, $req){
+            foreach ($PropertiDcs as $PropertiDc)
+            {
+                $countReportInventori = ReportInventori::where("id_employee", $req->id_employee)->where("id_properti_dc", $PropertiDc->id)->count();
+                if ($countReportInventori == 0)
+                {
+                    ReportInventori::create([
+                        "no_polisi"       => strtoupper($req->no_polisi),
+                        "id_employee"     => $req->id_employee,
+                        "id_properti_dc"  => $PropertiDc->id,
+                        "quantity"        => 0,
+                        "actual"          => 0
+                    ]);
+                }
+            }
+        });
+
+        return redirect(route('report.demo.inventori'))->with([
+                'type'   => 'success',
+                'title'  => 'Berhasil<br/>',
+                'message'=> '<i class="em em-confetti_ball mr-2"></i>Data berhasil diperbarui!'
+        ]);
+    }
+
+    public function inventoriDCExportXLS()
+    {
+        $result = DB::transaction(function(){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "Demo Cooking - Report Inventori (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportDCReportInventoriJob($JobTrace, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
     public function SMDdistpf(Request $request)
     {
         
@@ -2292,7 +2424,7 @@ class ReportController extends Controller
 
     public function SMDsales(Request $request)
     {
-        $sales = Distribution::orderBy('created_at', 'DESC');
+        $sales = SalesMd::orderBy('created_at', 'DESC');
         if ($request->has('employee')) {
             $sales->whereHas('employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
@@ -2917,13 +3049,14 @@ class ReportController extends Controller
         $result = DB::transaction(function() use ($id_subcategory, $filterMonth){
             try
             {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->nama . " " . Carbon::parse($filterMonth)->format("M-Y"),
+                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->name . " " . Carbon::parse($filterMonth)->format("M-Y") . " (" .$filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSPGPasarSalesSummaryJob($JobTrace, [$id_subcategory, $filterMonth]));
+                dispatch(new ExportSPGPasarSalesSummaryJob($JobTrace, [$id_subcategory, $filterMonth, $filecode]));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
@@ -3067,13 +3200,14 @@ class ReportController extends Controller
         $result = DB::transaction(function(){
             try
             {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "SPG Pasar - Report Achievement",
+                    'title' => "SPG Pasar - Report Achievement (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSPGPasarAchievementJob($JobTrace));
+                dispatch(new ExportSPGPasarAchievementJob($JobTrace, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)

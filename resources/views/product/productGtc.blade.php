@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Product Fokus GTC")
+@section('title', "Product Fokus Product")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Product Fokus GTC<small>Manage</small></h2>
+  <h2 class="content-heading pt-10"> Product Fokus <small>Manage</small></h2>
   @if($errors->any())
     <div class="alert alert-danger">
       <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -22,15 +22,15 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <a href="{{route ('fokusMD.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+            <button class="btn btn-info btn-square"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="promoTable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Product</th>
-          <th>Area</th>
+          <th>Area</th> 
           <th>Month From</th>
           <th>Month Until</th>
           <th class="text-center" style="width: 15%;"> Action</th>
@@ -41,12 +41,68 @@
   </div>
 </div>
 
-<div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="fa fa-edit"></i> Update Product Fokus</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <form id="editForm" method="post">
+              {!! method_field('PUT') !!}
+              {!! csrf_field() !!}
+              <div class="block-content">
+                <div class="form-group">
+                  <label>Product</label>
+                  <select class="js-edit form-control" style="width: 100%" id="productInput" name="id_product" >
+                    @foreach($product as $data)
+                      <option value="{{ $data->id }}">{{ $data->name }} </option>
+                    @endforeach
+                  </select>
+                </div>
+                <div class="row">
+                  <div class="form-group col-md-12">
+                      <label>Area</label>
+                      <select class= "js-edit form-control" id="areaInput" style="width: 100%"  name="id_area" >
+                      <option disabled selected>Choose your Area</option>
+                        @foreach($area as $data)
+                          <option value="{{ $data->id }}">{{ $data->name }} </option>
+                        @endforeach
+                      </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                      <label>Month From</label>
+                      <input class="form-control date1" type="text" id="fromInput" name="from" data-month-highlight="true" data-date-format="mm/yyyy" placeholder="dd/yyyy" required>
+                  </div>
+                  <div class="form-group col-md-6">
+                      <label>Month Until</label>
+                      <input class="form-control date1" type="text" id="toInput" name="to" data-month-highlight="true" data-date-format="mm/yyyy" placeholder="dd/yyyy">
+                  </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-alt-success">
+                        <i class="fa fa-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import <i>Product Fokus MD</i></h3>
+          <h3 class="block-title"><i class="fa fa-plus"></i> Add Product Fokus</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -54,48 +110,49 @@
           </div>
         </div>
       </div>
-      <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('fokusMD.import') }}">
-        {{ csrf_field() }}
+      <form action="{{ route('fokusGTC.add') }}" method="post">
+        {!! csrf_field() !!}
         <div class="block-content">
           <div class="form-group">
-            <a href="{{ route('fokusMD.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+            <label>Product</label>
+            <select class="js-select2 form-control" style="width: 100%" name="product[]" multiple required>
+              @foreach($product as $data)
+                <option value="{{ $data->id }}">{{ $data->name }} </option>
+              @endforeach
+            </select>
           </div>
-          <div class="block-content">
-            <h5> Sample Data :</h5>
-            <table class="table table-bordered table-vcenter">
-                <thead>
-                    <tr>
-                        <td><b>Product</b></td>
-                        <td><b>Month From</b></td>
-                        <td><b>Month Until</b></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Product Name 1</td>
-                        <td>Month From 1</td>
-                        <td>Month Until 1</td>
-                    </tr>
-                    <tr>
-                        <td>Product Name 2</td>
-                        <td>Month From 2</td>
-                        <td>Month Until 2</td>
-                    </tr>
-                </tbody>
-            </table>
-          </div>
-          <div class="form-group col-md-12">
-            <label>Upload Your Data Product:</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                <label class="custom-file-label">Choose file Excel</label>
-                <code> *Type File Excel</code>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="custom-control custom-checkbox custom-control-inline">
+                  <input class="custom-control-input" type="checkbox" id="example-inline-checkbox2" checked>
+                  <label class="custom-control-label" for="example-inline-checkbox2">ALL</label>
+              </div>
+              <div id="test">
+                <select id="coba" class="js-select2 form-control" style="width: 100%" name="area">
+                  <option value="">Choose Area</option>
+                    @foreach ($area as $dis)
+                    <option value="{{ $dis->id }}">{{ $dis->name }}</option>
+                    @endforeach
+                </select>
+              </div>
             </div>
-           </div>
+          </div>
+          <br/>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Month From</label>
+              <input class="form-control date1" type="text" placeholder="Month From" data-date-format="mm/yyyy" name="from" data-month-highlight="true" required>
+            </div>
+            <div class="col-md-6">
+              <label>Month Until</label>
+              <input class="form-control date1" type="text" placeholder="Month Until" data-date-format="mm/yyyy" name="to" data-month-highlight="true" required>
+            </div>
+          </div>
         </div>
+        <br/>
         <div class="modal-footer">
           <button type="submit" class="btn btn-alt-success">
-            <i class="fa fa-save"></i> Import
+            <i class="fa fa-save"></i> Save
           </button>
           <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
         </div>
@@ -103,13 +160,6 @@
     </div>
   </div>
 </div>
-
-{{-- MODAL EDIT FOCUS --}}
-@include('product._form_focus_gtc', ['id' => 'editModal', 'type' => 'edit'])
-
-{{-- MODAL ADD FOCUS --}}
-@include('product._form_focus_gtc', ['id' => 'tambahModal', 'action' => route('fokusGTC.add')])
-
 @endsection
 
 @section('css')
@@ -129,6 +179,35 @@
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script type="text/javascript">
+      $('#test').hide();
+      $("#example-inline-checkbox2").change(function() {
+          if ($(this).removeAttr("checked")) {
+            $('#test').show();
+          }
+      });
+
+      $("#example-inline-checkbox2").change(function() {
+          if ($(this).prop("checked")) {
+            $('#test').hide();
+            $('#coba').val(null).trigger('change');
+          }
+      });
+  
+      $(".date1").datepicker( {
+        format: "mm/yyyy",
+        viewMode: "months",
+        autoclose: true,
+        minViewMode: "months"
+      });
+
+      function editModal(json) {
+          $('#editModal').modal('show');
+          $('#editForm').attr('action', "{{ url('/product/fokusGTC/update') }}/"+json.id);
+          $('#productInput').val(json.product).trigger('change');
+          $('#areaInput').val(json.area).trigger('change');
+          $('#fromInput').val(json.from);
+          $('#toInput').val(json.to);
+      }
       @if(session('type'))
       $(document).ready(function() {
           $.notify({
@@ -150,6 +229,7 @@
       $(function() {
           $('#promoTable').DataTable({
               processing: true,
+              serverSide: true,
               drawCallback: function(){
                   $('.js-swal-delete').on('click', function(){
                     var url = $(this).data("url");
@@ -178,16 +258,21 @@
                   });
               },
               ajax: '{!! route('fokusGTC.data') !!}',
-              scrollY: "300px",
               columns: [
-	            { data: 'id', name: 'id' },
+	              { data: 'id', name: 'id' },
                 { data: 'product.name', name: 'product.name'},
-                { data: 'area.name', name: 'area.name'},
+	              { data: 'area', name: 'area' },
                 { data: 'from', name: 'from' },
                 { data: 'to', name: 'to' },
-	            { data: 'action', name: 'action' },
+	              { data: 'action', name: 'action' }
               ]
           });
       });
+      $(".js-select2").select2({ 
+      dropdownParent: $("#tambahModal")
+    });
+    $(".js-edit").select2({ 
+      dropdownParent: $("#editModal")
+    });
   </script>
 @endsection
