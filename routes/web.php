@@ -640,6 +640,16 @@ Route::prefix('report')->group(function () {
 				Route::get('/export', 'ReportController@exportSMDstocking')->name('export.smd.stockist')->middleware('auth');
 			});
 
+			Route::prefix('cbd')->group(function () {
+				Route::get('/', function(){
+					$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+					$data['product'] = \App\Product::whereIn('id', $getId)->get();
+					return view('report.smd.cbd', $data);
+				})->name('report.cbd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDcbd')->name('data.smd.cbd')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDcbd')->name('export.smd.cbd')->middleware('auth');
+			});
+
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
 					$getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
