@@ -16,6 +16,8 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
 {
     use Authenticatable;
     use DropDownHelper;
+
+    protected $table = 'employees';
     
     protected $fillable = [
         'name', 'nik', 'id_position', 'ktp', 'phone', 'email', 'rekening', 'bank', 'status', 'joinAt', 'id_agency', 'gender', 'education', 'birthdate', 'foto_ktp', 'foto_tabungan', 'isResign', 'password', 'id_timezone'

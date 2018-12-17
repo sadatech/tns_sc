@@ -694,6 +694,20 @@ Route::prefix('report')->group(function () {
 				Route::post('/data', 'ReportController@SMDsalesSummary')->name('smd.pasar.sales.summary.data')->middleware('auth');
 			});
 
+			Route::prefix('target-kpi')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.target-kpi');
+				})->name('report.target.kpi.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDTargetKpi')->name('smd.pasar.target.kpi.data')->middleware('auth');
+			});
+
+			Route::prefix('kpi')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.kpi');
+				})->name('report.kpi.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDKpi')->name('smd.pasar.kpi.data')->middleware('auth');
+			});
+
 		});
 
 		// SPG PASAR

@@ -290,6 +290,14 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/sales-summary') ? 'active' : '' }}" href="{{ route('report.sales.summary.smd') }}"><span class="sidebar-mini-hide">Sales Summary</span></a>
                                     </li>
+                                    {{-- KPI --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/kpi') ? 'active' : '' }}" href="{{ route('report.kpi.smd') }}"><span class="sidebar-mini-hide">KPI</span></a>
+                                    </li>
+                                    {{-- TARGET KPI --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/target-kpi') ? 'active' : '' }}" href="{{ route('report.target.kpi.smd') }}"><span class="sidebar-mini-hide">Target KPI</span></a>
+                                    </li>                                    
                                 </ul>
                             </li>
                         </ul>

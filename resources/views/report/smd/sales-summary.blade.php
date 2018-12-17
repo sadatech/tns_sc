@@ -38,7 +38,7 @@
       </div>
   </div>
 
-  <div class="block block-themed " id="panelData"> 
+  <div class="block block-themed " id="panelData" style="display: none;"> 
     <div class="block-header bg-primary">
       <h3 class="block-title">Datatables</h3>
     </div>
