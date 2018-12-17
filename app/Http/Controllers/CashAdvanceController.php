@@ -11,6 +11,7 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\CashAdvance;
+use App\Area;
 use DB;
 
 use App\JobTrace;
@@ -112,6 +113,9 @@ class CashAdvanceController extends Controller
         ->addColumn("tgl", function($item){
             return Carbon::parse($item->date)->format("d");
         })
+        ->addColumn("employee", function($item){
+            return $item->employee->name;
+        })
         ->make(true);
     }
 
@@ -124,7 +128,7 @@ class CashAdvanceController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "Demo Cooking - Report Cash Advance " . $filecode,
+                    'title' => "Demo Cooking - Report Cash Advance - " . Area::where("id", $id_area)->first()->name. " - " . Carbon::parse($filterPeriode)->format("M Y") . " (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportDCReportCashAdvanceJob($JobTrace, $id_area, $filterPeriode, $filecode));

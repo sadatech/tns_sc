@@ -28,7 +28,7 @@ trait ExportDCReportCashAdvanceTrait
 		        $data[] = $dtObj;
 
 		        $dtObj["listHeader"][] = ["KM PADA SAAT PENGISIAN BBM", "ANGKUTAN", "BIAYA LAIN-LAIN"];
-		        $dtObj["listHeader"][] = ["TGL",
+		        $dtObj["listHeader"][] = ["TGL", "EMPLOYEE",
 		        	"KETERANGAN", "KM AWAL", "KM AKHIR", "KM TOTAL",
 		        	"TPD", "HOTEL / KOSAN",
 			        "BBM", "PARKIR/TOL", "PEMBELIAN BAHAN BAKU", "PEMBELIAN PROPERTY", "PERIJINAN",
@@ -50,6 +50,7 @@ trait ExportDCReportCashAdvanceTrait
                 {
                 	$dtObj["dataValue"][] = [
                 		Carbon::parse($dbData->date)->format("d"),
+                        $dbData->employee->name,
                 		$dbData->description,
                 		$dbData->km_begin,
                 		$dbData->km_end,
@@ -84,6 +85,7 @@ trait ExportDCReportCashAdvanceTrait
 						$dtObj["dataValue"][] = [
 							null,
 							"Grand Total",
+                            null,
 							(clone $CashAdvanceDataQuery)->sum("km_begin"),
 							(clone $CashAdvanceDataQuery)->sum("km_end"),
 							(clone $CashAdvanceDataQuery)->sum("km_distance"),
@@ -123,6 +125,10 @@ trait ExportDCReportCashAdvanceTrait
                     $cell->setAlignment("center");
                 });
 
+                // merge "Grand Total"
+                $sheet->mergeCells("B".($dtObj["allHeight"] - 1).":U".($dtObj["allHeight"] - 1));
+                $sheet->mergeCells("B".$dtObj["allHeight"].":C".$dtObj["allHeight"]);
+
                 // skip line 3
                 $sheet->row(3, function($row){
                 	$row->setFontSize(11);
@@ -143,62 +149,63 @@ trait ExportDCReportCashAdvanceTrait
 	            }
 
 	            // set width border
-	            $sheet->setWidth("B", 30);
-	            $sheet->setWidth("C", 15);
-	            $sheet->setWidth("D", 15);
-	            $sheet->setWidth("E", 15);
-	            $sheet->setWidth("G", 20);
-	            $sheet->setWidth("H", 15);
-	            $sheet->setWidth("I", 20);
-	            $sheet->setWidth("J", 25);
-	            $sheet->setWidth("K", 25);
-	            $sheet->setWidth("L", 15);
-                $sheet->setWidth("R", 10);
-                $sheet->setWidth("S", 30);
-                $sheet->setWidth("T", 20);
+                $sheet->setWidth(chr(ord("A") + 1), 20);// 
+	            $sheet->setWidth(chr(ord("B") + 1), 30);
+	            $sheet->setWidth(chr(ord("C") + 1), 15);
+	            $sheet->setWidth(chr(ord("D") + 1), 15);
+	            $sheet->setWidth(chr(ord("E") + 1), 15);
+	            $sheet->setWidth(chr(ord("G") + 1), 20);
+	            $sheet->setWidth(chr(ord("H") + 1), 15);
+	            $sheet->setWidth(chr(ord("I") + 1), 20);
+	            $sheet->setWidth(chr(ord("J") + 1), 25);
+	            $sheet->setWidth(chr(ord("K") + 1), 25);
+	            $sheet->setWidth(chr(ord("L") + 1), 15);
+                $sheet->setWidth(chr(ord("R") + 1), 10);
+                $sheet->setWidth(chr(ord("S") + 1), 30);
+                $sheet->setWidth(chr(ord("T") + 1), 20);
 
                 // create border 
                 // Set all borders (top, right, bottom, left)
-                $sheet->cell("R4", function($cell){
+                $sheet->cell("".chr(ord("R") + 1)."4", function($cell){
                 	$cell->setValue("Area");
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "none", "none", "thin");
                 });
-                $sheet->setWidth("S", 30);
-                $sheet->cell("S4", function($cell) use ($CashAdvanceDataQuery){
+                $sheet->setWidth(chr(ord("S") + 1), 30);
+                $sheet->cell("".chr(ord("S") + 1)."4", function($cell) use ($CashAdvanceDataQuery){
                 	$cell->setValue(": " . ucfirst((clone $CashAdvanceDataQuery)->first()->area->name));
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "thin", "none", "none");
                 });
-                $sheet->cell("T4", function($cell){
+                $sheet->cell(chr(ord("T") + 1)."4", function($cell){
                 	$cell->setValue("");
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "thin", "none", "none");
                 });
                 //
-                $sheet->cell("R5", function($cell){
+                $sheet->cell(chr(ord("R") + 1)."5", function($cell){
                 	$cell->setValue("Periode");
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "none", "thin", "thin");
                 });
-                $sheet->cell("S5", function($cell) use ($CashAdvanceDataQuery){
+                $sheet->cell(chr(ord("S") + 1)."5", function($cell) use ($CashAdvanceDataQuery){
                 	$cell->setValue(": " . Carbon::parse((clone $CashAdvanceDataQuery)->first()->date)->format("M Y"));
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "none", "thin", "none");
                 });
-                $sheet->cell("T5", function($cell){
+                $sheet->cell(chr(ord("T") + 1)."5", function($cell){
                 	$cell->setValue("");
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "thin", "thin", "none");
                 });
                 //
-                $sheet->cell("S6", function($cell){
+                $sheet->cell(chr(ord("T") + 1)."6", function($cell){
                 	$cell->setValue("");
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
@@ -210,9 +217,9 @@ trait ExportDCReportCashAdvanceTrait
                 {
                 	$starthead = strtoupper(chr(ord($starthead) + 1));
 
-                	if ($starthead == "C" || $starthead == "D" || $starthead == "E" ||
-                		$starthead == "M" || $starthead == "N" || $starthead == "O" || $starthead == "P" || $starthead == "Q" ||
-                		$starthead == "R" || $starthead == "S")
+                	if ($starthead == chr(ord("C") + 1) || $starthead == chr(ord("D") + 1) || $starthead == chr(ord("E") + 1) ||
+                		$starthead == chr(ord("M") + 1) || $starthead == chr(ord("N") + 1) || $starthead ==chr(ord("O") + 1) || $starthead == chr(ord("P") + 1) || $starthead == chr(ord("Q") + 1) ||
+                		$starthead == chr(ord("R") + 1) || $starthead == chr(ord("S") + 1))
                 	{
                 		$dtObj["listSkip"][] = $starthead;
                 	} else {
@@ -224,7 +231,7 @@ trait ExportDCReportCashAdvanceTrait
                 		$sheet->mergeCells($CharMerge."8:".$CharMerge."9");
                 	}
 
-            		$cellFill = ($starthead == "C" || $starthead == "D" || $starthead == "E" || $starthead == "M" || $starthead == "N" || $starthead == "O" || $starthead == "P" || $starthead == "Q" || $starthead == "R" || $starthead == "S" ? $starthead."9" : $starthead."8");
+            		$cellFill = ($starthead == chr(ord("C") + 1) || $starthead == chr(ord("D") + 1) || $starthead == chr(ord("E") + 1) || $starthead == chr(ord("M") + 1) || $starthead == chr(ord("N") + 1) || $starthead ==chr(ord("O") + 1) || $starthead == chr(ord("P") + 1) || $starthead == chr(ord("Q") + 1) || $starthead == chr(ord("R") + 1) || $starthead == chr(ord("S") + 1) ? $starthead."9" : $starthead."8");
 
             		$sheet->row(8, function($row){
 	                    $row->setAlignment("center");
@@ -243,24 +250,24 @@ trait ExportDCReportCashAdvanceTrait
 
                 }
 
-                $sheet->mergeCells("C8:E8");
-                $sheet->cell("C8", function($cell) use ($dtObj){
+                $sheet->mergeCells(chr(ord("C") + 1)."8:".chr(ord("E") + 1)."8");
+                $sheet->cell(chr(ord("C") + 1)."8", function($cell) use ($dtObj){
             		$cell->setValue($dtObj["listHeader"][0][0]);
                     $cell->setAlignment("center");
                     $cell->setValignment("center");
                     $cell->setFontSize(11);
                     $cell->setFontWeight('bold');
                 });
-                $sheet->mergeCells("M8:Q8");
-                $sheet->cell("M8", function($cell) use ($dtObj){
+                $sheet->mergeCells(chr(ord("M") + 1)."8:".chr(ord("Q") + 1)."8");
+                $sheet->cell(chr(ord("M") + 1)."8", function($cell) use ($dtObj){
             		$cell->setValue($dtObj["listHeader"][0][1]);
                     $cell->setAlignment("center");
                     $cell->setValignment("center");
                     $cell->setFontSize(11);
                     $cell->setFontWeight('bold');
                 });
-                $sheet->mergeCells("R8:S8");
-                $sheet->cell("R8", function($cell) use ($dtObj){
+                $sheet->mergeCells(chr(ord("R") + 1)."8:".chr(ord("S") + 1)."8");
+                $sheet->cell(chr(ord("R") + 1)."8", function($cell) use ($dtObj){
             		$cell->setValue($dtObj["listHeader"][0][2]);
                     $cell->setAlignment("center");
                     $cell->setValignment("center");
