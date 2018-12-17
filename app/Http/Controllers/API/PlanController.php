@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Components\traits\ApiAuthHelper;
-use App\PlanDc;
-use App\PlanEmployee;
-use Config;
-use JWTAuth;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
+use JWTAuth;
+use Config;
+use Image;
+use DB;
+use App\PlanEmployee;
+use App\PlanDc;
 
 class PlanController extends Controller
 {
@@ -26,25 +28,48 @@ class PlanController extends Controller
 		$code = 200;
 		if ($check['success'] == true) {
 			
+			$photo = '-';
 			if ($image 	= $request->file('photo')) {
 				$photo 	= time()."_".$image->getClientOriginalName();
 				$path 	= 'uploads/plan';
 				$image->move($path, $photo);
+				$image_compress = Image::make($path.'/'.$photo)->orientate();
+				$image_compress->save($path.'/'.$photo, 50);
 			}
 			$date 	= Carbon::now()->toDateString();
 			$user = $check['user'];
 
-			$update 	= PlanDc::whereDate('date',$date)->whereHas('planEmployee', function($query) use ($user)
+			$check 	= PlanDc::whereDate('date',$date)->whereHas('planEmployee', function($query) use ($user)
 			{
 				return $query->where('id_employee', $user->id);
-			})->orderBy('id','desc')
-			->update([
-				'stocklist'	=> $request->stocklist,
-				'actual'		=> $request->actual,
-				'photo'			=> $photo,
-			]);
+			})->orderBy('id','desc');
 
-			if ($update) {
+			$transaction = DB::transaction(function () use ($request, $photo, $user, $check) {
+				if ($check->get()->count() > 0) {
+					$update = $check->update([
+						'channel'		=> $request->channel,
+						'stocklist'		=> $request->stocklist,
+						'actual'		=> $request->actual,
+						'photo'			=> $photo,
+					]);
+				}else{
+					$create = PlanDc::create([
+						'plan'			=> '-',
+						'date'			=> $date,
+						'channel'		=> $request->channel,
+						'stocklist'		=> $request->stocklist,
+						'actual'		=> $request->actual,
+						'photo'			=> $photo,
+					]);
+					PlanEmployee::create([
+						'id_employee' 	=> $user->id,
+						'id_plandc'		=> $create->id,
+					]);
+				}
+				return 'success';
+			});
+
+			if ($transaction == 'success') {
 				$res['success'] = true;
 				$res['msg'] 	= "Success Checkin.";
 			} else {

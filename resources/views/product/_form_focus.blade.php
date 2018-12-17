@@ -45,11 +45,11 @@ $type = $type ?? '';
           <div class="row">
             <div class="col-md-6">
               <label>Month From</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Month From" data-date-format="mm/yyyy" id="{{$type}}DateFrom" name="from" data-month-highlight="true" required>
             </div>
             <div class="col-md-6">
               <label>Month Until</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Month Until" id="{{$type}}DateTo" name="to" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Month Until" data-date-format="mm/yyyy" id="{{$type}}DateTo" name="to" data-month-highlight="true" required>
             </div>
           </div>
         </div>

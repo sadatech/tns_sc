@@ -30,6 +30,19 @@ class ProductController extends Controller
         return $data;
     }
 
+
+    public function getProductByCategory($param){
+
+        $data = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+                        ->join('categories','sub_categories.id_category', 'categories.id')
+                        ->where('categories.id',$param)
+                        ->select('products.*')->get();
+
+        // return response()->json($data);
+        return $data;
+
+    }
+
    public function baca()
    {
        return view('product.product');

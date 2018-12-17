@@ -27,8 +27,10 @@ use App\Employee;
 use App\EmployeePasar;
 use App\EmployeeSubArea;
 use App\Pasar;
+use App\Block;
 use App\EmployeeStore;
 use App\Filters\EmployeeFilters;
+use App\Filters\BlockFilters;
 
 class EmployeeController extends Controller
 {
@@ -37,8 +39,23 @@ class EmployeeController extends Controller
 		return $data;
 	}
 
+	public function getDataWithFiltersBlock(BlockFilters $filters){
+		$data = Block::filter($filters)->get();
+		return $data;
+	}
+
 	public function getDataWithFiltersForReport(EmployeeFilters $filters){
 		$data = Employee::filter($filters)->get();
+		return $data;
+	}
+
+	public function getDataIsTL()
+	{
+		$data = Employee::where("id_position", 5)
+		->whereHas("employeeSubArea", function($query){
+			$query->where("isTl", 1);
+		})
+		->get();
 		return $data;
 	}
 

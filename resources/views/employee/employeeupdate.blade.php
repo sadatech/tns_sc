@@ -409,19 +409,6 @@
         $('#status').val(null);
         $('#storeStay').hide();
         $('#storeMobile').hide();
-    } else if (position == {{ App\Position::where(['level' => 'motoric'])->first()->id }}) {
-        var selected = {!! $pasar_selected !!};
-        $.each(selected, function( index, value ) {
-          addItemPasar(value.pasars_item);
-      });
-        $('#pasarMobile').show();
-        $('#status').hide();
-        $('#tl').hide();
-        $('#subarea').hide();
-        $('#subareaInput').val(null);
-        $('#status').val(null);
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
     } else if (position == {{ App\Position::where(['level' => 'dc'])->first()->id }}) {
         var selectedArea2 = {!! $area_selected !!};
         var getIdArea2 = selectedArea2[0].subarea_item.split("|")[0];

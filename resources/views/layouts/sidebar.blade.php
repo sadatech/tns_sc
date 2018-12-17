@@ -55,15 +55,17 @@
                         <a class="{{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><i class="si si-cup"></i><span class="sidebar-mini-hide">Dashboard</span></a>
                     </li>
                     @if(Auth::user()->level == "administrator") 
-                    <!-- <li>
+                    {{-- <li>
                         <a class="{{ request()->is('company') ? 'active' : '' }}" href="{{ route('company') }}"><i class="si si-briefcase"></i><span class="sidebar-mini-hide">Company Profile</span></a>
-                    </li> -->
+                    </li> --}}
                     @endif
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Master Data</span></li>
                     {{-- Store --}}
                     <li class="{{ request()->is('store/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-shopping-cart"></i><span class="sidebar-mini-hide">Store(s)</span></a>
                         <ul>
+                        
+                       
                             <li>
                                 <a class="{{ request()->is('store/region') ? 'active' : '' }}" href="{{ route('region') }}">Region</a>
                             </li>
@@ -73,15 +75,21 @@
                             <li>
                                 <a class="{{ request()->is('store/subarea') ? 'active' : '' }}" href="{{ route('subarea') }}">Sub Area</a>
                             </li>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            <li>
+                                <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Root</a>
+                            </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('store/channel') ? 'active' : '' }}" href="{{ route('channel') }}">Channel</a>
                             </li>
                             <li>
                                 <a class="{{ request()->is('store/account') ? 'active' : '' }}" href="{{ route('account') }}">Account</a>
                             </li>
-                            <li>
+                            <!--<li>
                                 <a class="{{ request()->is('store/distributor') ? 'active' : '' }}" href="{{ route('distributor') }}">Distributor</a>
-                            </li>
+                            </li>-->
                             <li>
                                 <a class="{{ request()->is('store/sales_tiers') ? 'active' : '' }}" href="{{ route('sales_tiers') }}">Sales Tiers</a>
                             </li>
@@ -89,11 +97,15 @@
                                 <a class="{{ request()->is('store/summary') ? 'active' : '' }}" href="{{ route('store') }}">Store</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('store/pasar') ? 'active' : '' }}" href="{{ route('pasar') }}">Pasar</a>
-                            </li>
-                            <li>
                                 <a class="{{ request()->is('store/place') ? 'active' : '' }}" href="{{ route('place') }}">Place</a>
                             </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            <li>
+                                <a class="{{ request()->is('store/pasar') ? 'active' : '' }}" href="{{ route('pasar') }}">Pasar</a>
+                            </li>
+                            @endif
+                         
                         </ul>
                     </li>
                     {{-- Employee --}}
@@ -106,15 +118,19 @@
                             <li>
                                 <a class="{{ request()->is('employee/agency') ? 'active' : '' }}" href="{{ route('agency') }}">Agency</a>
                             </li>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">MTC</a>
                             </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                             <li>
                                 <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">GTC</a>
                             </li>
                             <li>
                                 <a class="{{ request()->is('employee/summary/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
                             </li>
+                            @endif
                             <li>
                                 <a class="{{ request()->is('employee/resign') ? 'active' : '' }}" href="{{ route('resign') }}">Resign</a>
                             </li>
@@ -124,9 +140,15 @@
                         </ul>
                     </li>
                     {{-- PlannDc --}}
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                      <li>
                         <a class="{{ request()->is('planDc') ? 'active' : '' }}" href="{{ route('planDc') }}"><i class="fa fa-pied-piper"></i><span class="sidebar-mini-hide">Plan Dc</span></a>
                     </li>
+                    {{-- PropertiDc  --}}
+                     <li>
+                        <a class="{{ request()->is('propertiDc') ? 'active' : '' }}" href="{{ route('propertiDc') }}"><i class="fa fa-suitcase"></i><span class="sidebar-mini-hide">Properti Dc</span></a>
+                    </li>
+                    @endif
                     {{-- Product --}}
                     <li class="{{ request()->is('product/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Product(s)</span></a>
@@ -146,18 +168,34 @@
                             <li>
                                 <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('product/product-competitor') ? 'active' : '' }}" href="{{ route('product-competitor') }}">Product Competitor</a>
                             </li>
+                            @endif
                             <li>
                                 <a class="{{ request()->is('product/price') ? 'active' : '' }}" href="{{ route('price') }}">Price</a>
                             </li>
-                            <li>
+                            <!--<li>
                                 <a class="{{ request()->is('product/fokus') ? 'active' : '' }}" href="{{ route('fokus') }}">Fokus</a>
-                            </li>
-                            <!-- <li>
-                                <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
                             </li> -->
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
+                             <li>
+                                <a class="{{ request()->is('product/fokus-mtc') ? 'active' : '' }}" href="{{ route('fokusMtc') }}">Fokus MTC</a>
+                            </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                             <li>
+                                <a class="{{ request()->is('product/fokusGTC') ? 'active' : '' }}" href="{{ route('fokusGTC') }}">Fokus GTC</a>
+                            </li>
+                            {{-- <li>
+                                <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
+                            </li> --}}
+
+                            <li>
+                                <a class="{{ request()->is('product/fokusSpg') ? 'active' : '' }}" href="{{ route('fokusSpg') }}">Fokus SPG Pasar</a>
+                            </li>
+                            @endif
                             <!-- <li>
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
@@ -167,23 +205,29 @@
                     <li class="{{ request()->is('target/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-target"></i><span class="sidebar-mini-hide">Target(s)</span></a>
                         <ul>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('target/mtc') ? 'active' : '' }}" href="{{ route('mtc') }}">MTC</a>
                             </li>
-                            <li>
+                            @endif
+                            <!--<li>
                                 <a class="{{ request()->is('target/dc') ? 'active' : '' }}" href="{{ route('target.dc') }}">Demo Cooking</a>
-                            </li>
+                            </li>-->
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                             <li>
                                 <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
                             </li>
-                            <li>
+                            @endif
+                            <!--<li>
                                 <a class="{{ request()->is('target/spg') ? 'active' : '' }}" href="{{ route('target.spg') }}">SPG Pasar</a>
-                            </li>
+                            </li>-->
                         </ul>
                     </li>
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                     <li>
                         <a class="{{ request()->is('pf') ? 'active' : '' }}" href="{{ route('pf') }}"><i class="si si-settings"></i><span class="sidebar-mini-hide">Setting PF</span></a>
                     </li>  
+                    @endif
                     </li> 
                     {{-- USERS--}}
 
@@ -210,6 +254,7 @@
                     
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- REPORT GTC --}}
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                     <li class="{{ request()->is('report/gtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">GTC</span></a>
                         <ul>
@@ -300,6 +345,10 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/demo/cashAdvance') ? 'active' : '' }}" href="{{ route('report.demo.cashAdvance') }}"><span class="sidebar-mini-hide">Cash Advance</span></a>
                                     </li>
+                                    {{-- Inventori --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/demo/inventori') ? 'active' : '' }}" href="{{ route('report.demo.inventori') }}"><span class="sidebar-mini-hide">Inventori</span></a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
@@ -322,11 +371,9 @@
                             </li>
                         </ul>
                     </li>
-                </ul>
-
-                      
+                    @endif
                     </li>
-
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                     {{-- REPORT MTC --}}
                     <li class="{{ request()->is('report/mtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">MTC</span></a>
@@ -341,7 +388,7 @@
                             </li>
                             {{-- SALES MTC REVIEW --}}
                             <li>
-                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
+                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Achievement MTC</span></a>
                             </li>
                             {{-- Display Share--}}
                             <li>
@@ -363,6 +410,11 @@
                             </li>  
                         </ul>
                     </li>
+                    @endif
+                </ul>
+
+                      
+                   
         </div>
      
     </div>

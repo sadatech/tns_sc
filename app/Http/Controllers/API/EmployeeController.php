@@ -9,6 +9,7 @@ use DB;
 use Config;
 use Auth;
 use JWTAuth;
+use Image;
 
 use App\Employee;
 
@@ -152,13 +153,17 @@ class EmployeeController extends Controller
 
 			if ($req->hasFile('photo'))
 			{
-				$photo = $req->file('photo');
+				$image = $req->file('photo');
+				$photo 	= time()."_".$image->getClientOriginalName();
+				$path 	= 'uploads/profile/'."employee/photo_" . $photo_type;
+				$image->move($path, $photo);
 
-				$path = $photo->store("employee/photo_" . $photo_type);
+				$image_compress = Image::make($path.'/'.$photo)->orientate();
+						$image_compress->save($path.'/'.$photo, 50);
 
 				Employee::where("id", $this->employe_auth->id)
 				->update([
-					"foto_" . str_replace("profile", "profil", $photo_type) => $path
+					"foto_" . str_replace("profile", "profil", $photo_type) => $path.'/'.$photo
 				]);
 
 				return response()->json(["message"=>"Operation Success"], 200);

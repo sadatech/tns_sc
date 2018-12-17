@@ -53,9 +53,19 @@ class Product extends Model
     	return $this->hasMany('App\FokusProduct', 'id_product');
     }
 
+    public function fokusGTC()
+    {
+    	return $this->hasMany('App\ProductFokusGtc', 'id_product');
+    }
+
     public function subcategory()
     {
         return $this->belongsTo('App\SubCategory', 'id_subcategory');
+    }
+
+    public function productcategory()
+    {
+        return $this->subcategory->category();
     }
 
     public function brand()
@@ -75,6 +85,11 @@ class Product extends Model
     public function measure()
     {
         return $this->hasMany('App\ProductMeasure', 'id_product');
+    }
+
+    public function fokusMtc()
+    {
+        return $this->hasMany('App\ProductFokusMtc', 'id_product');
     }
 
     public function sku_units()

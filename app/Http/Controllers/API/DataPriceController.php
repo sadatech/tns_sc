@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Components\traits\WeekHelper;
 use App\DataPrice;
 use App\DetailDataPrice;
 use JWTAuth;
@@ -13,6 +14,8 @@ use Carbon\Carbon;
 
 class DataPriceController extends Controller
 {
+	use WeekHelper;
+
 	public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
@@ -46,7 +49,7 @@ class DataPriceController extends Controller
 							$modelDataPrice->id_store = $data->store;
 							$modelDataPrice->id_employee = $user->id;
 							$modelDataPrice->date = $date;
-							$modelDataPrice->week = $data->week;
+							$modelDataPrice->week = $this->getWeek($date);
 							$modelDataPrice->save();
 							foreach ($data->product as $product) {
 

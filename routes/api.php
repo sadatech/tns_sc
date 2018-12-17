@@ -176,6 +176,29 @@ Route::prefix('block')->group(function () {
 	Route::get('/disable/{id}/{status}', 'API\BlockController@disable')->name('api.block.disable');
 });
 
+// Report Inventory
+Route::prefix('report_inventory')->group(function () {
+	Route::post('/update/{id}', 'API\ReportInventoriController@store')->name('api.report_inventory.update');
+	Route::get('/list', 'API\ReportInventoriController@list')->name('api.report_inventory.list');
+});
+
+// Route
+Route::prefix('route')->group(function () {
+	Route::get('/list', 'API\RouteController@list')->name('api.route.list');
+});
+
+// Property DC
+Route::prefix('property_dc')->group(function () {
+	Route::get('/list', 'API\PropertyDcController@list')->name('api.route.list');
+});
+
+// Block
+Route::prefix('cash_advance')->group(function () {
+	Route::post('/add', 'API\CashAdvanceController@store')->name('api.cash_advance.add');
+	Route::get('/list', 'API\CashAdvanceController@list')->name('api.cash_advance.list');
+});
+
+
 // History
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
