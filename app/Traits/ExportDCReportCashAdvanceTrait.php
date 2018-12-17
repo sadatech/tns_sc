@@ -16,7 +16,7 @@ trait ExportDCReportCashAdvanceTrait
 		$CashAdvanceDataQuery = CashAdvance::where("id_area", $id_area)
         ->whereMonth("date", Carbon::parse($filtermonth)->format("m"))
         ->whereYear("date", Carbon::parse($filtermonth)->format("Y"));
-		$CashAdvanceData = ( clone $CashAdvanceDataQuery)->get();
+		$CashAdvanceData = (clone $CashAdvanceDataQuery)->get();
 
 		$filename = "DC - Report Cash Advance (".$filecode.")";
 		$store = Excel::create($filename, function($excel) use ($CashAdvanceDataQuery, $CashAdvanceData, &$data){
@@ -116,8 +116,8 @@ trait ExportDCReportCashAdvanceTrait
 
                 // header name // line 2
                 $sheet->mergeCells($dtObj["allWidthObj"][0]."2:".$dtObj["allWidth"]."2");
-                $sheet->cell($dtObj["allWidthObj"][0]."2", function($cell){
-                	$cell->setValue("SUMMARY PENYELESAIAN CASH ADVANCE  - DEMO COOKING TEAM");
+                $sheet->cell($dtObj["allWidthObj"][0]."2", function($cell) use ($CashAdvanceDataQuery){
+                	$cell->setValue("SUMMARY PENYELESAIAN CASH ADVANCE  - DEMO COOKING TEAM " . strtoupper((clone $CashAdvanceDataQuery)->first()->area->name));
                     $cell->setFontWeight('bold');
                     $cell->setFontSize(24);
                     $cell->setAlignment("center");
@@ -161,13 +161,13 @@ trait ExportDCReportCashAdvanceTrait
                 // Set all borders (top, right, bottom, left)
                 $sheet->cell("R4", function($cell){
                 	$cell->setValue("Area");
-                    $cell->setAlignment("center");
+                    $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "none", "none", "thin");
                 });
                 $sheet->setWidth("S", 30);
-                $sheet->cell("S4", function($cell){
-                	$cell->setValue(": Areanya");
+                $sheet->cell("S4", function($cell) use ($CashAdvanceDataQuery){
+                	$cell->setValue(": " . ucfirst((clone $CashAdvanceDataQuery)->first()->area->name));
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "thin", "none", "none");
@@ -180,13 +180,13 @@ trait ExportDCReportCashAdvanceTrait
                 });
                 //
                 $sheet->cell("R5", function($cell){
-                	$cell->setValue("Bulan");
-                    $cell->setAlignment("center");
+                	$cell->setValue("Periode");
+                    $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "none", "thin", "thin");
                 });
-                $sheet->cell("S5", function($cell){
-                	$cell->setValue(": Desember 2015");
+                $sheet->cell("S5", function($cell) use ($CashAdvanceDataQuery){
+                	$cell->setValue(": " . Carbon::parse((clone $CashAdvanceDataQuery)->first()->date)->format("M Y"));
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 	$cell->setBorder("thin", "none", "thin", "none");
@@ -199,7 +199,7 @@ trait ExportDCReportCashAdvanceTrait
                 });
                 //
                 $sheet->cell("S6", function($cell){
-                	$cell->setValue("Hal : Biaya Front Liner Team ");
+                	$cell->setValue("");
                     $cell->setAlignment("left");
                     $cell->setFontSize(11);
                 });
@@ -273,9 +273,9 @@ trait ExportDCReportCashAdvanceTrait
                 $data = $dtObj;
 
 			});
-		})->export("XLSX");
+		})->store("xlsx", public_path("export/report"), true);
 
-		return response()->json($data, 200, [], JSON_PRETTY_PRINT);
+		return asset("export/report") . "/" . $filename . ".xlsx";
 	}
 
 }
