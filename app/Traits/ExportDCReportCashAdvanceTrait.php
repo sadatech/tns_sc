@@ -230,6 +230,7 @@ trait ExportDCReportCashAdvanceTrait
 	                    $row->setAlignment("center");
 	                    $row->setValignment("center");
 	                    $row->setFontSize(11);
+                        $row->setFontWeight('bold');
             		});
 
             		$sheet->cell($cellFill, function($cell) use ($cellFill, $Header2Key, $dtObj){
@@ -237,6 +238,7 @@ trait ExportDCReportCashAdvanceTrait
 	                    $cell->setAlignment("center");
 	                    $cell->setValignment("center");
 	                    $cell->setFontSize(11);
+                        $cell->setFontWeight('bold');
             		});
 
                 }
@@ -247,6 +249,7 @@ trait ExportDCReportCashAdvanceTrait
                     $cell->setAlignment("center");
                     $cell->setValignment("center");
                     $cell->setFontSize(11);
+                    $cell->setFontWeight('bold');
                 });
                 $sheet->mergeCells("M8:Q8");
                 $sheet->cell("M8", function($cell) use ($dtObj){
@@ -254,6 +257,7 @@ trait ExportDCReportCashAdvanceTrait
                     $cell->setAlignment("center");
                     $cell->setValignment("center");
                     $cell->setFontSize(11);
+                    $cell->setFontWeight('bold');
                 });
                 $sheet->mergeCells("R8:S8");
                 $sheet->cell("R8", function($cell) use ($dtObj){
@@ -261,6 +265,7 @@ trait ExportDCReportCashAdvanceTrait
                     $cell->setAlignment("center");
                     $cell->setValignment("center");
                     $cell->setFontSize(11);
+                    $cell->setFontWeight('bold');
                 });
 
                 $startNum = 10;
