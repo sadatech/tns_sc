@@ -49,6 +49,7 @@ use App\DistributionMotoric;
 use App\DistributionDetail;
 use App\DistributionMotoricDetail;
 use App\SalesMd as SalesMD;
+use App\Cbd;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Jobs\ExportSPGPasarAchievementJob;

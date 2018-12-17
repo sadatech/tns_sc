@@ -24,6 +24,6 @@ class CashAdvance extends Model
 
     public function area()
     {
-        return $this->belongsTo('App\area', 'id_area');
+        return $this->belongsTo('App\Area', 'id_area');
     }
 }
