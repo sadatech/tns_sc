@@ -10,6 +10,8 @@ class FokusProduct extends Model
         'id_product', 'id_pf'
     ];
 
+    protected $dates = ['deleted_at'];
+
     public function product()
     {
     	return $this->belongsTo('App\Product', 'id_product');

@@ -687,6 +687,27 @@ Route::prefix('report')->group(function () {
 
 			});
 
+			Route::prefix('sales-summary')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.sales-summary');
+				})->name('report.sales.summary.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDsalesSummary')->name('smd.pasar.sales.summary.data')->middleware('auth');
+			});
+
+			Route::prefix('target-kpi')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.target-kpi');
+				})->name('report.target.kpi.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDTargetKpi')->name('smd.pasar.target.kpi.data')->middleware('auth');
+			});
+
+			Route::prefix('kpi')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.kpi');
+				})->name('report.kpi.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDKpi')->name('smd.pasar.kpi.data')->middleware('auth');
+			});
+
 		});
 
 		// SPG PASAR
@@ -980,6 +1001,8 @@ Route::prefix('promoactivity')->group(function(){
 
 Route::prefix('data')->group(function () {
 	Route::post('/subcategory-product-data', 'ReportController@SPGsalesSummaryHeader')->name('subcategory-product-data');
+	Route::post('/product-fokus-gtc-data', 'ReportController@SMDsalesSummaryHeader')->name('product-fokus-gtc-data');
+	Route::post('/product-fokus-gtc-cat1-cat2', 'ReportController@SMDCat1Cat2')->name('product-fokus-gtc-cat1-cat2');
 });
 
 
