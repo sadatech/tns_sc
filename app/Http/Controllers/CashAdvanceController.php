@@ -13,6 +13,9 @@ use Illuminate\Support\Str;
 use App\CashAdvance;
 use DB;
 
+use App\JobTrace;
+use App\Jobs\ExportDCReportCashAdvanceJob;
+
 class CashAdvanceController extends Controller
 {
     /**
@@ -112,13 +115,28 @@ class CashAdvanceController extends Controller
         ->make(true);
     }
 
-    use \App\Traits\ExportDCReportCashAdvanceTrait;
-
     public function exportXLS($id_area, $filterPeriode)
     {
-        $data = $this->DCReportCashAdvanceExportTrait($id_area, $filterPeriode, "ss");
-
-        return $data;
+        $result = DB::transaction(function() use ($id_area, $filterPeriode){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "Demo Cooking - Report Cash Advance " . $filecode,
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportDCReportCashAdvanceJob($JobTrace, $id_area, $filterPeriode, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
 }
