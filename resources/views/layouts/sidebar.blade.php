@@ -64,6 +64,8 @@
                     <li class="{{ request()->is('store/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-shopping-cart"></i><span class="sidebar-mini-hide">Store(s)</span></a>
                         <ul>
+                        
+                       
                             <li>
                                 <a class="{{ request()->is('store/region') ? 'active' : '' }}" href="{{ route('region') }}">Region</a>
                             </li>
@@ -73,18 +75,21 @@
                             <li>
                                 <a class="{{ request()->is('store/subarea') ? 'active' : '' }}" href="{{ route('subarea') }}">Sub Area</a>
                             </li>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                             <li>
                                 <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Root</a>
                             </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('store/channel') ? 'active' : '' }}" href="{{ route('channel') }}">Channel</a>
                             </li>
                             <li>
                                 <a class="{{ request()->is('store/account') ? 'active' : '' }}" href="{{ route('account') }}">Account</a>
                             </li>
-                            <li>
+                            <!--<li>
                                 <a class="{{ request()->is('store/distributor') ? 'active' : '' }}" href="{{ route('distributor') }}">Distributor</a>
-                            </li>
+                            </li>-->
                             <li>
                                 <a class="{{ request()->is('store/sales_tiers') ? 'active' : '' }}" href="{{ route('sales_tiers') }}">Sales Tiers</a>
                             </li>
@@ -92,11 +97,15 @@
                                 <a class="{{ request()->is('store/summary') ? 'active' : '' }}" href="{{ route('store') }}">Store</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('store/pasar') ? 'active' : '' }}" href="{{ route('pasar') }}">Pasar</a>
-                            </li>
-                            <li>
                                 <a class="{{ request()->is('store/place') ? 'active' : '' }}" href="{{ route('place') }}">Place</a>
                             </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            <li>
+                                <a class="{{ request()->is('store/pasar') ? 'active' : '' }}" href="{{ route('pasar') }}">Pasar</a>
+                            </li>
+                            @endif
+                         
                         </ul>
                     </li>
                     {{-- Employee --}}
@@ -109,15 +118,19 @@
                             <li>
                                 <a class="{{ request()->is('employee/agency') ? 'active' : '' }}" href="{{ route('agency') }}">Agency</a>
                             </li>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">MTC</a>
                             </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                             <li>
                                 <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">GTC</a>
                             </li>
                             <li>
                                 <a class="{{ request()->is('employee/summary/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
                             </li>
+                            @endif
                             <li>
                                 <a class="{{ request()->is('employee/resign') ? 'active' : '' }}" href="{{ route('resign') }}">Resign</a>
                             </li>
@@ -127,6 +140,7 @@
                         </ul>
                     </li>
                     {{-- PlannDc --}}
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                      <li>
                         <a class="{{ request()->is('planDc') ? 'active' : '' }}" href="{{ route('planDc') }}"><i class="fa fa-pied-piper"></i><span class="sidebar-mini-hide">Plan Dc</span></a>
                     </li>
@@ -134,6 +148,7 @@
                      <li>
                         <a class="{{ request()->is('propertiDc') ? 'active' : '' }}" href="{{ route('propertiDc') }}"><i class="fa fa-suitcase"></i><span class="sidebar-mini-hide">Properti Dc</span></a>
                     </li>
+                    @endif
                     {{-- Product --}}
                     <li class="{{ request()->is('product/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Product(s)</span></a>
@@ -153,27 +168,34 @@
                             <li>
                                 <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('product/product-competitor') ? 'active' : '' }}" href="{{ route('product-competitor') }}">Product Competitor</a>
                             </li>
+                            @endif
                             <li>
                                 <a class="{{ request()->is('product/price') ? 'active' : '' }}" href="{{ route('price') }}">Price</a>
                             </li>
-                            <li>
+                            <!--<li>
                                 <a class="{{ request()->is('product/fokus') ? 'active' : '' }}" href="{{ route('fokus') }}">Fokus</a>
-                            </li>
-                             <li>
-                                <a class="{{ request()->is('product/fokusGTC') ? 'active' : '' }}" href="{{ route('fokusGTC') }}">Fokus GTC</a>
-                            </li>
+                            </li> -->
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                              <li>
                                 <a class="{{ request()->is('product/fokus-mtc') ? 'active' : '' }}" href="{{ route('fokusMtc') }}">Fokus MTC</a>
+                            </li>
+                            @endif
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                             <li>
+                                <a class="{{ request()->is('product/fokusGTC') ? 'active' : '' }}" href="{{ route('fokusGTC') }}">Fokus GTC</a>
                             </li>
                             {{-- <li>
                                 <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
                             </li> --}}
+
                             <li>
                                 <a class="{{ request()->is('product/fokusSpg') ? 'active' : '' }}" href="{{ route('fokusSpg') }}">Fokus SPG Pasar</a>
                             </li>
+                            @endif
                             <!-- <li>
                                 <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
                             </li> -->
@@ -183,23 +205,29 @@
                     <li class="{{ request()->is('target/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-target"></i><span class="sidebar-mini-hide">Target(s)</span></a>
                         <ul>
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                             <li>
                                 <a class="{{ request()->is('target/mtc') ? 'active' : '' }}" href="{{ route('mtc') }}">MTC</a>
                             </li>
+                            @endif
                             <!--<li>
                                 <a class="{{ request()->is('target/dc') ? 'active' : '' }}" href="{{ route('target.dc') }}">Demo Cooking</a>
                             </li>-->
+                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                             <li>
                                 <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
                             </li>
+                            @endif
                             <!--<li>
                                 <a class="{{ request()->is('target/spg') ? 'active' : '' }}" href="{{ route('target.spg') }}">SPG Pasar</a>
                             </li>-->
                         </ul>
                     </li>
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                     <li>
                         <a class="{{ request()->is('pf') ? 'active' : '' }}" href="{{ route('pf') }}"><i class="si si-settings"></i><span class="sidebar-mini-hide">Setting PF</span></a>
                     </li>  
+                    @endif
                     </li> 
                     {{-- USERS--}}
 
@@ -226,6 +254,7 @@
                     
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- REPORT GTC --}}
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
                     <li class="{{ request()->is('report/gtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">GTC</span></a>
                         <ul>
@@ -240,6 +269,10 @@
                                     {{-- STOCKIST MTC --}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/stockist') ? 'active' : '' }}" href="{{ route('report.stockist') }}"><span class="sidebar-mini-hide">Stockist</span></a>
+                                    </li>
+                                    {{-- CBD --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/cbd') ? 'active' : '' }}" href="{{ route('report.cbd') }}"><span class="sidebar-mini-hide">CBD</span></a>
                                     </li>
                                     {{-- Dist PF MTC--}}
                                     <li>
@@ -327,26 +360,26 @@
                             {{-- MOTORIK --}}
                             <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motorik</span></a>
-                                <ul>
-                            {{-- ATTENDANCE MOTORIK --}}
-                            <li>
-                                <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
-                            </li>
-                            {{-- DIST PF MOTORIK --}}
-                            <li>
-                                <a class="{{ request()->is('report/gtc/motorik/distPF') ? 'active' : '' }}" href="{{ route('report.motorik.distPF') }}"><span class="sidebar-mini-hide">Dist PF</span></a>
-                            </li>
-                            {{-- SALES MOTORIK --}}
-                            <li>
-                                <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
+                            <ul>
+                                {{-- ATTENDANCE MOTORIK --}}
+                                <li>
+                                    <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                                </li>
+                                {{-- DIST PF MOTORIK --}}
+                                <li>
+                                    <a class="{{ request()->is('report/gtc/motorik/distPF') ? 'active' : '' }}" href="{{ route('report.motorik.distPF') }}"><span class="sidebar-mini-hide">Dist PF</span></a>
+                                </li>
+                                {{-- SALES MOTORIK --}}
+                                <li>
+                                    <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
+                                </li>
+                            </ul>
                             </li>
                         </ul>
                     </li>
-                </ul>
-
-                      
+                    @endif
                     </li>
-
+                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
                     {{-- REPORT MTC --}}
                     <li class="{{ request()->is('report/mtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">MTC</span></a>
@@ -383,6 +416,11 @@
                             </li>  
                         </ul>
                     </li>
+                    @endif
+                </ul>
+
+                      
+                   
         </div>
      
     </div>
