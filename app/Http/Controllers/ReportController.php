@@ -83,6 +83,7 @@ use App\ProductFokus;
 use App\FokusProduct;
 use App\Model\Extend\SalesMdSummary;
 use App\ProductFokusGtc;
+use App\Pf;
 
 class ReportController extends Controller
 {
@@ -3471,7 +3472,7 @@ class ReportController extends Controller
             return @$item->getSumCat1($request->periode);
         })
         ->addColumn('sum_cat_2', function ($item) use ($request){
-            return 0;
+            return @$item->getSumCat2($request->periode);
         })
         ->addColumn('sum_of_total_value', function ($item) use ($request){
             return number_format(@$item->getTotalValue($request->periode));
@@ -3489,10 +3490,10 @@ class ReportController extends Controller
             return round(@$item->getAvgEc($request->periode));
         })
         ->addColumn('average_cat_1', function ($item) use ($request){
-            return 0;
+            return @$item->getAvgCat1($request->periode);
         })
         ->addColumn('average_cat_2', function ($item) use ($request){
-            return 0;
+            return @$item->getAvgCat2($request->periode);
         })
         ->addColumn('average_of_total_value', function ($item) use ($request){
             return number_format(@$item->getAvgTotalValue($request->periode));
@@ -3510,10 +3511,10 @@ class ReportController extends Controller
             return @$item->getBestEc($request->periode);
         })
         ->addColumn('best_cat_1', function ($item) use ($request){
-            return 0;
+            return @$item->getBestCat1($request->periode);
         })
         ->addColumn('best_cat_2', function ($item) use ($request){
-            return 0;
+            return @$item->getBestCat2($request->periode);
         })
         ->addColumn('best_of_total_value', function ($item) use ($request){
             return @$item->getBestTotalValue($request->periode);
@@ -3525,6 +3526,19 @@ class ReportController extends Controller
             return @$item->getTotalPoint($request->periode);
         })     
         ->make(true);
+
+    }
+
+    public function SMDCat1Cat2(Request $request){
+
+        $pf = Pf::whereDate('from', '<=', Carbon::parse($request->periode))
+                ->whereDate('to', '>=', Carbon::parse($request->periode))
+                ->first();
+
+        return [
+            "cat1" => @$pf->category1->name,
+            "cat2" => @$pf->category2->name
+        ];
 
     }
 }

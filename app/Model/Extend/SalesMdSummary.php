@@ -529,10 +529,9 @@ class SalesMdSummary extends SalesMd
     		$oos = StockMdDetail::whereHas('stock', function ($query){
                                 return $query->whereDate('date', $this->periode)->where('id_pasar', $this->outlet->employeePasar->pasar->id)->where('id_employee', $this->id_employee);
                             })    						
-    						->where('id_product', $item)
-    						->first()->oos;
+    						->where('id_product', $item);
 
-    		$result[$item] = $oos;
+    		$result[$item] = ($oos->first()) ? $oos->first()->oos : 0;
 
     	}
 

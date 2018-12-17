@@ -1002,6 +1002,7 @@ Route::prefix('promoactivity')->group(function(){
 Route::prefix('data')->group(function () {
 	Route::post('/subcategory-product-data', 'ReportController@SPGsalesSummaryHeader')->name('subcategory-product-data');
 	Route::post('/product-fokus-gtc-data', 'ReportController@SMDsalesSummaryHeader')->name('product-fokus-gtc-data');
+	Route::post('/product-fokus-gtc-cat1-cat2', 'ReportController@SMDCat1Cat2')->name('product-fokus-gtc-cat1-cat2');
 });
 
 

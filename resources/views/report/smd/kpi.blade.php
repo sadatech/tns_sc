@@ -252,6 +252,42 @@ table.table thead tr th {
       var serial = $("#filterForm").serialize()
       console.log(serial)
 
+      $.ajax({
+        url:"{!! route('product-fokus-gtc-cat1-cat2') !!}",
+        method:"POST", //First change type to method here
+
+        data:{
+          periode: $('#filterMonth').val(),
+        },
+        success:function(response) {
+          console.log(response);
+
+          if(response.cat1 == null){
+            document.getElementById("sum_cat_1").innerHTML = "Sum of -";
+            document.getElementById("avg_cat_1").innerHTML = "Avg of -";
+            document.getElementById("best_cat_1").innerHTML = "-";
+          }else{
+            document.getElementById("sum_cat_1").innerHTML = "Sum of "+response.cat1;
+            document.getElementById("avg_cat_1").innerHTML = "Avg of "+response.cat1;
+            document.getElementById("best_cat_1").innerHTML = response.cat1;
+          }
+
+          if(response.cat2 == null){
+            document.getElementById("sum_cat_2").innerHTML = "Sum of -";
+            document.getElementById("avg_cat_2").innerHTML = "Avg of -";
+            document.getElementById("best_cat_2").innerHTML = "-";
+          }else{
+            document.getElementById("sum_cat_2").innerHTML = "Sum of "+response.cat2;
+            document.getElementById("avg_cat_2").innerHTML = "Avg of "+response.cat2;
+            document.getElementById("best_cat_2").innerHTML = response.cat2;
+          }
+        },
+        error:function(){
+          swal("Error!", "Failed to request!", "error");
+        }
+
+      });
+
       $('#panelData').removeAttr('style');
       
     })

@@ -122,6 +122,39 @@ class TargetKpiMd extends Employee
     	return $data->first()->qty * 1;
     }
 
+    public function getSumCat2($periode){
+    	$pf = Pf::whereDate('from', '<=', Carbon::parse($periode))
+    			->whereDate('to', '>=', Carbon::parse($periode))
+    			->first()->id_category2;
+
+    	$data = SalesMd::join('sales_md_details', 'sales_mds.id', 'sales_md_details.id_sales')
+        					->join('products', 'products.id', 'sales_md_details.id_product')
+        					->join('employees', 'employees.id', 'sales_mds.id_employee')
+        					->whereMonth('sales_mds.date', Carbon::parse($periode)->month)
+        					->whereYear('sales_mds.date', Carbon::parse($periode)->year)
+        					->where('employees.id', $this->id)
+        					->where('products.id_subcategory', $pf)        					
+        					->select(DB::raw('(sum(sales_md_details.qty)) as qty'));
+
+    	return $data->first()->qty * 1;
+    }
+
+    public function getAvgCat1($periode){
+    	return ($this->getHkActual($periode) == 0 || $this->getHkActual($periode) == null) ? 0 : $this->getSumCat1($periode)/$this->getHkActual($periode);
+    }
+
+    public function getAvgCat2($periode){
+    	return ($this->getHkActual($periode) == 0 || $this->getHkActual($periode) == null) ? 0 : $this->getSumCat2($periode)/$this->getHkActual($periode);
+    }
+
+    public function getBestCat1($periode){
+    	return ($this->getAvgCat1($periode) > 4) ? 1 : 0;
+    }
+
+    public function getBestCat2($periode){
+    	return ($this->getAvgCat2($periode) > 4) ? 1 : 0;
+    }
+
     /** TARGET KPI **/
 
     public function getTarget($periode){
