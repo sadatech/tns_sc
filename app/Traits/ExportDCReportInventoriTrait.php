@@ -31,7 +31,7 @@ trait ExportDCReportInventoriTrait
 
 		        	$dtObj["dataDBCount"] = $dtObj["dataDB"]->count();
 
-		        	$dtObj["listHeader"] = ["No", "Item", "Quantity", "Actual", "Status", "Dokumentasi"];
+		        	$dtObj["listHeader"] = ["No", "Item", "Quantity", "Actual", "Status", "Description", "Dokumentasi"];
 
 	                // all width
 	                $dtObj["allWidth"] = "@";
@@ -55,13 +55,14 @@ trait ExportDCReportInventoriTrait
 	                        $dataDB_data->quantity,
 	                        $dataDB_data->actual,
 	                        (isset($dataDB_data->status) ? $dataDB_data->status : "-"),
+	                        (isset($dataDB_data->description) ? $dataDB_data->description : "-"),
 	                        (isset($dataDB_data->photo) ? null : "-")
 	                    ];
 	                	$dtObj["imgCoordinate"][$startVal]["Drawing"] = new PHPExcel_Worksheet_Drawing;
 	                	if (isset($dataDB_data->photo))
 	                	{
-	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setPath(public_path("/../../public_html/".($dataDB_data->photo)));
-	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setCoordinates("F".($startVal - 1));
+	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setPath(public_path("/".($dataDB_data->photo)));
+	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setCoordinates("G".($startVal - 1));
 	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setWorksheet($sheet);
 	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setWidth(40);
 	                	}
