@@ -284,11 +284,6 @@ function filteringReportWithoutSearch(arrayOfData) {
                     this.data = result.data;
                     return result.data;
                 },
-
-                success:function(response) {
-                  swal("Set Filter Done", "Please check the results", "success");
-                  
-                },
             },
             scrollX:        true,
             scrollCollapse: true,
@@ -299,6 +294,8 @@ function filteringReportWithoutSearch(arrayOfData) {
             "order": order,
             "ordering": false
         });
+
+        swal("Set Filter Done", "Please check the results", "success");
                 
     })
 }

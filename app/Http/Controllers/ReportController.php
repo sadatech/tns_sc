@@ -74,10 +74,16 @@ use App\Filters\EmployeeStoreFilters;
 use App\Filters\SalesSpgSummaryFilters;
 use App\Model\Extend\SalesSpgPasarAchievement;
 use App\Model\Extend\SalesSpgPasarSummary;
+use App\Model\Extend\TargetKpiMd;
 use App\SubCategory;
 use App\ProductFokusSpg;
 use App\ReportInventori;
 use App\PropertiDc;
+use App\ProductFokus;
+use App\FokusProduct;
+use App\Model\Extend\SalesMdSummary;
+use App\ProductFokusGtc;
+use App\Pf;
 
 class ReportController extends Controller
 {
@@ -2346,7 +2352,7 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "Demo Cooking - Report Inventori " . $filecode,
+                    'title' => "Demo Cooking - Report Inventori (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportDCReportInventoriJob($JobTrace, $filecode));
@@ -3053,7 +3059,7 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->name . " " . Carbon::parse($filterMonth)->format("M-Y") . " " .$filecode,
+                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->name . " " . Carbon::parse($filterMonth)->format("M-Y") . " (" .$filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportSPGPasarSalesSummaryJob($JobTrace, [$id_subcategory, $filterMonth, $filecode]));
@@ -3114,50 +3120,6 @@ class ReportController extends Controller
         });
 
         return $dt->make(true);
-        
-        // return Datatables::of($sales)
-        // ->addColumn('area', function ($data) {
-        //     return @$data->pasar->subarea->area->name;
-        // })
-        // ->addColumn('nama_spg', function ($data) {
-        //     return @$data->employee->name;
-        // })
-        // ->addColumn('tanggal', function ($data) {
-        //     return Carbon::parse($data->date)->format('D, F d, Y');
-        // })
-        // ->addColumn('nama_pasar', function ($data) {
-        //     return @$data->pasar->name;
-        // })
-        // ->addColumn('nama_stokies', function ($data) {
-        //     return 'Under Construction';
-        // })
-        // ->addColumn('jumlah_beli', function ($data) {
-        //     return $data->getJumlahBeli();
-        // })
-        // ->addColumn('detail', function ($data) {
-            
-        //     return $data->getDetail();
-        //     // return $pf;
-        //     // return "<table class='table'>
-        //     //             <thead>
-        //     //                 <th>Sales CCL 65 ml (Pcs)</th>
-        //     //                 <th>Sales CCL 200 ml</th>
-        //     //             </thead>
-        //     //             <tbody>
-        //     //                 <tr>
-        //     //                     <td>100</td>
-        //     //                     <td>0</td>
-        //     //                 </tr>
-        //     //                 <tr>
-        //     //                     <td>20</td>
-        //     //                     <td>10</td>
-        //     //                 </tr>
-        //     //             </tbody>
-        //     //         </table>";
-        // })
-        // ->rawColumns(['detail'])
-        // ->make(true);
-        // return Datatables::of($sales)->make(true);
     }    
 
     public function SPGsalesSummaryHeader(Request $request){
@@ -3204,7 +3166,7 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "SPG Pasar - Report Achievement " . $filecode,
+                    'title' => "SPG Pasar - Report Achievement (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportSPGPasarAchievementJob($JobTrace, $filecode));
@@ -3261,5 +3223,322 @@ class ReportController extends Controller
         // })
         ->make(true);
         // return Datatables::of($sales)->make(true);
+    }
+
+    public function SMDsalesSummaryHeader(Request $request){
+
+        // return $request->all();
+
+        $periode = Carbon::parse($request->periode)->format('Y-m-d');
+
+        // $id_subcategories = array_unique(FokusProduct::whereHas('pf.Fokus.channel', function ($query){
+        //                     return $query->where('name', 'GTC');
+        //                 })
+        //                 ->whereHas('pf', function ($query) use ($periode){
+        //                     return $query->whereDate('from', '<=', $periode)
+        //                                  ->whereDate('to', '>=', $periode);
+        //                 })                        
+        //                 ->get()->pluck('product.subcategory.id')->toArray());
+
+        $id_subcategories = array_unique(ProductFokusGtc::whereDate('from', '<=', $periode)->whereDate('to', '>=', $periode)->get()->pluck('product.subcategory.id')->toArray());
+
+        $subcategories = SubCategory::whereIn('id', $id_subcategories)->get();
+        
+        $th_before = "";
+        $th = "";
+        $array_column = array();        
+
+        /* DISTRIBUSI */
+
+        $colspan_dist = 0;
+        foreach ($subcategories as $item) {
+            $th .= "<th>Dist. ".$item->name."</th>";
+            array_push($array_column, ['data'=>'dist_'.$item->id, 'name'=>'dist_'.$item->id ]);
+            $colspan_dist += 1;
+        }
+        if($colspan_dist > 0) $th_before .= "<th colspan='".$colspan_dist."' style='text-align: center;'>Distribusi Produk Fokus</th>";
+
+        /* SALES */
+
+        $colspan_sales = 0;
+        foreach ($subcategories as $item) {
+            $th .= "<th>Sales ".$item->name."</th>";
+            array_push($array_column, ['data'=>'sales_'.$item->id, 'name'=>'sales_'.$item->id ]);
+            $colspan_sales += 1;
+        }
+        if($colspan_sales > 0) $th_before .= "<th colspan='".$colspan_sales."' style='text-align: center;'>Sales [ Unit ] / Pack</th>";
+
+        /* EC, VALUE PF, VALUE NON, TOTAL */
+
+        $th_before .= "<th colspan='5' style='text-align: center;'>SUMMARY</th>";
+        $th .= "<th>EC</th><th>Value Product Fokus</th><th>Value Non Produk Fokus</th><th>Value Total</th><th>CBD</th>";
+        array_push($array_column, 
+            ['data'=>'eff_call', 'name'=>'eff_call'],
+            ['data'=>'value_pf', 'name'=>'value_pf'],
+            ['data'=>'value_non_pf', 'name'=>'value_non_pf'],
+            ['data'=>'value_total', 'name'=>'value_total'],
+            ['data'=>'cbd', 'name'=>'cbd']
+        );
+
+        /* OOS */
+
+        $id_product_oos = StockMdDetail::whereHas('stock', function ($query) use ($periode){
+                                return $query->whereMonth('date', Carbon::parse($periode)->month)->whereYear('date', Carbon::parse($periode)->year);
+                            })->pluck('id_product')->toArray();
+
+        $products = Product::whereIn('id', $id_product_oos)->get();
+
+        $colspan_oos = 0;
+        foreach ($products as $item) {
+            $th .= "<th>".$item->name."</th>";
+            array_push($array_column, ['data'=>'oos_'.$item->id, 'name'=>'oos_'.$item->id ]);
+            $colspan_oos += 1;
+        }
+        if($colspan_oos > 0) $th_before .= "<th colspan='".$colspan_oos."' style='text-align: center;'>OOS (STOKIES)</th>";
+
+        return 
+        [
+            "th_before" => $th_before,
+            "th" => $th,
+            "columns" => $array_column
+        ];
+
+        // return array_unique($id_subcategories);
+        
+        // $products = ProductFokusSpg::whereHas('product', function($query) use ($request){
+        //                 return $query->where('id_subcategory', $request->id_subcategory);
+        //             })->whereDate('from', '<=', $periode)->whereDate('to', '>=', $periode)->get();
+
+        // $sub_category = SubCategory::where('id', $request->id_subcategory)->first()->name;
+
+        // $th = "";
+        // $array_column = array();
+
+        // foreach ($products as $item) {
+        //     $th .= "<th>Sales ".$item->product->name."</th>";
+        //     array_push($array_column, ['data'=>'product_'.$item->product->id, 'name'=>'product_'.$item->product->id ]);
+        //     // array_push($array_column, $item->id);
+        // }
+
+        // $th .= "<th>Sales Other</th><th>Sales Product Fokus</th><th>Total Value</th>";
+        // array_push($array_column, 
+        //     ['data'=>'sales_other', 'name'=>'sales_other'],
+        //     ['data'=>'sales_pf', 'name'=>'sales_pf'],
+        //     ['data'=>'total_value', 'name'=>'total_value']
+        // );
+
+        // return 
+        // [
+        //     "th" => $th,
+        //     "columns" => $array_column
+        // ];
+    }
+
+    public function SMDsalesSummary(Request $request)
+    {
+        // return $request->all();
+
+        $periode = Carbon::parse($request->periode)->format('Y-m-d');
+
+        // $id_subcategories = array_unique(FokusProduct::whereHas('pf.Fokus.channel', function ($query){
+        //                     return $query->where('name', 'GTC');
+        //                 })
+        //                 ->whereHas('pf', function ($query) use ($periode){
+        //                     return $query->whereDate('from', '<=', $periode)
+        //                                  ->whereDate('to', '>=', $periode);
+        //                 })                        
+        //                 ->get()->pluck('product.subcategory.id')->toArray());
+
+        $id_subcategories = array_unique(ProductFokusGtc::whereDate('from', '<=', $periode)->whereDate('to', '>=', $periode)->get()->pluck('product.subcategory.id')->toArray());
+
+        $id_product_oos = StockMdDetail::whereHas('stock', function ($query) use ($periode){
+                                return $query->whereMonth('date', Carbon::parse($periode)->month)->whereYear('date', Carbon::parse($periode)->year);
+                            })->pluck('id_product')->toArray();
+        
+        $sales = SalesMdSummary::whereMonth('date', Carbon::parse($request->periode)->month)
+                                 ->whereYear('date', Carbon::parse($request->periode)->year)
+                                 ->groupBy('id_employee', 'date')
+                                 ->orderBy('date', 'DESC')
+                                 ->orderBy('id_employee', 'ASC');
+                                 // ->orderBy('outlets.id_pasar', 'ASC');
+
+        // return $sales->get();
+        
+        $dt = Datatables::of($sales);
+
+        /* DISTRIBUTION PF */
+        foreach ($id_subcategories as $column) {
+            $dt->addColumn('dist_'.$column, function($item) use ($column) {
+                // return $item->detail;
+                return array_key_exists($column, $item->distribusi_pf) ? number_format($item->distribusi_pf[$column]) : 0;
+            });
+        }
+
+        /* SALES PF */
+        foreach ($id_subcategories as $column) {
+            $dt->addColumn('sales_'.$column, function($item) use ($column) {
+                // return $item->detail;
+                return array_key_exists($column, $item->sales_pf) ? number_format($item->sales_pf[$column]) : 0;
+            });
+        }
+
+        /* OOS */
+        foreach ($id_product_oos as $column) {
+            $dt->addColumn('oos_'.$column, function($item) use ($column) {
+                // return $item->detail;
+                return array_key_exists($column, $item->oos) ? number_format($item->oos[$column]) : 0;
+            });
+        }
+
+        /* VALUE PF, VALUE NON PF, TOTAL VALUE */
+        $dt->addColumn('value_pf', function($item) {
+            return number_format($item->value_pf);
+        });
+        $dt->addColumn('value_non_pf', function($item) {
+            return number_format($item->value_non_pf);
+        });
+        $dt->addColumn('value_total', function($item) {
+            return number_format($item->value_total);
+        });
+
+        return $dt->make(true);
+    }    
+
+    public function SMDTargetKpi(Request $request)
+    {
+        $target_kpi = TargetKpiMd::whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        });
+
+        // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
+
+        // return array_key_exists('hk', $target_kpi->first()->getTarget($request->periode)) ? $target_kpi->first()->getTarget($request->periode)['hk'] : 0;
+        // return $request->all();
+        
+        return Datatables::of($target_kpi)
+        ->addColumn('hk_target', function ($item) use ($request){
+            return is_null($item->getTarget($request->periode)) ? 0 : $item->getTarget($request->periode)['hk'];
+        })
+        ->addColumn('target_sales_value', function ($item) use ($request) {
+            return number_format(is_null($item->getTarget($request->periode)) ? 0 : $item->getTarget($request->periode)['value_sales']);
+        })
+        ->addColumn('target_ec_pf', function ($item) use ($request) {
+            return is_null($item->getTarget($request->periode)) ? 0 : $item->getTarget($request->periode)['ec'];
+        })
+        ->addColumn('target_cbd', function ($item) use ($request) {
+            return is_null($item->getTarget($request->periode)) ? 0 : $item->getTarget($request->periode)['cbd'];
+        })
+        ->addColumn('ach_sales_value', function ($item) use ($request) {
+            return number_format(@$item->getSalesValue($request->periode));
+        })
+        ->addColumn('ach_ec_pf', function ($item) use ($request) {
+            return number_format(@$item->getEc($request->periode));
+        })
+        ->addColumn('ach_cbd', function ($item) use ($request) {
+            return number_format(@$item->getCbd($request->periode));
+        })
+        ->make(true);
+
+    }
+
+    public function SMDKpi(Request $request)
+    {
+        $target_kpi = TargetKpiMd::whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        });
+
+        // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
+
+        // return array_key_exists('hk', $target_kpi->first()->getTarget($request->periode)) ? $target_kpi->first()->getTarget($request->periode)['hk'] : 0;
+        // return $request->all();
+        
+        return Datatables::of($target_kpi)
+        ->addColumn('hk_target', function ($item) use ($request){
+            return is_null($item->getTarget($request->periode)) ? 0 : $item->getTarget($request->periode)['hk'];
+        })
+        ->addColumn('hk_actual', function ($item) use ($request){
+            return @$item->getHkActual($request->periode);
+        })
+        ->addColumn('sum_of_cbd', function ($item) use ($request){
+            return @$item->getCbd($request->periode);
+        })
+        ->addColumn('sum_of_call', function ($item) use ($request){
+            return @$item->getCall($request->periode);
+        })
+        ->addColumn('sum_of_ec', function ($item) use ($request){
+            return @$item->getEc($request->periode);
+        })
+        ->addColumn('sum_cat_1', function ($item) use ($request){
+            return @$item->getSumCat1($request->periode);
+        })
+        ->addColumn('sum_cat_2', function ($item) use ($request){
+            return @$item->getSumCat2($request->periode);
+        })
+        ->addColumn('sum_of_total_value', function ($item) use ($request){
+            return number_format(@$item->getTotalValue($request->periode));
+        })
+        ->addColumn('sum_of_value_pf', function ($item) use ($request){
+            return number_format(@$item->getSalesValue($request->periode));
+        })
+        ->addColumn('average_cbd', function ($item) use ($request){
+            return round(@$item->getAvgCbd($request->periode));
+        })
+        ->addColumn('average_call', function ($item) use ($request){
+            return round(@$item->getAvgCall($request->periode));
+        })
+        ->addColumn('average_ec', function ($item) use ($request){
+            return round(@$item->getAvgEc($request->periode));
+        })
+        ->addColumn('average_cat_1', function ($item) use ($request){
+            return @$item->getAvgCat1($request->periode);
+        })
+        ->addColumn('average_cat_2', function ($item) use ($request){
+            return @$item->getAvgCat2($request->periode);
+        })
+        ->addColumn('average_of_total_value', function ($item) use ($request){
+            return number_format(@$item->getAvgTotalValue($request->periode));
+        })
+        ->addColumn('average_of_value_pf', function ($item) use ($request){
+            return number_format(@$item->getAvgSalesValue($request->periode));
+        })
+        ->addColumn('best_cbd', function ($item) use ($request){
+            return @$item->getBestCbd($request->periode);
+        })
+        ->addColumn('best_call', function ($item) use ($request){
+            return @$item->getBestCall($request->periode);
+        })
+        ->addColumn('best_ec', function ($item) use ($request){
+            return @$item->getBestEc($request->periode);
+        })
+        ->addColumn('best_cat_1', function ($item) use ($request){
+            return @$item->getBestCat1($request->periode);
+        })
+        ->addColumn('best_cat_2', function ($item) use ($request){
+            return @$item->getBestCat2($request->periode);
+        })
+        ->addColumn('best_of_total_value', function ($item) use ($request){
+            return @$item->getBestTotalValue($request->periode);
+        })
+        ->addColumn('best_of_value_pf', function ($item) use ($request){
+            return @$item->getBestSalesValue($request->periode);
+        })
+        ->addColumn('total_point', function ($item) use ($request){
+            return @$item->getTotalPoint($request->periode);
+        })     
+        ->make(true);
+
+    }
+
+    public function SMDCat1Cat2(Request $request){
+
+        $pf = Pf::whereDate('from', '<=', Carbon::parse($request->periode))
+                ->whereDate('to', '>=', Carbon::parse($request->periode))
+                ->first();
+
+        return [
+            "cat1" => @$pf->category1->name,
+            "cat2" => @$pf->category2->name
+        ];
+
     }
 }
