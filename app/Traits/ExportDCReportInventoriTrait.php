@@ -61,7 +61,7 @@ trait ExportDCReportInventoriTrait
 	                	$dtObj["imgCoordinate"][$startVal]["Drawing"] = new PHPExcel_Worksheet_Drawing;
 	                	if (isset($dataDB_data->photo))
 	                	{
-	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setPath(public_path("/".($dataDB_data->photo)));
+	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setPath(public_path("/../../public_html/".($dataDB_data->photo)));
 	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setCoordinates("G".($startVal - 1));
 	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setWorksheet($sheet);
 	                		$dtObj["imgCoordinate"][$startVal]["Drawing"]->setWidth(40);
