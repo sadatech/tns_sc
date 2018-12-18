@@ -4,13 +4,18 @@ namespace App;
 
 use App\Components\traits\ValidationHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductFokusGtc extends Model
 {
+    use SoftDeletes;
+
     use ValidationHelper;
     protected $fillable = [
         'id_product', 'id_area', 'from', 'to'
     ];
+
+    protected $dates = ['deleted_at'];
 
     public static function rule()
     {
