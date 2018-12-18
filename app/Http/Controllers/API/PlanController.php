@@ -44,7 +44,7 @@ class PlanController extends Controller
 				return $query->where('id_employee', $user->id);
 			})->orderBy('id','desc');
 
-			$transaction = DB::transaction(function () use ($request, $photo, $user, $check) {
+			$transaction = DB::transaction(function () use ($request, $photo, $user, $date, $check) {
 				if ($check->get()->count() > 0) {
 					$update = $check->update([
 						'channel'		=> $request->channel,

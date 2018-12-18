@@ -9,9 +9,9 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         DB::table('user_role')->insert([
-            // ['level' => 'MasterAdmin'],
-            // ['level' => 'Administrator'],
-            // ['level' => 'User'],
+            ['level' => 'MasterAdmin'],
+            ['level' => 'Administrator'],
+            ['level' => 'User'],
             ['level' => 'AdminGtc'],
             ['level' => 'AdminMtc']
         ]);
