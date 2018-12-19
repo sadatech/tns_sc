@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class Outlet extends Model
 {
@@ -18,5 +19,10 @@ class Outlet extends Model
     public function attendanceOutlet()
     {
         return $this->hasMany('App\AttendanceOutlet', 'id_outlet');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }
