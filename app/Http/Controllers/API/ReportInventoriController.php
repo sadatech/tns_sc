@@ -42,6 +42,7 @@ class ReportInventoriController extends Controller
 					'actual'			=> $request->actual,
 					'status'			=> $request->status,
 					'photo'				=> isset($photo) ? $path.'/'.$photo : null,
+					'description'		=> $request->description,
 				]);
 				if ($insert) {
 					$res['success'] = true;
@@ -77,6 +78,7 @@ class ReportInventoriController extends Controller
 						'quantity' 			=> $data->quantity,
 						'actual'			=> $data->actual,
 						'status'			=> $data->status,
+						'description'		=> $data->description,
 						'photo'				=> $data->photo,
 						'photo_url'			=> $data->photo ? asset($data->photo) : null,
 						'id_properti_dc' 	=> $data->properti->id,
