@@ -2343,8 +2343,11 @@ class ReportController extends Controller
         ]);
     }
 
+    // use \App\Traits\ExportDCReportInventoriTrait;
+
     public function inventoriDCExportXLS()
     {
+        // return $this->DCReportInventoriExportTrait("cc");
         $result = DB::transaction(function(){
             try
             {
@@ -2545,6 +2548,41 @@ class ReportController extends Controller
             });
         }
         return $dt->make(true);
+    }
+
+    public function SMDcbd(Request $request)
+    {
+        $cbd = Cbd::orderBy('created_at', 'DESC')->with(['employee','outlet'])
+        ->when($request->has('employee'), function ($q) use ($request){
+            return $q->whereIdEmployee($request->input('employee'));
+        })
+        ->when($request->has('periode'), function ($q) use ($request){
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('outlet'), function ($q) use ($request){
+            $q->whereHas('outlet', function($q2) use ($request){
+                return $q2->where('id_outlet', $request->input('outlet'));
+            });
+        })->get();
+
+        $data = array();
+        $id = 1;
+        foreach ($cbd as $val) {
+            if ($val->employee->position->level == 'mdgtc'){
+                $data[] = array(
+                    'id'            => $id++,
+                    'outlet'        => $val->outlet->name,
+                    'employee'      => $val->employee->name,
+                    'date'          => $val->date,
+                    'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                );
+            }
+        }
+
+        $dt = Datatables::of(collect($data));
+        
+        return $dt->rawColumns(['photo'])->make(true);
     }
 
     public function getCbd($data, $periode, $day)
