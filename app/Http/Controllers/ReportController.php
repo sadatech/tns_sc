@@ -2343,8 +2343,11 @@ class ReportController extends Controller
         ]);
     }
 
+    // use \App\Traits\ExportDCReportInventoriTrait;
+
     public function inventoriDCExportXLS()
     {
+        // return $this->DCReportInventoriExportTrait("cc");
         $result = DB::transaction(function(){
             try
             {
