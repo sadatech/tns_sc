@@ -707,6 +707,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.kpi');
 				})->name('report.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDKpi')->name('smd.pasar.kpi.data')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDKpiExportXLS')->name('smd.pasar.kpi.exportXLS')->middleware('auth');
 			});
 
 		});

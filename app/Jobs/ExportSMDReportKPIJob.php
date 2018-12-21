@@ -11,13 +11,13 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 use App\JobTrace;
-use \App\Traits\ExportSMDReportSalesSummaryTrait;
+use App\Traits\ExportSMDReportKPITrait;
 
-class ExportSMDReportSalesSummaryJob implements ShouldQueue
+class ExportSMDReportKPIJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportSMDReportSalesSummaryTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportSMDReportKPITrait;
 
-    protected $trace, $params;
+    protected $trace, $filterPeriode, $filecode;
 
     /**
      * The number of times the job may be attempted.
@@ -31,10 +31,11 @@ class ExportSMDReportSalesSummaryJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(JobTrace $trace, $params = [])
+    public function __construct(JobTrace $trace, $filterPeriode, $filecode)
     {
         $this->trace = $trace;
-        $this->params = $params;
+        $this->filterPeriode = $filterPeriode;
+        $this->filecode = $filecode;
     }
 
     /**
@@ -46,7 +47,7 @@ class ExportSMDReportSalesSummaryJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->SMDReportSalesSummaryExportTrait($this->params[0], $this->params[1]), // return excel file location
+            'results' => $this->SMDReportKPIExportTrait($this->filterPeriode, $this->filecode), // return excel file location
         ]);
     }
 
@@ -63,4 +64,5 @@ class ExportSMDReportSalesSummaryJob implements ShouldQueue
             'log' => $exception->getMessage(),
         ]);
     }
+
 }

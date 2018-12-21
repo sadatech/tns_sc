@@ -48,7 +48,7 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.distpf.smd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="summaryTable">
@@ -199,6 +199,22 @@ table.table thead tr th {
 
           });
 
+          /**
+           * Download OnClick
+           */
+          $("#btnDownloadXLS").on("click", function(){
+            $.ajax({
+              url: $(this).attr("target-url"),
+              type: "post",
+              success: function(e){
+                swal("Success!", e.result, "success");
+              },
+              error: function(){
+                swal("Error!", e.result, "error");
+              }
+            });
+          });
+
           $('#filterMonth').datetimepicker({
               format: "MM yyyy",
               startView: "3",
@@ -287,6 +303,8 @@ table.table thead tr th {
         }
 
       });
+
+      $("#btnDownloadXLS").attr("target-url", "{{ route('smd.pasar.kpi.exportXLS') }}" + "/" + $('#filterMonth').val());
 
       $('#panelData').removeAttr('style');
       
