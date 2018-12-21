@@ -221,3 +221,11 @@ Route::prefix("employee")->group(function(){
 	Route::post("edit/profile", "API\EmployeeController@editProfile")->name("api.employee.edit.profile");
 	Route::post("edit/profile/photo/{type?}", "API\EmployeeController@editProfilePhoto")->name("api.employee.edit.profile.photo");
 });
+
+/**
+ * Achievement
+ */
+Route::prefix("achievement")->group(function(){
+	Route::get('/mdpasar/{id?}', 'API\AchievementController@MDPasar')->name('api.ach.md-pasar');
+	Route::get('/mtc/{id?}', 'API\AchievementController@MtcEmployee')->name('api.ach.mtc');
+});
