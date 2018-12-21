@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Components\traits\ApiAuthHelper;
 use App\CashAdvance;
+use App\EmployeeSubArea;
+use App\Employee;
 use Carbon\Carbon;
 use JWTAuth;
 use Config;
@@ -22,10 +24,14 @@ class CashAdvanceController extends Controller
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
-			if (empty($request->area) || empty($request->date) ) {
+			if (empty($request->date) ) {
 				$res['success'] = false;
-				$res['msg'] 	= "Area and Date cannot be empty.";
+				$res['msg'] 	= "Date cannot be empty.";
 			} else {
+				$area = EmployeeSubArea::whereIdEmployee($user->id)->first()->subarea->id_area;
+				
+				if (!empty($area)) {
+
 					$total_cost_list[] = (!empty($request->tpd) ? $request->tpd : 0);
 					$total_cost_list[] = (!empty($request->hotel) ? $request->hotel : 0);
 					$total_cost_list[] = (!empty($request->bbm) ? $request->bbm : 0);
@@ -42,36 +48,40 @@ class CashAdvanceController extends Controller
 					
 					$total = array_sum($total_cost_list);
 
-				$insert = CashAdvance::create([
-					'id_employee'		=> $user->id,
-					'id_area'			=> $request->area,
-					'date'              => $request->date,
-					'description'       => $request->description ?? null,
-					'km_begin'          => $request->km_begin ?? null,
-					'km_end'            => $request->km_end ?? null,
-					'km_distance'       => (!empty($request->km_end) && !empty($request->km_begin)) ? $request->km_end - $request->km_begin : null,
-					'tpd'               => $request->tpd ?? null,
-					'hotel'             => $request->hotel ?? null,
-					'bbm'               => $request->bbm ?? null,
-					'parking_and_toll'  => $request->parking_and_toll ?? null,
-					'raw_material'      => $request->raw_material ?? null,
-					'property'          => $request->property ?? null,
-					'permission'        => $request->permission ?? null,
-					'bus'               => $request->bus ?? null,
-					'sipa'              => $request->sipa ?? null,
-					'taxibike'          => $request->taxibike ?? null,
-					'rickshaw'          => $request->rickshaw ?? null,
-					'taxi'              => $request->taxi ?? null,
-					'other_cost'    	=> $request->other_cost ?? null,
-					'other_description' => $request->other_description ?? null,
-					'total_cost'        => $total,
-				]);
-				if ($insert->id) {
-					$res['success'] = true;
-					$res['msg'] 	= "Success add Cash Advance.";
-				} else {
+					$insert = CashAdvance::create([
+						'id_employee'		=> $user->id,
+						'id_area'			=> $area,
+						'date'              => $request->date,
+						'description'       => $request->description ?? null,
+						'km_begin'          => $request->km_begin ?? 0,
+						'km_end'            => $request->km_end ?? 0,
+						'km_distance'       => (!empty($request->km_end) && !empty($request->km_begin)) ? $request->km_end - $request->km_begin : 0,
+						'tpd'               => $request->tpd ?? 0,
+						'hotel'             => $request->hotel ?? 0,
+						'bbm'               => $request->bbm ?? 0,
+						'parking_and_toll'  => $request->parking_and_toll ?? 0,
+						'raw_material'      => $request->raw_material ?? 0,
+						'property'          => $request->property ?? 0,
+						'permission'        => $request->permission ?? 0,
+						'bus'               => $request->bus ?? 0,
+						'sipa'              => $request->sipa ?? 0,
+						'taxibike'          => $request->taxibike ?? 0,
+						'rickshaw'          => $request->rickshaw ?? 0,
+						'taxi'              => $request->taxi ?? 0,
+						'other_cost'    	=> $request->other_cost ?? 0,
+						'other_description' => $request->other_description ?? null,
+						'total_cost'        => $total,
+					]);
+					if ($insert->id) {
+						$res['success'] = true;
+						$res['msg'] 	= "Success add Cash Advance.";
+					} else {
+						$res['success'] = false;
+						$res['msg'] 	= "Failed to add Cash Advance.";
+					}
+				}else{
 					$res['success'] = false;
-					$res['msg'] 	= "Failed to add Cash Advance.";
+					$res['msg'] 	= "Area cannot be empty.";
 				}
 			}
 		}else{

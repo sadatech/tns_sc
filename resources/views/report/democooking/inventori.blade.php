@@ -60,6 +60,7 @@
                     <th style="width: 5px;">Quantity</th>
                     <th style="width: 5px;">Actual</th>
                     <th style="width: 10%;">Status</th>
+                    <th style="width: 10%;">Description</th>
                     <th>Dokumentasi</th>
                     <!-- <th style="width: 15%;"> Action</th> -->
                 </thead>
@@ -239,6 +240,7 @@
           { data: 'quantity', name: 'quantity'},
           { data: 'actual', name: 'actual'},
           { data: 'status', name: 'status'},
+          { data: 'description', name: 'description'},
           { data: 'dokumentasi', name: 'dokumentasi'}
           ]
       });

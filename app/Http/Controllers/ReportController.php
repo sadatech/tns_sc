@@ -461,12 +461,18 @@ class ReportController extends Controller
     public function achievementSalesMtcDataSPG(Request $request, EmployeeStoreFilters $filters){
 
         $periode = Carbon::parse($request->periode);
-        $data = EmployeeStore::filter($filters)
-                ->whereHas('employee.position', function($query){
+        $data = EmployeeStore::whereHas('employee.position', function($query){
                     return $query->where('level', 'spgmtc');
-                })
-                ->groupBy(['id_employee','id_store'])
-                ->orderBy('id_employee', 'ASC');            
+                });
+                
+        /* FILTER */
+        if($request->store != null && $request->store != 'null'){
+            $data = $data->where('id_store', $request->store);
+        }
+        if($request->employee != null && $request->employee != 'null'){
+            $data = $data->where('id_employee', $request->employee);
+        }
+        $data = $data->groupBy(['id_employee','id_store'])->orderBy('id_employee', 'ASC');
 
         // foreach ($data as $item) {
             
@@ -484,8 +490,8 @@ class ReportController extends Controller
 
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
-            return $this->getWeek(Carbon::parse('2018-12-31'));
-            return Carbon::now()->day;
+            // return $this->getWeek(Carbon::parse('2018-12-31'));
+            // return Carbon::now()->day;
             return $item->employee->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
@@ -494,14 +500,14 @@ class ReportController extends Controller
         ->addColumn('actual_current', function($item) use ($periode) {
             return number_format($item->employee->getActual(['store' => $item->id_store, 'date' => $periode]));
         })
-        ->addColumn('target', function($item) use ($periode) {
+        ->addColumn('target', function($item) use ($periode) {            
             return number_format($item->employee->getTarget(['store' => $item->id_store, 'date' => $periode]));
         })
         ->addColumn('achievement', function($item) use ($periode) {
             return $item->employee->getAchievement(['store' => $item->id_store, 'date' => $periode]);
         })
         ->addColumn('target_focus1', function($item) use ($periode) {
-            return number_format($item->employee->getTarget1(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->employee->getTarget1Alt(['store' => $item->id_store, 'date' => $periode]));
         })
         ->addColumn('achievement_focus1', function($item) use ($periode) {
             return number_format($item->employee->getActualPf1(['store' => $item->id_store, 'date' => $periode]));
@@ -510,7 +516,7 @@ class ReportController extends Controller
             return $item->employee->getAchievementPf1(['store' => $item->id_store, 'date' => $periode]);
         })
         ->addColumn('target_focus2', function($item) use ($periode) {
-            return number_format($item->employee->getTarget2(['store' => $item->id_store, 'date' => $periode]));
+            return number_format($item->employee->getTarget2Alt(['store' => $item->id_store, 'date' => $periode]));
         })
         ->addColumn('achievement_focus2', function($item) use ($periode) {
             return number_format($item->employee->getActualPf2(['store' => $item->id_store, 'date' => $periode]));
@@ -531,9 +537,15 @@ class ReportController extends Controller
     public function achievementSalesMtcDataMD(Request $request, EmployeeFilters $filters){
 
         $periode = Carbon::parse($request->periode);
-        $data = Employee::filter($filters)->whereHas('position', function ($query){
+        $data = Employee::whereHas('position', function ($query){
                     return $query->where('level', 'mdmtc');
-                })->orderBy('id', 'ASC');
+                });
+
+        /* FILTER */
+        if($request->employee != null && $request->employee != 'null'){
+            $data = $data->where('id', $request->employee);
+        }
+        $data = $data->orderBy('id', 'ASC');
 
         // return response()->json('zz');
 
@@ -556,6 +568,24 @@ class ReportController extends Controller
         ->addColumn('growth', function($item) use ($periode) {
             return $item->getGrowth(['date' => $periode]);
         })
+        ->addColumn('target_focus1', function($item) use ($periode) {   
+            return number_format($item->getTarget1Alt(['date' => $periode]));
+        })
+        ->addColumn('achievement_focus1', function($item) use ($periode) {
+            return number_format($item->getActualPf1(['date' => $periode]));
+        })
+        ->addColumn('percentage_focus1', function($item) use ($periode) {
+            return $item->getAchievementPf1(['date' => $periode]);
+        })
+        ->addColumn('target_focus2', function($item) use ($periode) {
+            return number_format($item->getTarget2Alt(['date' => $periode]));
+        })
+        ->addColumn('achievement_focus2', function($item) use ($periode) {
+            return number_format($item->getActualPf2(['date' => $periode]));
+        })
+        ->addColumn('percentage_focus2', function($item) use ($periode) {
+            return $item->getAchievementPf2(['date' => $periode]);
+        })
         ->addColumn('jml_store', function($item) {
             return $item->employeeStore->count();
         })
@@ -565,12 +595,21 @@ class ReportController extends Controller
     public function achievementSalesMtcDataTL(Request $request, EmployeeStoreFilters $filters){
 
         $periode = Carbon::parse($request->periode);
-        $data = Employee::filter($filters)
-                ->with('employeeSubArea.subarea')
+        $data = Employee::with('employeeSubArea.subarea')
                 ->whereHas('position', function($query){
                     return $query->where('level', 'tlmtc');
-                })
-                ->orderBy('id', 'ASC');
+                });
+
+        /* FILTER */
+        if($request->area != null && $request->area != 'null'){
+            $data = $data->whereHas('employeeSubArea.subarea.area', function($query) use ($request){
+                                return $query->where('id', $request->area);
+                            });
+        }
+        if($request->employee != null && $request->employee != 'null'){
+            $data = $data->where('id', $request->employee);
+        }
+        $data = $data->orderBy('id', 'ASC');
 
         // return response()->json($data->get());
 
@@ -579,40 +618,40 @@ class ReportController extends Controller
             return $item->name;
         })
         ->addColumn('actual_previous', function($item) use ($periode) {
-            return number_format($item->getActualPrevious(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+            return number_format($item->getActualPrevious(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('actual_current', function($item) use ($periode) {
-            return number_format($item->getActual(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+            return number_format($item->getActual(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('target', function($item) use ($periode) {
-            return number_format($item->getTarget(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+            return number_format($item->getTarget(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('achievement', function($item) use ($periode) {
-            return $item->getAchievement(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+            return $item->getAchievement(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
         ->addColumn('target_focus1', function($item) use ($periode) {
-            return number_format($item->getTarget1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+            return number_format($item->getTarget1Alt(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('achievement_focus1', function($item) use ($periode) {
-            return number_format($item->getActualPf1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+            return number_format($item->getActualPf1(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('percentage_focus1', function($item) use ($periode) {
-            return $item->getAchievementPf1(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+            return $item->getAchievementPf1(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
         ->addColumn('target_focus2', function($item) use ($periode) {
-            return number_format($item->getTarget2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+            return number_format($item->getTarget2Alt(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('achievement_focus2', function($item) use ($periode) {
-            return number_format($item->getActualPf2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
+            return number_format($item->getActualPf2(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]));
         })
         ->addColumn('percentage_focus2', function($item) use ($periode) {
-            return $item->getAchievementPf2(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+            return $item->getAchievementPf2(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
         ->addColumn('growth', function($item) use ($periode) {
-            return $item->getGrowth(['sub_area' => $item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
+            return $item->getGrowth(['sub_area' => @$item->employeeSubArea[0]->subarea->name, 'date' => $periode]);
         })
         ->addColumn('area', function($item) {
-            return $item->employeeSubArea[0]->subarea->area->name;
+            return @$item->employeeSubArea[0]->subarea->area->name;
         })
         ->make(true);     
     }
@@ -2345,8 +2384,11 @@ class ReportController extends Controller
         ]);
     }
 
+    // use \App\Traits\ExportDCReportInventoriTrait;
+
     public function inventoriDCExportXLS()
     {
+        // return $this->DCReportInventoriExportTrait("cc");
         $result = DB::transaction(function(){
             try
             {
@@ -2547,6 +2589,41 @@ class ReportController extends Controller
             });
         }
         return $dt->make(true);
+    }
+
+    public function SMDcbd(Request $request)
+    {
+        $cbd = Cbd::orderBy('created_at', 'DESC')->with(['employee','outlet'])
+        ->when($request->has('employee'), function ($q) use ($request){
+            return $q->whereIdEmployee($request->input('employee'));
+        })
+        ->when($request->has('periode'), function ($q) use ($request){
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('outlet'), function ($q) use ($request){
+            $q->whereHas('outlet', function($q2) use ($request){
+                return $q2->where('id_outlet', $request->input('outlet'));
+            });
+        })->get();
+
+        $data = array();
+        $id = 1;
+        foreach ($cbd as $val) {
+            if ($val->employee->position->level == 'mdgtc'){
+                $data[] = array(
+                    'id'            => $id++,
+                    'outlet'        => $val->outlet->name,
+                    'employee'      => $val->employee->name,
+                    'date'          => $val->date,
+                    'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                );
+            }
+        }
+
+        $dt = Datatables::of(collect($data));
+        
+        return $dt->rawColumns(['photo'])->make(true);
     }
 
     public function getCbd($data, $periode, $day)
