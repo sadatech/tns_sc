@@ -20,7 +20,7 @@
       <div class="col-sm-3">
         <input type="text" id="filterMonth" class="form-control" placeholder="Periode" name="periode">
       </div>
-      <button class="btn btn-md btn-primary" id="filterSearchPeriode" onclick="filteringReportWithoutSearch(paramFilter)"><i class="fa fa-search"></i> Search</button>
+      <button class="btn btn-md btn-primary" id="filterSearchPeriode"><i class="fa fa-search"></i> Search</button>
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
@@ -44,8 +44,8 @@
                   <select id="filterAreaTl" class="inputFilter" name="id_ar_tl"></select>
               </div>
               <div class="col-3 col-sm-3" style="vertical-align: middle;">
-                  <button class="btn btn-sm btn-primary" id="filterSearchTl" onclick="filteringReportWithoutSearch(paramFilter)"><i class="fa fa-search"></i> Search</button>
-                  <button class="btn btn-sm btn-danger" id="filterResetTl" onclick="triggerResetWithoutSearch(paramReset)"><i class="fa fa-refresh"></i> Clear</button>
+                  <button class="btn btn-sm btn-primary" id="filterSearchTl" ><i class="fa fa-search"></i> Search</button>
+                  <button class="btn btn-sm btn-danger" id="filterResetTl" ><i class="fa fa-refresh"></i> Clear</button>
               </div>
             </div>
             
@@ -90,8 +90,8 @@
                   <select id="filterStoreSpg" class="inputFilter" name="id_str_spg"></select>
               </div>
               <div class="col-3 col-sm-3" style="vertical-align: middle;">
-                  <button class="btn btn-sm btn-primary" id="filterSearchSpg" onclick="filteringReportWithoutSearch(paramFilter)"><i class="fa fa-search"></i> Search</button>
-                  <button class="btn btn-sm btn-danger" id="filterResetSpg" onclick="triggerResetWithoutSearch(paramReset)"><i class="fa fa-refresh"></i> Clear</button>
+                  <button class="btn btn-sm btn-primary" id="filterSearchSpg"><i class="fa fa-search"></i> Search</button>
+                  <button class="btn btn-sm btn-danger" id="filterResetSpg"><i class="fa fa-refresh"></i> Clear</button>
               </div>
             </div>
             
@@ -135,8 +135,8 @@
                   <select id="filterEmployeeMd" class="inputFilter" name="id_emp_md"></select>
               </div>
               <div class="col-3 col-sm-3" style="vertical-align: middle;">
-                  <button class="btn btn-sm btn-primary" id="filterSearchMd" onclick="filteringReportWithoutSearch(paramFilter)"><i class="fa fa-search"></i> Search</button>
-                  <button class="btn btn-sm btn-danger" id="filterResetMd" onclick="triggerResetWithoutSearch(paramReset)"><i class="fa fa-refresh"></i> Clear</button>
+                  <button class="btn btn-sm btn-primary" id="filterSearchMd"><i class="fa fa-search"></i> Search</button>
+                  <button class="btn btn-sm btn-danger" id="filterResetMd"><i class="fa fa-refresh"></i> Clear</button>
               </div>
             </div>
             
@@ -152,6 +152,12 @@
             <th class="text-center">Target</th>
             <th class="text-center">% Ach</th>
             <th class="text-center">Growth</th>
+            <th class="text-center">Achievement Fokus 1</th>
+            <th class="text-center">Target Fokus 1</th>
+            <th class="text-center">% Achievement</th>
+            <th class="text-center">Achievement Fokus 2</th>
+            <th class="text-center">Target Fokus 2</th>
+            <th class="text-center">% Achievement</th>
             <th>Jumlah Store</th>
           </thead>
         </table>
@@ -255,6 +261,12 @@
                 { data: 'target', name: 'target'},
                 { data: 'achievement', name: 'achievement'},
                 { data: 'growth', name: 'growth'},
+                { data: 'achievement_focus1', name: 'achievement_focus1'},
+                { data: 'target_focus1', name: 'target_focus1'},
+                { data: 'percentage_focus1', name: 'percentage_focus1'},
+                { data: 'achievement_focus2', name: 'achievement_focus2'},
+                { data: 'target_focus2', name: 'target_focus2'},
+                { data: 'percentage_focus2', name: 'percentage_focus2'},
                 { data: 'jml_store', name: 'jml_store'}];
 
         var md_paramFilter = [md_table, $('#'+md_table), md_url, md_tableColumns, md_columnDefs, md_order];
@@ -339,7 +351,7 @@
             "processing": true,
             "serverSide": true,
             "ajax": {
-                url: tl_url,
+                url: tl_url + "?periode=" +$("#filterMonth").val(),
                 type: 'POST',
                 dataType: 'json',
                 error: function (data) {
@@ -364,7 +376,7 @@
             "processing": true,
             "serverSide": true,
             "ajax": {
-                url: spg_url,
+                url: spg_url + "?periode=" +$("#filterMonth").val(),
                 type: 'POST',
                 dataType: 'json',
                 error: function (data) {
@@ -389,7 +401,7 @@
             "processing": true,
             "serverSide": true,
             "ajax": {
-                url: md_url,
+                url: md_url + "?periode=" +$("#filterMonth").val(),
                 type: 'POST',
                 dataType: 'json',
                 error: function (data) {
@@ -409,65 +421,312 @@
     });
       
 
-    $("#filterReset").click(function () {
+    $("#filterResetTl").click(function () {
+      
+        $('#filterEmployeeTl').val(null).trigger('change')
+        $('#filterAreaTl').val(null).trigger('change')
 
-      $.each($('#filterForm select'), function(key, value) {
-        $('#'+this.id).val(null).trigger('change')
-      })
+        if($.fn.dataTable.isDataTable('#tlTable')){
+            $('#tlTable').DataTable().clear();
+            $('#tlTable').DataTable().destroy();
+        }
 
-      $('#filterMonth').val(moment().format("MMMM Y"));
+        // RENDER TABLE TL
+        $('#tlTable').dataTable({
+          "fnCreatedRow": function (nRow, data) {
+              $(nRow).attr('class', data.id);
+          },
+          "processing": true,
+          "serverSide": true,
+          "ajax": {
+              url: tl_url + "?periode=" +$("#filterMonth").val(),
+              type: 'POST',
+              dataType: 'json',
+              error: function (data) {
+                swal("Error!", "Failed to load Data!", "error");
+              },
+          },
+          scrollX:        true,
+          scrollCollapse: true,
+          "bFilter" : false,
+          "rowId": "id",
+          "columns": tl_tableColumns,
+          "columnDefs": tl_columnDefs,
+          "order": tl_order,
+          "autoWidth": false
+        });
+
     })
 
-    $("#filterSearch").click(function() {
-      var serial = $("#filterForm").serialize()
-      console.log(serial)
+    $("#filterResetSpg").click(function () {
+
+        $('#filterEmployeeSpg').val(null).trigger('change')
+        $('#filterStoreSpg').val(null).trigger('change')
+
+        if($.fn.dataTable.isDataTable('#spgTable')){
+            $('#spgTable').DataTable().clear();
+            $('#spgTable').DataTable().destroy();
+        }
+
+        // RENDER TABLE SPG
+          $('#spgTable').dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: spg_url + "?periode=" +$("#filterMonth").val(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter" : false,
+            "rowId": "id",
+            "columns": spg_tableColumns,
+            "columnDefs": spg_columnDefs,
+            "order": spg_order,
+            "autoWidth": false
+          }); 
+
     })
 
+    $("#filterResetMd").click(function () {
 
-    // $("#exportAll").click( function(){
+        $('#filterEmployeeMd').val(null).trigger('change')
 
-    //     var element = $("#exportAll");
-    //     var icon = $("#exportAllIcon");
-    //     if (element.attr('disabled') != 'disabled') {
-    //         var thisClass = icon.attr('class');
-    //         // Export data
-    //         exportFile = '';
+        if($.fn.dataTable.isDataTable('#mdTable')){
+            $('#mdTable').DataTable().clear();
+            $('#mdTable').DataTable().destroy();
+        }
 
-    //         $.ajax({
-    //             type: 'POST',
-    //             url: 'export' + "?" + $("#filterForm").serialize() + "&model=Sales MTC",
-    //             dataType: 'json',
-    //             beforeSend: function()
-    //             {   
-    //                 console.log($("#filterForm").serialize());
-    //                 element.attr('disabled', 'disabled');
-    //                 icon.attr('class', 'fa fa-spinner fa-spin');
-    //             },
-    //             success: function (data) {
-                    
-    //                 console.log(data);
-    //                 element.removeAttr('disabled');
-    //                 icon.attr('class', thisClass);
-                    
-    //                 if(data.result){
-    //                   swal("Berhasil melakukan request", "Silahkan cek di halaman 'Download Export File'", "success");
-    //                 }else{
-    //                   swal("Gagal melakukan request", "Silahkan dicoba kembali", "error");
-    //                 }
-                    
-    //             },
-    //             error: function(xhr, textStatus, errorThrown){
-    //                 element.removeAttr('disabled');
-    //                 icon.attr('class', thisClass);
-    //                 console.log(errorThrown);
-    //                 alert('Export request failed');
-    //             }
-    //         });
+        // RENDER TABLE MD
+          $('#mdTable').dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: md_url + "?periode=" +$("#filterMonth").val(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter" : false,
+            "rowId": "id",
+            "columns": md_tableColumns,
+            "columnDefs": md_columnDefs,
+            "order": md_order,
+            "autoWidth": false
+          });  
 
-    //     }
+    })
 
+    $("#filterSearchPeriode").click(function() {
+        console.log($("#filterMonth").val());
 
-    // });
+        if($.fn.dataTable.isDataTable('#tlTable')){
+            $('#tlTable').DataTable().clear();
+            $('#tlTable').DataTable().destroy();
+        }
+
+        if($.fn.dataTable.isDataTable('#spgTable')){
+            $('#spgTable').DataTable().clear();
+            $('#spgTable').DataTable().destroy();
+        }
+
+        if($.fn.dataTable.isDataTable('#mdTable')){
+            $('#mdTable').DataTable().clear();
+            $('#mdTable').DataTable().destroy();
+        }
+
+        // RENDER TABLE TL
+        $('#tlTable').dataTable({
+          "fnCreatedRow": function (nRow, data) {
+              $(nRow).attr('class', data.id);
+          },
+          "processing": true,
+          "serverSide": true,
+          "ajax": {
+              url: tl_url + "?periode=" +$("#filterMonth").val(),
+              type: 'POST',
+              dataType: 'json',
+              error: function (data) {
+                swal("Error!", "Failed to load Data!", "error");
+              },
+          },
+          scrollX:        true,
+          scrollCollapse: true,
+          "bFilter" : false,
+          "rowId": "id",
+          "columns": tl_tableColumns,
+          "columnDefs": tl_columnDefs,
+          "order": tl_order,
+          "autoWidth": false
+        });
+
+        // RENDER TABLE SPG
+          $('#spgTable').dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: spg_url + "?periode=" +$("#filterMonth").val(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter" : false,
+            "rowId": "id",
+            "columns": spg_tableColumns,
+            "columnDefs": spg_columnDefs,
+            "order": spg_order,
+            "autoWidth": false
+          });    
+
+          // RENDER TABLE MD
+          $('#mdTable').dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: md_url + "?periode=" +$("#filterMonth").val(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter" : false,
+            "rowId": "id",
+            "columns": md_tableColumns,
+            "columnDefs": md_columnDefs,
+            "order": md_order,
+            "autoWidth": false
+          });
+    })
+
+    $("#filterSearchTl").click(function() {
+        console.log($("#filterMonth").val());
+
+        if($.fn.dataTable.isDataTable('#tlTable')){
+            $('#tlTable').DataTable().clear();
+            $('#tlTable').DataTable().destroy();
+        }
+
+        // RENDER TABLE TL
+        $('#tlTable').dataTable({
+          "fnCreatedRow": function (nRow, data) {
+              $(nRow).attr('class', data.id);
+          },
+          "processing": true,
+          "serverSide": true,
+          "ajax": {
+              url: tl_url + "?periode=" + $("#filterMonth").val() + "&area=" + $("#filterAreaTl").val() + "&employee=" + $("#filterEmployeeTl").val(),
+              type: 'POST',
+              dataType: 'json',
+              error: function (data) {
+                swal("Error!", "Failed to load Data!", "error");
+              },
+          },
+          scrollX:        true,
+          scrollCollapse: true,
+          "bFilter" : false,
+          "rowId": "id",
+          "columns": tl_tableColumns,
+          "columnDefs": tl_columnDefs,
+          "order": tl_order,
+          "autoWidth": false
+        });
+    })
+
+    $("#filterSearchSpg").click(function() {
+        console.log($("#filterMonth").val());
+
+        if($.fn.dataTable.isDataTable('#spgTable')){
+            $('#spgTable').DataTable().clear();
+            $('#spgTable').DataTable().destroy();
+        }
+
+        // RENDER TABLE SPG
+        $('#spgTable').dataTable({
+          "fnCreatedRow": function (nRow, data) {
+              $(nRow).attr('class', data.id);
+          },
+          "processing": true,
+          "serverSide": true,
+          "ajax": {
+              url: spg_url + "?periode=" + $("#filterMonth").val() + "&store=" + $("#filterStoreSpg").val() + "&employee=" + $("#filterEmployeeSpg").val(),
+              type: 'POST',
+              dataType: 'json',
+              error: function (data) {
+                swal("Error!", "Failed to load Data!", "error");
+              },
+          },
+          scrollX:        true,
+          scrollCollapse: true,
+          "bFilter" : false,
+          "rowId": "id",
+          "columns": spg_tableColumns,
+          "columnDefs": spg_columnDefs,
+          "order": spg_order,
+          "autoWidth": false
+        });
+    })
+
+    $("#filterSearchMd").click(function() {
+        console.log($("#filterMonth").val());
+
+        if($.fn.dataTable.isDataTable('#mdTable')){
+            $('#mdTable').DataTable().clear();
+            $('#mdTable').DataTable().destroy();
+        }
+
+        // RENDER TABLE SPG
+        $('#mdTable').dataTable({
+          "fnCreatedRow": function (nRow, data) {
+              $(nRow).attr('class', data.id);
+          },
+          "processing": true,
+          "serverSide": true,
+          "ajax": {
+              url: md_url + "?periode=" + $("#filterMonth").val() + "&employee=" + $("#filterEmployeeMd").val(),
+              type: 'POST',
+              dataType: 'json',
+              error: function (data) {
+                swal("Error!", "Failed to load Data!", "error");
+              },
+          },
+          scrollX:        true,
+          scrollCollapse: true,
+          "bFilter" : false,
+          "rowId": "id",
+          "columns": md_tableColumns,
+          "columnDefs": md_columnDefs,
+          "order": md_order,
+          "autoWidth": false
+        });
+    })
+
 
   </script>
 @endsection

@@ -8,7 +8,7 @@ class ReportInventori extends Model
 {
     protected $table = "report_inventories";
 
-    protected $fillable = ["no_polisi", "id_employee", "id_properti_dc", "quantity", "actual", "status", "photo"];
+    protected $fillable = ["no_polisi", "id_employee", "id_properti_dc", "quantity", "actual", "status", "photo", "description"];
 
     public function employee()
     {
