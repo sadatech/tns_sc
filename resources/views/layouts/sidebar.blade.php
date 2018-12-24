@@ -407,6 +407,9 @@
                             {{-- Availability Display--}}
                             <li>
                                 <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability Display</span></a>
+                            </li> {{-- Promo Activity--}}
+                            <li>
+                                <a class="{{ request()->is('promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><span class="sidebar-mini-hide">Promo Activity</span></a>
                             </li>  
                         </ul>
                     </li>
