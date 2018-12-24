@@ -14,13 +14,13 @@ use App\Employee;
 
 class AchievementController extends Controller
 {
-	public function __construct()
+    public function __construct()
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
 
     // MD PASAR (PARAM & TOKEN)
-    public function MDPasar($id_employee = ''){    	
+    public function MDPasar($id_employee = ''){
 
     	try {
 			$res['success'] = false;
@@ -31,8 +31,8 @@ class AchievementController extends Controller
 
 					$result = array();
 
-			    	$periode = Carbon::parse('November 2018');
-			    	// $periode = Carbon::now();
+#			    	$periode = Carbon::parse('November 2018');
+			    	$periode = Carbon::now();
 
 			    	$id = ($id_employee == '') ? $user->id : $id_employee;
 
@@ -74,7 +74,7 @@ class AchievementController extends Controller
     }
 
     // SPG MTC (PARAM & TOKEN)
-    public function MtcEmployee($id_employee = ''){    	
+    public function MtcEmployee($id_employee = ''){
 
     	try {
 			$res['success'] = false;
@@ -85,7 +85,8 @@ class AchievementController extends Controller
 
 					$result = array();
 
-			    	$periode = Carbon::parse('November 2018');
+#			    	$periode = Carbon::parse('November 2018');
+                    $periode = Carbon::now();
 
 			    	$id = ($id_employee == '') ? $user->id : $id_employee;
 
