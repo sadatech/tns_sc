@@ -202,7 +202,7 @@ Route::prefix('cash_advance')->group(function () {
 // History
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
-	Route::get('/sales/{type}/{date?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
+	Route::get('/sales/{type}/{date?}/{status?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
 	Route::get('/sales-recap/{date?}', 'API\HistoryController@salesRecapHistory')->name('api.sales-recap-history.list');
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
 	Route::get('/distribution/{type}/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');

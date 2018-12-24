@@ -49,10 +49,10 @@ class DisplayShareController extends Controller
 
                     });
                 } catch (\Exception $e) {
-                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 1'], 500);
+                    return response()->json(['success' => false, 'msg' => 'Gagal melakukan transaksi 1'], 500);
                 }
 
-                return response()->json(['status' => true, 'id_transaksi' => $displayShareHeader->id, 'message' => 'Data berhasil di input']);
+                return response()->json(['success' => true, 'id_transaksi' => $displayShareHeader->id, 'msg' => 'Data berhasil di input']);
 
             } else { // If header didn't exist (create header & detail)
 
@@ -81,13 +81,13 @@ class DisplayShareController extends Controller
 
                     });
                 } catch (\Exception $e) {
-                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 2'], 500);
+                    return response()->json(['success' => false, 'msg' => 'Gagal melakukan transaksi 2'], 500);
                 }
 
                 // Check sell in(Sell Thru) header after insert
                 $displayShareHeaderAfter = DisplayShare::where('id_employee', $employee->id)->where('id_store', $content['store'])->where('date', date('Y-m-d'))->first();
 
-                return response()->json(['status' => true, 'id_transaksi' => $displayShareHeaderAfter->id, 'message' => 'Data berhasil di input']);
+                return response()->json(['success' => true, 'id_transaksi' => $displayShareHeaderAfter->id, 'msg' => 'Data berhasil di input']);
 
             }
 
