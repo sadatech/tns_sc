@@ -692,6 +692,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.sales-summary');
 				})->name('report.sales.summary.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDsalesSummary')->name('smd.pasar.sales.summary.data')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDsalesSummaryExportXLS')->name('smd.pasar.sales.summary.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('target-kpi')->group(function () {
@@ -706,6 +707,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.kpi');
 				})->name('report.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDKpi')->name('smd.pasar.kpi.data')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDKpiExportXLS')->name('smd.pasar.kpi.exportXLS')->middleware('auth');
 			});
 
 		});
