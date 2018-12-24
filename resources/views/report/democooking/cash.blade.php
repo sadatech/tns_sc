@@ -59,33 +59,34 @@
                 <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="cashDcTable">
                     <thead>
                         <tr>
-                            <td rowspan="2" valign="middle" align="center">Tgl.</td>
-                            <td rowspan="2" valign="middle" align="center">Keterangan</td>
-                            <td colspan="3" align="center" valign="middle">KM pada saat pengisian BBM</td>
-                            <td rowspan="2" valign="middle" align="center">TPD</td>
-                            <td rowspan="2" valign="middle" align="center">Hotel / Kosan</td>
-                            <td rowspan="2" valign="middle" align="center">BBM</td>
-                            <td rowspan="2" valign="middle" align="center">Parkir/Tol</td>
-                            <td rowspan="2" valign="middle" align="center">Pembelian Bahan Baku</td>
-                            <td rowspan="2" valign="middle" align="center">Pembelian Property</td>
-                            <td rowspan="2" valign="middle" align="center">Perijinan</td>
-                            <td colspan="{{ route('spg.pasar.sales.summary.data') }}"" align="center" valign="middle">Angkutan</td>
-                            <td colspan="2" align="center" valign="middle">Biaya lain-lain</td>
-                            <td rowspan="2" valign="middle" align="center">Total Biaya</td>
+                            <th rowspan="2" style="vertical-align: middle; width: 20px !important;">Tgl.</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Employee</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Keterangan</th>
+                            <th colspan="3" style="vertical-align: middle; text-align: center; width: 200px !important;">KM pada saat pengisian BBM</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">TPD</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Hotel / Kosan</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">BBM</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Parkir/Tol</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Pembelian Bahan Baku</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Pembelian Property</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Perijinan</th>
+                            <th colspan="5" style="vertical-align: middle; text-align: center; width: 200px !important;">Angkutan</th>
+                            <th colspan="2" style="vertical-align: middle; text-align: center; width: 200px !important;">Biaya lain-lain</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Total Biaya</th>
                         </tr>
                         <tr>
-                            <td valign="middle" align="center">KM Awal</td>
-                            <td valign="middle" align="center">KM Akhir</td>
-                            <td valign="middle" align="center">Jarak Tempuh</td>
+                            <th style="vertical-align: middle; width: 120px !important;">KM Awal</th>
+                            <th style="vertical-align: middle; width: 120px !important;">KM Akhir</th>
+                            <th style="vertical-align: middle; width: 120px !important;">Jarak Tempuh</th>
                             <!--  -->
-                            <td valign="middle" align="center">Bus</td>
-                            <td valign="middle" align="center">SIPA</td>
-                            <td valign="middle" align="center">Ojek</td>
-                            <td valign="middle" align="center">Becak</td>
-                            <td valign="middle" align="center">Taksi</td>
+                            <th style="vertical-align: middle; width: 120px !important;">Bus</th>
+                            <th style="vertical-align: middle; width: 120px !important;">SIPA</th>
+                            <th style="vertical-align: middle; width: 120px !important;">Ojek</th>
+                            <th style="vertical-align: middle; width: 120px !important;">Becak</th>
+                            <th style="vertical-align: middle; width: 120px !important;">Taksi</th>
                             <!--  -->
-                            <td valign="middle" align="center">Rp.</td>
-                            <td valign="middle" align="center">Keterangan</td>
+                            <th style="vertical-align: middle; width: 120px !important;">Rp.</th>
+                            <th style="vertical-align: middle; width: 120px !important;">Keterangan</th>
                         </tr>
                     </thead>
                 </table>
@@ -162,7 +163,7 @@
   min-width: 5px;
 }*/
 table.table thead tr th {
-  min-width: 200px;
+  /*width: 300px !important;*/
 }
 </style>
 @endsection
@@ -203,6 +204,22 @@ table.table thead tr th {
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
+        });
+
+        /**
+         * Download OnClick
+         */
+        $("#btnDownloadXLS").on("click", function(){
+          $.ajax({
+            url: $(this).attr("target-url"),
+            type: "post",
+            success: function(e){
+              swal("Success!", e.result, "success");
+            },
+            error: function(){
+              swal("Error!", e.result, "error");
+            }
+          });
         });
 
         /**
@@ -290,6 +307,8 @@ table.table thead tr th {
                 $('#cashDcTable').DataTable().destroy();
             }
 
+            $("#btnDownloadXLS").attr("target-url", "{{ route('report.demo.cashAdvance.exportXLS') }}" + "/" + $('#filterArea').val() + "/" + $('#filterMonth').val());
+
             $('#cashDcTable').dataTable({
                 "fnCreatedRow": function (nRow, data) {
                     $(nRow).attr('class', data.id);
@@ -297,7 +316,7 @@ table.table thead tr th {
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    url: "{{ route('spg.pasar.sales.summary.data') }}" + "?" + $("#filterForm").serialize(),
+                    url: "{{ route('report.demo.cashAdvance.data') }}" + "?" + $("#filterForm").serialize(),
                     type: 'POST',
                     dataType: 'json',
                     error: function (data) {
@@ -306,9 +325,31 @@ table.table thead tr th {
                 },
                 scrollX:        true,
                 scrollCollapse: true,
-                "bFilter": false,
-                "rowId": "id",
-                // "columns": tableColumns,
+                // "bFilter": false,
+                // "rowId": "id",
+                "columns": [
+                  { data: 'tgl', name: 'tgl' },
+                  { data: 'employee', name: 'employee' },
+                  { data: 'description', name: 'description'},
+                  { data: 'km_begin', name: 'km_begin'},
+                  { data: 'km_end', name: 'km_end'},
+                  { data: 'km_distance', name: 'km_distance'},
+                  { data: 'tpd', name: 'tpd'},
+                  { data: 'hotel', name: 'hotel'},
+                  { data: 'bbm', name: 'bbm'},
+                  { data: 'parking_and_toll', name: 'parking_and_toll'},
+                  { data: 'raw_material', name: 'raw_material'},
+                  { data: 'property', name: 'property'},
+                  { data: 'permission', name: 'permission'},
+                  { data: 'bus', name: 'bus'},
+                  { data: 'sipa', name: 'sipa'},
+                  { data: 'taxibike', name: 'taxibike'},
+                  { data: 'rickshaw', name: 'rickshaw'},
+                  { data: 'taxi', name: 'taxi'},
+                  { data: 'other_cost', name: 'other_cost'},
+                  { data: 'other_description', name: 'other_description'},
+                  { data: 'total_cost', name: 'total_cost'},
+                ],
                 // "columnDefs": columnDefs,
                 "order": [[0, 'desc']],
                 "ordering": false

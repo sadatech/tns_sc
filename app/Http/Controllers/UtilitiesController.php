@@ -52,7 +52,7 @@ class UtilitiesController extends Controller
                 }
                 if($item->status == 'DONE' && ($item->results != '' || $item->results != null)){
                     $mode += 1;
-                    $action .= " <a target='_blank' href='".$item->results."' class='btn btn-sm btn-success btn-square' title='Download File'><i class='si si-cloud-download'></i></a>";
+                    $action .= " <a target='_blank' href='".asset("/export/report/" . basename($item->results))."' class='btn btn-sm btn-success btn-square' title='Download File'><i class='si si-cloud-download'></i></a>";
                 }
                 if($mode == 0){
                     return '-';

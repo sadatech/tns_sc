@@ -11,7 +11,12 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\CashAdvance;
+use App\Area;
 use DB;
+
+use App\JobTrace;
+use App\Jobs\ExportDCReportCashAdvanceJob;
+
 class CashAdvanceController extends Controller
 {
     /**
@@ -96,4 +101,46 @@ class CashAdvanceController extends Controller
             ]);
         }
     }
+
+    public function data(Request $req)
+    {
+        $CashAdvance = CashAdvance::where("id_area", $req->id_area)
+        ->whereMonth("date", Carbon::parse($req->periode)->format("m"))
+        ->whereYear("date", Carbon::parse($req->periode)->format("Y"))
+        ->get();
+
+        return Datatables::of($CashAdvance)
+        ->addColumn("tgl", function($item){
+            return Carbon::parse($item->date)->format("d");
+        })
+        ->addColumn("employee", function($item){
+            return $item->employee->name;
+        })
+        ->make(true);
+    }
+
+    public function exportXLS($id_area, $filterPeriode)
+    {
+        $result = DB::transaction(function() use ($id_area, $filterPeriode){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "Demo Cooking - Report Cash Advance - " . Area::where("id", $id_area)->first()->name. " - " . Carbon::parse($filterPeriode)->format("M Y") . " (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportDCReportCashAdvanceJob($JobTrace, $id_area, $filterPeriode, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
 }

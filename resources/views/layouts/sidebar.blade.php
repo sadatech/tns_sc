@@ -270,6 +270,10 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/stockist') ? 'active' : '' }}" href="{{ route('report.stockist') }}"><span class="sidebar-mini-hide">Stockist</span></a>
                                     </li>
+                                    {{-- CBD --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/cbd') ? 'active' : '' }}" href="{{ route('report.cbd') }}"><span class="sidebar-mini-hide">CBD</span></a>
+                                    </li>
                                     {{-- Dist PF MTC--}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/distributorPf') ? 'active' : '' }}" href="{{ route('report.dist.pf') }}"><span class="sidebar-mini-hide">Distribusi PF</span></a>
@@ -282,10 +286,18 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Summary</span></a>
                                     </li>
-                                    {{-- Achievement--}}
-                                    {{-- <li>
-                                        <a class="{{ request()->is('report/gtc/achievement') ? 'active' : '' }}" href="{{ route('report.achievement') }}"><span class="sidebar-mini-hide">Achievement</span></a>
-                                    </li> --}}
+                                    {{-- SALES SUMMARY --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/sales-summary') ? 'active' : '' }}" href="{{ route('report.sales.summary.smd') }}"><span class="sidebar-mini-hide">Sales Summary</span></a>
+                                    </li>
+                                    {{-- KPI --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/kpi') ? 'active' : '' }}" href="{{ route('report.kpi.smd') }}"><span class="sidebar-mini-hide">KPI</span></a>
+                                    </li>
+                                    {{-- TARGET KPI --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/target-kpi') ? 'active' : '' }}" href="{{ route('report.target.kpi.smd') }}"><span class="sidebar-mini-hide">Target KPI</span></a>
+                                    </li>                                    
                                 </ul>
                             </li>
                         </ul>
@@ -356,18 +368,20 @@
                             {{-- MOTORIK --}}
                             <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motorik</span></a>
-                                <ul>
-                            {{-- ATTENDANCE MOTORIK --}}
-                            <li>
-                                <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
-                            </li>
-                            {{-- DIST PF MOTORIK --}}
-                            <li>
-                                <a class="{{ request()->is('report/gtc/motorik/distPF') ? 'active' : '' }}" href="{{ route('report.motorik.distPF') }}"><span class="sidebar-mini-hide">Dist PF</span></a>
-                            </li>
-                            {{-- SALES MOTORIK --}}
-                            <li>
-                                <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
+                            <ul>
+                                {{-- ATTENDANCE MOTORIK --}}
+                                <li>
+                                    <a class="{{ request()->is('report/gtc/motorik/attendance') ? 'active' : '' }}" href="{{ route('report.motorik.attendance') }}"><span class="sidebar-mini-hide">Attendance</span></a>
+                                </li>
+                                {{-- DIST PF MOTORIK --}}
+                                <li>
+                                    <a class="{{ request()->is('report/gtc/motorik/distPF') ? 'active' : '' }}" href="{{ route('report.motorik.distPF') }}"><span class="sidebar-mini-hide">Dist PF</span></a>
+                                </li>
+                                {{-- SALES MOTORIK --}}
+                                <li>
+                                    <a class="{{ request()->is('report/gtc/motorik/sales') ? 'active' : '' }}" href="{{ route('report.motorik.sales') }}"><span class="sidebar-mini-hide">Sales</span></a>
+                                </li>
+                            </ul>
                             </li>
                         </ul>
                     </li>

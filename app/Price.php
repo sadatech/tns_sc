@@ -5,10 +5,14 @@ namespace App;
 use App\Components\BaseModel;
 use App\Components\traits\ValidationHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Price extends BaseModel
 {
-    use ValidationHelper;
+    use ValidationHelper, SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'id_product', 'rilis', 'price'
