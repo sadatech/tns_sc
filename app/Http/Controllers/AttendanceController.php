@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -16,7 +14,6 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use Box\Spout\Writer\Style\Color;
 use File;
 use Excel;
-
 class AttendanceController extends Controller
 {
     /**
@@ -28,7 +25,6 @@ class AttendanceController extends Controller
     {
         return view('report.attendance');
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -43,9 +39,8 @@ class AttendanceController extends Controller
         // ->select('attendance_outlets.*','checkin');
         $employees = DB::table('employees')
         ->join('positions', 'employees.id_position', '=', 'positions.id')
-        ->where('positions.level', '=', 'mdmtc')
+        ->where('positions.level', 'mdmtc')->orWhere('positions.level','spgmtc')
         ->select('employees.*','level');
-
         $employee = Employee::all();
       
         return Datatables::of($employee)
@@ -76,7 +71,6 @@ class AttendanceController extends Controller
         ->addColumn('attendance',function($employee){
             return $attendance = Attendance::where('keterangan','masuk')->where('id_employee',$employee->id)->count();
         })
-
         ->addColumn('attendance_detail',function($employees){
             $array = [];
             $month = Carbon::parse()->format('m');
@@ -101,7 +95,6 @@ class AttendanceController extends Controller
                                 $attdDetail->checkin = $attdDetail->checkin;
                                 $attdDetail->checkout = $attdDetail->checkout;
                                 $attendanceCollection->push($attdDetail);
-
                             } 
                             if ($key->keterangan == 'masuk') {
                                     $data = array(
@@ -131,12 +124,10 @@ class AttendanceController extends Controller
                     }
                 }else{
                     array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i</button>");
-
                 } 
                }else{
                     return "<button class='btn btn-sm btn-secondary btn-square' style='width:200px;height:40px'><i class='fa fa-warning
 '></i> Belum ada absen </button>";
-
                 } 
             }
             return implode(' ', $array);
@@ -144,19 +135,15 @@ class AttendanceController extends Controller
         ->rawColumns(['attendance','attendance_detail'])
         ->make(true);
     }
-
     public function exportXLS()
     {
-
      Excel::create('AttendanceMTC-Report_'.Carbon::now(), function($excel){
-
         $excel->sheet('Attendance Report MTC', function($sheet){
             $sheet->cells('A1:G1', function($cells) {
                 $cells->setFontWeight('bold');
                 $cells->setAlignment('center');
                 $cells->setBackground('#74fd84');
             });
-
             $sheet->row(1, ['Employee','Keterangan','Store','Place','Checkin','Checkout','Date']);
             $employee = Employee::all()->pluck('id');
             $array = [];
@@ -166,7 +153,6 @@ class AttendanceController extends Controller
             $maxMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
             
             $attendance = Attendance::whereIn('id_employee', $employee)->get();
-
               for($i=1; $i <= $maxMonth; $i++){    
                 // if($i <= $day){
                 $attendance__ = Attendance::whereIn('id_employee', $employee)->whereYear('date',$year)->whereMonth('date',$month)->whereDay('date',$i)->get();
@@ -187,7 +173,6 @@ class AttendanceController extends Controller
                                     $attdDetail->attendance->date, 
                                 ]);
                                 $attendanceCollection->push($attdDetail);
-
                                 } 
                         }
                 }
