@@ -38,26 +38,28 @@ class AttendanceController extends Controller
         // ->join('outlets', 'attendance_outlets.id_outlet', '=', 'outlets.id')
         // ->select('attendance_outlets.*','checkin');
         $employees = DB::table('employees')
+        ->join('attendances','employees.id','=','attendances.id_employee')
+        ->join('attendance_outlets','attendances.id','=','attendance_outlets.id_attendance')
         ->join('positions', 'employees.id_position', '=', 'positions.id')
-        ->where('positions.level', 'mdmtc')->orWhere('positions.level','spgmtc')
-        ->select('employees.*','level');
+        ->where('positions.level', 'spgmtc')->orWhere('positions.level','mdmtc')
+        ->select('employees.*','attendance_outlets.checkin','attendance_outlets.checkout','positions.level');
         $employee = Employee::all();
       
-        return Datatables::of($employee)
-        ->addColumn('employee', function($employee) {
-            return $employee->name;
+        return Datatables::of($employees)
+        ->addColumn('employee', function($employees) {
+            return $employees->name;
         })
-        ->addColumn('nik', function($employee) {
-            return $employee->nik;
+        ->addColumn('nik', function($employees) {
+            return $employees->nik;
         })
-        ->addColumn('checkin', function($employee) {
-            return $employee->checkin;
+        ->addColumn('checkin', function($employees) {
+            return $employees->checkin;
         })
-        ->addColumn('checkout', function($employee) {
-            return $employee->checkout;
+        ->addColumn('checkout', function($employees) {
+            return $employees->checkout;
         })
-        ->addColumn('role', function($employee) {
-            return $employee->position->level;
+        ->addColumn('role', function($employees) {
+            return $employees->level ?? '';
         })
         // ->addColumn('keterangan', function($attendanceOutlet) {
         //     return implode(',',$attendanceOutlet->attendance->keterangan->toArray());
