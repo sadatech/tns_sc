@@ -178,7 +178,7 @@ Route::prefix('block')->group(function () {
 
 // Report Inventory
 Route::prefix('report_inventory')->group(function () {
-	Route::post('/add', 'API\ReportInventoriController@store')->name('api.report_inventory.add');
+	Route::post('/update/{id}', 'API\ReportInventoriController@store')->name('api.report_inventory.update');
 	Route::get('/list', 'API\ReportInventoriController@list')->name('api.report_inventory.list');
 });
 
@@ -192,11 +192,17 @@ Route::prefix('property_dc')->group(function () {
 	Route::get('/list', 'API\PropertyDcController@list')->name('api.route.list');
 });
 
+// Block
+Route::prefix('cash_advance')->group(function () {
+	Route::post('/add', 'API\CashAdvanceController@store')->name('api.cash_advance.add');
+	Route::get('/list', 'API\CashAdvanceController@list')->name('api.cash_advance.list');
+});
+
 
 // History
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
-	Route::get('/sales/{type}/{date?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
+	Route::get('/sales/{type}/{date?}/{status?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
 	Route::get('/sales-recap/{date?}', 'API\HistoryController@salesRecapHistory')->name('api.sales-recap-history.list');
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
 	Route::get('/distribution/{type}/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
@@ -214,4 +220,12 @@ Route::prefix("employee")->group(function(){
 	Route::post("edit/password", "API\EmployeeController@editPassword")->name("api.employee.edit.password");
 	Route::post("edit/profile", "API\EmployeeController@editProfile")->name("api.employee.edit.profile");
 	Route::post("edit/profile/photo/{type?}", "API\EmployeeController@editProfilePhoto")->name("api.employee.edit.profile.photo");
+});
+
+/**
+ * Achievement
+ */
+Route::prefix("achievement")->group(function(){
+	Route::get('/mdpasar/{id?}', 'API\AchievementController@MDPasar')->name('api.ach.md-pasar');
+	Route::get('/mtc/{id?}', 'API\AchievementController@MtcEmployee')->name('api.ach.mtc');
 });

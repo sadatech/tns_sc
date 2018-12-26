@@ -1,6 +1,7 @@
 <?php
-
 namespace App\Jobs;
+
+use Exception;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -15,7 +16,7 @@ class ExportSPGPasarAchievementJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportSPGPasarAchievementTrait;
 
-    protected $trace;
+    protected $trace, $filecode;
 
     /**
      * The number of times the job may be attempted.
@@ -29,9 +30,10 @@ class ExportSPGPasarAchievementJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(JobTrace $trace)
+    public function __construct(JobTrace $trace, $filecode)
     {
         $this->trace = $trace;
+        $this->filecode = $filecode;
     }
 
     /**
@@ -43,7 +45,7 @@ class ExportSPGPasarAchievementJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->SPGPasarAchievementExportTrait(), // return excel file location
+            'results' => $this->SPGPasarAchievementExportTrait($this->filecode), // return excel file location
         ]);
 
     }

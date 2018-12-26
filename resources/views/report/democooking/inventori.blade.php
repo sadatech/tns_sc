@@ -11,43 +11,70 @@
     </div>
     @endif
     <h2 class="content-heading pt-10">Inventori <small>Report</small></h2>
-    <div class="block block-themed"> 
-        <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
-            <h3 class="block-title">Datatables</h3>
+
+    <div class="block block-themed block-mode-loading-refresh">
+      <div class="block-header bg-primary">
+          <h3 class="block-title">
+              Filters
+          </h3>
+          <div class="block-options">
+              <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"><i class="si si-arrow-down"></i></button>
+          </div>
+      </div>
+      <div class="block-content bg-white">
+        <form id="filterForm" method="post" action="#">
+          <div class="row items-push">
+              <div class="col-4 col-sm-4 text-center text-sm-left">
+                  <div class="font-size-sm font-w600 text-uppercase text-muted">Employee</div>
+                  <select id="filterEmployee" class="inputFilter" name="id_area"></select>
+              </div>
+          </div>
+          <div class="row col-sm-12 col-md-12">
+            <p class="btn btn-sm btn-primary" id="filterSearch"><i class="fa fa-search"></i> Search</p>
+            <p class="btn btn-sm btn-success" id="filterSearch" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus"></i> Add Data</p>
+            <p class="btn btn-sm btn-danger" id="filterReset"><i class="fa fa-refresh"></i> Clear</p>
         </div>
-        <div class="block">        
-            <div class="block-content block-content-full">
-                <div class="block-header p-0 mb-20">
+    </form>
+</div>
+</div>
+
+<div class="block block-themed" style="display: none;" id="panelTable"> 
+    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+        <h3 class="block-title" id="titleDatatable">Datatables</h3>
+    </div>
+    <div class="block">        
+        <div class="block-content block-content-full">
+            <div class="block-header p-0 mb-20">
                 <h3 class="block-title">
-                    <!-- <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button> -->
                 </h3>
                 <div class="block-option">
                     <!-- <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button> -->
-                    <a href="{{ route('properti.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                    <a target-url="{{ route('dc.inventori.data.exportXLS') }}" id="btnDownloadXLS" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                 </div>
             </div>
-            <table class="table table-striped table-vcenter js-dataTable-full" id="channeltable">
-            <thead>
-                <th class="text-center" style="width: 6px;">#</th>
-                <th>Employee</th>
-                <th>Item</th>
-                <th>Quantity</th>
-                <th>Actual</th>
-                <th>Status</th>
-                <th>Dokumentasi</th>
-                <!-- <th style="width: 15%;"> Action</th> -->
-            </thead>
+            <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
+                <thead>
+                    <th class="text-center" style="width: 6px;">#</th>
+                    <th>Employee</th>
+                    <th style="width: 25%;">Item</th>
+                    <th style="width: 5px;">Quantity</th>
+                    <th style="width: 5px;">Actual</th>
+                    <th style="width: 10%;">Status</th>
+                    <th style="width: 10%;">Description</th>
+                    <th>Dokumentasi</th>
+                    <!-- <th style="width: 15%;"> Action</th> -->
+                </thead>
             </table>
         </div>  
     </div>
 </div>
 
-<!-- <div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-gd-sun p-10">
-                    <h3 class="block-title"><i class="fa fa-plus"></i> Add Properti Dc</h3>
+                    <h3 class="block-title"><i class="fa fa-plus"></i> Add Employee Properti Dc</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
                             <i class="si si-close"></i>
@@ -55,46 +82,16 @@
                     </div>
                 </div>
             </div>
-            <form action="{{ route('properti.add') }}" method="post">
+            <form action="{{ route('dc.inventori.data.add') }}" method="post">
                 {!! csrf_field() !!}
                 <div class="block-content">
                     <div class="form-group">
-                        <label>Item</label>
-                        <input type="text" class="form-control" name="item" placeholder="Add new channel" required>
+                        <label>No Polisi</label>
+                        <input type="text" class="form-control" name="no_polisi" placeholder="Add new No Polisi" required autocomplete="off">
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> -->
-
-
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout" role="document">
-        <div class="modal-content">
-            <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-gd-sun p-10">
-                    <h3 class="block-title"><i class="fa fa-edit"></i> Update Properti Dc</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="si si-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <form id="editForm" method="post">
-                {!! method_field('PUT') !!}
-                {!! csrf_field() !!}
-                <div class="block-content">
                     <div class="form-group">
-                        <label>Item</label>
-                        <input type="text" class="form-control" name="item" id="nameInput" required>
+                        <label>Employee</label>
+                        <select id="filterEmployeeAdd" class="form-control inputFilter" name="id_employee"></select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -108,145 +105,151 @@
     </div>
 </div>
 
-<div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
-        <div class="modal-content">
-            <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-gd-sun p-10">
-                    <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Properti Dc</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="si si-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('properti.import') }}">
-                {{ csrf_field() }}
-                <div class="block-content">
-                    <div class="form-group">
-                      <a href="{{ route('properti.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
-                    </div>
-                    <div class="block-content">
-                        <h5> Sample Data :</h5>
-                        <table class="table table-bordered table-vcenter">
-                            <thead>
-                                <tr>
-                                    <td><b>Item</b></td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Item 1</td>
-                                </tr>
-                                <tr>
-                                    <td>Item 2</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label>Upload Your Data Properti DC:</label>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
-                            <label class="custom-file-label">Choose file Excel</label>
-                            <code> *Type File Excel</code>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Import
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 @endsection
 
 @section('css')
-  <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
-  <style type="text/css">
-    [data-notify="container"] {
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
+<style type="text/css">
+[data-notify="container"] {
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-  </style>
+}
+</style>
 @endsection
 
 @section('script')
-  <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
-  <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
-  <script type="text/javascript">
+<script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
+<script type="text/javascript">
     function editModal(json) {
-                $('#editModal').modal('show');
-                $('#editForm').attr('action', "{{ url('/propertiDc/update') }}/"+json.id);
-                $('#nameInput').val(json.item);
-            }
+        $('#editModal').modal('show');
+        $('#editForm').attr('action', "{{ url('/propertiDc/update') }}/"+json.id);
+        $('#nameInput').val(json.item);
+    }
     @if(session('type'))
     $(document).ready(function() {
       $.notify({
         title: '<strong>{!! session('title') !!}</strong>',
         message: '{!! session('message') !!}'
-      }, {
+    }, {
         type: '{!! session('type') !!}',
         animate: {
           enter: 'animated zoomInDown',
           exit: 'animated zoomOutUp'
-        },
-        placement: {
+      },
+      placement: {
           from: 'top',
           align: 'center'
+      }
+  });
+  });
+    @endif
+    $(function() {
+
+    });
+</script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $("#btnDownloadXLS").on("click", function(){
+      $.ajax({
+        url: $(this).attr("target-url"),
+        type: "post",
+        success: function(e){
+          swal("Success!", e.result, "success");
+        },
+        error: function(){
+          swal("Error!", e.result, "error");
         }
       });
     });
-    @endif
-    $(function() {
-      $('#channeltable').DataTable({
-        filter: true,
-        processing: true,
-        serverSide: true,
-        drawCallback: function(){
-            $('.js-swal-delete').on('click', function(){
-              var url = $(this).data("url");
-              swal({
-                title: 'Are you sure?',
-                text: 'You will not be able to recover this data!',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d26a5c',
-                confirmButtonText: 'Yes, delete it!',
-                html: false,
-                preConfirm: function() {
-                    return new Promise(function (resolve) {
-                        setTimeout(function () {
-                            resolve();
-                        }, 50);
-                    });
-                }
-              }).then(function(result){
-                if (result.value) {
-                    window.location = url;
-                } else if (result.dismiss === 'cancel') {
-                    swal('Cancelled', 'Your data is safe :)', 'error');
-                }
-              });
-            });
-        },
-        ajax: '{!! route('dc.inventori.data') !!}',
-        scrollY: "300px",
-        columns: [
-        { data: 'id', name: 'id' },
-        { data: 'employee', name: 'employee'},
-        { data: 'item', name: 'item'},
-        { data: 'quantity', name: 'quantity'},
-        { data: 'actual', name: 'actual'},
-        { data: 'status', name: 'status'},
-        { data: 'dokumentasi', name: 'dokumentasi'},
-        // { data: 'action', name: 'action' },
-        ]
-      });
+
+    $('#filterEmployee').select2(setOptions('{{ route("employee-is-tl-select2") }}', 'Select Employee', function (params) {
+        return filterData('name', params.term);
+    }, function (data, params) {
+        return {
+          results: $.map(data, function (obj){
+            return {id: obj.id, text: obj.name}
+        })
+      }
+  }));
+    $('#filterEmployeeAdd').select2(setOptions('{{ route("employee-is-tl-select2") }}', 'Select Employee', function (params) {
+        return filterData('name', params.term);
+    }, function (data, params) {
+        return {
+          results: $.map(data, function (obj){
+            return {id: obj.id, text: obj.name}
+        })
+      }
+  }));
+
+    $("#filterReset").click(function (){
+      $.each($('#filterForm select'), function(key, value) {
+        $('#'+this.id).val(null).trigger('change');
     });
-  </script>
+      $('#panelTable').slideUp();
+  })
+
+
+    $("#filterSearch").click(function(){
+        if($('#filterEmployee').val() == null){
+            swal("Warning!", "Please select Employee First!", "warning");
+            return;
+        }
+
+        $("#filterEmployeeAdd").val($("#filterEmployee").val());
+
+        if($.fn.dataTable.isDataTable('#reportTable'))
+        {
+            $('#reportTable').DataTable().clear();
+            $('#reportTable').DataTable().destroy();
+        }
+
+        $('#panelTable').slideDown();
+
+        $('#reportTable').DataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            // event scroll after datatable loaded
+            "drawCallback": function(){
+                setTimeout(function(){
+                    $('html, body').animate({scrollTop: ($('#panelTable').offset().top - 75)}, 500);
+                }, 10);
+            },
+            "filter": true,
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: '{!! route('dc.inventori.data') !!}',
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+              },
+          },
+          "columns": [
+          { data: 'id', name: 'id' },
+          { data: 'employee', name: 'employee'},
+          { data: 'item', name: 'item'},
+          { data: 'quantity', name: 'quantity'},
+          { data: 'actual', name: 'actual'},
+          { data: 'status', name: 'status'},
+          { data: 'description', name: 'description'},
+          { data: 'dokumentasi', name: 'dokumentasi'}
+          ]
+      });
+
+        $.each($('#filterForm select'), function(key, value) {
+            $('#'+this.id).val(null).trigger('change');
+        });
+    });
+
+})
+</script>
 @endsection
