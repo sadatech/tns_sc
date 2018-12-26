@@ -253,6 +253,7 @@ class EmployeeController extends Controller
 		->select('employees.*');
 		return Datatables::of($employee)
 		->addColumn('action', function ($employee) {
+			// return '';
 			if (isset($employee->id)) {
 			$employeeS 		= EmployeeStore::where(['id_employee' => $employee->id])->get();
 				$store 		= array();
@@ -286,6 +287,7 @@ class EmployeeController extends Controller
 			}
 		})
 		->addColumn('employeeStore', function($employee) {
+			// return '';
 			$store = EmployeeStore::where(['id_employee' => $employee->id])->get();
 			$storeList = array();
 			foreach ($store as $data) {
