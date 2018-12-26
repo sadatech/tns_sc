@@ -202,7 +202,7 @@ Route::prefix('cash_advance')->group(function () {
 // History
 Route::prefix('history')->group(function () {
 	Route::get('/attendance/{type}/{date?}', 'API\HistoryController@attenadnceHistory')->name('api.attendance-history.list');
-	Route::get('/sales/{type}/{date?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
+	Route::get('/sales/{type}/{date?}/{status?}', 'API\HistoryController@salesHistory')->name('api.sales-history.list');
 	Route::get('/sales-recap/{date?}', 'API\HistoryController@salesRecapHistory')->name('api.sales-recap-history.list');
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
 	Route::get('/distribution/{type}/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
@@ -220,4 +220,12 @@ Route::prefix("employee")->group(function(){
 	Route::post("edit/password", "API\EmployeeController@editPassword")->name("api.employee.edit.password");
 	Route::post("edit/profile", "API\EmployeeController@editProfile")->name("api.employee.edit.profile");
 	Route::post("edit/profile/photo/{type?}", "API\EmployeeController@editProfilePhoto")->name("api.employee.edit.profile.photo");
+});
+
+/**
+ * Achievement
+ */
+Route::prefix("achievement")->group(function(){
+	Route::get('/mdpasar/{id?}', 'API\AchievementController@MDPasar')->name('api.ach.md-pasar');
+	Route::get('/mtc/{id?}', 'API\AchievementController@MtcEmployee')->name('api.ach.mtc');
 });
