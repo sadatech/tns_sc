@@ -700,6 +700,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.target-kpi');
 				})->name('report.target.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDTargetKpi')->name('smd.pasar.target.kpi.data')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDTargetKpiExportXLS')->name('smd.pasar.target.kpi.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('kpi')->group(function () {
