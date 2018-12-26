@@ -49,6 +49,16 @@ class EmployeeController extends Controller
 		return $data;
 	}
 
+	public function getDataIsTL()
+	{
+		$data = Employee::where("id_position", 5)
+		->whereHas("employeeSubArea", function($query){
+			$query->where("isTl", 1);
+		})
+		->get();
+		return $data;
+	}
+
 	public function baca()
 	{
 		return view('employee.employee');
@@ -243,6 +253,7 @@ class EmployeeController extends Controller
 		->select('employees.*');
 		return Datatables::of($employee)
 		->addColumn('action', function ($employee) {
+			// return '';
 			if (isset($employee->id)) {
 			$employeeS 		= EmployeeStore::where(['id_employee' => $employee->id])->get();
 				$store 		= array();
@@ -276,6 +287,7 @@ class EmployeeController extends Controller
 			}
 		})
 		->addColumn('employeeStore', function($employee) {
+			// return '';
 			$store = EmployeeStore::where(['id_employee' => $employee->id])->get();
 			$storeList = array();
 			foreach ($store as $data) {

@@ -1,6 +1,7 @@
 <?php
-
 namespace App\Jobs;
+
+use Exception;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -22,7 +23,7 @@ class ExportSPGPasarSalesSummaryJob implements ShouldQueue
      *
      * @var int
      */
-    // public $tries = 5;
+    public $tries = 5;
 
     /**
      * Create a new job instance.
@@ -44,7 +45,7 @@ class ExportSPGPasarSalesSummaryJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->SPGPasarSalesSummaryExportTrait($this->params[0], $this->params[1]), // return excel file location
+            'results' => $this->SPGPasarSalesSummaryExportTrait($this->params[0], $this->params[1], $this->params[2]), // return excel file location
         ]);
     }
 

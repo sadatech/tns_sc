@@ -16,6 +16,8 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
 {
     use Authenticatable;
     use DropDownHelper;
+
+    protected $table = 'employees';
     
     protected $fillable = [
         'name', 'nik', 'id_position', 'ktp', 'phone', 'email', 'rekening', 'bank', 'status', 'joinAt', 'id_agency', 'gender', 'education', 'birthdate', 'foto_ktp', 'foto_tabungan', 'isResign', 'password', 'id_timezone'
@@ -53,6 +55,43 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                         ORDER BY pfs.id desc
                         LIMIT 1
                      ) = sales_mtc_summary.id_category,
+                    1, 0)".$pf;
+        }
+
+        return $pf;
+    }
+
+    public function pfQueryAlt($periode, $focus = '')
+    {
+        $newDate = Carbon::parse($periode)->format('Y-m-d');
+        $pf = "* IF (
+                        (
+                            SELECT COUNT(*) FROM product_fokus_mtcs 
+                            WHERE product_fokus_mtcs.id_product = sales_mtc_summary.id_product
+                            AND product_fokus_mtcs.id_channel = sales_mtc_summary.id_channel
+                            AND 
+                            (
+                                product_fokus_mtcs.id_area = sales_mtc_summary.id_area
+                                OR
+                                product_fokus_mtcs.id_area is null
+                            )
+                            AND product_fokus_mtcs.from <= '".$newDate."'
+                            AND product_fokus_mtcs.to >= '".$newDate."'                            
+                        ) 
+                > 0, 1, 0)
+              ";
+
+        if ($focus != '') {
+            $pf = "* IF(
+                    (SELECT 
+                        id_category$focus
+                        FROM `pfs`
+                        WHERE 
+                            MONTH(date) = ".Carbon::parse($periode)->month."
+                            AND YEAR(date) = ".Carbon::parse($periode)->year."
+                        ORDER BY pfs.id desc
+                        LIMIT 1
+                     ) = sales_mtc_summary.id_subcategory,
                     1, 0)".$pf;
         }
 
@@ -181,6 +220,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
 
     public function getTarget1($data){
         $pf = $this->pfQuery($data['date']->month, $data['date']->year, '1');
+        // return $pf;
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -277,6 +317,106 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
             break;       
         }
         
+    }
+
+    public function getTarget1Alt($data){
+        $pf = $this->pfQueryAlt($data['date'], '1');
+        // return $pf;
+        switch ($this->position->level) {
+            case 'spgmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(target_value $pf) AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND id_store = ".$data['store']."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;    
+
+            case 'mdmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT SUM(target_value $pf) AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;  
+
+            case 'tlmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT SUM(target_value $pf) AS result
+                        FROM sales_mtc_summary
+                        WHERE sub_area = '".$data['sub_area']."'
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;       
+        }
+    }
+
+    public function getTarget2Alt($data){
+        $pf = $this->pfQueryAlt($data['date'], '2');
+        // return $pf;
+        switch ($this->position->level) {
+            case 'spgmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT 
+                            SUM(target_value $pf) AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND id_store = ".$data['store']."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;    
+
+            case 'mdmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT SUM(target_value $pf) AS result
+                        FROM sales_mtc_summary
+                        WHERE id_employee = ".$this->id."
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;  
+
+            case 'tlmtc':
+                return 
+                    DB::select(
+                        "
+                        SELECT SUM(target_value $pf) AS result
+                        FROM sales_mtc_summary
+                        WHERE sub_area = '".$data['sub_area']."'
+                        AND MONTH(date) = ".$data['date']->month."
+                        AND YEAR(date) = ".$data['date']->year."
+                        LIMIT 1
+                        "
+                    )[0]->result * 1;
+            break;       
+        }
     }
 
     public function getActual($data){
@@ -440,7 +580,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                     DB::select(
                         "
                         SELECT 
-                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                            SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
                         AS result
                         FROM sales_mtc_summary
                         WHERE id_employee = ".$this->id."
@@ -455,7 +595,8 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getActualPf1($data){
-        $pf = $this->pfQuery($data['date']->month, $data['date']->year, '1');
+        // $pf = $this->pfQuery($data['date']->month, $data['date']->year, '1');
+        $pf = $this->pfQueryAlt($data['date'], '1');
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -496,7 +637,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                     DB::select(
                         "
                         SELECT 
-                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                            SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
                         AS result
                         FROM sales_mtc_summary
                         WHERE id_employee = ".$this->id."
@@ -546,12 +687,13 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getAchievementPf1($data){
-        $target = $this->getTarget1($data);
+        $target = $this->getTarget1Alt($data);
         return ($target > 0) ? round(($this->getActualPf1($data)/$target)*100, 2).'%' : '0%';
     }
 
     public function getActualPf2($data){
-        $pf = $this->pfQuery($data['date']->month, $data['date']->year, '2');
+        // $pf = $this->pfQuery($data['date']->month, $data['date']->year, '2');
+        $pf = $this->pfQueryAlt($data['date'], '2');
         switch ($this->position->level) {
             case 'spgmtc':
                 return 
@@ -592,7 +734,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
                     DB::select(
                         "
                         SELECT 
-                            SUM(total_actual * IF(target_value > 0, 1, 0))
+                            SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
                         AS result
                         FROM sales_mtc_summary
                         WHERE id_employee = ".$this->id."
@@ -642,9 +784,124 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
     }
 
     public function getAchievementPf2($data){
-        $target = $this->getTarget2($data);
+        $target = $this->getTarget2Alt($data);
         return ($target > 0) ? round(($this->getActualPf2($data)/$target)*100, 2).'%' : '0%';
     }
+
+    /* ACHIEVEMENT FOR API */
+    public function getTargetApi($data){
+        return 
+            DB::select(
+                "
+                SELECT SUM(target_value) AS result
+                FROM sales_mtc_summary
+                WHERE id_employee = ".$this->id."
+                AND MONTH(date) = ".$data['date']->month."
+                AND YEAR(date) = ".$data['date']->year."
+                LIMIT 1
+                "
+            )[0]->result * 1;        
+    }
+
+    public function getTarget1AltApi($data){
+        $pf = $this->pfQueryAlt($data['date'], '1');
+        
+        return 
+            DB::select(
+                "
+                SELECT SUM(target_value $pf) AS result
+                FROM sales_mtc_summary
+                WHERE id_employee = ".$this->id."
+                AND MONTH(date) = ".$data['date']->month."
+                AND YEAR(date) = ".$data['date']->year."
+                LIMIT 1
+                "
+            )[0]->result * 1;
+    }
+
+    public function getTarget2AltApi($data){
+        $pf = $this->pfQueryAlt($data['date'], '2');
+        
+        return 
+            DB::select(
+                "
+                SELECT SUM(target_value $pf) AS result
+                FROM sales_mtc_summary
+                WHERE id_employee = ".$this->id."
+                AND MONTH(date) = ".$data['date']->month."
+                AND YEAR(date) = ".$data['date']->year."
+                LIMIT 1
+                "
+            )[0]->result * 1;
+    }
+
+    public function getActualApi($data){
+        return 
+            DB::select(
+                "
+                SELECT 
+                    SUM(total_actual * IF(target_value > 0, 1, 0))
+                AS result
+                FROM sales_mtc_summary
+                WHERE id_employee = ".$this->id."
+                AND MONTH(date) = ".$data['date']->month."
+                AND YEAR(date) = ".$data['date']->year."
+                LIMIT 1
+                "
+            )[0]->result * 1;
+        
+    }
+
+    public function getActualPreviousApi($data){
+        return 
+            DB::select(
+                "
+                SELECT 
+                    SUM(total_actual * IF(target_value > 0, 1, 0))
+                AS result
+                FROM sales_mtc_summary
+                WHERE id_employee = ".$this->id."
+                AND MONTH(date) = ".$data['date']->month."
+                AND YEAR(date) = ".Carbon::parse($data['date'])->subYear()->year."
+                LIMIT 1
+                "
+            )[0]->result * 1;      
+    }
+
+    public function getActualPf1Api($data){
+        $pf = $this->pfQueryAlt($data['date'], '1');
+        return 
+            DB::select(
+                "
+                SELECT 
+                    SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
+                AS result
+                FROM sales_mtc_summary
+                WHERE id_employee = ".$this->id."
+                AND MONTH(date) = ".$data['date']->month."
+                AND YEAR(date) = ".$data['date']->year."
+                LIMIT 1
+                "
+            )[0]->result * 1;       
+    }
+
+    public function getActualPf2Api($data){
+        $pf = $this->pfQueryAlt($data['date'], '2');
+        return 
+            DB::select(
+                "
+                SELECT 
+                    SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
+                AS result
+                FROM sales_mtc_summary
+                WHERE id_employee = ".$this->id."
+                AND MONTH(date) = ".$data['date']->month."
+                AND YEAR(date) = ".$data['date']->year."
+                LIMIT 1
+                "
+            )[0]->result * 1;       
+    }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

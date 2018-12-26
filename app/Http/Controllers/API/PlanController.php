@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use JWTAuth;
 use Config;
 use Image;
+use DB;
 use App\PlanEmployee;
 use App\PlanDc;
 
@@ -27,6 +28,7 @@ class PlanController extends Controller
 		$code = 200;
 		if ($check['success'] == true) {
 			
+			$photo = '-';
 			if ($image 	= $request->file('photo')) {
 				$photo 	= time()."_".$image->getClientOriginalName();
 				$path 	= 'uploads/plan';
@@ -37,17 +39,37 @@ class PlanController extends Controller
 			$date 	= Carbon::now()->toDateString();
 			$user = $check['user'];
 
-			$update 	= PlanDc::whereDate('date',$date)->whereHas('planEmployee', function($query) use ($user)
+			$check 	= PlanDc::whereDate('date',$date)->whereHas('planEmployee', function($query) use ($user)
 			{
 				return $query->where('id_employee', $user->id);
-			})->orderBy('id','desc')
-			->update([
-				'stocklist'	=> $request->stocklist,
-				'actual'		=> $request->actual,
-				'photo'			=> $photo,
-			]);
+			})->orderBy('id','desc');
 
-			if ($update) {
+			$transaction = DB::transaction(function () use ($request, $photo, $user, $date, $check) {
+				if ($check->get()->count() > 0) {
+					$update = $check->update([
+						'channel'		=> $request->channel,
+						'stocklist'		=> $request->stocklist,
+						'actual'		=> $request->actual,
+						'photo'			=> $photo,
+					]);
+				}else{
+					$create = PlanDc::create([
+						'plan'			=> '-',
+						'date'			=> $date,
+						'channel'		=> $request->channel,
+						'stocklist'		=> $request->stocklist,
+						'actual'		=> $request->actual,
+						'photo'			=> $photo,
+					]);
+					PlanEmployee::create([
+						'id_employee' 	=> $user->id,
+						'id_plandc'		=> $create->id,
+					]);
+				}
+				return 'success';
+			});
+
+			if ($transaction == 'success') {
 				$res['success'] = true;
 				$res['msg'] 	= "Success Checkin.";
 			} else {

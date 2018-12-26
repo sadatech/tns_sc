@@ -20,8 +20,6 @@ class UtilitiesController extends Controller
     public function reportDownloadData(JobTraceFilters $filters){
     	$data = JobTrace::filter($filters);
 
-        // return response()->json($data->get());
-
         return Datatables::of($data)
             ->addColumn('request_by', function ($item) {
                 return @$item->user->name;
@@ -54,7 +52,7 @@ class UtilitiesController extends Controller
                 }
                 if($item->status == 'DONE' && ($item->results != '' || $item->results != null)){
                     $mode += 1;
-                    $action .= " <a target='_blank' href='".$item->results."' class='btn btn-sm btn-success btn-square' title='Download File'><i class='si si-cloud-download'></i></a>";
+                    $action .= " <a target='_blank' href='".asset("/export/report/" . basename($item->results))."' class='btn btn-sm btn-success btn-square' title='Download File'><i class='si si-cloud-download'></i></a>";
                 }
                 if($mode == 0){
                     return '-';

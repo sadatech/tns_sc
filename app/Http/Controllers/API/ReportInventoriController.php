@@ -18,7 +18,7 @@ class ReportInventoriController extends Controller
 	{
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
-	public function store(Request $request)
+	public function store(Request $request, $id)
 	{
 		
 		$check = $this->authCheck();
@@ -30,33 +30,26 @@ class ReportInventoriController extends Controller
 				$res['success'] = false;
 				$res['msg'] = "Property DC cannot be empty.";
 			} else {
-				if (!empty(PropertiDc::find($request->properti_dc))) {
-
-					if ($image 	= $request->file('photo')) {
-						$photo 	= time()."_".$image->getClientOriginalName();
-						$path 	= 'uploads/report_inventory';
-						$image->move($path, $photo);
-						$image_compress = Image::make($path.'/'.$photo)->orientate();
-						$image_compress->save($path.'/'.$photo, 50);
-					}
-					$insert = ReportInventori::create([
-						'id_properti_dc'	=> $request->properti_dc,
-						'id_employee'		=> $user->id,
-						'quantity'			=> $request->quantity,
-						'actual'			=> $request->actual,
-						'status'			=> $request->status,
-						'photo'				=> $path.'/'.$photo,
-					]);
-					if ($insert->id) {
-						$res['success'] = true;
-						$res['msg'] 	= "Success add Report Inventory.";
-					} else {
-						$res['success'] = false;
-						$res['msg'] 	= "Failed to add Report Inventory.";
-					}
+				if ($image 	= $request->file('photo')) {
+					$photo 	= time()."_".$image->getClientOriginalName();
+					$path 	= 'uploads/report_inventory';
+					$image->move($path, $photo);
+					$image_compress = Image::make($path.'/'.$photo)->orientate();
+					$image_compress->save($path.'/'.$photo, 50);
+				}
+				$insert = ReportInventori::where('id',$id)->update([
+					'quantity'			=> $request->quantity,
+					'actual'			=> $request->actual,
+					'status'			=> $request->status,
+					'photo'				=> isset($photo) ? $path.'/'.$photo : null,
+					'description'		=> $request->description,
+				]);
+				if ($insert) {
+					$res['success'] = true;
+					$res['msg'] 	= "Success add Report Inventory.";
 				} else {
 					$res['success'] = false;
-					$res['msg'] 	= "Property DC undefined.";
+					$res['msg'] 	= "Failed to add Report Inventory.";
 				}
 			}
 		}else{
@@ -73,21 +66,23 @@ class ReportInventoriController extends Controller
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
+
 			$reportInventory = ReportInventori::where('id_employee', $user->id)->get();
+
 			if ($reportInventory->count() > 0) {
 				$listReportInventory = [];
 				$res['success'] = true;
 				foreach ($reportInventory as $data) {
 					$listReportInventory[] = array(
 						'id' 				=> $data->id,
-						'name' 				=> $data->name,
 						'quantity' 			=> $data->quantity,
 						'actual'			=> $data->actual,
 						'status'			=> $data->status,
+						'description'		=> $data->description,
 						'photo'				=> $data->photo,
 						'photo_url'			=> $data->photo ? asset($data->photo) : null,
 						'id_properti_dc' 	=> $data->properti->id,
-						'properti_dc_name' 	=> $data->properti->name,
+						'properti_dc_name' 	=> $data->properti->item,
 					);
 				}
 				$res['reportInventory'] = $listReportInventory;
