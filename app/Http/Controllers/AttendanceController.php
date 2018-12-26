@@ -104,19 +104,19 @@ class AttendanceController extends Controller
                                     'attandaceDetail' => $attendanceCollection,
                                     'attendance' => $key
                                 );
-                             array_push($array, "<button class='btn btn-sm btn-success btn-square' style='width:80px;height:40px' onclick='detailModal(".json_encode($data).")'>$i</button>");
+                             array_push($array, "<button class='btn btn-sm btn-success btn-square' style='width:80px;height:40px' onclick='detailModal(".json_encode($data).")'>$i<br>Masuk</button>");
                              
                             }else if($key->keterangan == 'sakit'){
-                                 array_push($array, "<button class='btn btn-sm btn-warning btn-square' style='width:80px;height:40px'>$i</button>");
+                                 array_push($array, "<button class='btn btn-sm btn-warning btn-square' style='width:80px;height:40px'>$i<br>Sakit</button>");
                                  
                             }else if($key->keterangan == 'alpha'){
-                                array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i</button>");
+                                array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i<br>Alpha</button>");
                                 
                             }else if($key->keterangan == 'cuti'){
-                                array_push($array, "<button class='btn btn-sm btn-primary btn-square' style='width:80px;height:40px'>$i</button>");
+                                array_push($array, "<button class='btn btn-sm btn-primary btn-square' style='width:80px;height:40px'>$i<br>Cuti</button>");
                                 
                             }else{
-                               array_push($array, "<button class='btn btn-sm btn-secondary btn-square' style='width:80px;height:40px'>$i</button>");
+                               array_push($array, "<button class='btn btn-sm btn-secondary btn-square' style='width:80px;height:40px'>$i<br>Alpha</button>");
                                
                             }
                         // }else{
@@ -125,7 +125,7 @@ class AttendanceController extends Controller
                         // }
                     }
                 }else{
-                    array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i</button>");
+                    array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i<br>Alpha</button>");
                 } 
                }else{
                     return "<button class='btn btn-sm btn-secondary btn-square' style='width:200px;height:40px'><i class='fa fa-warning
