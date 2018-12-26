@@ -1,32 +1,14 @@
 <?php
 
-namespace App;
+namespace App\Model\Extend;
 
-use App\Components\traits\DropDownHelper;
-use App\Filters\QueryFilters;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Employee as Employee;
 use DB;
 use Carbon\Carbon;
-use App\Pasar;
 
-class Employee extends Model implements AuthenticatableContract, JWTSubject
+class MtcEmployeeSummary extends Employee
 {
-    use Authenticatable;
-    use DropDownHelper;
-
-    protected $table = 'employees';
-    
-    protected $fillable = [
-        'name', 'nik', 'id_position', 'ktp', 'phone', 'email', 'rekening', 'bank', 'status', 'joinAt', 'id_agency', 'gender', 'education', 'birthdate', 'foto_ktp', 'foto_tabungan', 'isResign', 'password', 'id_timezone'
-    ];
-
-    protected $hidden = [
-        'password'
-    ];
-
     public function pfQuery($month, $year, $focus = '')
     {
         $pf = "* IF(
@@ -96,76 +78,6 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
         }
 
         return $pf;
-    }
-    
-    public function resigns()
-    {
-        return $this->hasMany('App\Resign', 'id_employee');
-    }
-
-    public function planEmployee()
-    {
-        return $this->hasMany('App\PlanEmployee', 'id_employee');
-    }
-
-    public function attendanceDetail()
-    {
-        return $this->hasMany('App\AttendanceDetail', 'id_employee');
-    }
-
-    public function attendanceOutlet()
-    {
-        return $this->hasMany('App\AttendanceOutlet', 'id_employee');
-    }
-
-    public function attendance()
-    {
-        return $this->hasMany('App\Attendance', 'id_employee');
-    }
-
-    public function rejoins()
-    {
-        return $this->hasMany('App\Rejoin', 'id_employee');
-    }
-
-    public function sellin()
-    {
-        return $this->hasMany('App\SellIn', 'id_employee');
-    }
-
-    public function headeriin()
-    {
-        return $this->hasMany('App\HeaderIn', 'id_employee');
-    }
-
-    public function employeeStore()
-    {
-        return $this->hasMany('App\EmployeeStore', 'id_employee');
-    }
-
-    public function employeePasar()
-    {
-        return $this->hasMany('App\EmployeePasar', 'id_employee');
-    }
-
-    public function employeeSubArea()
-    {
-        return $this->hasMany('App\EmployeeSubArea', 'id_employee');
-    }
-
-    public function position()
-    {
-        return $this->belongsTo('App\Position', 'id_position');
-    }
-
-    public function agency()
-    {
-        return $this->belongsTo('App\Agency', 'id_agency');
-    }
-
-    public function timezone()
-    {
-        return $this->belongsTo('App\Timezone', 'id_timezone');
     }
 
     /* Achievement MTC */
@@ -787,154 +699,4 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
         $target = $this->getTarget2Alt($data);
         return ($target > 0) ? round(($this->getActualPf2($data)/$target)*100, 2).'%' : '0%';
     }
-
-    /* ACHIEVEMENT FOR API */
-    public function getTargetApi($data){
-        return 
-            DB::select(
-                "
-                SELECT SUM(target_value) AS result
-                FROM sales_mtc_summary
-                WHERE id_employee = ".$this->id."
-                AND MONTH(date) = ".$data['date']->month."
-                AND YEAR(date) = ".$data['date']->year."
-                LIMIT 1
-                "
-            )[0]->result * 1;        
-    }
-
-    public function getTarget1AltApi($data){
-        $pf = $this->pfQueryAlt($data['date'], '1');
-        
-        return 
-            DB::select(
-                "
-                SELECT SUM(target_value $pf) AS result
-                FROM sales_mtc_summary
-                WHERE id_employee = ".$this->id."
-                AND MONTH(date) = ".$data['date']->month."
-                AND YEAR(date) = ".$data['date']->year."
-                LIMIT 1
-                "
-            )[0]->result * 1;
-    }
-
-    public function getTarget2AltApi($data){
-        $pf = $this->pfQueryAlt($data['date'], '2');
-        
-        return 
-            DB::select(
-                "
-                SELECT SUM(target_value $pf) AS result
-                FROM sales_mtc_summary
-                WHERE id_employee = ".$this->id."
-                AND MONTH(date) = ".$data['date']->month."
-                AND YEAR(date) = ".$data['date']->year."
-                LIMIT 1
-                "
-            )[0]->result * 1;
-    }
-
-    public function getActualApi($data){
-        return 
-            DB::select(
-                "
-                SELECT 
-                    SUM(total_actual * IF(target_value > 0, 1, 0))
-                AS result
-                FROM sales_mtc_summary
-                WHERE id_employee = ".$this->id."
-                AND MONTH(date) = ".$data['date']->month."
-                AND YEAR(date) = ".$data['date']->year."
-                LIMIT 1
-                "
-            )[0]->result * 1;
-        
-    }
-
-    public function getActualPreviousApi($data){
-        return 
-            DB::select(
-                "
-                SELECT 
-                    SUM(total_actual * IF(target_value > 0, 1, 0))
-                AS result
-                FROM sales_mtc_summary
-                WHERE id_employee = ".$this->id."
-                AND MONTH(date) = ".$data['date']->month."
-                AND YEAR(date) = ".Carbon::parse($data['date'])->subYear()->year."
-                LIMIT 1
-                "
-            )[0]->result * 1;      
-    }
-
-    public function getActualPf1Api($data){
-        $pf = $this->pfQueryAlt($data['date'], '1');
-        return 
-            DB::select(
-                "
-                SELECT 
-                    SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
-                AS result
-                FROM sales_mtc_summary
-                WHERE id_employee = ".$this->id."
-                AND MONTH(date) = ".$data['date']->month."
-                AND YEAR(date) = ".$data['date']->year."
-                LIMIT 1
-                "
-            )[0]->result * 1;       
-    }
-
-    public function getActualPf2Api($data){
-        $pf = $this->pfQueryAlt($data['date'], '2');
-        return 
-            DB::select(
-                "
-                SELECT 
-                    SUM(total_actual * IF(target_value > 0, 1, 0) $pf)
-                AS result
-                FROM sales_mtc_summary
-                WHERE id_employee = ".$this->id."
-                AND MONTH(date) = ".$data['date']->month."
-                AND YEAR(date) = ".$data['date']->year."
-                LIMIT 1
-                "
-            )[0]->result * 1;       
-    }
-
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
-
-    public function scopeFilter($query, QueryFilters $filters)
-    {
-        return $filters->apply($query);
-    }
-
-    public function getAreaByPasar(){
-        return implode(', ', array_unique(Pasar::with('subarea.area')->whereIn('id', $this->employeePasar->pluck('id_pasar')->toArray())->get()->pluck('subarea.area.name')->toArray()));
-    }
-
-    public function toArray(){
-        $array = parent::toArray();
-        $array['foto_profil_url'] = !empty($this->foto_profil) ? asset($this->foto_profil) : '';
-        return $array;
-    }
 }
-
