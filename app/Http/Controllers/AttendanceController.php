@@ -38,9 +38,9 @@ class AttendanceController extends Controller
         // ->join('outlets', 'attendance_outlets.id_outlet', '=', 'outlets.id')
         // ->select('attendance_outlets.*','checkin');
         $employees = DB::table('employees')
-        ->join('attendances','employees.id','=','attendances.id_employee')
-        ->join('attendance_outlets','attendances.id','=','attendance_outlets.id_attendance')
-        ->join('positions', 'employees.id_position', '=', 'positions.id')
+        ->leftjoin('attendances','employees.id','=','attendances.id_employee')
+        ->leftjoin('attendance_outlets','attendances.id','=','attendance_outlets.id_attendance')
+        ->leftjoin('positions', 'employees.id_position', '=', 'positions.id')
         ->where('positions.level', 'spgmtc')->orWhere('positions.level','mdmtc')
         ->select('employees.*','attendance_outlets.checkin','attendance_outlets.checkout','positions.level');
         $employee = Employee::all();
@@ -59,7 +59,7 @@ class AttendanceController extends Controller
             return $employees->checkout;
         })
         ->addColumn('role', function($employees) {
-            return $employees->level ?? '';
+            return $employees->level;
         })
         // ->addColumn('keterangan', function($attendanceOutlet) {
         //     return implode(',',$attendanceOutlet->attendance->keterangan->toArray());
