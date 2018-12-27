@@ -13,12 +13,15 @@ use Illuminate\Support\Collection;
 use App\Components\traits\WeekHelper;
 use App\Category;
 use App\Area;
+use App\subArea;
 use App\Account;
 use App\DisplayShare;
 use App\DetailAvailability;
 use App\DetailDisplayShare;
 use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
+use App\DataPrice;
+use App\DetailDataPrice;
 use App\EmployeeStore;
 use App\Store;
 use App\EmployeeSubArea;
@@ -59,6 +62,7 @@ use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
 use App\Product;
+use App\ProductCompetitor;
 use App\SalesSpgPasar;
 use App\SalesMotoricDetail;
 use App\SalesMotoric;
@@ -822,15 +826,81 @@ class ReportController extends Controller
         return view('report.price-vs-competitor');
     }
 
-    public function PriceVsData(){
+    public function priceDataRow(){
+        $subareas = subArea::get();
+        $accounts = Account::get();
 
-    
+        $datas1 = ProductCompetitor::join('brands','product_competitors.id_brand','brands.id')
+                        ->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
+                        ->join('categories','sub_categories.id_category', 'categories.id')
+                        ->select('product_competitors.*',
+                            'brands.name as brand_name',
+                            'categories.name as category_name')
+                        ->get();
+
+        $datas2 = Product::join('brands','products.id_brand','brands.id')
+                        ->join('sub_categories','products.id_subcategory','sub_categories.id')
+                        ->join('categories','sub_categories.id_category', 'categories.id')
+                        ->select('products.*',
+                            'brands.name as brand_name',
+                            'categories.name as category_name')
+                        ->get();
+
+        foreach ($datas2 as $data2) {
+            $data2[$data2->id.'_lowest'] = 1000000000;
+            $data2[$data2->id.'_highest'] = 0;
+            $data2[$data2->id.'_vs'] = 0;
+
+            foreach ($accounts as $account) {
+                // $data2[$subarea->id.'_'.$data2->id.'_min'] = '-';
+                // $data2[$subarea->id.'_'.$data2->id.'_max'] = '-';
+
+                $store = Store::where('stores.id_account',$account->id)
+                            ->pluck('stores.id');
+                $price = DataPrice::whereIn('data_price.id_store',$store)
+                                ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
+                                ->where('detail_data_price.id_product',$data2->id);
+                if($price){
+                    $storeMin = $price->where('price', $price->min('price'))->pluck('id_store');
+                    $location = Store::whereIn('stores.id',$storeMin)
+                                    ->pluck('stores.name1')->toArray();
+                    $data2[$account->id.'_'.$data2->id.'store_min'] = implode(", ",$location);
+
+                    $storeMax = $price->where('price', $price->max('price'))->pluck('id_store');
+                    $location = Store::whereIn('stores.id',$storeMax)
+                                    ->pluck('stores.name1')->toArray();
+                    $data2[$account->id.'_'.$data2->id.'store_max'] = implode(", ",$location);
+
+                    $data2[$account->id.'_'.$data2->id.'_min'] = $price->min('price');
+                    $data2[$account->id.'_'.$data2->id.'_max'] = $price->max('price');
+
+                    if(($data2[$data2->id.'_lowest'] > $data2[$account->id.'_'.$data2->id.'_min'])&($data2[$account->id.'_'.$data2->id.'_min'] != null)){
+                        $data2[$data2->id.'_lowest'] = $data2[$account->id.'_'.$data2->id.'_min'];
+                    }
+                    if(($data2[$data2->id.'_highest'] < $data2[$account->id.'_'.$data2->id.'_max'])&($data2[$account->id.'_'.$data2->id.'_max'] != null)){
+                        $data2[$data2->id.'_highest'] = $data2[$account->id.'_'.$data2->id.'_max'];
+                    }
+                }
+
+            }
+
+        $data2[$data2->id.'_vs'] = round($data2[$data2->id.'_highest'] / $data2[$data2->id.'_lowest'] * 1, 2);
+
+
+        }        
+
+        return response()->json($datas2);
     }
 
     // *********** AVAILABILITY ****************** //
 
     public function availabilityRow(){
         $data['categories'] = Category::get();
+        $data['products'] = Product::get();
+        $data['jml_product'] = Product::get()->count();
+        $data['categories'] = Category::get();
+        $data['brands'] = Brand::get();
+        $data['jml_brand'] = Brand::get()->count();
         return view('report.availability', $data);
     }
 
@@ -870,6 +940,7 @@ class ReportController extends Controller
                             )->orderBy('avai_date')->get();
 
         foreach($datas as $data) {
+                        $data['cek'] = 'NO';
             foreach ($categories as $category) {
                 $data[$category->id] = $category->name;
                 $data[$category->id.'sum'] = 0;
@@ -888,6 +959,7 @@ class ReportController extends Controller
                         $data[$category->id.'_'.$product->id] = $detail_data->available;
                         $data[$category->id.'sumAvailable'] += $detail_data->available;
                         $data[$category->id.'sum'] += 1;
+                        $data['cek'] = 'CEK';
                     }
 
                 }
@@ -901,16 +973,16 @@ class ReportController extends Controller
 
         } 
 
-        return response()->json($datas);
+        // return response()->json($datas);
 
-        return Datatables::of($data)->make(true);
+        return Datatables::of($datas)->make(true);
         // return response()->json($data);
     }
 
 
     public function availabilityIndex(){
         $data['categories'] = Category::get();
-        return view('report.availability', $data);
+        return view('report.availabilityAch', $data);
     }
 
     public function availabilityAreaData(){

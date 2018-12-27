@@ -57,6 +57,8 @@ Route::prefix('subarea')->group(function () {
 Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 	Route::get('pf/list/{type}/{id}', 'API\ProductController@pfList')->name('api.product.pf.list');
+	Route::get('/list-competitor', 'API\ProductController@listCompetitor')->name('api.product.list-competitor');
+	Route::get('/list-competitorByParam/{cat}/{brand}', 'API\ProductController@listCompetitorByCatBrand')->name('api.product.list-competitorByParam');
 });
 
 Route::prefix('brand')->group(function () {
@@ -109,6 +111,7 @@ Route::prefix('display-share')->group(function () {
 
 Route::prefix('additional-display')->group(function () {
 	Route::post('/add', 'API\AdditionalDisplayController@store')->name('api.additional-display.add');
+	Route::get('/jenis-display', 'API\AdditionalDisplayController@jenisDisplay')->name('api.additional-display.jenis-display');
 });
 
 Route::prefix('cbd')->group(function () {
