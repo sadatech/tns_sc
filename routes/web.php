@@ -871,8 +871,24 @@ Route::prefix('mtc')->group(function () {
 	});
 
 
+	Route::prefix('priceData')->group(function () {
+		Route::get('/', 'ReportController@priceDataIndex')->name('priceData')->middleware('auth');
+		Route::get('/row', 'ReportController@priceDataRow')->name('priceData.row')->middleware('auth');
+		Route::get('/dataAccountRow', 'ReportController@priceDataAccountRowData')->name('priceData.dataAccountRow')->middleware('auth');
+		Route::get('/dataArea', 'ReportController@priceDataAreaData')->name('priceData.dataArea')->middleware('auth');
+		Route::get('/dataAccount', 'ReportController@priceDataAccountData')->name('priceData.dataAccount')->middleware('auth');
+		Route::post('/edit/{id}', 'ReportController@priceDataUpdate')->name('priceData.edit')->middleware('auth');
+		Route::post('/import', 'ImportQueueController@ImportpriceData')->name('priceData.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/SellinImport.xlsx'));
+		})->name('SellIn.download-template')->middleware('auth');
+	});
+
+
 	Route::prefix('availability')->group(function () {
 		Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
+		Route::get('/row', 'ReportController@availabilityRow')->name('availability.row')->middleware('auth');
 		Route::get('/dataAccountRow', 'ReportController@availabilityAccountRowData')->name('availability.dataAccountRow')->middleware('auth');
 		Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
 		Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
