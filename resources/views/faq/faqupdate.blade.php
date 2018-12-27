@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "FAQ Create")
+@section('title', "FAQ Update")
 @section('content')
 <div class="content">
-    <h2 class="content-heading pt-10">FAQ <small>Create</small></h2>
+    <h2 class="content-heading pt-10">FAQ <small>Update</small></h2>
     <div class="container">
 	<div class="block">
                 <div class="block-content">

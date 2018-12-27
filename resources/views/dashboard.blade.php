@@ -9,12 +9,17 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }} {{ request()->is('/') ? 'active' : '' }}" href="{{ route('dashboard') }}"><i class="fa fa-line-chart mr-2"></i>Dashboard</a>
                     </li>
+
+                    @if(Auth::user()->role->level == 'AdminGtc')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('dashboard/gtc/*') ? 'active' : '' }} {{ request()->is('dashboard/gtc') ? 'active' : '' }}" href="{{ route('dashboard.gtc') }}"><i class="fa fa-line-chart mr-2"></i>GTC Graph</a>
                     </li>
+                    @endif
+                    @if(Auth::user()->role->level == 'AdminMtc')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('dashboard/mtc/*') ? 'active' : '' }}" href="{{ route('dashboard.mtc') }}"><i class="fa fa-line-chart mr-2"></i>MTC Graph</a>
                     </li>
+                    @endif
                 </div>
             </div>
         </div>
