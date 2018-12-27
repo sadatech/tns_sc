@@ -14,6 +14,8 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use Box\Spout\Writer\Style\Color;
 use File;
 use Excel;
+use App\Filters\AttendanceFilters;
+
 class AttendanceController extends Controller
 {
     /**
@@ -30,19 +32,39 @@ class AttendanceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function data()
+    public function data(Request $request, AttendanceFilters $filters)
     {
         // $attendance = DB::table('attendance_outlets')
         // ->join('attendances', 'attendance_outlets.id_attendance', '=', 'attendances.id')
         // ->join('employees', 'attendances.id_employee', '=', 'employees.id')
         // ->join('outlets', 'attendance_outlets.id_outlet', '=', 'outlets.id')
-        // ->select('attendance_outlets.*','checkin');
-        $employees = DB::table('employees')
+        // ->select('attendance_outlets.*','checkin');   
+        // return Employee::filter($filters)->get();    
+        $employees = Employee::filter($filters)
         ->leftjoin('attendances','employees.id','=','attendances.id_employee')
         ->leftjoin('attendance_outlets','attendances.id','=','attendance_outlets.id_attendance')
         ->leftjoin('positions', 'employees.id_position', '=', 'positions.id')
-        ->where('positions.level', 'spgmtc')->orWhere('positions.level','mdmtc')
+        ->whereIn('positions.level', ['spgmtc', 'mdmtc'])
         ->select('employees.*','attendance_outlets.checkin','attendance_outlets.checkout','positions.level');
+        // ->when(isset($request['id_emp']) && ($request['id_emp'] != ''), function($query) use ($request){
+        //     return $query->where('employees.id', '=', $request['id_emp']);
+        // });
+
+        // return $employees->get();
+
+        // if(isset($request['newPeriode'])){
+        //     $employees->whereHas('attendance', function($query) use ($request){
+        //         return $query->whereMonth('date', '=', Carbon::parse($request['newPeriode'])->format('m'))
+        //                      ->whereYear('date', '=', Carbon::parse($request['newPeriode'])->format('Y'));
+        //     });
+        // }
+
+        // if(isset($request['id_emp']) && ($request['id_emp'] != '')){
+        //     $employees->where('employees.id', '=', $request['id_emp']);
+        // }
+
+        // return $employees->get();
+        
         $employee = Employee::all();
       
         return Datatables::of($employees)

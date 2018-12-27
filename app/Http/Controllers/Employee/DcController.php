@@ -41,7 +41,7 @@ class DcController extends Controller
 		return Datatables::of($employee)
 		->addColumn('action', function ($employee) {
 			// if ($employee->isResign == false) {
-				return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+				return "<a href=".route('ubah.employee', $employee->id)."/dc"." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
 				<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
 				<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
 				<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
