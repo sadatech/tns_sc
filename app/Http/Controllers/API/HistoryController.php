@@ -116,7 +116,7 @@ class HistoryController extends Controller
 		return response()->json($res, $code);
 	}
 
-	public function salesHistory($type='MTC', $date = '')
+	public function salesHistory($type='MTC', $date = '', $sales = '')
 	{
 		$check = $this->authCheck();
 		if ($check['success'] == true) {
@@ -126,6 +126,9 @@ class HistoryController extends Controller
 
 			if (strtoupper($type) == 'MTC') {
 				$header = Sales::query();
+				$header->when($sales != '', function ($q){
+					return $q->whereType('Sell Out');
+				});
 			}else if (strtoupper($type) == 'GTC-MD') {
 				$header = SalesMd::query();
 			}else if (strtoupper($type) == 'GTC-SPG') {
