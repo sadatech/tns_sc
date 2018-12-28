@@ -76,7 +76,7 @@
                             </li>
                             @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                             <li>
-                                <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Root</a>
+                                <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Route</a>
                             </li>
                             @endif
                             @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
