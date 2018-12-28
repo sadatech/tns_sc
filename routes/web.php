@@ -873,6 +873,7 @@ Route::prefix('mtc')->group(function () {
 
 	Route::prefix('priceData')->group(function () {
 		Route::get('/', 'ReportController@priceDataIndex')->name('priceData')->middleware('auth');
+		Route::get('/summary', 'ReportController@priceSummary')->name('priceData.summary')->middleware('auth');
 		Route::get('/row', 'ReportController@priceDataRow')->name('priceData.row')->middleware('auth');
 		Route::get('/dataAccountRow', 'ReportController@priceDataAccountRowData')->name('priceData.dataAccountRow')->middleware('auth');
 		Route::get('/dataArea', 'ReportController@priceDataAreaData')->name('priceData.dataArea')->middleware('auth');
