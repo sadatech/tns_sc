@@ -826,6 +826,20 @@ class ReportController extends Controller
         return view('report.price-vs-competitor');
     }
 
+    public function priceSummary (){
+        // $data['products'] = Product::join('brands','products.id_brand','brands.id')
+        //                 ->join('sub_categories','products.id_subcategory','sub_categories.id')
+        //                 ->join('categories','sub_categories.id_category', 'categories.id')
+        //                 ->select('products.*',
+        //                     'brands.name as brand_name',
+        //                     'categories.name as category_name')
+        //                 ->orderBy('category_name')->get();
+        $data['products'] = Product::whereIn('id',['1','2'])->get();
+        $data['accounts'] = Account::get();
+        // return response()->json($datas2);
+        return view('report.price-summary', $data);
+    }
+
     public function priceDataRow(){
         $subareas = subArea::get();
         $accounts = Account::get();
@@ -844,16 +858,16 @@ class ReportController extends Controller
                         ->select('products.*',
                             'brands.name as brand_name',
                             'categories.name as category_name')
-                        ->get();
+                        ->orderBy('category_name')->get();
 
         foreach ($datas2 as $data2) {
-            $data2[$data2->id.'_lowest'] = 1000000000;
-            $data2[$data2->id.'_highest'] = 0;
-            $data2[$data2->id.'_vs'] = 0;
+            $data2['lowest'] = '';
+            $data2['highest'] = '';
+            $data2['vs'] = '';
 
             foreach ($accounts as $account) {
-                // $data2[$subarea->id.'_'.$data2->id.'_min'] = '-';
-                // $data2[$subarea->id.'_'.$data2->id.'_max'] = '-';
+                // $data2[$subarea->id.'_min'] = '-';
+                // $data2[$subarea->id.'_max'] = '-';
 
                 $store = Store::where('stores.id_account',$account->id)
                             ->pluck('stores.id');
@@ -864,32 +878,37 @@ class ReportController extends Controller
                     $storeMin = $price->where('price', $price->min('price'))->pluck('id_store');
                     $location = Store::whereIn('stores.id',$storeMin)
                                     ->pluck('stores.name1')->toArray();
-                    $data2[$account->id.'_'.$data2->id.'store_min'] = implode(", ",$location);
+                    $data2[$account->id.'store_min'] = implode(", ",$location);
 
                     $storeMax = $price->where('price', $price->max('price'))->pluck('id_store');
                     $location = Store::whereIn('stores.id',$storeMax)
                                     ->pluck('stores.name1')->toArray();
-                    $data2[$account->id.'_'.$data2->id.'store_max'] = implode(", ",$location);
+                    $data2[$account->id.'store_max'] = implode(", ",$location);
 
-                    $data2[$account->id.'_'.$data2->id.'_min'] = $price->min('price');
-                    $data2[$account->id.'_'.$data2->id.'_max'] = $price->max('price');
+                    $data2[$account->id.'_min'] = $price->min('price');
+                    $data2[$account->id.'_max'] = $price->max('price');
 
-                    if(($data2[$data2->id.'_lowest'] > $data2[$account->id.'_'.$data2->id.'_min'])&($data2[$account->id.'_'.$data2->id.'_min'] != null)){
-                        $data2[$data2->id.'_lowest'] = $data2[$account->id.'_'.$data2->id.'_min'];
+                    if (($data2['lowest'] == '')&&($data2[$account->id.'_min'] != null)) {
+                            $data2['lowest'] = $data2[$account->id.'_min'];
+                            $data2['highest'] = $data2[$account->id.'_max'];
+                        
                     }
-                    if(($data2[$data2->id.'_highest'] < $data2[$account->id.'_'.$data2->id.'_max'])&($data2[$account->id.'_'.$data2->id.'_max'] != null)){
-                        $data2[$data2->id.'_highest'] = $data2[$account->id.'_'.$data2->id.'_max'];
+                    if(($data2['lowest'] > $data2[$account->id.'_min'])&&($data2[$account->id.'_min'] != null)){
+                        $data2['lowest'] = $data2[$account->id.'_min'];
+                    }
+                    if(($data2['highest'] < $data2[$account->id.'_max'])&&($data2[$account->id.'_max'] != null)){
+                        $data2['highest'] = $data2[$account->id.'_max'];
                     }
                 }
 
             }
-
-        $data2[$data2->id.'_vs'] = round($data2[$data2->id.'_highest'] / $data2[$data2->id.'_lowest'] * 1, 2);
-
-
+            if ($data2['lowest'] != '') {
+                $data2['vs'] = round($data2['highest'] / $data2['lowest'] * 1, 2);
+            }
         }        
 
-        return response()->json($datas2);
+        // return response()->json($datas2);
+        return Datatables::of($datas2)->make(true);
     }
 
     // *********** AVAILABILITY ****************** //
