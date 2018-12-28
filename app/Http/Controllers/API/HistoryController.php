@@ -126,9 +126,10 @@ class HistoryController extends Controller
 
 			if (strtoupper($type) == 'MTC') {
 				$header = Sales::query();
-				$header->when($sales != '', function ($q){
-					return $q->whereType('Sell Out');
-				});
+				$header->whereType('Sell In');
+			}else if (strtoupper($type) == 'MTC-O') {
+				$header = Sales::query();
+				$header->whereType('Sell Out');
 			}else if (strtoupper($type) == 'GTC-MD') {
 				$header = SalesMd::query();
 			}else if (strtoupper($type) == 'GTC-SPG') {
@@ -149,7 +150,7 @@ class HistoryController extends Controller
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})
 			->when($date != '', function ($q) use ($date){
-				return $q->whereDate('date', $date);
+				return $q->whereDate('sdate', "'".$date."'");
 			})->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {

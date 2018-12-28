@@ -53,10 +53,10 @@ class AdditionalDisplayController extends Controller
 
                     });
                 // } catch (\Exception $e) {
-                //     return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 1'], 500);
+                //     return response()->json(['success' => false, 'msg' => 'Gagal melakukan transaksi 1'], 500);
                 // }
 
-                return response()->json(['status' => true, 'id_transaksi' => $additionalDisplayHeader->id, 'message' => 'Data berhasil di input']);
+                return response()->json(['success' => true, 'id_transaksi' => $additionalDisplayHeader->id, 'msg' => 'Data berhasil di input']);
 
             } else { // If header didn't exist (create header & detail)
 
@@ -89,13 +89,13 @@ class AdditionalDisplayController extends Controller
 
                     });
                 // } catch (\Exception $e) {
-                //     return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 2'], 500);
+                //     return response()->json(['success' => false, 'msg' => 'Gagal melakukan transaksi 2'], 500);
                 // }
 
                 // Check sell in(Sell Thru) header after insert
                 $additionalDisplayHeaderAfter = AdditionalDisplay::where('id_employee', $employee->id)->where('id_store', $request['store'])->where('date', date('Y-m-d'))->first();
 
-                return response()->json(['status' => true, 'id_transaksi' => $additionalDisplayHeaderAfter->id, 'message' => 'Data berhasil di input']);
+                return response()->json(['success' => true, 'id_transaksi' => $additionalDisplayHeaderAfter->id, 'msg' => 'Data berhasil di input']);
 
             }
 
