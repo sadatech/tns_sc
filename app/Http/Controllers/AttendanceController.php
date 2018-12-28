@@ -14,6 +14,8 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use Box\Spout\Writer\Style\Color;
 use File;
 use Excel;
+use App\Filters\AttendanceFilters;
+
 class AttendanceController extends Controller
 {
     /**
@@ -30,34 +32,56 @@ class AttendanceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function data()
+    public function data(Request $request, AttendanceFilters $filters)
     {
         // $attendance = DB::table('attendance_outlets')
         // ->join('attendances', 'attendance_outlets.id_attendance', '=', 'attendances.id')
         // ->join('employees', 'attendances.id_employee', '=', 'employees.id')
         // ->join('outlets', 'attendance_outlets.id_outlet', '=', 'outlets.id')
-        // ->select('attendance_outlets.*','checkin');
-        $employees = DB::table('employees')
-        ->join('positions', 'employees.id_position', '=', 'positions.id')
-        ->where('positions.level', 'mdmtc')->orWhere('positions.level','spgmtc')
-        ->select('employees.*','level');
+        // ->select('attendance_outlets.*','checkin');   
+        // return Employee::filter($filters)->get();    
+        $employees = Employee::filter($filters)
+        ->leftjoin('attendances','employees.id','=','attendances.id_employee')
+        ->leftjoin('attendance_outlets','attendances.id','=','attendance_outlets.id_attendance')
+        ->leftjoin('positions', 'employees.id_position', '=', 'positions.id')
+        ->whereIn('positions.level', ['spgmtc', 'mdmtc'])
+        ->select('employees.*','attendance_outlets.checkin','attendance_outlets.checkout','positions.level');
+        // ->when(isset($request['id_emp']) && ($request['id_emp'] != ''), function($query) use ($request){
+        //     return $query->where('employees.id', '=', $request['id_emp']);
+        // });
+
+        // return $employees->get();
+
+        // if(isset($request['newPeriode'])){
+        //     $employees->whereHas('attendance', function($query) use ($request){
+        //         return $query->whereMonth('date', '=', Carbon::parse($request['newPeriode'])->format('m'))
+        //                      ->whereYear('date', '=', Carbon::parse($request['newPeriode'])->format('Y'));
+        //     });
+        // }
+
+        // if(isset($request['id_emp']) && ($request['id_emp'] != '')){
+        //     $employees->where('employees.id', '=', $request['id_emp']);
+        // }
+
+        // return $employees->get();
+        
         $employee = Employee::all();
       
-        return Datatables::of($employee)
-        ->addColumn('employee', function($employee) {
-            return $employee->name;
+        return Datatables::of($employees)
+        ->addColumn('employee', function($employees) {
+            return $employees->name;
         })
-        ->addColumn('nik', function($employee) {
-            return $employee->nik;
+        ->addColumn('nik', function($employees) {
+            return $employees->nik;
         })
-        ->addColumn('checkin', function($employee) {
-            return $employee->checkin;
+        ->addColumn('checkin', function($employees) {
+            return $employees->checkin;
         })
-        ->addColumn('checkout', function($employee) {
-            return $employee->checkout;
+        ->addColumn('checkout', function($employees) {
+            return $employees->checkout;
         })
-        ->addColumn('role', function($employee) {
-            return $employee->position->level;
+        ->addColumn('role', function($employees) {
+            return $employees->level;
         })
         // ->addColumn('keterangan', function($attendanceOutlet) {
         //     return implode(',',$attendanceOutlet->attendance->keterangan->toArray());
@@ -102,19 +126,19 @@ class AttendanceController extends Controller
                                     'attandaceDetail' => $attendanceCollection,
                                     'attendance' => $key
                                 );
-                             array_push($array, "<button class='btn btn-sm btn-success btn-square' style='width:80px;height:40px' onclick='detailModal(".json_encode($data).")'>$i</button>");
+                             array_push($array, "<button class='btn btn-sm btn-success btn-square' style='width:80px;height:40px' onclick='detailModal(".json_encode($data).")'>$i<br>Masuk</button>");
                              
                             }else if($key->keterangan == 'sakit'){
-                                 array_push($array, "<button class='btn btn-sm btn-warning btn-square' style='width:80px;height:40px'>$i</button>");
+                                 array_push($array, "<button class='btn btn-sm btn-warning btn-square' style='width:80px;height:40px'>$i<br>Sakit</button>");
                                  
                             }else if($key->keterangan == 'alpha'){
-                                array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i</button>");
+                                array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i<br>Alpha</button>");
                                 
                             }else if($key->keterangan == 'cuti'){
-                                array_push($array, "<button class='btn btn-sm btn-primary btn-square' style='width:80px;height:40px'>$i</button>");
+                                array_push($array, "<button class='btn btn-sm btn-primary btn-square' style='width:80px;height:40px'>$i<br>Cuti</button>");
                                 
                             }else{
-                               array_push($array, "<button class='btn btn-sm btn-secondary btn-square' style='width:80px;height:40px'>$i</button>");
+                               array_push($array, "<button class='btn btn-sm btn-secondary btn-square' style='width:80px;height:40px'>$i<br>Alpha</button>");
                                
                             }
                         // }else{
@@ -123,7 +147,7 @@ class AttendanceController extends Controller
                         // }
                     }
                 }else{
-                    array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i</button>");
+                    array_push($array, "<button class='btn btn-sm btn-danger btn-square' style='width:80px;height:40px'>$i<br>Alpha</button>");
                 } 
                }else{
                     return "<button class='btn btn-sm btn-secondary btn-square' style='width:200px;height:40px'><i class='fa fa-warning

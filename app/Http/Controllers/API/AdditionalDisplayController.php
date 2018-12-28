@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Components\traits\WeekHelper;
 use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
+use App\JenisDisplay;
 use JWTAuth;
 use Config;
 use Carbon\Carbon;
@@ -99,6 +100,12 @@ class AdditionalDisplayController extends Controller
 
             }
 
+    }
+
+    public function jenisDisplay(){
+        $jenis_display = JenisDisplay::get();
+
+        return response()->json($jenis_display, 200);
     }
 
 }

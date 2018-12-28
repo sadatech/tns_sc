@@ -55,7 +55,7 @@
                 <div class="block-content">
                     <div class="form-group">
                         <label>Item</label>
-                        <input type="text" class="form-control" name="item" placeholder="Add new channel" required>
+                        <input type="text" class="form-control" name="item" placeholder="Add New Properti DC" required>
                     </div>
                 </div>
                 <div class="modal-footer">
