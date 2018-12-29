@@ -868,6 +868,7 @@ Route::prefix('mtc')->group(function () {
 		Route::post('/data-spg', 'ReportController@achievementSalesMtcDataSPG')->name('achievement-salesmtc-spg.data')->middleware('auth');
 		Route::post('/data-md', 'ReportController@achievementSalesMtcDataMD')->name('achievement-salesmtc-md.data')->middleware('auth');
 		Route::post('/data-tl', 'ReportController@achievementSalesMtcDataTL')->name('achievement-salesmtc-tl.data')->middleware('auth');
+		Route::any('/exportXLS/{filterDate?}', 'ReportController@achievementSalesMtcExportXLS')->name('achievement-salesmtc.exportxls')->middleware('auth');
 	});
 
 
