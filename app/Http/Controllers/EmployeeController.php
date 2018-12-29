@@ -64,21 +64,43 @@ class EmployeeController extends Controller
 		return view('employee.employee');
 	}
 
-	public function read()
+	public function read($param = '')
 	{
 		$data['timezone'] 	= Timezone::all();
-		$data['position'] 	= Position::get();
+		if(Auth::user()->role->level == 'AdminGtc'){
+			$data['position'] 	= Position::whereIn('level', ['spggtc', 'mdgtc', 'dc', 'tlgtc', 'motoric'])->get();	
+		}else if(Auth::user()->role->level == 'AdminMtc'){
+			$data['position'] 	= Position::whereIn('level', ['spgmtc', 'mdmtc', 'tlmtc'])->get();
+		}else{
+			$data['position'] 	= Position::get();
+		}
+		if($param != null){
+			if($param == 'dc'){
+				$data['position'] = Position::where('level', 'dc')->get();
+			}
+		}
 		$data['agency'] 	= Agency::get();
 		$data['store'] 		= Store::get();
 		$data['pasar'] 		= Pasar::get();
 		$data['subarea'] 	= SubArea::get();
 		return view('employee.employeecreate', $data);
 	}
-	public function readupdate($id)
+	public function readupdate($id, $param = '')
 	{
 		$data['timezone'] 	= Timezone::all();
 		$data['emp'] 		= Employee::where(['id' => $id])->first();
-		$data['position'] 	= Position::get();
+		if(Auth::user()->role->level == 'AdminGtc'){
+			$data['position'] 	= Position::whereIn('level', ['spggtc', 'mdgtc', 'dc', 'tlgtc', 'motoric'])->get();	
+		}else if(Auth::user()->role->level == 'AdminMtc'){
+			$data['position'] 	= Position::whereIn('level', ['spgmtc', 'mdmtc', 'tlmtc'])->get();
+		}else{
+			$data['position'] 	= Position::get();
+		}
+		if($param != null){
+			if($param == 'dc'){
+				$data['position'] = Position::where('level', 'dc')->get();
+			}
+		}
 		$data['agency'] 	= Agency::get();
 		$data['store'] 		= Store::get();
 		$data['pasar'] 		= Pasar::get();
