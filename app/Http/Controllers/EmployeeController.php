@@ -214,12 +214,17 @@ class EmployeeController extends Controller
 					} else if (!empty($request->input('subarea'))) {
 						$dataSubArea = array();
 						foreach ($request->input('subarea') as $subarea) {
-							if (isset(\App\Position::where(['level' => 'tlmtc'])->first()->id)) {
-								$isTl = true;
-							} else if ($request->input('tl') == true) {
-								$isTl = true;
+							$dcCheck = Position::where('level', 'dc')->first();
+							if ($request->input('position') == $dcCheck->id)
+							{
+								if ($request->input('tl'))
+								{
+									$isTl = true;
+								} else {
+									$isTl = false;
+								}
 							} else {
-								$isTl = false;
+								$isTl = true;
 							}
 							$dataSubArea[] = array(
 								'id_employee' 	=> $insert->id,
