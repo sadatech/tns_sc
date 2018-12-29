@@ -67,15 +67,6 @@
                   </select>
                 </div>
                 <div class="row">
-                  <div class="form-group col-md-12">
-                      <label>Area</label>
-                      <select class= "js-edit form-control" id="areaInput" style="width: 100%"  name="id_area" >
-                      <option disabled selected>Choose your Area</option>
-                        @foreach($area as $data)
-                          <option value="{{ $data->id }}">{{ $data->name }} </option>
-                        @endforeach
-                      </select>
-                  </div>
                   <div class="form-group col-md-6">
                       <label>Month From</label>
                       <input class="form-control date1" type="text" id="fromInput" name="from" data-month-highlight="true" data-date-format="mm/yyyy" placeholder="dd/yyyy" required>
