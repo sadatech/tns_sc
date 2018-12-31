@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Product;
 use App\ProductFokusGtc;
+use App\ProductCompetitor;
 use App\FokusArea;
 use App\FokusChannel;
 use App\Pasar;
@@ -127,4 +128,23 @@ class ProductController extends Controller
 		}
 		return response()->json($res);
 	}
+
+	public function listCompetitor()
+	{
+		$competitor = ProductCompetitor::get();
+
+		return response()->json($competitor);
+	}
+	
+	public function listCompetitorByCatBrand($cat, $brand)
+	{
+		$competitor = ProductCompetitor::where('id_brand',$brand)
+										->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
+										->join('categories','sub_categories.id_category','categories.id')
+										->where('categories.id',$cat)
+										->select('product_competitors.*')->get();
+
+		return response()->json($competitor);
+	}
+
 }

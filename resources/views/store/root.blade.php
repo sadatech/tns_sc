@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Root")
+@section('title', "Route")
 @section('content')
 <div class="content">
   @if($errors->any())
@@ -10,7 +10,7 @@
         @endforeach
     </div>
   @endif
-  <h2 class="content-heading pt-10">Root <small>Manage</small></h2>
+  <h2 class="content-heading pt-10">Route <small>Manage</small></h2>
   <div class="block block-themed"> 
     <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
         <h3 class="block-title">Datatables</h3>
@@ -28,7 +28,7 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="subtable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
-          <th>Root</th>
+          <th>Route</th>
           <th>SubArea</th>
           <th>Area</th>
           <th>Region</th>          
@@ -45,7 +45,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="fa fa-edit"></i> Update Root</h3>
+          <h3 class="block-title"><i class="fa fa-edit"></i> Update Route</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -58,7 +58,7 @@
         {!! csrf_field() !!}
         <div class="block-content">
           <div class="form-group">
-            <label>Root Name</label>
+            <label>Route Name</label>
             <input type="text" class="form-control" name="name" id="nameInput" required>
           </div>
           <div class="col-md-12 col-sm-12" style="padding: 0">
@@ -91,7 +91,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Root</h3>
+          <h3 class="block-title"><i class="fa fa-plus"></i> Add Route</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -103,8 +103,8 @@
         {!! csrf_field() !!}
         <div class="block-content">
           <div class="form-group">
-            <label>Name Root</label>
-            <input type="text" class="form-control" name="name" placeholder="Add new Root" required>
+            <label>Name Route</label>
+            <input type="text" class="form-control" name="name" placeholder="Add new route" required>
           </div>
           <div class="col-md-12 col-sm-12" style="padding: 0">
             <label class="col-md-12 col-sm-12" style="padding: 0">Subarea</label>
