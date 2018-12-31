@@ -3,7 +3,8 @@
 @section('content')
 <div class="content">
   <h2 class="content-heading pt-10"> Sales Review <small> (MTC) </small> 
-    <button id="exportAll" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
+    <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+    <!-- <button id="exportAll" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button> -->
   </h2>
 
   @if($errors->any())
@@ -278,14 +279,31 @@
             headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }                  
-
           });
+
+          // fix url download data undefined
+          setTimeout(function(){
+            $("#filterSearchPeriode").click();
+          }, 100);
 
           $('#filterMonth').datetimepicker({
               format: "MM yyyy",
               startView: "3",
               minView: "3",
               autoclose: true,
+          });
+
+          $("#btnDownloadXLS").on("click", function(){
+            $.ajax({
+              url: $(this).attr("target-url"),
+              type: "post",
+              success: function(e){
+                swal("Success!", e.result, "success");
+              },
+              error: function(e){
+                swal("Error!", e.result, "error");
+              }
+            });
           });
 
           $('#filterMonth').val(moment().format("MMMM Y"));
@@ -531,8 +549,8 @@
 
     })
 
-    $("#filterSearchPeriode").click(function() {
-        console.log($("#filterMonth").val());
+    $("#filterSearchPeriode").click(function(){
+      $("#btnDownloadXLS").attr("target-url", "{{ route('achievement-salesmtc.exportxls') }}" + "/" + $('#filterMonth').val());
 
         if($.fn.dataTable.isDataTable('#tlTable')){
             $('#tlTable').DataTable().clear();

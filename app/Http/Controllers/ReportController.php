@@ -61,6 +61,7 @@ use App\Jobs\ExportSPGPasarSalesSummaryJob;
 use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
+use App\Jobs\ExportMTCAchievementJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -552,8 +553,6 @@ class ReportController extends Controller
         }
         $data = $data->orderBy('id', 'ASC');
 
-        // return response()->json('zz');
-
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
@@ -616,8 +615,6 @@ class ReportController extends Controller
         }
         $data = $data->orderBy('id', 'ASC');
 
-        // return response()->json($data->get());
-
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
@@ -659,6 +656,30 @@ class ReportController extends Controller
             return @$item->employeeSubArea[0]->subarea->area->name;
         })
         ->make(true);     
+    }
+
+    public function achievementSalesMtcExportXLS($filterPeriode)
+    {
+        $result = DB::transaction(function() use ($filterPeriode){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Achievement " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAchievementJob($JobTrace, $filterPeriode, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
 
