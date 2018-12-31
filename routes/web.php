@@ -438,10 +438,9 @@ Route::prefix('product')->group(function () {
 		Route::get('/export', 'ProductFokusGtcController@export')->name('fokusGTC.export')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusGtcController@update')->name('fokusGTC.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusGtcController@delete')->name('fokusGTC.delete')->middleware('auth');
-		Route::get('/download-template', function()
-		{
-			return response()->download(public_path('assets/FokusMDImport.xlsx'));
-		})->name('fokusMD.download-template')->middleware('auth');
+		Route::get('/download-template', function(){
+			return response()->download(public_path('assets/ProductFokusImportGTC.xlsx'));
+		})->name('fokusGTC.download-template')->middleware('auth');
 	});
 
 	//Fokus Spg Pages
@@ -868,6 +867,7 @@ Route::prefix('mtc')->group(function () {
 		Route::post('/data-spg', 'ReportController@achievementSalesMtcDataSPG')->name('achievement-salesmtc-spg.data')->middleware('auth');
 		Route::post('/data-md', 'ReportController@achievementSalesMtcDataMD')->name('achievement-salesmtc-md.data')->middleware('auth');
 		Route::post('/data-tl', 'ReportController@achievementSalesMtcDataTL')->name('achievement-salesmtc-tl.data')->middleware('auth');
+		Route::any('/exportXLS/{filterDate?}', 'ReportController@achievementSalesMtcExportXLS')->name('achievement-salesmtc.exportxls')->middleware('auth');
 	});
 
 
