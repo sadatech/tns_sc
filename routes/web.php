@@ -438,10 +438,9 @@ Route::prefix('product')->group(function () {
 		Route::get('/export', 'ProductFokusGtcController@export')->name('fokusGTC.export')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusGtcController@update')->name('fokusGTC.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusGtcController@delete')->name('fokusGTC.delete')->middleware('auth');
-		Route::get('/download-template', function()
-		{
-			return response()->download(public_path('assets/FokusMDImport.xlsx'));
-		})->name('fokusMD.download-template')->middleware('auth');
+		Route::get('/download-template', function(){
+			return response()->download(public_path('assets/ProductFokusImportGTC.xlsx'));
+		})->name('fokusGTC.download-template')->middleware('auth');
 	});
 
 	//Fokus Spg Pages
