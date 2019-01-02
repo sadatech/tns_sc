@@ -10,6 +10,7 @@ use Config;
 use JWTAuth;
 use Image;
 use App\NewCbd;
+use App\Outlet;
 
 class NewCbdController extends Controller
 {
@@ -48,34 +49,40 @@ class NewCbdController extends Controller
 			$user = $check['user'];
 			unset($check['user']);
 			$res = $check;
-			if ($image 	= $request->file('photo')) {
-				$photo 	= time()."_".$image->getClientOriginalName();
-				$path 	= 'uploads/cbd';
-				$image->move($path, $photo);
-				$image_compress = Image::make($path.'/'.$photo)->orientate();
-				$image_compress->save($path.'/'.$photo, 50);
-			}
-			$insert = NewCbd::create([
-				'id_employee'			=> $user->id,
-				'id_outlet'				=> $request->outlet,
-				'date'					=> Carbon::today()->toDateString(),
-				'photo'					=> $photo,
-				'posm_shop_sign'		=> $request->posm_shop_sign,
-				'posm_others'			=> $request->posm_others,
-				'posm_hangering_mobile'	=> $request->posm_hangering_mobile,
-				'posm_poster'			=> $request->posm_poster,
-				'cbd_competitor_detail'	=> $request->cbd_competitor_detail,
-				'cbd_competitor'		=> $request->cbd_competitor,
-				'cbd_position'			=> $request->cbd_position,
-				'outlet_type'			=> $request->outlet_type,
-				'total_hanger'			=> $request->total_hanger,
-			]);
-			if ($insert->id) {
-				$res['success'] = true;
-				$res['msg'] 	= "Success add CBD.";
-			} else {
+
+			if (Outlet::whereId($request->outlet)->get()->count() > 0) {
+				if ($image 	= $request->file('photo')) {
+					$photo 	= time()."_".$image->getClientOriginalName();
+					$path 	= 'uploads/cbd';
+					$image->move($path, $photo);
+					$image_compress = Image::make($path.'/'.$photo)->orientate();
+					$image_compress->save($path.'/'.$photo, 50);
+				}
+				$insert = NewCbd::create([
+					'id_employee'			=> $user->id,
+					'id_outlet'				=> $request->outlet,
+					'date'					=> Carbon::today()->toDateString(),
+					'photo'					=> $photo,
+					'posm_shop_sign'		=> $request->posm_shop_sign,
+					'posm_others'			=> $request->posm_others,
+					'posm_hangering_mobile'	=> $request->posm_hangering_mobile,
+					'posm_poster'			=> $request->posm_poster,
+					'cbd_competitor_detail'	=> $request->cbd_competitor_detail,
+					'cbd_competitor'		=> $request->cbd_competitor,
+					'cbd_position'			=> $request->cbd_position,
+					'outlet_type'			=> $request->outlet_type,
+					'total_hanger'			=> $request->total_hanger,
+				]);
+				if ($insert->id) {
+					$res['success'] = true;
+					$res['msg'] 	= "Success add CBD.";
+				} else {
+					$res['success'] = false;
+					$res['msg'] 	= "Fail add CBD.";
+				}
+			}else{
 				$res['success'] = false;
-				$res['msg'] 	= "Fail add CBD.";
+				$res['msg'] 	= "Fail Outlet not found.";
 			}
 		}else{
 			$res = $check;
