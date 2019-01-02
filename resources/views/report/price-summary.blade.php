@@ -2,7 +2,7 @@
 @section('title', "Sales Report - Availability")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Availability <small>Report</small></h2>
+  <h2 class="content-heading pt-10"> Display Share <small>Report</small></h2>
   @if($errors->any())
     <div class="alert alert-danger">
       <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -24,30 +24,23 @@
           </div>
         </div>
 
-        <div class="block-header p-0 mb-20">
-        </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
         <thead>
           <tr>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">DATE</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">STORE NAME</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">ACCOUNT</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">AREA</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">CEK/NO</th>
-            @foreach ($categories as $category)
-            <th colspan="{{ App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
-                                ->join('categories','sub_categories.id_category', 'categories.id')
-                                ->where('categories.id',$category->id)
-                                ->count() }}" style="vertical-align: middle; text-align: center;">{{ $category->name }}</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">CATEGORY</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">PRODUCT</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">PACKAGING</th>
+            @foreach ($accounts as $account)
+            <th colspan="2" style="vertical-align: middle; text-align: center;">{{ $account->name }}</th>
             @endforeach
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">LOWEST</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">HIGHEST</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">HIGHEST VS LOWEST</th>
           </tr>
           <tr>
-            @foreach ($categories as $category)
-              @foreach (App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
-                                ->join('categories','sub_categories.id_category', 'categories.id')
-                                ->where('categories.id',$category->id)->select('products.*')->get() as $product)
-                <th style="vertical-align: middle; text-align: center;">{{ $product->name }}</th>
-              @endforeach
+            @foreach ($accounts as $account)
+                <th style="vertical-align: middle; text-align: center;">LOWEST</th>
+                <th style="vertical-align: middle; text-align: center;">HIGHEST</th>
             @endforeach
           </tr>
 
@@ -149,30 +142,28 @@
 
       });
       @endif
-
       $(function() {
           $('#reportTable').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('availability.dataAccountRow') !!}',
+              ajax: '{!! route('priceData.row') !!}',
               columns: [
-                { data: 'avai_date', name: 'avai_date'},
-                { data: 'name1', name: 'name1'},
-                { data: 'account_name', name: 'account_name'},
-                { data: 'area_name', name: 'area_name'},
-                { data: 'cek', name: 'cek'},
-                @foreach($categories as $category)
-                  @foreach(App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
-                                ->join('categories','sub_categories.id_category', 'categories.id')
-                                ->where('categories.id',$category->id)->select('products.*')->get() as $product)
-                    { data: '{{ $category->id }}_{{ $product->id }}', name: '{{ $category->id }}_{{ $product->id }}', searchable: false, sortable: false},
+                { data: 'category_name', name: 'category_name'},
+                { data: 'brand_name', name: 'brand_name'},
+                { data: 'name', name: 'name'},
+                  @foreach($accounts as $account)
+                    {data: '{{ $account->id }}_min', name: '{{ $account->id }}_min', searchable: false, sortable: false},
+                    {data: '{{ $account->id }}_max', name: '{{ $account->id }}_max', searchable: false, sortable: false},
                   @endforeach
-                @endforeach
+                { data: 'lowest', name: 'lowest'},
+                { data: 'highest', name: 'highest'},
+                { data: 'vs', name: 'vs'},
               ],
               "scrollX":        true, 
               "scrollCollapse": true,
           });
       });
+
 
   </script>
 @endsection

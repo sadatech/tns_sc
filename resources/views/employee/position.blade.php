@@ -25,7 +25,7 @@
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="fa fa-plus"></i> Add Region</h3>
+                    <h3 class="block-title"><i class="fa fa-plus"></i> Update Position</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
                             <i class="si si-close"></i>

@@ -71,21 +71,51 @@ class ProductFokusSpgController extends Controller
             $data['to'][$key] = \Carbon\Carbon::create($to[1], $to[0])->endOfMonth()->toDateString();
         }
 
-        if (ProductFokusSpg::hasActivePF($data)) {
-            $this->alert['type'] = 'warning';
-            $this->alert['title'] = 'Warning!<br/>';
-            $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus SPG sudah ada!';
-        } else {
-            foreach ($data['id_product'] as $key => $id_product){
-                ProductFokusSpg::create([
-                'id_employee' => $data['id_employee'],
-                'id_product' => $id_product,
-                'from' => $data['from'][$key],
-                'to' => $data['to'][$key],
-                ]);
-
-            }
+        foreach ($data['id_product'] as $key => $id_product){
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus SPG!';
+            if ($id_product == "all")
+            {
+                foreach(Product::get() as $Product)
+                {
+                    if (ProductFokusSpg::hasActivePF([
+                        'id_employee' => $data['id_employee'],
+                        'id_product' => [$Product->id],
+                        'from' => [$data['from'][$key]],
+                        'to' => [$data['to'][$key]],
+                        ]))
+                    {
+                        $this->alert['type'] = 'warning';
+                        $this->alert['title'] = 'Warning!<br/>';
+                        $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus SPG sudah ada!';
+                    } else {
+                        ProductFokusSpg::create([
+                        'id_employee' => $data['id_employee'],
+                        'id_product' => $Product->id,
+                        'from' => $data['from'][$key],
+                        'to' => $data['to'][$key],
+                        ]);
+                    }
+                }
+            } else {
+                if (ProductFokusSpg::hasActivePF([
+                    'id_employee' => $data['id_employee'],
+                    'id_product' => [$id_product],
+                    'from' => [$data['from'][$key]],
+                    'to' => [$data['to'][$key]],
+                    ]))
+                {
+                    $this->alert['type'] = 'warning';
+                    $this->alert['title'] = 'Warning!<br/>';
+                    $this->alert['message'] = '<i class="em em-confounded mr-2"></i>Produk fokus SPG sudah ada!';
+                } else {
+                    ProductFokusSpg::create([
+                    'id_employee' => $data['id_employee'],
+                    'id_product' => $id_product,
+                    'from' => $data['from'][$key],
+                    'to' => $data['to'][$key],
+                    ]);
+                }
+            }
         }
 
         return redirect()->back()->with($this->alert);

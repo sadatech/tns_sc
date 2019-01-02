@@ -65,6 +65,8 @@ class DataPriceController extends Controller
 									$modelDetailDataPrice->id_data_price = $modelDataPrice->id;
 									$modelDetailDataPrice->id_product = $product->id;
 									$modelDetailDataPrice->price = $product->price;
+									$modelDetailDataPrice->isSasa = $product->isSasa;
+									$modelDetailDataPrice->id_brand_copetitor = $product->id_brand;
 									$modelDetailDataPrice->save();
 								}
 							}

@@ -3,6 +3,54 @@
 @section('content')
 <div class="content">
     <h2 class="content-heading pt-10">Attendance Report <small>Manage</small></h2>
+    <div class="block block-themed block-mode-loading-refresh">
+          <div class="block-header bg-primary">
+              <h3 class="block-title">
+                  Filters
+              </h3>
+              <div class="block-options">
+                  <button type="button" class="btn-block-option" data-toggle="block-option" data-action="content_toggle"><i class="si si-arrow-down"></i></button>
+              </div>
+          </div>
+          <div class="block-content bg-white">
+            <form id="filterForm" method="post" action="#">
+              <div class="row items-push">
+                  <div class="col-4 col-sm-4 text-center text-sm-left">
+                      <div class="font-size-sm font-w600 text-uppercase text-muted">Region</div>
+                      <select id="filterRegion" class="inputFilter" name="id_reg"></select>
+                  </div>
+                  <div class="col-4 col-sm-4 text-center text-sm-left">
+                      <div class="font-size-sm font-w600 text-uppercase text-muted">Area</div>
+                      <select id="filterArea" class="inputFilter" name="id_ar"></select>
+                  </div>
+                  <div class="col-4 col-sm-4 text-center text-sm-left">
+                      <div class="font-size-sm font-w600 text-uppercase text-muted">Sub Area</div>
+                      <select id="filterSubArea" class="inputFilter" name="id_sar"></select>
+                  </div>
+                  <div class="col-4 col-sm-4 text-center text-sm-left">
+                      <div class="font-size-sm font-w600 text-uppercase text-muted">Store</div>
+                      <select id="filterStore" class="inputFilter" name="id_str"></select>
+                  </div>
+                  <div class="col-4 col-sm-4 text-center text-sm-left">
+                      <div class="font-size-sm font-w600 text-uppercase text-muted">Employee</div>
+                      <select id="filterEmployee" class="inputFilter" name="id_emp"></select>
+                  </div>
+                  <div class="col-4 col-sm-4 text-center text-sm-left">
+                      <div class="font-size-sm font-w600 text-uppercase text-muted">Role</div>
+                      <select id="filterRole" class="inputFilter" name="id_role">
+                        <option value="">-</option>
+                        <option value="spgmtc">SPG</option>
+                        <option value="mdmtc">MD</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="row col-sm-12 col-md-12">
+                <p class="btn btn-sm btn-primary" id="filterSearch" onclick="filteringReportWithoutSearch(paramFilter)"><i class="fa fa-search"></i> Search</p>
+                <p class="btn btn-sm btn-danger" id="filterReset" onclick="triggerResetWithoutSearch(paramReset)"><i class="fa fa-refresh"></i> Clear</p>
+              </div>
+            </form>
+          </div>
+      </div>
     <div class="block block-themed"> 
         <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
             <h3 class="block-title">Datatables</h3>
@@ -18,7 +66,7 @@
                     </div>
                 </div>
 
-                <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="faqtable">
+                <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="attendanceTable">
                     <thead>
                         <th width="70px">NIK</th>
                         <th width="100px">Name</th>
@@ -66,6 +114,10 @@
 @section('css')
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/magnific-popup/magnific-popup.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
     <style type="text/css">
         [data-notify="container"] {
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
@@ -78,9 +130,34 @@
 
 @section('script')
     <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
+    <script src="{{ asset('js/select2-handler.js') }}"></script>
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script src="{{ asset('js/daterangepicker.js') }}"></script>
+    <script src="{{ asset('js/datetimepicker-handler.js') }}"></script>
     <script type="text/javascript">
+
+      var table = 'attendanceTable';
+        var filterId = ['#filterRegion', '#filterArea', '#filterSubArea', '#filterStore', '#filterEmployee', '#filterRole'];
+        var url = "{!! route('attendance.data') !!}";
+        var order = [ [0, 'desc']];
+        var columnDefs = [{"className": "dt-center", "targets": [0]}];
+        var tableColumns = [
+                { data: 'nik', name: 'nik' },
+                { data: 'employee', name: 'employee' },
+                { data: 'role', name: 'role' },
+                { data: 'attendance', name: 'attendance' },
+                { data: 'attendance_detail', name: 'attendance_detail' }];
+
+        var exportButton = '#export';
+
+        var paramFilter = [table, $('#'+table), url, tableColumns, columnDefs, order, exportButton];
+
+        var paramReset = [filterId, table, $('#'+table), url, tableColumns, columnDefs, order, exportButton, '#filterMonth'];
+
+
        function detailModal(json) {
         $('#detailModal').modal('show');
         $('#name').text(json.name);
@@ -122,54 +199,114 @@
                     align: 'center'
                 }
             });
+        
     });
     @endif
-    $(function() {
-        $('#faqtable').DataTable({
-            processing: true,
-            scrollX: true,
-            drawCallback: function(){
-              $('.popup-image').magnificPopup({
-                    type: 'image',
-                }); 
-                $('.js-swal-delete').on('click', function(){
-                    var url = $(this).data("url");
-                    swal({
-                        title: 'Are you sure?',
-                        text: 'You will not be able to recover this data!',
-                        type: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d26a5c',
-                        confirmButtonText: 'Yes, delete it!',
-                        html: false,
-                        preConfirm: function() {
-                            return new Promise(function (resolve) {
-                                setTimeout(function () {
-                                    resolve();
-                                }, 50);
-                            });
-                        }
-                    }).then(function(result){
-                        if (result.value) {
-                            window.location = url;
-                        } else if (result.dismiss === 'cancel') {
-                            swal('Cancelled', 'Your data is safe :)', 'error');
-                        }
-                    });
-                });
-            },
-            ajax: '{!! route('attendance.data') !!}',
-            serverSide: true,
-            scrollY: "300px",
-            columns: [  
-            { data: 'nik', name: 'nik' },
-            { data: 'employee', name: 'employee' },
-            { data: 'role', name: 'role' },
-            { data: 'attendance', name: 'attendance' },
-            { data: 'attendance_detail', name: 'attendance_detail' },
 
-            ]
-        });
+    $(document).ready(function() {
+          $.ajaxSetup({
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }                  
+
+          });          
+
+          $('#filterRegion').select2(setOptions('{{ route("region-select2") }}', 'Select Region', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Select Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          $('#filterSubArea').select2(setOptions('{{ route("sub-area-select2") }}', 'Select Sub Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Select Store', function (params) {
+            return filterData('store', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name1}
+              })
+            }
+          }));
+
+          $('#filterEmployee').select2(setOptions('{{ route("employee-select2-for-report") }}', 'Select Employee', function (params) {
+            filters['employeeMtc'] = 'test';
+            return filterData('employee', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
+
+          $('#filterRole').select2({
+              width: '100%',
+              placeholder: 'Select Role'
+          });
+
+          // TABLE RENDER
+          $('#attendanceTable').dataTable({
+            "fnCreatedRow": function (nRow, data) {
+                $(nRow).attr('class', data.id);
+            },
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                url: url + "?" + $("#filterForm").serialize(),
+                type: 'POST',
+                dataType: 'json',
+                error: function (data) {
+                  swal("Error!", "Failed to load Data!", "error");
+                },
+            },
+            scrollX:        true,
+            scrollCollapse: true,
+            "bFilter": false,
+            "rowId": "id",
+            "columns": tableColumns,
+            "columnDefs": columnDefs,
+            "order": order,
+            "ordering": false,
+            "searching": false
+          });
+
     });
+
+    $("#filterReset").click(function () {
+
+      $.each($('#filterForm select'), function(key, value) {
+        $('#'+this.id).val(null).trigger('change')
+      })
+
+    })
+
+    $("#filterSearch").click(function() {
+      var serial = $("#filterForm").serialize()
+      console.log(serial)
+    })
+
     </script>
 @endsection
