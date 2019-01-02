@@ -235,8 +235,8 @@ Route::prefix('employee')->group(function () {
 		Route::get('/dc', 'Employee\DcController@baca')->name('employee.dc')->middleware('auth');
 
 		// Crud
-		Route::get('/create', 'EmployeeController@read')->name('tambah.employee')->middleware('auth');
-		Route::get('/update/{id}', 'EmployeeController@readupdate')->name('ubah.employee')->middleware('auth');
+		Route::get('/create/{param?}', 'EmployeeController@read')->name('tambah.employee')->middleware('auth');
+		Route::get('/update/{id}/{param?}', 'EmployeeController@readupdate')->name('ubah.employee')->middleware('auth');
 		Route::post('/create', 'EmployeeController@store')->name('employee.add')->middleware('auth');
 		Route::put('/update/{id}', 'EmployeeController@update')->name('employee.update')->middleware('auth');
 		Route::get('/delete/{id}', 'EmployeeController@delete')->name('employee.delete')->middleware('auth');
@@ -438,10 +438,9 @@ Route::prefix('product')->group(function () {
 		Route::get('/export', 'ProductFokusGtcController@export')->name('fokusGTC.export')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFokusGtcController@update')->name('fokusGTC.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFokusGtcController@delete')->name('fokusGTC.delete')->middleware('auth');
-		Route::get('/download-template', function()
-		{
-			return response()->download(public_path('assets/FokusMDImport.xlsx'));
-		})->name('fokusMD.download-template')->middleware('auth');
+		Route::get('/download-template', function(){
+			return response()->download(public_path('assets/ProductFokusImportGTC.xlsx'));
+		})->name('fokusGTC.download-template')->middleware('auth');
 	});
 
 	//Fokus Spg Pages
@@ -700,6 +699,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.target-kpi');
 				})->name('report.target.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDTargetKpi')->name('smd.pasar.target.kpi.data')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDTargetKpiExportXLS')->name('smd.pasar.target.kpi.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('kpi')->group(function () {
@@ -853,7 +853,7 @@ Route::prefix('mtc')->group(function () {
 
 	Route::prefix('attendance')->group(function(){
 		Route::get('/', 'AttendanceController@index')->name('attendance')->middleware('auth');
-		Route::get('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
+		Route::post('/data', 'AttendanceController@data')->name('attendance.data')->middleware('auth');
 		Route::get('/exportXLS', 'AttendanceController@exportXLS')->name('attendance.exportXLS')->middleware('auth');
 	});
 
@@ -867,11 +867,29 @@ Route::prefix('mtc')->group(function () {
 		Route::post('/data-spg', 'ReportController@achievementSalesMtcDataSPG')->name('achievement-salesmtc-spg.data')->middleware('auth');
 		Route::post('/data-md', 'ReportController@achievementSalesMtcDataMD')->name('achievement-salesmtc-md.data')->middleware('auth');
 		Route::post('/data-tl', 'ReportController@achievementSalesMtcDataTL')->name('achievement-salesmtc-tl.data')->middleware('auth');
+		Route::any('/exportXLS/{filterDate?}', 'ReportController@achievementSalesMtcExportXLS')->name('achievement-salesmtc.exportxls')->middleware('auth');
+	});
+
+
+	Route::prefix('priceData')->group(function () {
+		Route::get('/', 'ReportController@priceDataIndex')->name('priceData')->middleware('auth');
+		Route::get('/summary', 'ReportController@priceSummary')->name('priceData.summary')->middleware('auth');
+		Route::get('/row', 'ReportController@priceDataRow')->name('priceData.row')->middleware('auth');
+		Route::get('/dataAccountRow', 'ReportController@priceDataAccountRowData')->name('priceData.dataAccountRow')->middleware('auth');
+		Route::get('/dataArea', 'ReportController@priceDataAreaData')->name('priceData.dataArea')->middleware('auth');
+		Route::get('/dataAccount', 'ReportController@priceDataAccountData')->name('priceData.dataAccount')->middleware('auth');
+		Route::post('/edit/{id}', 'ReportController@priceDataUpdate')->name('priceData.edit')->middleware('auth');
+		Route::post('/import', 'ImportQueueController@ImportpriceData')->name('priceData.import')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/SellinImport.xlsx'));
+		})->name('SellIn.download-template')->middleware('auth');
 	});
 
 
 	Route::prefix('availability')->group(function () {
 		Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
+		Route::get('/row', 'ReportController@availabilityRow')->name('availability.row')->middleware('auth');
 		Route::get('/dataAccountRow', 'ReportController@availabilityAccountRowData')->name('availability.dataAccountRow')->middleware('auth');
 		Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
 		Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');

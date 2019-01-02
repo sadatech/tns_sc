@@ -13,11 +13,15 @@ use Illuminate\Support\Collection;
 use App\Components\traits\WeekHelper;
 use App\Category;
 use App\Area;
+use App\subArea;
 use App\Account;
 use App\DisplayShare;
+use App\DetailAvailability;
 use App\DetailDisplayShare;
 use App\AdditionalDisplay;
 use App\DetailAdditionalDisplay;
+use App\DataPrice;
+use App\DetailDataPrice;
 use App\EmployeeStore;
 use App\Store;
 use App\EmployeeSubArea;
@@ -57,7 +61,9 @@ use App\Jobs\ExportSPGPasarSalesSummaryJob;
 use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
+use App\Jobs\ExportMTCAchievementJob;
 use App\Product;
+use App\ProductCompetitor;
 use App\SalesSpgPasar;
 use App\SalesMotoricDetail;
 use App\SalesMotoric;
@@ -547,8 +553,6 @@ class ReportController extends Controller
         }
         $data = $data->orderBy('id', 'ASC');
 
-        // return response()->json('zz');
-
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
@@ -611,8 +615,6 @@ class ReportController extends Controller
         }
         $data = $data->orderBy('id', 'ASC');
 
-        // return response()->json($data->get());
-
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
@@ -654,6 +656,30 @@ class ReportController extends Controller
             return @$item->employeeSubArea[0]->subarea->area->name;
         })
         ->make(true);     
+    }
+
+    public function achievementSalesMtcExportXLS($filterPeriode)
+    {
+        $result = DB::transaction(function() use ($filterPeriode){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Achievement " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAchievementJob($JobTrace, $filterPeriode, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
 
@@ -821,15 +847,100 @@ class ReportController extends Controller
         return view('report.price-vs-competitor');
     }
 
-    public function PriceVsData(){
+    public function priceSummary (){
+        // $data['products'] = Product::join('brands','products.id_brand','brands.id')
+        //                 ->join('sub_categories','products.id_subcategory','sub_categories.id')
+        //                 ->join('categories','sub_categories.id_category', 'categories.id')
+        //                 ->select('products.*',
+        //                     'brands.name as brand_name',
+        //                     'categories.name as category_name')
+        //                 ->orderBy('category_name')->get();
+        $data['products'] = Product::whereIn('id',['1','2'])->get();
+        $data['accounts'] = Account::get();
+        // return response()->json($datas2);
+        return view('report.price-summary', $data);
+    }
 
-    
+    public function priceDataRow(){
+        $subareas = subArea::get();
+        $accounts = Account::get();
+
+        $datas1 = ProductCompetitor::join('brands','product_competitors.id_brand','brands.id')
+                        ->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
+                        ->join('categories','sub_categories.id_category', 'categories.id')
+                        ->select('product_competitors.*',
+                            'brands.name as brand_name',
+                            'categories.name as category_name')
+                        ->get();
+
+        $datas2 = Product::join('brands','products.id_brand','brands.id')
+                        ->join('sub_categories','products.id_subcategory','sub_categories.id')
+                        ->join('categories','sub_categories.id_category', 'categories.id')
+                        ->select('products.*',
+                            'brands.name as brand_name',
+                            'categories.name as category_name')
+                        ->orderBy('category_name')->get();
+
+        foreach ($datas2 as $data2) {
+            $data2['lowest'] = '';
+            $data2['highest'] = '';
+            $data2['vs'] = '';
+
+            foreach ($accounts as $account) {
+                // $data2[$subarea->id.'_min'] = '-';
+                // $data2[$subarea->id.'_max'] = '-';
+
+                $store = Store::where('stores.id_account',$account->id)
+                            ->pluck('stores.id');
+                $price = DataPrice::whereIn('data_price.id_store',$store)
+                                ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
+                                ->where('detail_data_price.id_product',$data2->id);
+                if($price){
+                    $storeMin = $price->where('price', $price->min('price'))->pluck('id_store');
+                    $location = Store::whereIn('stores.id',$storeMin)
+                                    ->pluck('stores.name1')->toArray();
+                    $data2[$account->id.'store_min'] = implode(", ",$location);
+
+                    $storeMax = $price->where('price', $price->max('price'))->pluck('id_store');
+                    $location = Store::whereIn('stores.id',$storeMax)
+                                    ->pluck('stores.name1')->toArray();
+                    $data2[$account->id.'store_max'] = implode(", ",$location);
+
+                    $data2[$account->id.'_min'] = $price->min('price');
+                    $data2[$account->id.'_max'] = $price->max('price');
+
+                    if (($data2['lowest'] == '')&&($data2[$account->id.'_min'] != null)) {
+                            $data2['lowest'] = $data2[$account->id.'_min'];
+                            $data2['highest'] = $data2[$account->id.'_max'];
+                        
+                    }
+                    if(($data2['lowest'] > $data2[$account->id.'_min'])&&($data2[$account->id.'_min'] != null)){
+                        $data2['lowest'] = $data2[$account->id.'_min'];
+                    }
+                    if(($data2['highest'] < $data2[$account->id.'_max'])&&($data2[$account->id.'_max'] != null)){
+                        $data2['highest'] = $data2[$account->id.'_max'];
+                    }
+                }
+
+            }
+            if ($data2['lowest'] != '') {
+                $data2['vs'] = round($data2['highest'] / $data2['lowest'] * 1, 2);
+            }
+        }        
+
+        // return response()->json($datas2);
+        return Datatables::of($datas2)->make(true);
     }
 
     // *********** AVAILABILITY ****************** //
 
     public function availabilityRow(){
         $data['categories'] = Category::get();
+        $data['products'] = Product::get();
+        $data['jml_product'] = Product::get()->count();
+        $data['categories'] = Category::get();
+        $data['brands'] = Brand::get();
+        $data['jml_brand'] = Brand::get()->count();
         return view('report.availability', $data);
     }
 
@@ -839,58 +950,79 @@ class ReportController extends Controller
 
         $totaltanggal = Carbon::now()->daysInMonth;
         $account = 1;
-        $stores = Store::where('id_account',$account)->get();
-        $datas = new Collection();
-        $i = 1;
-        while ( $i<=$totaltanggal ) {
-            foreach ($stores as $store) {
-                $item['date'] = $i;
-                $item['store'] = $store->name1;
-                $item['account'] = $store->account->name;
-                $item['subarea'] = $store->subarea->name;
-            $datas->push($item);
-            }
-            $i++;
-        }
+        // $stores = Store::where('id_account',$account)->get();
+        // $datas = new Collection();
+        // $i = 1;
+        // while ( $i<=$totaltanggal ) {
+        //     foreach ($stores as $store) {
+        //         $item['date'] = $i;
+        //         $item['store'] = $store->name1;
+        //         $item['account'] = $store->account->name;
+        //         $item['subarea'] = $store->subarea->name;
+        //     $datas->push($item);
+        //     }
+        //     $i++;
+        // }
+
+        $datas = Store::where('stores.id_account',$account)
+                        ->join('availability','stores.id','availability.id_store')
+                        ->join('detail_availability','availability.id','detail_availability.id_availability')
+                        ->leftjoin('accounts','stores.id_account','accounts.id')
+                        ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
+                        ->select(
+                            'stores.id',
+                            'availability.date as avai_date',
+                            'stores.name1',
+                            'stores.name2',
+                            'accounts.name as account_name',
+                            'sub_areas.name as area_name',
+                            'detail_availability.id as availability_id'
+                            )->orderBy('avai_date')->get();
 
         foreach($datas as $data) {
+                        $data['cek'] = 'NO';
             foreach ($categories as $category) {
-                    $item[$category->id] = $category->name;
-                //     $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
-                //                     ->join('categories','sub_categories.id_category', 'categories.id')
-                //                     ->where('categories.id',$category)
-                //                     ->select('products.*')->get();
-                // foreach ($products as $brand) {
-                //     $data[$category->id.'_'.$products->id] = $products->name;
-                //     // $data[$category->id.'_'.$products->id.'_depth'] = '-';
-                //     // $detail_data = DetailDisplayShare::where('detail_display_shares.id_display_share', $data->id)
-                //     //                                 ->where('detail_display_shares.id_category',$category->id)
-                //     //                                 ->where('detail_display_shares.id_products',$products->id)
-                //     //                                 ->first();
-                //     // if ($detail_data) {
-                //     //     $data[$category->id.'_'.$products->id.'_tier'] = $detail_data->tier;
-                //     //     $data[$category->id.'_'.$products->id.'_depth'] = $detail_data->depth;
+                $data[$category->id] = $category->name;
+                $data[$category->id.'sum'] = 0;
+                $data[$category->id.'sumAvailable'] = 0;
+                $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+                                ->join('categories','sub_categories.id_category', 'categories.id')
+                                ->where('categories.id',$category->id)
+                                ->select('products.*')->get();
+                foreach ($products as $product) {
+                    $data[$category->id.'_'.$product->id] = $product->name;
+                    $data[$category->id.'_'.$product->id] = '-';
+                    $detail_data = DetailAvailability::where('detail_availability.id', $data->availability_id)
+                                                    ->where('detail_availability.id_product',$product->id)
+                                                    ->first();
+                    if ($detail_data) {
+                        $data[$category->id.'_'.$product->id] = $detail_data->available;
+                        $data[$category->id.'sumAvailable'] += $detail_data->available;
+                        $data[$category->id.'sum'] += 1;
+                        $data['cek'] = 'CEK';
+                    }
 
-                //     //     $data[$category->id.'_total_tier'] += $detail_data->tier;
-                //     //     $data[$category->id.'_total_depth'] += $detail_data->depth;
+                }
+                    if ($data[$category->id.'sum'] > 0){
+                        $data[$category->id.'availability'] = round($data[$category->id.'sumAvailable'] / $data[$category->id.'sum'] * 100, 2).'%';
 
-                //     // }
-                // }
-            $data->push($item);
+                    }else{
+                        $data[$category->id.'availability'] = 'mobile';
+                    }
             }
 
         } 
-        // $datas = 
-        return response()->json($datas);
 
-        return Datatables::of($data)->make(true);
+        // return response()->json($datas);
+
+        return Datatables::of($datas)->make(true);
         // return response()->json($data);
     }
 
 
     public function availabilityIndex(){
         $data['categories'] = Category::get();
-        return view('report.availability', $data);
+        return view('report.availabilityAch', $data);
     }
 
     public function availabilityAreaData(){
@@ -1103,40 +1235,43 @@ class ReportController extends Controller
             $persenPF = 40;
             $data['hitTargetTB'] = 0;
             $data['hitTargetPF'] = 0;
+            // $data['achTB'] = 0;
+            // $data['achPF'] = 0;
 
+            if ($dataActuals) {
+                foreach ($dataActuals as $dataActual) {
+                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                    $actualTB = clone $actualDS;
+                    $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
+                    $actualTB = $actualTB->where('id_category',$categoryTB)->first();
+                    $data['tierTB'] = $actualTB->tier;
+                    $data['tierSumTB'] = $actualTotal;
 
-            foreach ($dataActuals as $dataActual) {
-                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
-                $actualTB = clone $actualDS;
-                $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
-                $actualTB = $actualTB->where('id_category',$categoryTB)->first();
-                $data['tierTB'] = $actualTB->tier;
-                $data['tierSumTB'] = $actualTotal;
+                    if ($data['tierSumTB'] == 0) {
+                        $data['hitTargetTB'] += 0;
+                    }else{
+                        $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
+                        if ($nilaiActual >= $persenTB) {
+                        $data['hitTargetTB'] += 1;
+                        } else
+                        $data['hitTargetTB'] += 0;
+                    }
 
-                if ($data['tierSumTB'] == 0) {
-                    $data['hitTargetTB'] += 0;
-                }else{
-                    $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
-                    if ($nilaiActual >= $persenTB) {
-                    $data['hitTargetTB'] += 1;
-                    } else
-                    $data['hitTargetTB'] += 0;
-                }
+                    $actualPF = clone $actualDS;
+                    $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
+                    $actualPF = $actualPF->where('id_category',$categoryPF)->first();
+                    $data['tierPF'] = $actualPF->tier;
+                    $data['tierSumPF'] = $actualTotal;
 
-                $actualPF = clone $actualDS;
-                $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
-                $actualPF = $actualPF->where('id_category',$categoryPF)->first();
-                $data['tierPF'] = $actualPF->tier;
-                $data['tierSumPF'] = $actualTotal;
-
-                if ($data['tierSumPF'] == 0) {
-                    $data['hitTargetPF'] += 0;
-                }else{
-                    $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
-                    if ($nilaiActual >= $persenPF) {
-                    $data['hitTargetPF'] += 1;
-                    } else
-                    $data['hitTargetPF'] += 0;
+                    if ($data['tierSumPF'] == 0) {
+                        $data['hitTargetPF'] += 0;
+                    }else{
+                        $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
+                        if ($nilaiActual >= $persenPF) {
+                        $data['hitTargetPF'] += 1;
+                        } else
+                        $data['hitTargetPF'] += 0;
+                    }
                 }
             }
 
@@ -1189,40 +1324,44 @@ class ReportController extends Controller
             $persenPF = 40;
             $data['hitTargetTB'] = 0;
             $data['hitTargetPF'] = 0;
+            // $data['achTB'] = 0;
+            // $data['achPF'] = 0;
 
 
-            foreach ($dataActuals as $dataActual) {
-                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
-                $actualTB = clone $actualDS;
-                $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
-                $actualTB = $actualTB->where('id_category',$categoryTB)->first();
-                $data['tierTB'] = $actualTB->tier;
-                $data['tierSumTB'] = $actualTotal;
+            if ($dataActuals) {
+                foreach ($dataActuals as $dataActual) {
+                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                    $actualTB = clone $actualDS;
+                    $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
+                    $actualTB = $actualTB->where('id_category',$categoryTB)->first();
+                    $data['tierTB'] = $actualTB->tier;
+                    $data['tierSumTB'] = $actualTotal;
 
-                if ($data['tierSumTB'] == 0) {
-                    $data['hitTargetTB'] += 0;
-                }else{
-                    $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
-                    if ($nilaiActual >= $persenTB) {
-                    $data['hitTargetTB'] += 1;
-                    } else
-                    $data['hitTargetTB'] += 0;
-                }
+                    if ($data['tierSumTB'] == 0) {
+                        $data['hitTargetTB'] += 0;
+                    }else{
+                        $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
+                        if ($nilaiActual >= $persenTB) {
+                        $data['hitTargetTB'] += 1;
+                        } else
+                        $data['hitTargetTB'] += 0;
+                    }
 
-                $actualPF = clone $actualDS;
-                $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
-                $actualPF = $actualPF->where('id_category',$categoryPF)->first();
-                $data['tierPF'] = $actualPF->tier;
-                $data['tierSumPF'] = $actualTotal;
+                    $actualPF = clone $actualDS;
+                    $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
+                    $actualPF = $actualPF->where('id_category',$categoryPF)->first();
+                    $data['tierPF'] = $actualPF->tier;
+                    $data['tierSumPF'] = $actualTotal;
 
-                if ($data['tierSumPF'] == 0) {
-                    $data['hitTargetPF'] += 0;
-                }else{
-                    $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
-                    if ($nilaiActual >= $persenPF) {
-                    $data['hitTargetPF'] += 1;
-                    } else
-                    $data['hitTargetPF'] += 0;
+                    if ($data['tierSumPF'] == 0) {
+                        $data['hitTargetPF'] += 0;
+                    }else{
+                        $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
+                        if ($nilaiActual >= $persenPF) {
+                        $data['hitTargetPF'] += 1;
+                        } else
+                        $data['hitTargetPF'] += 0;
+                    }
                 }
             }
 
@@ -1277,40 +1416,44 @@ class ReportController extends Controller
             $persenPF = 40;
             $data['hitTargetTB'] = 0;
             $data['hitTargetPF'] = 0;
+            // $data['achTB'] = 0;
+            // $data['achPF'] = 0;
 
 
-            foreach ($dataActuals as $dataActual) {
-                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
-                $actualTB = clone $actualDS;
-                $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
-                $actualTB = $actualTB->where('id_category',$categoryTB)->first();
-                $data['tierTB'] = $actualTB->tier;
-                $data['tierSumTB'] = $actualTotal;
+            if ($dataActuals) {
+                foreach ($dataActuals as $dataActual) {
+                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                    $actualTB = clone $actualDS;
+                    $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
+                    $actualTB = $actualTB->where('id_category',$categoryTB)->first();
+                    $data['tierTB'] = $actualTB->tier;
+                    $data['tierSumTB'] = $actualTotal;
 
-                if ($data['tierSumTB'] == 0) {
-                    $data['hitTargetTB'] += 0;
-                }else{
-                    $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
-                    if ($nilaiActual >= $persenTB) {
-                    $data['hitTargetTB'] += 1;
-                    } else
-                    $data['hitTargetTB'] += 0;
-                }
+                    if ($data['tierSumTB'] == 0) {
+                        $data['hitTargetTB'] += 0;
+                    }else{
+                        $nilaiActual = round($data['tierTB'] / $data['tierSumTB'] * 100, 2);
+                        if ($nilaiActual >= $persenTB) {
+                        $data['hitTargetTB'] += 1;
+                        } else
+                        $data['hitTargetTB'] += 0;
+                    }
 
-                $actualPF = clone $actualDS;
-                $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
-                $actualPF = $actualPF->where('id_category',$categoryPF)->first();
-                $data['tierPF'] = $actualPF->tier;
-                $data['tierSumPF'] = $actualTotal;
+                    $actualPF = clone $actualDS;
+                    $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
+                    $actualPF = $actualPF->where('id_category',$categoryPF)->first();
+                    $data['tierPF'] = $actualPF->tier;
+                    $data['tierSumPF'] = $actualTotal;
 
-                if ($data['tierSumPF'] == 0) {
-                    $data['hitTargetPF'] += 0;
-                }else{
-                    $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
-                    if ($nilaiActual >= $persenPF) {
-                    $data['hitTargetPF'] += 1;
-                    } else
-                    $data['hitTargetPF'] += 0;
+                    if ($data['tierSumPF'] == 0) {
+                        $data['hitTargetPF'] += 0;
+                    }else{
+                        $nilaiActual = round($data['tierPF'] / $data['tierSumPF'] * 100, 2);
+                        if ($nilaiActual >= $persenPF) {
+                        $data['hitTargetPF'] += 1;
+                        } else
+                        $data['hitTargetPF'] += 0;
+                    }
                 }
             }
 
@@ -3542,6 +3685,30 @@ class ReportController extends Controller
         })
         ->make(true);
 
+    }
+
+    public function SMDTargetKpiExportXLS($filterPeriode)
+    {
+        $result = DB::transaction(function() use ($filterPeriode){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "SMD Pasar - Report KPI " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportSMDReportKPIJob($JobTrace, $filterPeriode, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
     public function SMDKpi(Request $request)

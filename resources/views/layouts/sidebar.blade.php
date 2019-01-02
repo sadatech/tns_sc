@@ -15,8 +15,7 @@
 
                     <div class="content-header-item">
                         <a class="link-effect font-w700" href="index.html">
-                            <i class="si si-ghost text-primary"></i>
-                            <span class="font-size-xl text-dual-primary-dark">ez</span><span class="font-size-xl text-primary">pz</span>
+                            <span class="font-size-xl text-dual-primary-dark">SASA</span>
                         </a>
                     </div>
                 </div>
@@ -75,12 +74,12 @@
                             <li>
                                 <a class="{{ request()->is('store/subarea') ? 'active' : '' }}" href="{{ route('subarea') }}">Sub Area</a>
                             </li>
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                             <li>
-                                <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Root</a>
+                                <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Route</a>
                             </li>
                             @endif
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                             <li>
                                 <a class="{{ request()->is('store/channel') ? 'active' : '' }}" href="{{ route('channel') }}">Channel</a>
                             </li>
@@ -100,7 +99,7 @@
                                 <a class="{{ request()->is('store/place') ? 'active' : '' }}" href="{{ route('place') }}">Place</a>
                             </li>
                             @endif
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                             <li>
                                 <a class="{{ request()->is('store/pasar') ? 'active' : '' }}" href="{{ route('pasar') }}">Pasar</a>
                             </li>
@@ -118,12 +117,12 @@
                             <li>
                                 <a class="{{ request()->is('employee/agency') ? 'active' : '' }}" href="{{ route('agency') }}">Agency</a>
                             </li>
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                             <li>
                                 <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">MTC</a>
                             </li>
                             @endif
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                             <li>
                                 <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">GTC</a>
                             </li>
@@ -140,7 +139,7 @@
                         </ul>
                     </li>
                     {{-- PlannDc --}}
-                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                      <li>
                         <a class="{{ request()->is('planDc') ? 'active' : '' }}" href="{{ route('planDc') }}"><i class="fa fa-pied-piper"></i><span class="sidebar-mini-hide">Plan Dc</span></a>
                     </li>
@@ -168,7 +167,7 @@
                             <li>
                                 <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                             <li>
                                 <a class="{{ request()->is('product/product-competitor') ? 'active' : '' }}" href="{{ route('product-competitor') }}">Product Competitor</a>
                             </li>
@@ -179,12 +178,12 @@
                             <!--<li>
                                 <a class="{{ request()->is('product/fokus') ? 'active' : '' }}" href="{{ route('fokus') }}">Fokus</a>
                             </li> -->
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                              <li>
                                 <a class="{{ request()->is('product/fokus-mtc') ? 'active' : '' }}" href="{{ route('fokusMtc') }}">Fokus MTC</a>
                             </li>
                             @endif
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                              <li>
                                 <a class="{{ request()->is('product/fokusGTC') ? 'active' : '' }}" href="{{ route('fokusGTC') }}">Fokus GTC</a>
                             </li>
@@ -205,7 +204,7 @@
                     <li class="{{ request()->is('target/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-target"></i><span class="sidebar-mini-hide">Target(s)</span></a>
                         <ul>
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                             <li>
                                 <a class="{{ request()->is('target/mtc') ? 'active' : '' }}" href="{{ route('mtc') }}">MTC</a>
                             </li>
@@ -213,7 +212,7 @@
                             <!--<li>
                                 <a class="{{ request()->is('target/dc') ? 'active' : '' }}" href="{{ route('target.dc') }}">Demo Cooking</a>
                             </li>-->
-                            @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                             <li>
                                 <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
                             </li>
@@ -223,7 +222,7 @@
                             </li>-->
                         </ul>
                     </li>
-                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                     <li>
                         <a class="{{ request()->is('pf') ? 'active' : '' }}" href="{{ route('pf') }}"><i class="si si-settings"></i><span class="sidebar-mini-hide">Setting PF</span></a>
                     </li>  
@@ -231,7 +230,7 @@
                     </li> 
                     {{-- USERS--}}
 
-                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2')
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator')
                     <li>
                         <a class="{{ request()->is('user/index') ? 'active' : '' }}" href="{{ route('user') }}"><i class="si si-user-follow"></i><span class="sidebar-mini-hide">User</span></a>
                     </li>  
@@ -254,7 +253,7 @@
                     
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- REPORT GTC --}}
-                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '4')
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                     <li class="{{ request()->is('report/gtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">GTC</span></a>
                         <ul>
@@ -387,7 +386,7 @@
                     </li>
                     @endif
                     </li>
-                    @if(Auth::user()->role_id == '1' || Auth::user()->role_id == '2' || Auth::user()->role_id == '5')
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                     {{-- REPORT MTC --}}
                     <li class="{{ request()->is('report/mtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">MTC</span></a>
@@ -398,33 +397,39 @@
                             </li>
                             {{-- SALES MTC --}}
                             <li>
-                                <a class="{{ request()->is('report/mtc/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><span class="sidebar-mini-hide">Sales MTC</span></a>
-                            </li>
-                            {{-- SALES MTC REVIEW --}}
-                            <li>
-                                <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Achievement MTC</span></a>
-                            </li>
+                                <a class="{{ request()->is('report/mtc/salesmtc') ? 'active' : '' }}" href="{{ route('salesmtc') }}"><span class="sidebar-mini-hide">Sales Summary</span></a>
+                            </li>                            
                             {{-- Display Share--}}
                             <li>
                                 <a class="{{ request()->is('report/mtc/display_share') ? 'active' : '' }}" href="{{ route('display_share') }}"><span class="sidebar-mini-hide">Display Share</span></a>
-                            </li>  
-                            <li>
-                                <a class="{{ request()->is('report/mtc/display_share/ach') ? 'active' : '' }}" href="{{ route('display_share.ach') }}"><span class="sidebar-mini-hide">Ach Display Share</span></a>
-                            </li>  
+                            </li>                              
                             {{-- Additional Display--}}
                             <li>
                                 <a class="{{ request()->is('report/mtc/additional_display') ? 'active' : '' }}" href="{{ route('additional_display') }}"><span class="sidebar-mini-hide">Additional Display</span></a>
-                            </li>  
+                            </li>                              
+                            {{-- Availability--}}
                             <li>
-                                <a class="{{ request()->is('report/mtc/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><span class="sidebar-mini-hide">Ach Additional Display</span></a>
-                            </li>  
-                            {{-- Availability Display--}}
-                            <li>
-                                <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability Display</span></a>
+                                <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability</span></a>
                             </li> {{-- Promo Activity--}}
                             <li>
                                 <a class="{{ request()->is('promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><span class="sidebar-mini-hide">Promo Activity</span></a>
-                            </li>  
+                            </li>
+                            {{-- Achievement --}}
+                            <li class="{{ request()->is('report/mtc/achievement') ? 'open' : '' }} {{ request()->is('report/mtc/display_share/ach') ? 'open' : '' }} {{ request()->is('report/mtc/additional_display/ach') ? 'open' : '' }}">
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Achievement</span></a>
+                                <ul>
+                                    {{-- SALES MTC REVIEW --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/mtc/achievement') ? 'active' : '' }}" href="{{ route('achievement-salesmtc') }}"><span class="sidebar-mini-hide">Achievement MTC</span></a>
+                                    </li>
+                                    <li>
+                                        <a class="{{ request()->is('report/mtc/display_share/ach') ? 'active' : '' }}" href="{{ route('display_share.ach') }}"><span class="sidebar-mini-hide">Ach Display Share</span></a>
+                                    </li>  
+                                    <li>
+                                        <a class="{{ request()->is('report/mtc/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><span class="sidebar-mini-hide">Ach Additional Display</span></a>
+                                    </li>  
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                     @endif

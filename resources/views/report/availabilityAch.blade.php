@@ -24,33 +24,27 @@
           </div>
         </div>
 
+        <center><h3>AREA</h3></center>
+        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableArea">
+        <thead>
+          <th class="text-center" style="width: 70px;">no</th>
+          <th>AREA</th>
+          @foreach ($categories as $category)
+          <th>{{ $category->name }}</th>
+          @endforeach
+        </thead>
+        </table>
+
         <div class="block-header p-0 mb-20">
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
+        <center><h3>ACCOUNT</h3></center>
+        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableAccount">
         <thead>
-          <tr>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">DATE</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">STORE NAME</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">ACCOUNT</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">AREA</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">CEK/NO</th>
-            @foreach ($categories as $category)
-            <th colspan="{{ App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
-                                ->join('categories','sub_categories.id_category', 'categories.id')
-                                ->where('categories.id',$category->id)
-                                ->count() }}" style="vertical-align: middle; text-align: center;">{{ $category->name }}</th>
-            @endforeach
-          </tr>
-          <tr>
-            @foreach ($categories as $category)
-              @foreach (App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
-                                ->join('categories','sub_categories.id_category', 'categories.id')
-                                ->where('categories.id',$category->id)->select('products.*')->get() as $product)
-                <th style="vertical-align: middle; text-align: center;">{{ $product->name }}</th>
-              @endforeach
-            @endforeach
-          </tr>
-
+          <th class="text-center" style="width: 70px;">no</th>
+          <th>ACCOUNT</th>
+          @foreach ($categories as $category)
+          <th>{{ $category->name }}</th>
+          @endforeach
         </thead>
         </table>
 
@@ -149,24 +143,33 @@
 
       });
       @endif
-
       $(function() {
-          $('#reportTable').DataTable({
+          $('#reportTableArea').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('availability.dataAccountRow') !!}',
+              ajax: '{!! route('availability.dataArea') !!}',
               columns: [
-                { data: 'avai_date', name: 'avai_date'},
-                { data: 'name1', name: 'name1'},
-                { data: 'account_name', name: 'account_name'},
-                { data: 'area_name', name: 'area_name'},
-                { data: 'cek', name: 'cek'},
+                { data: 'id', name: 'id'},
+                { data: 'area', name: 'area'},
                 @foreach($categories as $category)
-                  @foreach(App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
-                                ->join('categories','sub_categories.id_category', 'categories.id')
-                                ->where('categories.id',$category->id)->select('products.*')->get() as $product)
-                    { data: '{{ $category->id }}_{{ $product->id }}', name: '{{ $category->id }}_{{ $product->id }}', searchable: false, sortable: false},
-                  @endforeach
+                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
+                @endforeach
+              ],
+              "scrollX":        true, 
+              "scrollCollapse": true,
+          });
+      });
+
+      $(function() {
+          $('#reportTableAccount').DataTable({
+              processing: true,
+              serverSide: true,
+              ajax: '{!! route('availability.dataAccount') !!}',
+              columns: [
+                { data: 'id', name: 'id'},
+                { data: 'area', name: 'area'},
+                @foreach($categories as $category)
+                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
                 @endforeach
               ],
               "scrollX":        true, 

@@ -19,4 +19,10 @@ class EmployeeFilters extends QueryFilters
     		return $query->whereIn('level', $value);
     	});
     }
+
+    public function employeeMtc() {
+        return $this->builder->whereHas('position', function($query){
+                return $query->whereIn('level', ['spgmtc', 'mdmtc']);
+            });
+    }
 }
