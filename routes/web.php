@@ -650,6 +650,14 @@ Route::prefix('report')->group(function () {
 				Route::get('/export', 'ReportController@exportSMDcbd')->name('export.smd.cbd')->middleware('auth');
 			});
 
+			Route::prefix('new-cbd')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.new-cbd');
+				})->name('report.new-cbd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
+				Route::get('/export', 'ReportController@exportSMDnewCbd')->name('export.smd.new-cbd')->middleware('auth');
+			});
+
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
 					$getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');

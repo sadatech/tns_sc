@@ -50,6 +50,7 @@ use App\DistributionDetail;
 use App\DistributionMotoricDetail;
 use App\SalesMd as SalesMD;
 use App\Cbd;
+use App\NewCbd;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Jobs\ExportSPGPasarAchievementJob;
@@ -2617,6 +2618,50 @@ class ReportController extends Controller
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                );
+            }
+        }
+
+        $dt = Datatables::of(collect($data));
+        
+        return $dt->rawColumns(['photo'])->make(true);
+    }
+
+    public function SMDNewCbd(Request $request)
+    {
+        $cbd = NewCbd::orderBy('created_at', 'DESC')->with(['employee','outlet'])
+        ->when($request->has('employee'), function ($q) use ($request){
+            return $q->whereIdEmployee($request->input('employee'));
+        })
+        ->when($request->has('periode'), function ($q) use ($request){
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('outlet'), function ($q) use ($request){
+            $q->whereHas('outlet', function($q2) use ($request){
+                return $q2->where('id_outlet', $request->input('outlet'));
+            });
+        })->get();
+
+        $data = array();
+        $id = 1;
+        foreach ($cbd as $val) {
+            if ($val->employee->position->level == 'mdgtc'){
+                $data[] = array(
+                    'id'            => $id++,
+                    'outlet'        => $val->outlet->name,
+                    'employee'      => $val->employee->name,
+                    'date'          => $val->date,
+                    'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                    'posm_shop_sign'        => $val->posm_shop_sign,
+                    'posm_others'           => $val->posm_others,
+                    'posm_hangering_mobile' => $val->posm_hangering_mobile,
+                    'posm_poster'           => $val->posm_poster,
+                    'cbd_competitor_detail' => $val->cbd_competitor_detail,
+                    'cbd_competitor'        => $val->cbd_competitor,
+                    'cbd_position'          => $val->cbd_position,
+                    'outlet_type'           => $val->outlet_type,
+                    'total_hanger'          => $val->total_hanger,
                 );
             }
         }
