@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App\ProductPromo;
-use App\ProductFokus;
+use App\ProductFokusGtc;
 use App\Area;
 use App\SubArea;
 use App\Region;
@@ -125,25 +125,27 @@ class AreaController extends Controller
     public function delete($id) 
     {
         $area = Area::find($id);
-            $sub = SubArea::where(['id_area' => $area->id])->count();
-            $sub = ProductPromo::where(['id_area' => $area->id])->count();
-            $sub = ProductFokus::where(['id_area' => $area->id])->count();
-            if (!$sub < 1) {
-                return redirect()->back()
-                ->with([
-                    'type'    => 'danger',
-                    'title'   => 'Gagal!<br/>',
-                    'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain (region, area, store, promo, dan target product)!'
-                ]);
-            } else {
-                $area->delete();
-                return redirect()->back()
-                ->with([
-                    'type'      => 'success',
-                    'title'     => 'Sukses!<br/>',
-                    'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-               ]);
-            }
+
+        $SubArea = SubArea::where(['id_area' => $area->id])->count();
+        $ProductFokusGtc = ProductFokusGtc::where(['id_area' => $area->id])->count();
+
+        if (!$SubArea < 1 || !$ProductFokusGtc < 1)
+        {
+            return redirect()->back()
+            ->with([
+                'type'    => 'danger',
+                'title'   => 'Gagal!<br/>',
+                'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain (region, area, store, promo, dan target product)!'
+            ]);
+        } else {
+            $area->delete();
+            return redirect()->back()
+            ->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
+           ]);
+        }
 
     }
 }
