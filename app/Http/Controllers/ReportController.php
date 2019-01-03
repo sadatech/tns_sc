@@ -2483,9 +2483,9 @@ class ReportController extends Controller
         }
     }
 
-    public function inventoriDC()
+    public function inventoriDC($id_employee)
     {
-        $data = ReportInventori::get();
+        $data = ReportInventori::where("id_employee", $id_employee)->get();
         return Datatables::of(collect($data))
         ->addColumn("employee", function($item){
             return Employee::where("id", $item->id_employee)->first()->name;
