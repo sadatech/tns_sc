@@ -847,15 +847,14 @@ class ReportController extends Controller
         return view('report.price-vs-competitor');
     }
 
+    public function priceRow (){
+        $data['accounts'] = Account::get();
+        // return response()->json($datas2);
+        return view('report.price-summary', $data);
+    }
+
+
     public function priceSummary (){
-        // $data['products'] = Product::join('brands','products.id_brand','brands.id')
-        //                 ->join('sub_categories','products.id_subcategory','sub_categories.id')
-        //                 ->join('categories','sub_categories.id_category', 'categories.id')
-        //                 ->select('products.*',
-        //                     'brands.name as brand_name',
-        //                     'categories.name as category_name')
-        //                 ->orderBy('category_name')->get();
-        $data['products'] = Product::whereIn('id',['1','2'])->get();
         $data['accounts'] = Account::get();
         // return response()->json($datas2);
         return view('report.price-summary', $data);
