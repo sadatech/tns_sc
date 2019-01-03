@@ -1238,9 +1238,11 @@ class ReportController extends Controller
             // $data['achTB'] = 0;
             // $data['achPF'] = 0;
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -1328,9 +1330,10 @@ class ReportController extends Controller
             // $data['achPF'] = 0;
 
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -1419,10 +1422,10 @@ class ReportController extends Controller
             // $data['achTB'] = 0;
             // $data['achPF'] = 0;
 
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
