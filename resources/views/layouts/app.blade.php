@@ -6,15 +6,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
 
-    <title>@yield('title') - HRBA </title>
-    <meta name="description" content="HRBA - Demonstrasi Aplikasi">
+    <title>@yield('title') - SASA </title>
+    <meta name="description" content="SASA - Demonstrasi Aplikasi">
     <meta name="author" content="Sada Technology">
     <meta name="robots" content="noindex, nofollow">
 
     <!-- Open Graph Meta -->
-    <meta property="og:title" content="HRBA - Demonstrasi Aplikasi">
-    <meta property="og:site_name" content="HRBA">
-    <meta property="og:description" content="HRBA - Demonstrasi Aplikasi yang dibuat oleh Sada Technology">
+    <meta property="og:title" content="SASA - Demonstrasi Aplikasi">
+    <meta property="og:site_name" content="SASA">
+    <meta property="og:description" content="SASA - Demonstrasi Aplikasi yang dibuat oleh Sada Technology">
     <meta property="og:type" content="website">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 

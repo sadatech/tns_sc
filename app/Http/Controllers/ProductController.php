@@ -9,7 +9,8 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use App\Filters\ProductFilters;
 use App\Price;
 use App\Product;
-use App\ProductFokus;
+use App\ProductFokusGtc;
+use App\ProductFokusMtc;
 use App\ProductUnit;
 use App\ProductPromo;
 use App\ProductMeasure;
@@ -147,9 +148,12 @@ class ProductController extends Controller
     public function delete($id)
     {
         $product = Product::find($id);
+
         $prc = Price::where(['id_product' => $product->id])->count();
-        $pf = ProductFokus::where(['id_product' => $product->id])->count();
-        $jumlah = $prc + $pf;
+        $pfGTC = ProductFokusGtc::where(['id_product' => $product->id])->count();
+        $pfMTC = ProductFokusMtc::where(['id_product' => $product->id])->count();
+        $jumlah = $prc + $pfGTC + $pfMTC;
+
         if (!$jumlah < 1) 
         {
             return redirect()->back()
