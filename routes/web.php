@@ -808,7 +808,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.democooking.inventori');
 				})->name('report.demo.inventori')->middleware('auth');
-				Route::post('/data', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
+				Route::post('/data/{employee?}', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
 				Route::post('/add', 'ReportController@inventoriDCAdd')->name('dc.inventori.data.add')->middleware('auth');
 				Route::any('/exportXLS', 'ReportController@inventoriDCExportXLS')->name('dc.inventori.data.exportXLS')->middleware('auth');
 			});
