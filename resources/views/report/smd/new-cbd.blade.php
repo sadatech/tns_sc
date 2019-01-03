@@ -48,7 +48,8 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-            <a href="{{ route('export.smd.new-cbd') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
@@ -103,7 +104,7 @@ table.table thead tr th {
 <script type="text/javascript">
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
+    $('#filterEmployee,#filterOutlet').val(null).trigger('change');
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
@@ -134,6 +135,23 @@ table.table thead tr th {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
+  
+  /**
+   * Download OnClick
+   */
+  $("#btnDownloadXLS").on("click", function(){
+    $.ajax({
+      url: $(this).attr("target-url"),
+      type: "post",
+      success: function(e){
+        swal("Success!", e.result, "success");
+      },
+      error: function(){
+        swal("Error!", e.result, "error");
+      }
+    });
+  });
+
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
@@ -168,6 +186,7 @@ table.table thead tr th {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
+        $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/new");
       },
       columns: [
       { data: 'id' },

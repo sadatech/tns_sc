@@ -23,7 +23,7 @@ class NewCbd extends Model
     public function toArray(){
         $array = parent::toArray();
         $array['outlet_name'] = $this->outlet->name;
-        $array['photo1_url'] = !empty($this->photo) ? ('uploads/cbd/'.$this->photo) : '';
+        $array['photo1_url'] = !empty($this->photo) ? asset('uploads/cbd/'.$this->photo) : '';
         return $array;
     }
 }
