@@ -141,14 +141,14 @@ trait ExportGTCCbdTrait
 						$row->setFontSize(12);
 					});
 
-            	$imgDrawing = new PHPExcel_Worksheet_Drawing;
-            	if (isset($this->photoList[$valueTLKey]))
-            	{
-            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
-            		$imgDrawing->setCoordinates("D".($startTLRow));
-            		$imgDrawing->setWorksheet($sheet);
-            		$imgDrawing->setWidth(40);
-            	}
+	            	$imgDrawing = new PHPExcel_Worksheet_Drawing;
+	            	if (isset($this->photoList[$valueTLKey]))
+	            	{
+	            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
+	            		$imgDrawing->setCoordinates("D".($startTLRow));
+	            		$imgDrawing->setWorksheet($sheet);
+	            		$imgDrawing->setWidth(40);
+	            	}
 
 					$startTLRow++;
 				}
