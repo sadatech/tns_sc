@@ -64,6 +64,8 @@ class PfController extends Controller
             DB::transaction(function () use($data) {
                 $product = Pf::create($data);
             });
+            $this->alert['type'] = 'success';
+            $this->alert['title'] = 'Berhasil!<br/>';
             $this->alert['message'] = '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk fokus!';
         }
 

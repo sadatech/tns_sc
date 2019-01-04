@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Sales Report - Additional Display")
+@section('title', "Sales Report - Availability")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Additional Display <small>Report</small></h2>
+  <h2 class="content-heading pt-10"> Display Share <small>Report</small></h2>
   @if($errors->any())
     <div class="alert alert-danger">
       <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -11,32 +11,39 @@
       @endforeach
     </div>
   @endif
-
   <div class="block block-themed"> 
     <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
         <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
+        <div class="block-header p-0 mb-20">
           <div class="block-option">
             <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
             <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
           </div>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableSpg">
+        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
         <thead>
-          <th class="text-center" style="width: 70px;"></th>
-          <th>Region</th>
-          <th>Area</th>
-          <th>TL</th>
-          <th>Jabatan</th>
-          <th>Name</th>
-          <th>Store</th>
-          <th>Waktu</th>
-          <th>Jenis Display</th>
-          <th>Jumalah Add</th>
-          <th>Foto</th>
+          <tr>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">CATEGORY</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">PRODUCT</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">PACKAGING</th>
+            @foreach ($accounts as $account)
+            <th colspan="2" style="vertical-align: middle; text-align: center;">{{ $account->name }}</th>
+            @endforeach
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">LOWEST</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">HIGHEST</th>
+            <th rowspan="2" style="vertical-align: middle; text-align: center;">HIGHEST VS LOWEST</th>
+          </tr>
+          <tr>
+            @foreach ($accounts as $account)
+                <th style="vertical-align: middle; text-align: center;">LOWEST</th>
+                <th style="vertical-align: middle; text-align: center;">HIGHEST</th>
+            @endforeach
+          </tr>
+
         </thead>
         </table>
 
@@ -135,44 +142,28 @@
 
       });
       @endif
-      // $(function() {
-      //     $('#reportTableArea').DataTable({
-      //         processing: true,
-      //         serverSide: true,
-      //         ajax: '{!! route('additional_display.dataArea') !!}',
-      //         columns: [
-      //           { data: 'test0', name: 'test0'},
-      //           { data: 'test1', name: 'test1'},
-      //           { data: 'test2', name: 'test2'},
-      //           { data: 'test3', name: 'test3'},
-      //         ],
-      //         "scrollX":        true, 
-      //         "scrollCollapse": true,
-      //     });
-      // });
-
       $(function() {
-          $('#reportTableSpg').DataTable({
+          $('#reportTable').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('additional_display.dataSpg') !!}',
+              ajax: '{!! route('priceData.row') !!}',
               columns: [
-                { data: 'id', name: 'id', visible: false},
-                { data: 'region_name', name: 'region_name'},
-                { data: 'area_name', name: 'area_name'},
-                { data: 'tl_name', name: 'tl_name'},
-                { data: 'jabatan', name: 'jabatan'},
-                { data: 'emp_name', name: 'emp_name'},
-                { data: 'store_name', name: 'store_name'},
-                { data: 'date', name: 'date'},
-                { data: 'jenis_display_name', name: 'jenis_display_name'},
-                { data: 'jumlah_add', name: 'jumlah_add'},
-                { data: 'foto_Add', name: 'foto_Add'},
+                { data: 'category_name', name: 'category_name'},
+                { data: 'brand_name', name: 'brand_name'},
+                { data: 'name', name: 'name'},
+                  @foreach($accounts as $account)
+                    {data: '{{ $account->id }}_min', name: '{{ $account->id }}_min', searchable: false, sortable: false},
+                    {data: '{{ $account->id }}_max', name: '{{ $account->id }}_max', searchable: false, sortable: false},
+                  @endforeach
+                { data: 'lowest', name: 'lowest'},
+                { data: 'highest', name: 'highest'},
+                { data: 'vs', name: 'vs'},
               ],
               "scrollX":        true, 
               "scrollCollapse": true,
           });
       });
+
 
   </script>
 @endsection

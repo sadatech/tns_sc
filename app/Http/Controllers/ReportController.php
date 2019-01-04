@@ -54,6 +54,7 @@ use App\DistributionDetail;
 use App\DistributionMotoricDetail;
 use App\SalesMd as SalesMD;
 use App\Cbd;
+use App\NewCbd;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Jobs\ExportSPGPasarAchievementJob;
@@ -61,6 +62,8 @@ use App\Jobs\ExportSPGPasarSalesSummaryJob;
 use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
+use App\Jobs\ExportMTCAchievementJob;
+use App\Jobs\ExportGTCCbdJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -552,8 +555,6 @@ class ReportController extends Controller
         }
         $data = $data->orderBy('id', 'ASC');
 
-        // return response()->json('zz');
-
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
@@ -616,8 +617,6 @@ class ReportController extends Controller
         }
         $data = $data->orderBy('id', 'ASC');
 
-        // return response()->json($data->get());
-
         return Datatables::of($data)        
         ->addColumn('employee_name', function($item) {
             return $item->name;
@@ -661,6 +660,59 @@ class ReportController extends Controller
         ->make(true);     
     }
 
+    public function achievementSalesMtcExportXLS($filterPeriode)
+    {
+        $result = DB::transaction(function() use ($filterPeriode){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Achievement " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAchievementJob($JobTrace, $filterPeriode, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterEmployee, $filterOutlet, $new = '')
+    {
+        $filters['month']       = $filterMonth;
+        $filters['year']        = $filterYear;
+        $filters['employee']    = $filterEmployee;
+        $filters['outlet']      = $filterOutlet;
+        $filters['new']         = $new;
+        
+        $result = DB::transaction(function() use ($filters){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "GTC - CBD " . Carbon::parse('1/'.$filters['month'].'/'.$filters['year'])->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportGTCCbdJob($JobTrace, $filters, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
 
     // *********** STOCK ****************** //
 
@@ -826,6 +878,19 @@ class ReportController extends Controller
         return view('report.price-vs-competitor');
     }
 
+    public function priceRow (){
+        $data['accounts'] = Account::get();
+        // return response()->json($datas2);
+        return view('report.price-summary', $data);
+    }
+
+
+    public function priceSummary (){
+        $data['accounts'] = Account::get();
+        // return response()->json($datas2);
+        return view('report.price-summary', $data);
+    }
+
     public function priceDataRow(){
         $subareas = subArea::get();
         $accounts = Account::get();
@@ -844,16 +909,16 @@ class ReportController extends Controller
                         ->select('products.*',
                             'brands.name as brand_name',
                             'categories.name as category_name')
-                        ->get();
+                        ->orderBy('category_name')->get();
 
         foreach ($datas2 as $data2) {
-            $data2[$data2->id.'_lowest'] = 1000000000;
-            $data2[$data2->id.'_highest'] = 0;
-            $data2[$data2->id.'_vs'] = 0;
+            $data2['lowest'] = '';
+            $data2['highest'] = '';
+            $data2['vs'] = '';
 
             foreach ($accounts as $account) {
-                // $data2[$subarea->id.'_'.$data2->id.'_min'] = '-';
-                // $data2[$subarea->id.'_'.$data2->id.'_max'] = '-';
+                // $data2[$subarea->id.'_min'] = '-';
+                // $data2[$subarea->id.'_max'] = '-';
 
                 $store = Store::where('stores.id_account',$account->id)
                             ->pluck('stores.id');
@@ -864,32 +929,37 @@ class ReportController extends Controller
                     $storeMin = $price->where('price', $price->min('price'))->pluck('id_store');
                     $location = Store::whereIn('stores.id',$storeMin)
                                     ->pluck('stores.name1')->toArray();
-                    $data2[$account->id.'_'.$data2->id.'store_min'] = implode(", ",$location);
+                    $data2[$account->id.'store_min'] = implode(", ",$location);
 
                     $storeMax = $price->where('price', $price->max('price'))->pluck('id_store');
                     $location = Store::whereIn('stores.id',$storeMax)
                                     ->pluck('stores.name1')->toArray();
-                    $data2[$account->id.'_'.$data2->id.'store_max'] = implode(", ",$location);
+                    $data2[$account->id.'store_max'] = implode(", ",$location);
 
-                    $data2[$account->id.'_'.$data2->id.'_min'] = $price->min('price');
-                    $data2[$account->id.'_'.$data2->id.'_max'] = $price->max('price');
+                    $data2[$account->id.'_min'] = $price->min('price');
+                    $data2[$account->id.'_max'] = $price->max('price');
 
-                    if(($data2[$data2->id.'_lowest'] > $data2[$account->id.'_'.$data2->id.'_min'])&($data2[$account->id.'_'.$data2->id.'_min'] != null)){
-                        $data2[$data2->id.'_lowest'] = $data2[$account->id.'_'.$data2->id.'_min'];
+                    if (($data2['lowest'] == '')&&($data2[$account->id.'_min'] != null)) {
+                            $data2['lowest'] = $data2[$account->id.'_min'];
+                            $data2['highest'] = $data2[$account->id.'_max'];
+                        
                     }
-                    if(($data2[$data2->id.'_highest'] < $data2[$account->id.'_'.$data2->id.'_max'])&($data2[$account->id.'_'.$data2->id.'_max'] != null)){
-                        $data2[$data2->id.'_highest'] = $data2[$account->id.'_'.$data2->id.'_max'];
+                    if(($data2['lowest'] > $data2[$account->id.'_min'])&&($data2[$account->id.'_min'] != null)){
+                        $data2['lowest'] = $data2[$account->id.'_min'];
+                    }
+                    if(($data2['highest'] < $data2[$account->id.'_max'])&&($data2[$account->id.'_max'] != null)){
+                        $data2['highest'] = $data2[$account->id.'_max'];
                     }
                 }
 
             }
-
-        $data2[$data2->id.'_vs'] = round($data2[$data2->id.'_highest'] / $data2[$data2->id.'_lowest'] * 1, 2);
-
-
+            if ($data2['lowest'] != '') {
+                $data2['vs'] = round($data2['highest'] / $data2['lowest'] * 1, 2);
+            }
         }        
 
-        return response()->json($datas2);
+        // return response()->json($datas2);
+        return Datatables::of($datas2)->make(true);
     }
 
     // *********** AVAILABILITY ****************** //
@@ -1105,8 +1175,8 @@ class ReportController extends Controller
         return view('report.display-share-raw', $data);
     }
 
-    public function displayShareSpgData(){
-
+    public function displayShareSpgData(Request $request)
+    {
         $categories = Category::get();
         $brands = Brand::get();
 
@@ -1121,6 +1191,19 @@ class ReportController extends Controller
                 ->join("employees", "display_shares.id_employee", "=", "employees.id")
                 ->leftjoin("detail_display_shares", "display_shares.id", "=", "detail_display_shares.id_display_share")
                 ->groupby('display_shares.id_store')
+                ->when($request->has('employee'), function ($q) use ($request){
+                    return $q->where('display_shares.id_employee',$request->input('employee'));
+                })
+                // ->when($request->has('periode'), function ($q) use ($request){
+                //     return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+                //     ->whereYear('date', substr($request->input('periode'), 3));
+                // })
+                ->when(!empty($request->input('store')), function ($q) use ($request){
+                    return $q->where('id_store', $request->input('store'));
+                })
+                ->when($request->has('area'), function ($q) use ($request){
+                    return $q->where('id_area', $request->input('area'));
+                })
                 ->select(
                     'display_shares.*',
                     'stores.name1 as store_name',
@@ -1198,9 +1281,11 @@ class ReportController extends Controller
             // $data['achTB'] = 0;
             // $data['achPF'] = 0;
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -1288,9 +1373,10 @@ class ReportController extends Controller
             // $data['achPF'] = 0;
 
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -1379,10 +1465,10 @@ class ReportController extends Controller
             // $data['achTB'] = 0;
             // $data['achPF'] = 0;
 
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -2443,9 +2529,9 @@ class ReportController extends Controller
         }
     }
 
-    public function inventoriDC()
+    public function inventoriDC($id_employee)
     {
-        $data = ReportInventori::get();
+        $data = ReportInventori::where("id_employee", $id_employee)->get();
         return Datatables::of(collect($data))
         ->addColumn("employee", function($item){
             return Employee::where("id", $item->id_employee)->first()->name;
@@ -2705,6 +2791,39 @@ class ReportController extends Controller
             ->whereYear('date', substr($request->input('periode'), 3));
         })
         ->when($request->has('outlet'), function ($q) use ($request){
+            return $q->where('id_outlet', $request->input('outlet'));
+        })->get();
+
+        $data = array();
+        $id = 1;
+        foreach ($cbd as $val) {
+            if ($val->employee->position->level == 'mdgtc'){
+                $data[] = array(
+                    'id'            => $id++,
+                    'outlet'        => $val->outlet->name,
+                    'employee'      => $val->employee->name,
+                    'date'          => $val->date,
+                    'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                );
+            }
+        }
+
+        $dt = Datatables::of(collect($data));
+        
+        return $dt->rawColumns(['photo'])->make(true);
+    }
+
+    public function SMDNewCbd(Request $request)
+    {
+        $cbd = NewCbd::orderBy('created_at', 'DESC')->with(['employee','outlet'])
+        ->when($request->has('employee'), function ($q) use ($request){
+            return $q->whereIdEmployee($request->input('employee'));
+        })
+        ->when($request->has('periode'), function ($q) use ($request){
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('outlet'), function ($q) use ($request){
             $q->whereHas('outlet', function($q2) use ($request){
                 return $q2->where('id_outlet', $request->input('outlet'));
             });
@@ -2720,6 +2839,15 @@ class ReportController extends Controller
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                    'posm_shop_sign'        => $val->posm_shop_sign,
+                    'posm_others'           => $val->posm_others,
+                    'posm_hangering_mobile' => $val->posm_hangering_mobile,
+                    'posm_poster'           => $val->posm_poster,
+                    'cbd_competitor_detail' => $val->cbd_competitor_detail,
+                    'cbd_competitor'        => $val->cbd_competitor,
+                    'cbd_position'          => $val->cbd_position,
+                    'outlet_type'           => $val->outlet_type,
+                    'total_hanger'          => $val->total_hanger,
                 );
             }
         }

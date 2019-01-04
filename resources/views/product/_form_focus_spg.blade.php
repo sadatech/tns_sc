@@ -31,6 +31,7 @@ $type = $type ?? '';
                   <div class="form-group col-md-4">
                     <select class="form-control" style="width: 100%" id="addProductSelect" name="id_product[]" required>
                       <option value="" disabled selected>Choose your Product</option>
+                      <option value="all">All Products</option>
                       @foreach(App\Product::where('id_brand',1)->get() as $data)
                       <option value="{{ $data->id }}">{{ $data->name }} </option>
                       @endforeach
@@ -174,7 +175,7 @@ $type = $type ?? '';
       $.get(getDataUrl + '/' + $("#" + divArea).val(), function (data) {
       if(data){
         console.log(data);
-        document.getElementById("" + divArea.replace("addCategorySelect", "addProductSelect")).innerHTML = "<option selected disabled>Choose your Product</option>";
+        document.getElementById("" + divArea.replace("addCategorySelect", "addProductSelect")).innerHTML = "<option selected disabled>Choose your Product</option><option value='all'>All Products</option>";
 
                 var element = document.getElementById("" + divArea.replace("addCategorySelect", "addProductSelect"));
                 $.each(data, function(index, item) {

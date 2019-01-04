@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Channel;
 use App\Product;
 use App\ProductFokusGtc;
 use DB;
@@ -177,67 +178,87 @@ class ProductFokusGtcController extends Controller
 
     public function import(Request $request)
     {
-        $this->validate($request, [
-            'file' =>   'required'
-        ]);
+        $file = Input::file('file')->getClientOriginalName();
+        $filename = pathinfo($file, PATHINFO_FILENAME);
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-        $transaction = DB::transaction(function () use ($request) {
-            $file = Input::file('file')->getClientOriginalName();
-            $filename = pathinfo($file, PATHINFO_FILENAME);
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
+        if ($extension != 'xlsx' && $extension !=  'xls') {
+            return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+        }
 
-            if ($extension != 'xlsx' && $extension !=  'xls') {
-                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
-            }
-            if($request->hasFile('file')){
-                $file = $request->file('file')->getRealPath();
-                $ext = '';
-                
-                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
+        if($request->hasFile('file'))
+        {
+            $file = $request->file('file')->getRealPath();
+            $ext = '';
+            Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
+                if (!empty($results->all()))
                 {
                     foreach($results as $row)
                     {
-                        echo "$row<hr>";
-                        $dataProduct['product_name']        = $row->product;
-                        $dataProduct['product_code']        = $row->code;
-                        $dataProduct['subcategory_name']    = $row->subcategory;
-                        $dataProduct['category_name']       = $row->category;
-                        $dataProduct['sku']                 = $row->sku;
-                        $dataProduct['type']                = $row->type;
-                        $dataProduct['value']               = $row->value;
-                        $id_product = $this->findProduct($dataProduct);
+                        $listProduct = explode(",", $row->sku);
+                        foreach ($listProduct as $key => $product) {
+                            $getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($product))."'")->first();
+                            if (isset($getSku->id))
+                            {
+                                $fokusGTCTmplt[$getSku->id] = [
+                                    'id_product' => $getSku->id,
+                                    'from'       => Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'))->toDateString(),
+                                    'to'         => Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM'))->toDateString()
+                                ];
 
-                        // $data1 = Category::where(['id' => $id_product])->first();
-                        // $check = Product::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->category))."'")
-                        // ->where(['id_product' => $data1->id])->count();
-                        // if ($check < 1) {
-                            ProductFokusMD::create([
-                                'id_product'        => $id_product,
-                                'from'              => Carbon::now(),
-                                'to'                => Carbon::now()
-                            ])->id;
-                        // } else {
-                        //     return false;
-                        // }
+                                $listArea = explode(",", $row->area);
+                                foreach ($listArea as $area) {
+                                    $getArea = \App\Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($area))."'")->first();
+                                    if (isset($getArea->id)) {
+                                        $fokusGTC[$getSku->id][] = array_merge($fokusGTCTmplt[$getSku->id], ["id_area"=>$getArea->id]);
+                                    }
+                                }
+                            }
+                        }
+
+                        DB::beginTransaction();
+                        $skipped = false;
+                        foreach ($fokusGTC[$getSku->id] as $fokusGTCData)
+                        {
+                            // validate if periode exists
+                            if (!$skipped)
+                            {
+                                if (isset(ProductFokusGtc::where("id_product", $fokusGTCData["id_product"])->where("from", $fokusGTCData["from"])->where("to", $fokusGTCData["to"])->first()->id))
+                                {
+                                    $availPF = true;
+                                    $skipPF = true;
+                                }
+                            }
+
+                            if (!isset($skipPF)) $PFGTCObj = ProductFokusGtc::create($fokusGTCData);
+                            $skipped = true;
+
+                        }
+                        DB::commit();
                     }
-                },false);
+                } else {
+                    throw new Exception("Error Processing Request", 1);
+                }
+            }, false);
+            if (isset($availPF))
+            {
+                return redirect()->back()->with([
+                    'type' => 'danger',
+                    'title' => 'Gagal!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target, Silahkan cek data periode!'
+                ]);
+            } else {
+                return redirect()->back()->with([
+                    'type' => 'success',
+                    'title' => 'Sukses!<br/>',
+                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah produk target!'
+                ]);
             }
-            return 'success';
-        });
-
-        if ($transaction == 'success') {
-            return redirect()->back()
-            ->with([
-                'type'      => 'success',
-                'title'     => 'Sukses!<br/>',
-                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
-            ]);
-        }else{
-            return redirect()->back()
-            ->with([
-                'type'    => 'danger',
-                'title'   => 'Gagal!<br/>',
-                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+        } else {
+            return redirect()->back()->with([
+                'type' => 'danger',
+                'title' => 'Gagal!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>File harus di isi!'
             ]);
         }
     }
