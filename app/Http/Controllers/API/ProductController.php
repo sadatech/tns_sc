@@ -135,14 +135,26 @@ class ProductController extends Controller
 
 		return response()->json($competitor);
 	}
+
+	public function listCompetitorByCat($cat)
+	{
+		$competitor = ProductCompetitor::join('brands','product_competitors.id_brand','brands.id')
+										->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
+										->join('categories','sub_categories.id_category','categories.id')
+										->where('categories.id',$cat)
+										->select('product_competitors.*', 'categories.name as category_name', 'brands.id as brand_name')->get();
+
+		return response()->json($competitor);
+	}
 	
 	public function listCompetitorByCatBrand($cat, $brand)
 	{
 		$competitor = ProductCompetitor::where('id_brand',$brand)
+										->join('brands','product_competitors.id_brand','brands.id')
 										->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
 										->join('categories','sub_categories.id_category','categories.id')
 										->where('categories.id',$cat)
-										->select('product_competitors.*')->get();
+										->select('product_competitors.*', 'categories.name as category_name', 'brands.id as brand_name')->get();
 
 		return response()->json($competitor);
 	}

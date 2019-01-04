@@ -171,7 +171,7 @@
         })
       }
     }));
-    $('#areaSelect').select2(setOptions('{{ route("sub-area-select2") }}', 'Select Area', function (params) {
+    $('#areaSelect').select2(setOptions('{{ route("sub-area-select2") }}', 'Select Subarea', function (params) {
       return filterData('name', params.term);
     }, function (data, params) {
       return {

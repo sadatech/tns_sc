@@ -847,15 +847,14 @@ class ReportController extends Controller
         return view('report.price-vs-competitor');
     }
 
+    public function priceRow (){
+        $data['accounts'] = Account::get();
+        // return response()->json($datas2);
+        return view('report.price-summary', $data);
+    }
+
+
     public function priceSummary (){
-        // $data['products'] = Product::join('brands','products.id_brand','brands.id')
-        //                 ->join('sub_categories','products.id_subcategory','sub_categories.id')
-        //                 ->join('categories','sub_categories.id_category', 'categories.id')
-        //                 ->select('products.*',
-        //                     'brands.name as brand_name',
-        //                     'categories.name as category_name')
-        //                 ->orderBy('category_name')->get();
-        $data['products'] = Product::whereIn('id',['1','2'])->get();
         $data['accounts'] = Account::get();
         // return response()->json($datas2);
         return view('report.price-summary', $data);
@@ -1238,9 +1237,11 @@ class ReportController extends Controller
             // $data['achTB'] = 0;
             // $data['achPF'] = 0;
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -1328,9 +1329,10 @@ class ReportController extends Controller
             // $data['achPF'] = 0;
 
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -1419,10 +1421,10 @@ class ReportController extends Controller
             // $data['achTB'] = 0;
             // $data['achPF'] = 0;
 
+            foreach ($dataActuals as $dataActual) {
+                $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
 
-            if ($dataActuals) {
-                foreach ($dataActuals as $dataActual) {
-                    $actualDS = DetailDisplayShare::where('detail_display_shares.id_display_share',$dataActual);
+                if ($actualDS) {
                     $actualTB = clone $actualDS;
                     $actualTotal = $actualTB->where('id_category',$categoryTB)->sum('tier');
                     $actualTB = $actualTB->where('id_category',$categoryTB)->first();
@@ -2483,9 +2485,9 @@ class ReportController extends Controller
         }
     }
 
-    public function inventoriDC()
+    public function inventoriDC($id_employee)
     {
-        $data = ReportInventori::get();
+        $data = ReportInventori::where("id_employee", $id_employee)->get();
         return Datatables::of(collect($data))
         ->addColumn("employee", function($item){
             return Employee::where("id", $item->id_employee)->first()->name;
