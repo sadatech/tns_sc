@@ -32,7 +32,7 @@
           <th>TL</th>
           <th>Jabatan</th>
           <th>Name</th>
-          <th>Outlate</th>
+          <th>Store</th>
           <th>Waktu</th>
           <th>Jenis Display</th>
           <th>Jumalah Add</th>
