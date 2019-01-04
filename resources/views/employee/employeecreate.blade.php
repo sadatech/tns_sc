@@ -18,7 +18,7 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>NIK</label>
-                        <input type="text" class="form-control" name="nik" value="{{ old('nik') }}" placeholder="Add new nik" required>
+                        <input type="text" id="numNik" class="form-control" name="nik" value="{{ old('nik') }}" placeholder="Add new nik" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Name</label>
@@ -700,6 +700,7 @@ $("#example-inline-checkbox2").on('change', function() {
         
         return false;
     }
+    document.getElementById('numNik').addEventListener('keypress', ForNumbers, false);
     document.getElementById('numKtp').addEventListener('keypress', ForNumbers, false);
     document.getElementById('numPhone').addEventListener('keypress', ForNumbers, false);
 

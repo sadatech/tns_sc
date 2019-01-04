@@ -58,6 +58,7 @@ Route::prefix('product')->group(function () {
 	Route::post('/list', 'API\ProductController@list')->name('api.product.list');
 	Route::get('pf/list/{type}/{id}', 'API\ProductController@pfList')->name('api.product.pf.list');
 	Route::get('/list-competitor', 'API\ProductController@listCompetitor')->name('api.product.list-competitor');
+	Route::get('/list-competitorByCat/{cat}', 'API\ProductController@listCompetitorByCat')->name('api.product.list-competitorByCat');
 	Route::get('/list-competitorByParam/{cat}/{brand}', 'API\ProductController@listCompetitorByCatBrand')->name('api.product.list-competitorByParam');
 });
 

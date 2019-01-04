@@ -226,7 +226,7 @@
             "processing": true,
             "serverSide": true,
             "ajax": {
-                url: '{!! route('dc.inventori.data') !!}',
+                url: '{!! route('dc.inventori.data') !!}/' + $('#filterEmployee').val(),
                 type: 'POST',
                 dataType: 'json',
                 error: function (data) {
