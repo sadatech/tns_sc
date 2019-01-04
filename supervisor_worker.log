@@ -1,6 +1,0 @@
-
-In AbstractConnection.php line 155:
-                                                                            
-  Error while reading line from the server. [tcp://srv-01.sada.co.id:6379]  
-                                                                            
-
