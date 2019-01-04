@@ -1164,6 +1164,30 @@ class ReportController extends Controller
         // return response()->json($data);
     }
 
+    public function availabilityExportXLS()
+    {
+        $result = DB::transaction(function(){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Availability (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAvailabilityJob($JobTrace, $periode, $id_employee, $id_store, $id_area, $limit, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
     // *********** DISPLAY SHARE ****************** //
 
     public function displayShareIndex(){

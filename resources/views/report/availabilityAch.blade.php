@@ -19,8 +19,8 @@
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
           </div>
         </div>
 
@@ -143,39 +143,51 @@
 
       });
       @endif
-      $(function() {
-          $('#reportTableArea').DataTable({
-              processing: true,
-              serverSide: true,
-              ajax: '{!! route('availability.dataArea') !!}',
-              columns: [
-                { data: 'id', name: 'id'},
-                { data: 'area', name: 'area'},
-                @foreach($categories as $category)
-                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
-                @endforeach
-              ],
-              "scrollX":        true, 
-              "scrollCollapse": true,
-          });
-      });
+      $(document).ready(function(){
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
 
-      $(function() {
-          $('#reportTableAccount').DataTable({
-              processing: true,
-              serverSide: true,
-              ajax: '{!! route('availability.dataAccount') !!}',
-              columns: [
-                { data: 'id', name: 'id'},
-                { data: 'area', name: 'area'},
-                @foreach($categories as $category)
-                {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
-                @endforeach
-              ],
-              "scrollX":        true, 
-              "scrollCollapse": true,
-          });
-      });
+        $('#reportTableArea').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{!! route('availability.dataArea') !!}',
+            drawCallback: function(){
+              $("#btnDownloadXLSAll").attr("target-url","{{ route('availability.exportXLS') }}");
+              $("#btnDownloadXLS").attr("target-url","{{ route('availability.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
+            },
+            columns: [
+              { data: 'id', name: 'id'},
+              { data: 'area', name: 'area'},
+              @foreach($categories as $category)
+              {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
+              @endforeach
+            ],
+            "scrollX":        true, 
+            "scrollCollapse": true,
+        });
 
+        $('#reportTableAccount').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{!! route('availability.dataAccount') !!}',
+            drawCallback: function(){
+              $("#btnDownloadXLSAll").attr("target-url","{{ route('availability.exportXLS') }}");
+              $("#btnDownloadXLS").attr("target-url","{{ route('availability.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
+            },
+            columns: [
+              { data: 'id', name: 'id'},
+              { data: 'area', name: 'area'},
+              @foreach($categories as $category)
+              {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
+              @endforeach
+            ],
+            "scrollX":        true, 
+            "scrollCollapse": true,
+        });
+
+      });
   </script>
 @endsection
