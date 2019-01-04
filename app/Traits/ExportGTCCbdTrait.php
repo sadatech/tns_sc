@@ -18,6 +18,7 @@ trait ExportGTCCbdTrait
 	];
 
 	private $valueList 	= [];
+	private $photoList 	= [];
 	private $tempVar 	= [];
 
 	public function GTCCbdExportTrait($filters, $filecode)
@@ -49,21 +50,35 @@ trait ExportGTCCbdTrait
 			return $q->whereIdOutlet($this->tempVar['filters']['outlet']);
 		});
 
-		foreach ($data->get() as $d)
+		foreach ($data->get() as $a => $d)
 		{
 			if ($this->tempVar['filters']['new'] != '') {
-				$this->valueList[] = [$d->employee->name, $d->outlet->name, $d->date, "PHOTO",
-				$d->total_hanger, 
-				$d->outlet_type, 
-				$d->cbd_position,
-				$d->cbd_competitor,
-				$d->cbd_competitor_detail,
-				$d->posm_poster,
-				$d->posm_hangering_mobile,
-				$d->posm_others,
-				$d->posm_shop_sign];
+				$this->valueList[$a] = [
+					$d->employee->name,
+					$d->outlet->name,
+					$d->date,
+					"",
+					$d->total_hanger, 
+					$d->outlet_type, 
+					$d->cbd_position,
+					$d->cbd_competitor,
+					$d->cbd_competitor_detail,
+					$d->posm_poster,
+					$d->posm_hangering_mobile,
+					$d->posm_others,
+					$d->posm_shop_sign,
+				];
+
+				$this->photoList[$a] = $d->photo;
+
 			}else{
-				$this->valueList[] = [$d->employee->name, $d->outlet->name, $d->date, "PHOTO"];
+				$this->valueList[$a] = [
+					$d->employee->name,
+					$d->outlet->name,
+					$d->date,
+				];
+
+				$this->photoList[$a] = $d->photo;
 			}
 		}
 	}
@@ -120,11 +135,21 @@ trait ExportGTCCbdTrait
 
         		// row 2++
 				$startTLRow = 2;
-				foreach ($this->valueList as $valueTLData) {
+				foreach ($this->valueList as $valueTLKey => $valueTLData) {
 					$sheet->row($startTLRow, $valueTLData);
 					$sheet->row($startTLRow, function($row){
 						$row->setFontSize(12);
 					});
+
+	            	$imgDrawing = new PHPExcel_Worksheet_Drawing;
+	            	if (isset($this->photoList[$valueTLKey]))
+	            	{
+	            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
+	            		$imgDrawing->setCoordinates("D".($startTLRow));
+	            		$imgDrawing->setWorksheet($sheet);
+	            		$imgDrawing->setWidth(40);
+	            	}
+
 					$startTLRow++;
 				}
 
