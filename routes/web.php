@@ -468,6 +468,7 @@ Route::prefix('target')->group(function () {
 		Route::put('/update/{id}', 'TargetController@update')->name('mtc.update')->middleware('auth');
 		Route::get('/delete/{id}', 'TargetController@delete')->name('mtc.delete')->middleware('auth');
 		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('mtc.download-sample')->middleware('auth');
+		Route::any('/export', 'TargetController@exportXLS')->name('mtc.exportXLS')->middleware('auth');
 	});
 
 	Route::prefix('dc')->group(function () {
