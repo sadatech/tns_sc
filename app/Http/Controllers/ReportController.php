@@ -1194,10 +1194,10 @@ class ReportController extends Controller
                 ->when($request->has('employee'), function ($q) use ($request){
                     return $q->where('display_shares.id_employee',$request->input('employee'));
                 })
-                // ->when($request->has('periode'), function ($q) use ($request){
-                //     return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
-                //     ->whereYear('date', substr($request->input('periode'), 3));
-                // })
+                ->when($request->has('periode'), function ($q) use ($request){
+                    return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+                    ->whereYear('date', substr($request->input('periode'), 3));
+                })
                 ->when(!empty($request->input('store')), function ($q) use ($request){
                     return $q->where('id_store', $request->input('store'));
                 })
@@ -1533,7 +1533,8 @@ class ReportController extends Controller
         return view('report.additional-display');
     }
 
-    public function additionalDisplaySpgData(){
+    public function additionalDisplaySpgData(Request $request)
+    {
 
         $datas = AdditionalDisplay::where('additional_displays.deleted_at', null)
                 ->join("stores", "additional_displays.id_store", "=", "stores.id")
@@ -1545,6 +1546,19 @@ class ReportController extends Controller
                 ->join("employees", "additional_displays.id_employee", "=", "employees.id")
                 ->leftjoin("detail_additional_displays", "additional_displays.id", "=", "detail_additional_displays.id_additional_display")
                 ->join("jenis_displays", "detail_additional_displays.id_jenis_display", "=", "jenis_displays.id")
+                ->when($request->has('employee'), function ($q) use ($request){
+                    return $q->where('additional_displays.id_employee',$request->input('employee'));
+                })
+                ->when($request->has('periode'), function ($q) use ($request){
+                    return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+                    ->whereYear('date', substr($request->input('periode'), 3));
+                })
+                ->when(!empty($request->input('store')), function ($q) use ($request){
+                    return $q->where('id_store', $request->input('store'));
+                })
+                ->when($request->has('area'), function ($q) use ($request){
+                    return $q->where('id_area', $request->input('area'));
+                })
                 ->select(
                     'additional_displays.*',
                     'stores.name1 as store_name',

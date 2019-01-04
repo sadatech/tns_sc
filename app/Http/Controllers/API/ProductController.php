@@ -142,7 +142,7 @@ class ProductController extends Controller
 										->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
 										->join('categories','sub_categories.id_category','categories.id')
 										->where('categories.id',$cat)
-										->select('product_competitors.*', 'categories.name as category_name', 'brands.id as brand_name')->get();
+										->select('product_competitors.*', 'categories.name as category_name', 'brands.name as brand_name')->get();
 
 		return response()->json($competitor);
 	}
@@ -154,7 +154,7 @@ class ProductController extends Controller
 										->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
 										->join('categories','sub_categories.id_category','categories.id')
 										->where('categories.id',$cat)
-										->select('product_competitors.*', 'categories.name as category_name', 'brands.id as brand_name')->get();
+										->select('product_competitors.*', 'categories.name as category_name', 'brands.name as brand_name')->get();
 
 		return response()->json($competitor);
 	}
