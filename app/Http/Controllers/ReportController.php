@@ -54,6 +54,7 @@ use App\DistributionDetail;
 use App\DistributionMotoricDetail;
 use App\SalesMd as SalesMD;
 use App\Cbd;
+use App\NewCbd;
 use App\JobTrace;
 use App\Jobs\ExportJob;
 use App\Jobs\ExportSPGPasarAchievementJob;
@@ -62,6 +63,7 @@ use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
 use App\Jobs\ExportMTCAchievementJob;
+use App\Jobs\ExportGTCCbdJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -682,6 +684,35 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterEmployee, $filterOutlet, $new = '')
+    {
+        $filters['month']       = $filterMonth;
+        $filters['year']        = $filterYear;
+        $filters['employee']    = $filterEmployee;
+        $filters['outlet']      = $filterOutlet;
+        $filters['new']         = $new;
+        
+        $result = DB::transaction(function() use ($filters){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "GTC - CBD " . Carbon::parse('1/'.$filters['month'].'/'.$filters['year'])->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportGTCCbdJob($JobTrace, $filters, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
 
     // *********** STOCK ****************** //
 
@@ -1144,8 +1175,8 @@ class ReportController extends Controller
         return view('report.display-share-raw', $data);
     }
 
-    public function displayShareSpgData(){
-
+    public function displayShareSpgData(Request $request)
+    {
         $categories = Category::get();
         $brands = Brand::get();
 
@@ -1160,6 +1191,19 @@ class ReportController extends Controller
                 ->join("employees", "display_shares.id_employee", "=", "employees.id")
                 ->leftjoin("detail_display_shares", "display_shares.id", "=", "detail_display_shares.id_display_share")
                 ->groupby('display_shares.id_store')
+                ->when($request->has('employee'), function ($q) use ($request){
+                    return $q->where('display_shares.id_employee',$request->input('employee'));
+                })
+                // ->when($request->has('periode'), function ($q) use ($request){
+                //     return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+                //     ->whereYear('date', substr($request->input('periode'), 3));
+                // })
+                ->when(!empty($request->input('store')), function ($q) use ($request){
+                    return $q->where('id_store', $request->input('store'));
+                })
+                ->when($request->has('area'), function ($q) use ($request){
+                    return $q->where('id_area', $request->input('area'));
+                })
                 ->select(
                     'display_shares.*',
                     'stores.name1 as store_name',
@@ -2747,6 +2791,39 @@ class ReportController extends Controller
             ->whereYear('date', substr($request->input('periode'), 3));
         })
         ->when($request->has('outlet'), function ($q) use ($request){
+            return $q->where('id_outlet', $request->input('outlet'));
+        })->get();
+
+        $data = array();
+        $id = 1;
+        foreach ($cbd as $val) {
+            if ($val->employee->position->level == 'mdgtc'){
+                $data[] = array(
+                    'id'            => $id++,
+                    'outlet'        => $val->outlet->name,
+                    'employee'      => $val->employee->name,
+                    'date'          => $val->date,
+                    'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                );
+            }
+        }
+
+        $dt = Datatables::of(collect($data));
+        
+        return $dt->rawColumns(['photo'])->make(true);
+    }
+
+    public function SMDNewCbd(Request $request)
+    {
+        $cbd = NewCbd::orderBy('created_at', 'DESC')->with(['employee','outlet'])
+        ->when($request->has('employee'), function ($q) use ($request){
+            return $q->whereIdEmployee($request->input('employee'));
+        })
+        ->when($request->has('periode'), function ($q) use ($request){
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('outlet'), function ($q) use ($request){
             $q->whereHas('outlet', function($q2) use ($request){
                 return $q2->where('id_outlet', $request->input('outlet'));
             });
@@ -2762,6 +2839,15 @@ class ReportController extends Controller
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                    'posm_shop_sign'        => $val->posm_shop_sign,
+                    'posm_others'           => $val->posm_others,
+                    'posm_hangering_mobile' => $val->posm_hangering_mobile,
+                    'posm_poster'           => $val->posm_poster,
+                    'cbd_competitor_detail' => $val->cbd_competitor_detail,
+                    'cbd_competitor'        => $val->cbd_competitor,
+                    'cbd_position'          => $val->cbd_position,
+                    'outlet_type'           => $val->outlet_type,
+                    'total_hanger'          => $val->total_hanger,
                 );
             }
         }

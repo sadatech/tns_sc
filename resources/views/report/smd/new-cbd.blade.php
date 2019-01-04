@@ -49,6 +49,7 @@
           </h3>
           <div class="block-option">
             <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
@@ -59,6 +60,15 @@
               <th>Outlet</th>
               <th>Date</th>
               <th>Photo</th>
+              <th>Total Hanger</th>
+              <th>Outlet Type</th>
+              <th>CBD Position</th>
+              <th>CBD Competitor</th>
+              <th>CBD Competitor Detail</th>
+              <th>POSM Poster</th>
+              <th>POSM Hangering Mobile</th>
+              <th>POSM Others</th>
+              <th>POSM Shop Sign</th>
             </tr>
           </thead>
         </table>
@@ -94,7 +104,7 @@ table.table thead tr th {
 <script type="text/javascript">
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
+    $('#filterEmployee,#filterOutlet').val(null).trigger('change');
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
@@ -125,7 +135,7 @@ table.table thead tr th {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
-
+  
   /**
    * Download OnClick
    */
@@ -146,7 +156,7 @@ table.table thead tr th {
     Codebase.layout('header_loader_on');
     e.preventDefault();
     var table = null;
-    var url = '{!! route('data.smd.cbd') !!}';
+    var url = '{!! route('data.smd.new-cbd') !!}';
     table = $('#category').DataTable({
       processing: true,
       serverSide: true,
@@ -176,7 +186,7 @@ table.table thead tr th {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val());
+        $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/new");
       },
       columns: [
       { data: 'id' },
@@ -184,6 +194,15 @@ table.table thead tr th {
       { data: 'outlet' },
       { data: 'date' },
       { data: 'photo' },
+      { data: 'total_hanger' },
+      { data: 'outlet_type' },
+      { data: 'cbd_position' },
+      { data: 'cbd_competitor' },
+      { data: 'cbd_competitor_detail' },
+      { data: 'posm_poster' },
+      { data: 'posm_hangering_mobile' },
+      { data: 'posm_others' },
+      { data: 'posm_shop_sign' },
       ],
       bDestroy: true
     });
