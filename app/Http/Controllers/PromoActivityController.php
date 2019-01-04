@@ -90,12 +90,12 @@ class PromoActivityController extends Controller
     //         if($request->hasFile('file')){
     //             $file = $request->file('file')->getRealPath();
     //             $ext = '';
-                
+
     //             Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
     //                 {
     //                     foreach($results as $row)
     //                     {
-                         
+
     //                      Promo::create([
     //                         'id_employee' => $row->id_employee,
     //                         'id_store' => $row->id_store,
@@ -135,7 +135,7 @@ class PromoActivityController extends Controller
     //     }
     // }
 
-    public function data()
+    public function data(Request $request)
     {
            // $pk = DB::table('promo_details')
            //  ->join('promos', 'promo_details.id_promo', '=', 'promos.id')
@@ -145,12 +145,45 @@ class PromoActivityController extends Controller
            //  ->join('brands', 'promos.id_brand', '=', 'brands.id')
            //    ->select('promo_details.*', 'employees.name', 'stores.name1', 'brands.name', 'products.name');
         $promoDetail = PromoDetail::with(['promo', 'product'])
+        ->when($request->has('product'), function ($q) use ($request){
+            return $q->where('id_product',$request->input('product'));
+        })
+        ->when($request->has('employee'), function ($q) use ($request){
+            return $q->whereHas('promo', function($q2) use ($request)
+            {
+                return $q2->where('id_employee',$request->input('employee'));
+            });
+        })
+        ->when($request->has('begin_periode'), function ($q) use ($request){
+            return $q->whereDate('start_date', '>=', Carbon::parse('1/'.$request->input('begin_periode'))->format('Y-m-d'));
+        })
+        ->when($request->has('end_periode'), function ($q) use ($request){
+            return $q->whereDate('end_date', '<=', Carbon::parse('1/'.$request->input('end_periode'))->endOfMonth()->format('Y-m-d'));
+        })
+        ->when(!empty($request->input('store')), function ($q) use ($request){
+            return $q->whereHas('promo', function($q2) use ($request)
+            {
+                return $q2->where('id_store', $request->input('store'));
+            });
+        })
+        ->when($request->has('area'), function ($q) use ($request){
+            return $q->whereHas('promo', function($q2) use ($request)
+            {
+                return $q2->whereHas('store', function($q3) use ($request)
+                {
+                    return $q3->whereHas('subarea', function($q4) use ($request)
+                    {
+                        return $q4->where('id_area', $request->input('area'));
+                    });
+                });
+            });
+        })
         ->select('promo_details.*');
         return Datatables::of($promoDetail)
         
         ->addColumn('action', function ($promoDetail) {
-            return "<a href=".route('ubah.pk', $promoDetail->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-            <button data-url=".route('pk.delete', $promoDetail->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            return "<a href=".route('ubah.pa', $promoDetail->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+            <button data-url=".route('pa.delete', $promoDetail->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })
         ->addColumn('images', function($promoDetail) {
 
@@ -160,16 +193,16 @@ class PromoActivityController extends Controller
             <a href=".asset('uploads/promo/'.$promoDetail->promo->image3)." class='btn btn-sm btn-info btn-square popup-image'><i class='si si-picture'></i> Product 3</a>";
         })
         ->addColumn('store', function($promoDetail) {
-        return $promoDetail->promo->store->name1;
+            return $promoDetail->promo->store->name1;
         })
         ->addColumn('employee', function($promoDetail) {
-        return $promoDetail->promo->employee->name;
+            return $promoDetail->promo->employee->name;
         })
         ->addColumn('product', function($promoDetail) {
-        return $promoDetail->product->name;
+            return $promoDetail->product->name;
         })
         ->addColumn('brand', function($promoDetail) {
-        return $promoDetail->promo->brand->name;
+            return $promoDetail->promo->brand->name;
         })
         ->rawColumns(['images', 'action'])
         ->make(true);
@@ -206,11 +239,11 @@ class PromoActivityController extends Controller
         });
     })->export('xlsx');
      return ;
-    }
-    public function update(Request $request, $id)
-    {
+ }
+ public function update(Request $request, $id)
+ {
         //
-    }
+ }
 
     /**
      * Remove the specified resource from storage.
