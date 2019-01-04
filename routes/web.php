@@ -142,7 +142,7 @@ Route::prefix('store')->group(function () {
 		Route::get('/delete/{id}', 'AccountController@delete')->name('account.delete')->middleware('auth');
 		Route::get('/download-template', function()
 		{
-			return response()->download(public_path('assets/AccountImport.xlsx'));
+			return response()->download(public_path('assets/StoreAccountImport.xlsx'));
 		})->name('account.download-template')->middleware('auth');
 	});
 
