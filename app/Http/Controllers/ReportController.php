@@ -1583,16 +1583,17 @@ class ReportController extends Controller
     public function additionalDisplaySpgData(Request $request)
     {
 
-        $datas = AdditionalDisplay::where('additional_displays.deleted_at', null)
-                ->join("stores", "additional_displays.id_store", "=", "stores.id")
-                ->join('sub_areas', 'stores.id_subarea', 'sub_areas.id')
-                ->join('areas', 'sub_areas.id_area', 'areas.id')
-                ->join('regions', 'areas.id_region', 'regions.id')
-                ->leftjoin('employee_sub_areas', 'stores.id', 'employee_sub_areas.id_subarea')
-                ->leftjoin('employees as empl_tl', 'employee_sub_areas.id_employee', 'empl_tl.id')
-                ->join("employees", "additional_displays.id_employee", "=", "employees.id")
-                ->leftjoin("detail_additional_displays", "additional_displays.id", "=", "detail_additional_displays.id_additional_display")
-                ->join("jenis_displays", "detail_additional_displays.id_jenis_display", "=", "jenis_displays.id")
+        $datas = AdditionalDisplay::
+        // where('additional_displays.deleted_at', null)
+        //         ->join("stores", "additional_displays.id_store", "=", "stores.id")
+        //         ->join('sub_areas', 'stores.id_subarea', 'sub_areas.id')
+        //         ->join('areas', 'sub_areas.id_area', 'areas.id')
+        //         ->join('regions', 'areas.id_region', 'regions.id')
+        //         ->leftjoin('employee_sub_areas', 'stores.id', 'employee_sub_areas.id_subarea')
+        //         ->leftjoin('employees as empl_tl', 'employee_sub_areas.id_employee', 'empl_tl.id')
+        //         ->join("employees", "additional_displays.id_employee", "=", "employees.id")
+                leftjoin("detail_additional_displays", "additional_displays.id", "=", "detail_additional_displays.id_additional_display")
+                // ->join("jenis_displays", "detail_additional_displays.id_jenis_display", "=", "jenis_displays.id")
                 ->when($request->has('employee'), function ($q) use ($request){
                     return $q->where('additional_displays.id_employee',$request->input('employee'));
                 })
@@ -1606,19 +1607,20 @@ class ReportController extends Controller
                 ->when($request->has('area'), function ($q) use ($request){
                     return $q->where('id_area', $request->input('area'));
                 })
-                ->select(
-                    'additional_displays.*',
-                    'stores.name1 as store_name',
-                    'employees.name as emp_name',
-                    'jenis_displays.name as jenis_display_name',
-                    'detail_additional_displays.jumlah as jumlah_add',
-                    'detail_additional_displays.foto_additional as foto_Add',
-                    'regions.name as region_name',
-                    'areas.name as area_name',
-                    'empl_tl.name as tl_name',
-                    'employees.status as jabatan'
-                    )
+        //         ->select(
+        //             'additional_displays.*',
+        //             'stores.name1 as store_name',
+        //             'employees.name as emp_name',
+        //             'jenis_displays.name as jenis_display_name',
+        //             'detail_additional_displays.jumlah as jumlah_add',
+        //             'detail_additional_displays.foto_additional as foto_Add',
+        //             'regions.name as region_name',
+        //             'areas.name as area_name',
+        //             'empl_tl.name as tl_name',
+        //             'employees.status as jabatan'
+        //             )
                 ->get();
+                return $datas;
             
         //     $x = 0;
         // foreach($datas as $data)
