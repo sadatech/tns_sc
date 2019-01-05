@@ -64,11 +64,7 @@
               <th>Outlet Type</th>
               <th>CBD Position</th>
               <th>CBD Competitor</th>
-              <th>CBD Competitor Detail</th>
-              <th>POSM Poster</th>
-              <th>POSM Hangering Mobile</th>
-              <th>POSM Others</th>
-              <th>POSM Shop Sign</th>
+              <th>POSM</th>
             </tr>
           </thead>
         </table>
@@ -198,11 +194,7 @@ table.table thead tr th {
       { data: 'outlet_type' },
       { data: 'cbd_position' },
       { data: 'cbd_competitor' },
-      { data: 'cbd_competitor_detail' },
-      { data: 'posm_poster' },
-      { data: 'posm_hangering_mobile' },
-      { data: 'posm_others' },
-      { data: 'posm_shop_sign' },
+      { data: 'posm' },
       ],
       bDestroy: true
     });
