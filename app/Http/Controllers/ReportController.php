@@ -2934,15 +2934,11 @@ class ReportController extends Controller
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
-                    'posm_shop_sign'        => $val->posm_shop_sign,
-                    'posm_others'           => $val->posm_others,
-                    'posm_hangering_mobile' => $val->posm_hangering_mobile,
-                    'posm_poster'           => $val->posm_poster,
-                    'cbd_competitor_detail' => $val->cbd_competitor_detail,
-                    'cbd_competitor'        => $val->cbd_competitor,
-                    'cbd_position'          => $val->cbd_position,
-                    'outlet_type'           => $val->outlet_type,
-                    'total_hanger'          => $val->total_hanger,
+                    'posm'          => $val->posm,
+                    'cbd_competitor'=> $val->cbd_competitor,
+                    'cbd_position'  => $val->cbd_position,
+                    'outlet_type'   => $val->outlet_type,
+                    'total_hanger'  => $val->total_hanger,
                 );
             }
         }
