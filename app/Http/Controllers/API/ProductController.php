@@ -30,9 +30,15 @@ class ProductController extends Controller
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					$product = Product::whereIdBrand($request->input('brand'));
-					$product->when(!empty($request->input('subcategory')), function ($q) use ($request){
+					$product = Product::whereIdBrand($request->input('brand'))
+					->when(!empty($request->input('subcategory')), function ($q) use ($request){
 						return $q->whereIdSubcategory($request->input('subcategory'));
+					})
+					->when(!empty($request->input('category')), function ($q) use ($request){
+						return $q->whereHas('subcategory', function($q2)
+						{
+							return $q->whereIdCategory($request->input('category'));
+						});
 					});
 					if ($product->count() > 0) {
 						$dataArr = array();

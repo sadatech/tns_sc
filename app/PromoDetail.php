@@ -15,6 +15,11 @@ class PromoDetail extends Model
         return $this->belongsTo('App\Product', 'id_product');
     }
 
+    public function productCompetitor()
+    {
+        return $this->belongsTo('App\ProductCompetitor', 'id_product_competitor');
+    }
+
     public function promo()
     {
         return $this->belongsTo('App\Promo', 'id_promo');
