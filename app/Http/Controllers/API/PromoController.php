@@ -21,9 +21,72 @@ class PromoController extends Controller
 
 	public function store(Request $request)
 	{
+		$request = json_decode($request->getContent());
+		
 		$res['code'] = 200;
-		if (empty($request->input('store')) || empty($request->input('product'))) {
+		if (empty($request->store) || empty($request->detail)) {
 			$res['msg']	= "Please select Store and Product.";
+		}else
+		try {
+			DB::transaction(function () use ($request, &$res) {
+				if (!$user = JWTAuth::parseToken()->authenticate()) {
+					$res['success'] = false;
+					$res['msg'] 	= "User not found.";
+				} else {
+					
+					$promo = Promo::create([
+						'id_employee' 	=> $user->id,
+						'id_store' 		=> $request->store,
+						'id_brand' 		=> $request->brand,
+					]);
+					if ($promo) {
+						$res['id'] = $promo->id;
+						$productList = array();
+						foreach ($request->detail as $product) {
+							$productList[] = array(
+								'id_promo' 				=> $promo->id,
+								'id_product' 			=> $product->product,
+								'id_product_competitor'	=> $product->product_competitor,
+								'type' 					=> $product->type,
+								'description' 			=> $product->description,
+								'start_date' 			=> Carbon::parse($product->start_date),
+								'end_date'				=> Carbon::parse($product->end_date),
+								'created_at'    		=> Carbon::now(),
+								'updated_at'    		=> Carbon::now()
+							);
+						}
+						$insert = DB::table('promo_details')->insert($productList);
+						if ($insert) {
+							$res['success'] = true;
+							$res['msg'] 	= "Berhasil menambah promo.";
+						} else {
+							$res['success'] = false;
+							$res['msg'] 	= "Gagal menambah promo.";
+						}
+					}
+				}
+			});
+		} catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			$res['msg'] = "Token Expired.";
+			$res['code']= $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			$res['msg'] = "Token Invalid.";
+			$res['code']= $e->getStatusCode();
+		} catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+			$res['msg'] = "Token Absent.";
+			$res['code']= $e->getStatusCode();
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+		return response()->json($res, $code);
+	}
+
+	public function store_image(Request $request)
+	{
+		$res['code'] = 200;
+		if (empty($request->input('id'))) {
+			$res['msg']	= "Promo ID cannot be empty.";
 		}else
 		try {
 			DB::transaction(function () use ($request, &$res) {
@@ -52,36 +115,18 @@ class PromoController extends Controller
 						$image_compress = Image::make($path.'/'.$imageName3)->orientate();
 						$image_compress->save($path.'/'.$imageName3, 50);
 					}
-					$promo = Promo::create([
-						'id_employee' 	=> $user->id,
-						'id_store' 		=> $request->input('store'),
-						'id_brand' 		=> $request->input('brand'),
+					$promo = Promo::whereId($request->input('id'))->update([
 						'image1' 		=> (isset($imageName)?$imageName:''),
 						'image2' 		=> (isset($imageName2)?$imageName2:''),
 						'image3' 		=> (isset($imageName3)?$imageName3:''),
 					]);
+
 					if ($promo) {
-						$productList = array();
-						foreach ($request->input('product') as $product) {
-							$productList[] = array(
-								'id_promo' 		=> $promo->id,
-								'id_product' 	=> $product['id'],
-								'type' 			=> $product['type'],
-								'description' 	=> $product['description'],
-								'start_date' 	=> Carbon::parse($product['start_date']),
-								'end_date'		=> Carbon::parse($product['end_date']),
-								'created_at'    => Carbon::now(),
-				                'updated_at'    => Carbon::now()
-							);
-						}
-						$insert = DB::table('promo_details')->insert($productList);
-						if ($insert) {
-							$res['success'] = true;
-							$res['msg'] 	= "Berhasil menambah promo.";
-						} else {
-							$res['success'] = false;
-							$res['msg'] 	= "Gagal menambah promo.";
-						}
+						$res['success'] = true;
+						$res['msg'] 	= "Update Success.";
+					} else {
+						$res['success'] = false;
+						$res['msg'] 	= "Update Fail.";
 					}
 				}
 			});

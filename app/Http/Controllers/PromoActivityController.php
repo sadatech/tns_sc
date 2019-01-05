@@ -148,6 +148,9 @@ class PromoActivityController extends Controller
         ->when($request->has('product'), function ($q) use ($request){
             return $q->where('id_product',$request->input('product'));
         })
+        ->when($request->has('product_competitor'), function ($q) use ($request){
+            return $q->where('id_product_competitor',$request->input('product_competitor'));
+        })
         ->when($request->has('employee'), function ($q) use ($request){
             return $q->whereHas('promo', function($q2) use ($request)
             {
@@ -155,10 +158,10 @@ class PromoActivityController extends Controller
             });
         })
         ->when($request->has('begin_periode'), function ($q) use ($request){
-            return $q->whereDate('start_date', '>=', Carbon::parse('1/'.$request->input('begin_periode'))->format('Y-m-d'));
+            return $q->whereDate('start_date', '>=', "'".Carbon::parse('1/'.$request->input('begin_periode'))->format('Y-m-d')."'");
         })
         ->when($request->has('end_periode'), function ($q) use ($request){
-            return $q->whereDate('end_date', '<=', Carbon::parse('1/'.$request->input('end_periode'))->endOfMonth()->format('Y-m-d'));
+            return $q->whereDate('end_date', '<=', "'".Carbon::parse('1/'.$request->input('end_periode'))->endOfMonth()->format('Y-m-d')."'");
         })
         ->when(!empty($request->input('store')), function ($q) use ($request){
             return $q->whereHas('promo', function($q2) use ($request)
@@ -199,7 +202,11 @@ class PromoActivityController extends Controller
             return $promoDetail->promo->employee->name;
         })
         ->addColumn('product', function($promoDetail) {
-            return $promoDetail->product->name;
+            if (!empty($promoDetail->id_product)) {
+                return $promoDetail->product->name;
+            }else{
+                return $promoDetail->productCompetitor->name;
+            }
         })
         ->addColumn('brand', function($promoDetail) {
             return $promoDetail->promo->brand->name;
@@ -229,7 +236,7 @@ class PromoActivityController extends Controller
                     $ok->promo->store->name1, 
                     $ok->promo->employee->name,
                     $ok->promo->brand->name,
-                    $ok->product->name,
+                    (!empty($ok->id_product)?$ok->product->name:$ok->productCompetitor->name),
                     $ok->type,
                     $ok->description,
                     $ok->start_date,

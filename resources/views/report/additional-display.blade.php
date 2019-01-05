@@ -53,7 +53,7 @@
           <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
         </div>
       </div>
-
+      <hr>
       <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
@@ -216,8 +216,8 @@ th, td {
     });
   });
 
-  @if(session('type'))
-  $(document).ready(function() {
+   @if(session('type'))
+   $(document).ready(function() {
     $.notify({
       title: '<strong>{!! session('title') !!}</strong>',
       message: '{!! session('message') !!}'
@@ -234,6 +234,6 @@ th, td {
     });
 
   });
-  @endif
-</script>
-@endsection
+   @endif
+ </script>
+ @endsection
