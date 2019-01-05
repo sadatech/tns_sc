@@ -64,6 +64,7 @@ use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
 use App\Jobs\ExportMTCAchievementJob;
 use App\Jobs\ExportGTCCbdJob;
+use App\Jobs\ExportMTCDisplayShareJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -1265,6 +1266,37 @@ class ReportController extends Controller
 
         return Datatables::of($datas)->make(true);
         // return response()->json($datas);
+    }
+
+    public function displayShareSpgDataExportXLS(Request $request)
+    {
+        $periode     = ($request->periode == "null" || empty($request->periode) ? Carbon::now()->format('m/Y') : $request->periode);
+        $id_employee = ($request->id_employee == "null" || empty($request->id_employee) ? null : $request->id_employee);
+        $id_store    = ($request->id_store == "null" || empty($request->id_store) ? null : $request->id_store);
+        $id_area     = ($request->id_area == "null" || empty($request->id_area) ? null : $request->id_area);
+        $limit       = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($periode, $id_employee, $id_store, $id_area, $limit){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Display Share - " . (is_null($id_employee) ? "All Employee" : Employee::where("id", $id_employee)->first()->name) . " - " . Carbon::parse("01/".$periode)->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCDisplayShareJob($JobTrace, $periode, $id_employee, $id_store, $id_area, $limit, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+
     }
 
 
