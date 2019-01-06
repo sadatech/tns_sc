@@ -65,6 +65,7 @@ use App\Jobs\ExportSMDReportKPIJob;
 use App\Jobs\ExportMTCAchievementJob;
 use App\Jobs\ExportGTCCbdJob;
 use App\Jobs\ExportMTCDisplayShareJob;
+use App\Jobs\ExportMTCAvailabilityJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -1164,9 +1165,12 @@ class ReportController extends Controller
         // return response()->json($data);
     }
 
-    public function availabilityExportXLS()
+    public function availabilityExportXLS(Request $request)
     {
-        $result = DB::transaction(function(){
+        $limitArea    = ($request->get('limitArea') == "null" ? null : $request->get('limitArea'));
+        $limitAccount = ($request->get('limitAccount') == "null" ? null : $request->get('limitAccount'));
+
+        $result = DB::transaction(function() use ($limitArea, $limitAccount){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -1176,7 +1180,7 @@ class ReportController extends Controller
                     'title' => "MTC - Report Availability (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportMTCAvailabilityJob($JobTrace, $periode, $id_employee, $id_store, $id_area, $limit, $filecode));
+                dispatch(new ExportMTCAvailabilityJob($JobTrace, $limitArea, $limitAccount, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)

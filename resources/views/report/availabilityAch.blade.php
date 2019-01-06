@@ -150,6 +150,23 @@
           }
         });
 
+  /**
+   * Download OnClick
+   */
+
+   $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function(){
+    $.ajax({
+      url: $(this).attr("target-url"),
+      type: "post",
+      success: function(e){
+        swal("Success!", e.result, "success");
+      },
+      error: function(){
+        swal("Error!", e.result, "error");
+      }
+    });
+  });
+
         $('#reportTableArea').DataTable({
             processing: true,
             serverSide: true,
