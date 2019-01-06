@@ -206,4 +206,34 @@ class TargetController extends Controller
             'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
         ]);
     }
+
+    public function exportXLS()
+    {
+        $x = Target::with(['store','employee', 'product'])->select('targets.*');
+        if ($x->count() > 0) {
+            foreach ($x->get() as $val) {
+                $data[] = array(
+                    'employee'      => $val->employee->id,
+                    'store'         => $val->store->name1,
+                    'quantity'      => $val->quantity,
+                    'rilis'         => $val->rilis
+                );
+            }
+        
+            $filename = "TargetMtc_".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('TargetMtc', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
 }

@@ -96,6 +96,7 @@ Route::prefix('sales-motoric')->group(function () {
 
 Route::prefix('promo')->group(function () {
 	Route::post('/add', 'API\PromoController@store')->name('api.promo.add');
+	Route::post('/add-image', 'API\PromoController@store_image')->name('api.promo.add');
 });
 
 Route::prefix('dataprice')->group(function () {
@@ -118,6 +119,11 @@ Route::prefix('additional-display')->group(function () {
 Route::prefix('cbd')->group(function () {
 	Route::get('/list', 'API\CbdController@list')->name('api.cbd.list');
 	Route::post('/add', 'API\CbdController@store')->name('api.cbd.add');
+});
+
+Route::prefix('new-cbd')->group(function () {
+	Route::get('/list', 'API\NewCbdController@list')->name('api.new-cbd.list');
+	Route::post('/add', 'API\NewCbdController@store')->name('api.new-cbd.add');
 });
 
 Route::prefix('distribution')->group(function () {
@@ -211,6 +217,7 @@ Route::prefix('history')->group(function () {
 	Route::get('/stockist/{date?}', 'API\HistoryController@stockistHistory')->name('api.stockist-history.list');
 	Route::get('/distribution/{type}/{date?}', 'API\HistoryController@distributionHistory')->name('api.distribution-history.list');
 	Route::get('/cbd/{date?}', 'API\HistoryController@cbdHistory')->name('api.cbd-history.list');
+	Route::get('/new-cbd/{date?}', 'API\HistoryController@newCbdHistory')->name('api.new-cbd-history.list');
 	Route::get('/dc/{type?}/{date?}', 'API\HistoryController@dcHistory')->name('api.dc-history.list');
 	Route::get('/plan/{date?}', 'API\HistoryController@planHistory')->name('api.plan-history.list');
 	Route::get('/documentation/{date?}', 'API\HistoryController@documentationHistory')->name('api.documentation-history.list');

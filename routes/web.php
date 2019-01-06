@@ -142,7 +142,7 @@ Route::prefix('store')->group(function () {
 		Route::get('/delete/{id}', 'AccountController@delete')->name('account.delete')->middleware('auth');
 		Route::get('/download-template', function()
 		{
-			return response()->download(public_path('assets/AccountImport.xlsx'));
+			return response()->download(public_path('assets/StoreAccountImport.xlsx'));
 		})->name('account.download-template')->middleware('auth');
 	});
 
@@ -468,6 +468,7 @@ Route::prefix('target')->group(function () {
 		Route::put('/update/{id}', 'TargetController@update')->name('mtc.update')->middleware('auth');
 		Route::get('/delete/{id}', 'TargetController@delete')->name('mtc.delete')->middleware('auth');
 		Route::get('/sample-form/download/{employee_id}', 'TargetController@downloadSampleForm')->name('mtc.download-sample')->middleware('auth');
+		Route::any('/export', 'TargetController@exportXLS')->name('mtc.exportXLS')->middleware('auth');
 	});
 
 	Route::prefix('dc')->group(function () {
@@ -646,7 +647,15 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.cbd', $data);
 				})->name('report.cbd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDcbd')->name('data.smd.cbd')->middleware('auth');
-				Route::get('/export', 'ReportController@exportSMDcbd')->name('export.smd.cbd')->middleware('auth');
+				Route::post('/export/{month?}/{year?}/{employee?}/{outlet?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.cbd')->middleware('auth');
+			});
+
+			Route::prefix('new-cbd')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.new-cbd');
+				})->name('report.new-cbd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
+				Route::post('/export/{month?}/{year?}/{employee?}/{outlet?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -902,17 +911,19 @@ Route::prefix('mtc')->group(function () {
 	});
 	
 	Route::prefix('display_share')->group(function () {
+
 		Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
-			// Route::get('/dataArea', 'ReportController@displayShareAreaData')->name('display_share.dataArea')->middleware('auth');
+
 		Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
+		Route::any('/dataSpg/exportXLS', 'ReportController@displayShareSpgDataExportXLS')->name('display_share.dataSpg.exportXLS')->middleware('auth');
+
 		Route::get('/ach', 'ReportController@displayShareAch')->name('display_share.ach')->middleware('auth');
 		Route::get('/reportDataArea', 'ReportController@displayShareReportAreaData')->name('display_share.reportDataArea')->middleware('auth');
 		Route::get('/reportDataSpg', 'ReportController@displayShareReportSpgData')->name('display_share.reportDataSpg')->middleware('auth');
 		Route::get('/reportDataMd', 'ReportController@displayShareReportMdData')->name('display_share.reportDataMd')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
-		Route::get('/download-template', function()
-		{
+		Route::get('/download-template', function(){
 			return response()->download(public_path('assets/SellinImport.xlsx'));
 		})->name('SellIn.download-template')->middleware('auth');
 	});

@@ -21,6 +21,7 @@ trait ExportMTCAchievementTrait
 	private $valueList = [];
 	private $tempVar = [];
 
+
 	public function MTCAchievementExportTrait($filterPeriode, $filecode)
 	{
 		$this->tempVar['periode'] = $filterPeriode;
@@ -258,5 +259,4 @@ trait ExportMTCAchievementTrait
 
 		return asset("export/report") . "/" . $filename . ".xlsx";
 	}
-
 }

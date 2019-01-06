@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Sales Report - Additional Display")
+@section('title', "Report CBD SMD Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Additional Display <small>Report</small></h2>
+  <h2 class="content-heading pt-10">CBD SMD Pasar <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -20,20 +20,16 @@
         <form method="post" id="filter">
           <div class="row">
             <div class="col-md-4">
+              <label>Periode:</label>
+              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}" required>
+            </div>
+            <div class="col-md-4">
               <label>Employee:</label>
               <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
             <div class="col-md-4">
-              <label>Store:</label>
-              <select class="form-control" id="filterStore" name="store"></select>
-            </div>
-            <div class="col-md-4">
-              <label>Area:</label>
-              <select class="form-control" id="filterArea" name="area"></select>
-            </div>
-            <div class="col-md-4">
-              <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}" required>
+              <label>Outlet:</label>
+              <select class="form-control" id="filterOutlet" name="outlet"></select>
             </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
@@ -42,40 +38,40 @@
       </div>
     </div>
   </div>
-  <div class="block block-themed" id="table-block" style="display: none">
+  <div class="block block-themed" id="table-block" style="display: none"> 
     <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
       <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
-        <div class="block-option">
-          <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-          <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
-        </div>
-      </div>
-      <hr>
-      <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
-        <thead>
-          <th class="text-center" style="width: 70px;"></th>
-          <th>Region</th>
-          <th>Area</th>
-          <th>TL</th>
-          <th>Jabatan</th>
-          <th>Name</th>
-          <th>Store</th>
-          <th>Waktu</th>
-          <th>Jenis Display</th>
-          <th>Jumalah Add</th>
-          <th>Foto</th>
-        </thead>
-      </table>
+        <div class="block-header p-0 mb-20">
+          <h3 class="block-title">
+          </h3>
+          <div class="block-option">
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
 
+          </div>
+        </div>
+        <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 70px;"></th>
+              <th>Employee</th>
+              <th>Outlet</th>
+              <th>Date</th>
+              <th>Photo</th>
+              <th>Total Hanger</th>
+              <th>Outlet Type</th>
+              <th>CBD Position</th>
+              <th>CBD Competitor</th>
+              <th>POSM</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
     </div>
   </div>
 </div>
-</div>
-
-
 @endsection
 
 @section('css')
@@ -83,29 +79,28 @@
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
-[data-notify="container"] 
-{
+[data-notify="container"] {
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
-th, td {
-  white-space: nowrap;
+table.table thead tr th:first-child {
+  min-width: 5px;
+}
+table.table thead tr th {
+  min-width: 200px;
 }
 </style>
 @endsection
 
 @section('script')
 <script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-<script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    setTimeout(function() {
-      $('#filterEmployee,#filterStore,#filterArea').val(null).trigger('change');
-    }, 10);
+    $('#filterEmployee,#filterOutlet').val(null).trigger('change');
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
@@ -116,21 +111,12 @@ th, td {
       })
     }
   }));
-  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+  $('#filterOutlet').select2(setOptions('{{ route("outlet-select2") }}', 'Choose your Outlet', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {
       results: $.map(data, function (obj) {                                
         return {id: obj.id, text: obj.name}
-      })
-    }
-  }));
-  $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Choose your Store', function (params) {
-    return filterData('store', params.term);
-  }, function (data, params) {
-    return {
-      results: $.map(data, function (obj) {                                
-        return {id: obj.id, text: obj.name1}
       })
     }
   }));
@@ -145,12 +131,11 @@ th, td {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
-
+  
   /**
    * Download OnClick
    */
-
-   $("#btnDownloadXLS").on("click", function(){
+  $("#btnDownloadXLS").on("click", function(){
     $.ajax({
       url: $(this).attr("target-url"),
       type: "post",
@@ -163,19 +148,19 @@ th, td {
     });
   });
 
-   $('#filter').submit(function(e) {
+  $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
     var table = null;
-    var url = '{!! route('additional_display.dataSpg') !!}';
-    table = $('#reportTable').DataTable({
+    var url = '{!! route('data.smd.new-cbd') !!}';
+    table = $('#category').DataTable({
       processing: true,
       serverSide: true,
       scrollX: true,
       scrollY: "300px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         dataSrc: function(res) {
           Codebase.layout('header_loader_off');
@@ -197,43 +182,22 @@ th, td {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        // $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterStore").val()+"/new");
+        $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/new");
       },
       columns: [
-      { data: 'id', name: 'id', visible: false},
-      { data: 'region_name', name: 'region_name'},
-      { data: 'area_name', name: 'area_name'},
-      { data: 'tl_name', name: 'tl_name'},
-      { data: 'jabatan', name: 'jabatan'},
-      { data: 'emp_name', name: 'emp_name'},
-      { data: 'store_name', name: 'store_name'},
-      { data: 'date', name: 'date'},
-      { data: 'jenis_display_name', name: 'jenis_display_name'},
-      { data: 'jumlah_add', name: 'jumlah_add'},
-      { data: 'foto_Add', name: 'foto_Add'},
+      { data: 'id' },
+      { data: 'employee' },
+      { data: 'outlet' },
+      { data: 'date' },
+      { data: 'photo' },
+      { data: 'total_hanger' },
+      { data: 'outlet_type' },
+      { data: 'cbd_position' },
+      { data: 'cbd_competitor' },
+      { data: 'posm' },
       ],
       bDestroy: true
     });
   });
-
-   @if(session('type'))
-   $(document).ready(function() {
-    $.notify({
-      title: '<strong>{!! session('title') !!}</strong>',
-      message: '{!! session('message') !!}'
-    }, {
-      type: '{!! session('type') !!}',
-      animate: {
-        enter: 'animated zoomInDown',
-        exit: 'animated zoomOutUp'
-      },
-      placement: {
-        from: 'top',
-        align: 'center'
-      }
-    });
-
-  });
-   @endif
- </script>
- @endsection
+</script>
+@endsection

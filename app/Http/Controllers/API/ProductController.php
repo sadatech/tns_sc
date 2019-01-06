@@ -30,9 +30,15 @@ class ProductController extends Controller
 				if (!$user = JWTAuth::parseToken()->authenticate()) {
 					$res['msg'] = "User not found.";
 				} else {
-					$product = Product::whereIdBrand($request->input('brand'));
-					$product->when(!empty($request->input('subcategory')), function ($q) use ($request){
+					$product = Product::whereIdBrand($request->input('brand'))
+					->when(!empty($request->input('subcategory')), function ($q) use ($request){
 						return $q->whereIdSubcategory($request->input('subcategory'));
+					})
+					->when(!empty($request->input('category')), function ($q) use ($request){
+						return $q->whereHas('subcategory', function($q2)
+						{
+							return $q->whereIdCategory($request->input('category'));
+						});
 					});
 					if ($product->count() > 0) {
 						$dataArr = array();
@@ -142,7 +148,7 @@ class ProductController extends Controller
 										->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
 										->join('categories','sub_categories.id_category','categories.id')
 										->where('categories.id',$cat)
-										->select('product_competitors.*', 'categories.name as category_name', 'brands.id as brand_name')->get();
+										->select('product_competitors.*', 'categories.name as category_name', 'brands.name as brand_name')->get();
 
 		return response()->json($competitor);
 	}
@@ -154,7 +160,7 @@ class ProductController extends Controller
 										->join('sub_categories','product_competitors.id_subcategory','sub_categories.id')
 										->join('categories','sub_categories.id_category','categories.id')
 										->where('categories.id',$cat)
-										->select('product_competitors.*', 'categories.name as category_name', 'brands.id as brand_name')->get();
+										->select('product_competitors.*', 'categories.name as category_name', 'brands.name as brand_name')->get();
 
 		return response()->json($competitor);
 	}

@@ -100,7 +100,7 @@ class AccountController extends Controller
 		        	->with([
 		        		'type'    => 'success',
 		        		'title'   => 'Sukses!<br/>',
-		        		'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah channel!'
+		        		'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah account!'
 		        	]);
             } else {
                 return redirect()->back()
