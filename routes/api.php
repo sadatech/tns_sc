@@ -96,6 +96,7 @@ Route::prefix('sales-motoric')->group(function () {
 
 Route::prefix('promo')->group(function () {
 	Route::post('/add', 'API\PromoController@store')->name('api.promo.add');
+	Route::post('/add-image', 'API\PromoController@store_image')->name('api.promo.add');
 });
 
 Route::prefix('dataprice')->group(function () {

@@ -1059,7 +1059,16 @@ class ReportController extends Controller
         return view('report.availabilityAch', $data);
     }
 
-    public function availabilityAreaData(){
+    public function availabilityAreaData(Request $request){
+        
+        if (!empty($request->input('periode'))) {
+            $date = explode('/', $request->input('periode'));
+            $year   = $date[1];
+            $month  = $date[0];
+        }else{
+            $year   = Carbon::now()->format('Y');
+            $month  = Carbon::now()->format('m');
+        }
 
         $categories = Category::get();
         $areas = Area::get();
@@ -1083,6 +1092,7 @@ class ReportController extends Controller
                     JOIN categories c ON sc.id_category = c.id
                     WHERE c.id = '".$category->id."'
                     AND ar.id = '".$area->id."'
+                    AND year(`date`) = ".$year." and month(`date`) = ".$month."
                     ")[0]->data_count * 1;
                 $totalProductAvailability = DB::select(
                     "
@@ -1097,6 +1107,7 @@ class ReportController extends Controller
                     JOIN categories c ON sc.id_category = c.id
                     WHERE c.id = '".$category->id."'
                     AND ar.id = '".$area->id."'
+                    AND year(`date`) = ".$year." and month(`date`) = ".$month."
                     AND dv.available = 1
                     ")[0]->data_count * 1;
                 // return response()->json(round($totalProductAvailability / $totalProduct, 2) * 100);
@@ -1114,7 +1125,16 @@ class ReportController extends Controller
         // return response()->json($data);
     }
 
-    public function availabilityAccountData(){
+    public function availabilityAccountData(Request $request){
+        
+        if (!empty($request->input('periode'))) {
+            $date = explode('/', $request->input('periode'));
+            $year   = $date[1];
+            $month  = $date[0];
+        }else{
+            $year   = Carbon::now()->format('Y');
+            $month  = Carbon::now()->format('m');
+        }
 
         $categories = Category::get();
         $accounts = Account::get();
@@ -1137,6 +1157,7 @@ class ReportController extends Controller
                     JOIN categories c ON sc.id_category = c.id
                     WHERE c.id = '".$category->id."'
                     AND ac.id = '".$account->id."'
+                    AND year(`date`) = ".$year." and month(`date`) = ".$month."
                     ")[0]->data_count * 1;
                 $totalProductAvailability = DB::select(
                     "
@@ -1150,6 +1171,7 @@ class ReportController extends Controller
                     JOIN categories c ON sc.id_category = c.id
                     WHERE c.id = '".$category->id."'
                     AND ac.id = '".$account->id."'
+                    AND year(`date`) = ".$year." and month(`date`) = ".$month."
                     AND dv.available = 1
                     ")[0]->data_count * 1;
                 // return response()->json(round($totalProductAvailability / $totalProduct, 2) * 100);
@@ -1312,9 +1334,17 @@ class ReportController extends Controller
         return view('report.display-share-ach');
     }
 
-    public function displayShareReportAreaData(){
-
-        $mount = Carbon::now();
+    public function displayShareReportAreaData(Request $request){
+        
+        if (!empty($request->input('periode'))) {
+            $date   = explode('/', $request->input('periode'));
+            $year   = $date[1];
+            $month  = $date[0];
+        }else{
+            $date   = Carbon::now();
+            $year   = $date->format('Y');
+            $month  = $date->format('m');
+        }
 
         $datas = Employee::where('id_position','6')
                         ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
@@ -1330,8 +1360,8 @@ class ReportController extends Controller
 
             $dataActuals = Store::where('stores.id_subarea',$data->id_sub_area)
                                 ->join('display_shares','stores.id','display_shares.id_store')
-                                ->whereMonth('display_shares.date', $mount->format('m'))
-                                ->whereYear('display_shares.date', $mount->format('Y'))
+                                ->whereMonth('display_shares.date', $month)
+                                ->whereYear('display_shares.date', $year)
                                 ->groupby('display_shares.id_store')
                                 ->pluck('display_shares.id');
             $categoryTB = 1;
@@ -1405,9 +1435,18 @@ class ReportController extends Controller
         // ->make(true);
     }
 
-    public function displayShareReportSpgData(){
+    public function displayShareReportSpgData(Request $request){
+        
+        if (!empty($request->input('periode'))) {
+            $date   = explode('/', $request->input('periode'));
+            $year   = $date[1];
+            $month  = $date[0];
+        }else{
+            $date   = Carbon::now();
+            $year   = $date->format('Y');
+            $month  = $date->format('m');
+        }
 
-        $mount = Carbon::now();
         $datas = Employee::where('id_position','1')
                         ->select('employees.id','employees.name')->get();
         foreach ($datas as $data) {
@@ -1421,8 +1460,8 @@ class ReportController extends Controller
 
             $dataActuals = EmployeeStore::where('employee_stores.id_employee',$data->id)
                                 ->join('display_shares','employee_stores.id_store','display_shares.id_store')
-                                ->whereMonth('display_shares.date', $mount->format('m'))
-                                ->whereYear('display_shares.date', $mount->format('Y'))
+                                ->whereMonth('display_shares.date', $month)
+                                ->whereYear('display_shares.date', $year)
                                 ->groupby('display_shares.id_store')
                                 ->pluck('display_shares.id');
             $categoryTB = 1;
@@ -1458,7 +1497,7 @@ class ReportController extends Controller
                     $actualPF = clone $actualDS;
                     $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
                     $actualPF = $actualPF->where('id_category',$categoryPF)->first();
-                    $data['tierPF'] = $actualPF->tier;
+                    $data['tierPF'] = $actualPF->tier?? '';
                     $data['tierSumPF'] = $actualTotal;
 
                     if ($data['tierSumPF'] == 0) {
@@ -1496,9 +1535,17 @@ class ReportController extends Controller
         // ->make(true);
     }
 
-    public function displayShareReportMdData(){
-
-        $mount = Carbon::now();
+    public function displayShareReportMdData(Request $request){
+        
+        if (!empty($request->input('periode'))) {
+            $date   = explode('/', $request->input('periode'));
+            $year   = $date[1];
+            $month  = $date[0];
+        }else{
+            $date   = Carbon::now();
+            $year   = $date->format('Y');
+            $month  = $date->format('m');
+        }
 
         $datas = Employee::where('id_position','2')
                         ->select('employees.id','employees.name')->get();
@@ -1514,8 +1561,8 @@ class ReportController extends Controller
 
             $dataActuals = EmployeeStore::where('employee_stores.id_employee',$data->id)
                                 ->join('display_shares','employee_stores.id_store','display_shares.id_store')
-                                ->whereMonth('display_shares.date', $mount->format('m'))
-                                ->whereYear('display_shares.date', $mount->format('Y'))
+                                ->whereMonth('display_shares.date', $month)
+                                ->whereYear('display_shares.date', $year)
                                 ->groupby('display_shares.id_store')
                                 ->pluck('display_shares.id');
             $categoryTB = 1;
@@ -1550,7 +1597,7 @@ class ReportController extends Controller
                     $actualPF = clone $actualDS;
                     $actualTotal = $actualPF->where('id_category',$categoryPF)->sum('tier');
                     $actualPF = $actualPF->where('id_category',$categoryPF)->first();
-                    $data['tierPF'] = $actualPF->tier;
+                    $data['tierPF'] = $actualPF->tier?? '';
                     $data['tierSumPF'] = $actualTotal;
 
                     if ($data['tierSumPF'] == 0) {
@@ -1626,16 +1673,17 @@ class ReportController extends Controller
     public function additionalDisplaySpgData(Request $request)
     {
 
-        $datas = AdditionalDisplay::where('additional_displays.deleted_at', null)
-                ->join("stores", "additional_displays.id_store", "=", "stores.id")
-                ->join('sub_areas', 'stores.id_subarea', 'sub_areas.id')
-                ->join('areas', 'sub_areas.id_area', 'areas.id')
-                ->join('regions', 'areas.id_region', 'regions.id')
-                ->leftjoin('employee_sub_areas', 'stores.id', 'employee_sub_areas.id_subarea')
-                ->leftjoin('employees as empl_tl', 'employee_sub_areas.id_employee', 'empl_tl.id')
-                ->join("employees", "additional_displays.id_employee", "=", "employees.id")
-                ->leftjoin("detail_additional_displays", "additional_displays.id", "=", "detail_additional_displays.id_additional_display")
-                ->join("jenis_displays", "detail_additional_displays.id_jenis_display", "=", "jenis_displays.id")
+        $datas = AdditionalDisplay::
+        // where('additional_displays.deleted_at', null)
+        //         ->join("stores", "additional_displays.id_store", "=", "stores.id")
+        //         ->join('sub_areas', 'stores.id_subarea', 'sub_areas.id')
+        //         ->join('areas', 'sub_areas.id_area', 'areas.id')
+        //         ->join('regions', 'areas.id_region', 'regions.id')
+        //         ->leftjoin('employee_sub_areas', 'stores.id', 'employee_sub_areas.id_subarea')
+        //         ->leftjoin('employees as empl_tl', 'employee_sub_areas.id_employee', 'empl_tl.id')
+        //         ->join("employees", "additional_displays.id_employee", "=", "employees.id")
+                leftjoin("detail_additional_displays", "additional_displays.id", "=", "detail_additional_displays.id_additional_display")
+                // ->join("jenis_displays", "detail_additional_displays.id_jenis_display", "=", "jenis_displays.id")
                 ->when($request->has('employee'), function ($q) use ($request){
                     return $q->where('additional_displays.id_employee',$request->input('employee'));
                 })
@@ -1649,19 +1697,20 @@ class ReportController extends Controller
                 ->when($request->has('area'), function ($q) use ($request){
                     return $q->where('id_area', $request->input('area'));
                 })
-                ->select(
-                    'additional_displays.*',
-                    'stores.name1 as store_name',
-                    'employees.name as emp_name',
-                    'jenis_displays.name as jenis_display_name',
-                    'detail_additional_displays.jumlah as jumlah_add',
-                    'detail_additional_displays.foto_additional as foto_Add',
-                    'regions.name as region_name',
-                    'areas.name as area_name',
-                    'empl_tl.name as tl_name',
-                    'employees.status as jabatan'
-                    )
+        //         ->select(
+        //             'additional_displays.*',
+        //             'stores.name1 as store_name',
+        //             'employees.name as emp_name',
+        //             'jenis_displays.name as jenis_display_name',
+        //             'detail_additional_displays.jumlah as jumlah_add',
+        //             'detail_additional_displays.foto_additional as foto_Add',
+        //             'regions.name as region_name',
+        //             'areas.name as area_name',
+        //             'empl_tl.name as tl_name',
+        //             'employees.status as jabatan'
+        //             )
                 ->get();
+                return $datas;
             
         //     $x = 0;
         // foreach($datas as $data)
@@ -2971,15 +3020,11 @@ class ReportController extends Controller
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
-                    'posm_shop_sign'        => $val->posm_shop_sign,
-                    'posm_others'           => $val->posm_others,
-                    'posm_hangering_mobile' => $val->posm_hangering_mobile,
-                    'posm_poster'           => $val->posm_poster,
-                    'cbd_competitor_detail' => $val->cbd_competitor_detail,
-                    'cbd_competitor'        => $val->cbd_competitor,
-                    'cbd_position'          => $val->cbd_position,
-                    'outlet_type'           => $val->outlet_type,
-                    'total_hanger'          => $val->total_hanger,
+                    'posm'          => $val->posm,
+                    'cbd_competitor'=> $val->cbd_competitor,
+                    'cbd_position'  => $val->cbd_position,
+                    'outlet_type'   => $val->outlet_type,
+                    'total_hanger'  => $val->total_hanger,
                 );
             }
         }

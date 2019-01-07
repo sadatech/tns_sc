@@ -97,6 +97,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/magnific-popup/magnific-popup.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
@@ -111,12 +112,200 @@ th, td {
 @endsection
 
 @section('script')
-
+<script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('js/select2-handler.js') }}"></script>
+<script type="text/javascript">
+  $('#reset').click(function(){
+    setTimeout(function() {
+      $('.js-datepicker').val(null);
+    }, 10);
+  });
+  $(".js-datepicker").datepicker( {
+    format: "mm/yyyy",
+    viewMode: "months",
+    autoclose: true,
+    minViewMode: "months"
+  });
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+  $("#btnDownloadXLS").on("click", function(){
+    $.ajax({
+      url: $(this).attr("target-url"),
+      type: "post",
+      success: function(e){
+        swal("Success!", e.result, "success");
+      },
+      error: function(){
+        swal("Error!", e.result, "error");
+      }
+    });
+  });
+
+  $('#filter').submit(function(e) {
+    Codebase.layout('header_loader_on');
+    e.preventDefault();
+    var table = null;
+
+    var url = '{!! route('display_share.reportDataArea') !!}';
+    table = $('#reportTableArea').DataTable({
+      processing: true,
+      serverSide: true,
+      scrollX: true,
+      scrollY: "300px",
+      ajax: {
+        url: url + "?" + $("#filter").serialize(),
+        type: 'GET',
+        dataType: 'json',
+        dataSrc: function(res) {
+          Codebase.layout('header_loader_off');
+          if (res.data == 0) {
+            $('#table-block').hide();
+            swal("Error!", "Data is empty!", "error");
+            return res.data;
+          } else {
+            $('#table-block').show();
+            return res.data;
+          }
+        },
+        error: function (data) {
+          Codebase.layout('header_loader_off');
+          swal("Error!", "Failed to load Data!", "error");
+        },
+      },
+      drawCallback: function(){
+        $('.popup-image').magnificPopup({
+          type: 'image',
+        });
+      },
+      columns: [
+      { data: 'name', name: 'name'},
+      { data: 'store_cover', name: 'store_cover'},
+      { data: 'store_panel_cover', name: 'store_panel_cover'},
+      { data: 'hitTargetTB', name: 'hitTargetTB'},
+      { data: 'achTB', name: 'achTB'},
+      { data: 'hitTargetPF', name: 'hitTargetPF'},
+      { data: 'achPF', name: 'achPF'},
+      { data: 'location', name: 'location'},
+      ],
+      bDestroy: true
+    });
+
+    url = '{!! route('display_share.reportDataSpg') !!}';
+    table = $('#reportTableSpg').DataTable({
+      processing: true,
+      serverSide: true,
+      scrollX: true,
+      scrollY: "300px",
+      ajax: {
+        url: url + "?" + $("#filter").serialize(),
+        type: 'GET',
+        dataType: 'json',
+        dataSrc: function(res) {
+          Codebase.layout('header_loader_off');
+          if (res.data == 0) {
+            $('#table-block').hide();
+            swal("Error!", "Data is empty!", "error");
+            return res.data;
+          } else {
+            $('#table-block').show();
+            return res.data;
+          }
+        },
+        error: function (data) {
+          Codebase.layout('header_loader_off');
+          swal("Error!", "Failed to load Data!", "error");
+        },
+      },
+      drawCallback: function(){
+        $('.popup-image').magnificPopup({
+          type: 'image',
+        });
+      },
+      columns: [
+      { data: 'name', name: 'name'},
+      { data: 'store_cover', name: 'store_cover'},
+      { data: 'store_panel_cover', name: 'store_panel_cover'},
+      { data: 'hitTargetTB', name: 'hitTargetTB'},
+      { data: 'achTB', name: 'achTB'},
+      { data: 'hitTargetPF', name: 'hitTargetPF'},
+      { data: 'achPF', name: 'achPF'},
+      { data: 'location', name: 'location'},
+      ],
+      bDestroy: true
+    });
+
+    url = '{!! route('display_share.reportDataMd') !!}';
+    table = $('#reportTableMd').DataTable({
+      processing: true,
+      serverSide: true,
+      scrollX: true,
+      scrollY: "300px",
+      ajax: {
+        url: url + "?" + $("#filter").serialize(),
+        type: 'GET',
+        dataType: 'json',
+        dataSrc: function(res) {
+          Codebase.layout('header_loader_off');
+          if (res.data == 0) {
+            $('#table-block').hide();
+            swal("Error!", "Data is empty!", "error");
+            return res.data;
+          } else {
+            $('#table-block').show();
+            return res.data;
+          }
+        },
+        error: function (data) {
+          Codebase.layout('header_loader_off');
+          swal("Error!", "Failed to load Data!", "error");
+        },
+      },
+      drawCallback: function(){
+        $('.popup-image').magnificPopup({
+          type: 'image',
+        });
+      },
+      columns: [
+      { data: 'name', name: 'name'},
+      { data: 'store_cover', name: 'store_cover'},
+      { data: 'store_panel_cover', name: 'store_panel_cover'},
+      { data: 'hitTargetTB', name: 'hitTargetTB'},
+      { data: 'achTB', name: 'achTB'},
+      { data: 'hitTargetPF', name: 'hitTargetPF'},
+      { data: 'achPF', name: 'achPF'},
+      { data: 'location', name: 'location'},
+      ],
+      bDestroy: true
+    });
+  });
+@if(session('type'))
+$(document).ready(function() {
+  $.notify({
+    title: '<strong>{!! session('title') !!}</strong>',
+    message: '{!! session('message') !!}'
+  }, {
+    type: '{!! session('type') !!}',
+    animate: {
+      enter: 'animated zoomInDown',
+      exit: 'animated zoomOutUp'
+    },
+    placement: {
+      from: 'top',
+      align: 'center'
+    }
+  });
+
+});
+@endif
+</script>
 <script type="text/javascript">
   @if(session('type'))
   $(document).ready(function() {
@@ -314,6 +503,5 @@ $(document).ready(function() {
     });
 
 });
-
 </script>
 @endsection
