@@ -902,10 +902,10 @@ Route::prefix('mtc')->group(function () {
 		Route::get('/dataAccountRow', 'ReportController@availabilityAccountRowData')->name('availability.dataAccountRow')->middleware('auth');
 		Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
 		Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
+		Route::any('/exportXLS', 'ReportController@availabilityExportXLS')->name('availability.exportXLS')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@availabilityUpdate')->name('availability.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@Importavailability')->name('availability.import')->middleware('auth');
-		Route::get('/download-template', function()
-		{
+		Route::get('/download-template', function(){
 			return response()->download(public_path('assets/SellinImport.xlsx'));
 		})->name('SellIn.download-template')->middleware('auth');
 	});
@@ -921,6 +921,8 @@ Route::prefix('mtc')->group(function () {
 		Route::get('/reportDataArea', 'ReportController@displayShareReportAreaData')->name('display_share.reportDataArea')->middleware('auth');
 		Route::get('/reportDataSpg', 'ReportController@displayShareReportSpgData')->name('display_share.reportDataSpg')->middleware('auth');
 		Route::get('/reportDataMd', 'ReportController@displayShareReportMdData')->name('display_share.reportDataMd')->middleware('auth');
+		Route::any('/ach/exportXLS', 'ReportController@displayShareReportExportXLS')->name('display_share.report.exportXLS')->middleware('auth');
+
 		Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
 		Route::get('/download-template', function(){
@@ -933,6 +935,7 @@ Route::prefix('mtc')->group(function () {
 		Route::get('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
 		Route::get('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
 		Route::get('/ach', 'ReportController@additionalDisplayAch')->name('additional_display.ach')->middleware('auth');
+		Route::any('/ach/exportXLS', 'ReportController@additionalDisplayExportXLS')->name('additional_display.exportXLS')->middleware('auth');
 		Route::get('/reportDataArea', 'ReportController@additionalDisplayReportAreaData')->name('additional_display.reportDataArea')->middleware('auth');
 		Route::get('/reportDataSpg', 'ReportController@additionalDisplayReportSpgData')->name('additional_display.reportDataSpg')->middleware('auth');
 		Route::get('/reportDataMd', 'ReportController@additionalDisplayReportMdData')->name('additional_display.reportDataMd')->middleware('auth');
