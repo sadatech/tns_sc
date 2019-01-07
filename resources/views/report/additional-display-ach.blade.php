@@ -19,8 +19,8 @@
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
           </div>
         </div>
         <center><h3>Area/TL</h3></center>
@@ -110,51 +110,6 @@
   <script src="{{ asset('js/select2-handler.js') }}"></script>
   <script type="text/javascript">
 
-      //   $(document).ready(function() {
-      //   $.ajaxSetup({
-      //     headers: {
-      //       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      //     }
-      //   });
-
-      //   $('#employeeSelect').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
-      //     return filterData('employee', params.term);
-      //   }, function (data, params) {
-      //     return {
-      //       results: $.map(data, function (obj) {                                
-      //         return {id: obj.id, text: obj.nik+' - '+obj.name}
-      //       })
-      //     }
-      //   }));
-
-      //   $('#storeSelect').select2(setOptions('{{ route("store-select2") }}', 'Select Store', function (params) {
-      //     return filterData('store', params.term);
-      //   }, function (data, params) {
-      //     return {
-      //       results: $.map(data, function (obj) {                                
-      //         return {id: obj.id, text: obj.name1+' - '+obj.name2}
-      //       })
-      //     }
-      //   }));
-
-
-      //   $('#productSelect').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
-      //     return filterData('product', params.term);
-      //   }, function (data, params) {
-      //     return {
-      //       results: $.map(data, function (obj) {                                
-      //         return {id: obj.id, text: obj.name+' ('+obj.deskripsi+')'}
-      //       })
-      //     }
-      //   }));
-
-      // });
-
-//   $("#datepicker").datepicker( {
-//     format: "mm-yyyy",
-//     viewMode: "months", 
-//     minViewMode: "months"
-// });
       @if(session('type'))
       $(document).ready(function() {
           $.notify({
@@ -174,60 +129,157 @@
 
       });
       @endif
-      $(function() {
-          $('#reportTableArea').DataTable({
-              processing: true,
-              serverSide: true,
-              ajax: '{!! route('additional_display.reportDataArea') !!}',
-              columns: [
-                { data: 'name', name: 'name'},
-                { data: 'store_cover', name: 'store_cover'},
-                { data: 'store_panel_cover', name: 'store_panel_cover'},
-                { data: 'actual', name: 'actual'},
-                { data: 'ach', name: 'ach'},
-                { data: 'location', name: 'location'},
-              ],
-              "scrollX":        true, 
-              "scrollCollapse": true,
-              "columnDefs" : [{"className": "text-center", "targets" : [1,2,3,4,5]}],
-          });
-      });
-      $(function() {
-          $('#reportTableSpg').DataTable({
-              processing: true,
-              serverSide: true,
-              ajax: '{!! route('additional_display.reportDataSpg') !!}',
-              columns: [
-                { data: 'name', name: 'name'},
-                { data: 'store_cover', name: 'store_cover'},
-                { data: 'store_panel_cover', name: 'store_panel_cover'},
-                { data: 'actual', name: 'actual'},
-                { data: 'ach', name: 'ach'},
-                { data: 'location', name: 'location'},
-              ],
-              "scrollX":        true, 
-              "scrollCollapse": true,
-              "columnDefs" : [{"className": "text-center", "targets" : [1,2,3,4]}],
-          });
-      });
-      $(function() {
-          $('#reportTableMd').DataTable({
-              processing: true,
-              serverSide: true,
-              ajax: '{!! route('additional_display.reportDataMd') !!}',
-              columns: [
-                { data: 'name', name: 'name'},
-                { data: 'store_cover', name: 'store_cover'},
-                { data: 'store_panel_cover', name: 'store_panel_cover'},
-                { data: 'actual', name: 'actual'},
-                { data: 'ach', name: 'ach'},
-                { data: 'location', name: 'location'},
-              ],
-              "scrollX":        true, 
-              "scrollCollapse": true,
-              "columnDefs" : [{"className": "text-center", "targets" : [1,2,3,4,5]}],
-          });
-      });
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
 
+        /**
+         * Ajax Setup
+         */
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        /**
+         * Download OnClick
+         */
+        $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function() {
+            $.ajax({
+                url: $(this).attr("target-url"),
+                type: "post",
+                success: function(e) {
+                    swal("Success!", e.result, "success");
+                },
+                error: function() {
+                    swal("Error!", e.result, "error");
+                }
+            });
+        });
+
+        $('#reportTableArea').DataTable({
+            processing: true,
+            serverSide: true,
+            drawCallback: function() {
+                $("#btnDownloadXLSAll").attr("target-url", "{{ route('additional_display.exportXLS') }}" + "?limitArea=&limitSPG=&limitMD=");
+                $("#btnDownloadXLS").attr("target-url", "{{ route('additional_display.exportXLS') }}" + "?limitArea=" + $("#reportTableArea_length select").val() + "&limitSPG=" + $("#reportTableSpg_length select").val() + "&limitMD=" + $("#reportTableMd_length select").val());
+            },
+            ajax: '{!! route('additional_display.reportDataArea') !!}',
+            columns: [{
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'store_cover',
+                    name: 'store_cover'
+                },
+                {
+                    data: 'store_panel_cover',
+                    name: 'store_panel_cover'
+                },
+                {
+                    data: 'actual',
+                    name: 'actual'
+                },
+                {
+                    data: 'ach',
+                    name: 'ach'
+                },
+                {
+                    data: 'location',
+                    name: 'location'
+                },
+            ],
+            "scrollX": true,
+            "scrollCollapse": true,
+            "columnDefs": [{
+                "className": "text-center",
+                "targets": [1, 2, 3, 4, 5]
+            }],
+        });
+
+        $('#reportTableSpg').DataTable({
+            processing: true,
+            serverSide: true,
+            drawCallback: function() {
+                $("#btnDownloadXLSAll").attr("target-url", "{{ route('additional_display.exportXLS') }}" + "?limitArea=&limitSPG=&limitMD=");
+                $("#btnDownloadXLS").attr("target-url", "{{ route('additional_display.exportXLS') }}" + "?limitArea=" + $("#reportTableArea_length select").val() + "&limitSPG=" + $("#reportTableSpg_length select").val() + "&limitMD=" + $("#reportTableMd_length select").val());
+            },
+            ajax: '{!! route('additional_display.reportDataSpg') !!}',
+            columns: [{
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'store_cover',
+                    name: 'store_cover'
+                },
+                {
+                    data: 'store_panel_cover',
+                    name: 'store_panel_cover'
+                },
+                {
+                    data: 'actual',
+                    name: 'actual'
+                },
+                {
+                    data: 'ach',
+                    name: 'ach'
+                },
+                {
+                    data: 'location',
+                    name: 'location'
+                },
+            ],
+            "scrollX": true,
+            "scrollCollapse": true,
+            "columnDefs": [{
+                "className": "text-center",
+                "targets": [1, 2, 3, 4]
+            }],
+        });
+
+        $('#reportTableMd').DataTable({
+            processing: true,
+            serverSide: true,
+            drawCallback: function() {
+                $("#btnDownloadXLSAll").attr("target-url", "{{ route('additional_display.exportXLS') }}" + "?limitArea=&limitSPG=&limitMD=");
+                $("#btnDownloadXLS").attr("target-url", "{{ route('additional_display.exportXLS') }}" + "?limitArea=" + $("#reportTableArea_length select").val() + "&limitSPG=" + $("#reportTableSpg_length select").val() + "&limitMD=" + $("#reportTableMd_length select").val());
+            },
+            ajax: '{!! route('additional_display.reportDataMd') !!}',
+            columns: [{
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'store_cover',
+                    name: 'store_cover'
+                },
+                {
+                    data: 'store_panel_cover',
+                    name: 'store_panel_cover'
+                },
+                {
+                    data: 'actual',
+                    name: 'actual'
+                },
+                {
+                    data: 'ach',
+                    name: 'ach'
+                },
+                {
+                    data: 'location',
+                    name: 'location'
+                },
+            ],
+            "scrollX": true,
+            "scrollCollapse": true,
+            "columnDefs": [{
+                "className": "text-center",
+                "targets": [1, 2, 3, 4, 5]
+            }],
+        });
+    });
   </script>
 @endsection

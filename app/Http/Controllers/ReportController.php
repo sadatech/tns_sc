@@ -66,6 +66,8 @@ use App\Jobs\ExportMTCAchievementJob;
 use App\Jobs\ExportGTCCbdJob;
 use App\Jobs\ExportMTCDisplayShareJob;
 use App\Jobs\ExportMTCAvailabilityJob;
+use App\Jobs\ExportMTCDisplayShareAchievementJob;
+use App\Jobs\ExportMTCAdditionalDisplayAchievementJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -1586,6 +1588,34 @@ class ReportController extends Controller
         // ->make(true);
     }
 
+    public function displayShareReportExportXLS(Request $request)
+    {
+        $limitArea = ($request->limitArea == "null" || empty($request->limitArea) ? null : $request->limitArea);
+        $limitSPG = ($request->limitSPG == "null" || empty($request->limitSPG) ? null : $request->limitSPG);
+        $limitMD = ($request->limitMD == "null" || empty($request->limitMD) ? null : $request->limitMD);
+
+        $result = DB::transaction(function() use ($limitArea, $limitSPG, $limitMD){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Display Share Achievement - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCDisplayShareAchievementJob($JobTrace, $limitArea, $limitSPG, $limitMD, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
     // *********** ADDITIONAL DISPLAY ****************** //
 
 
@@ -1799,6 +1829,34 @@ class ReportController extends Controller
         // return Datatables::of(collect(DB::select($datas)))
         // ->make(true);
 
+    }
+
+    public function additionalDisplayExportXLS(Request $request)
+    {
+        $limitArea = ($request->limitArea == "null" || empty($request->limitArea) ? null : $request->limitArea);
+        $limitSPG = ($request->limitSPG == "null" || empty($request->limitSPG) ? null : $request->limitSPG);
+        $limitMD = ($request->limitMD == "null" || empty($request->limitMD) ? null : $request->limitMD);
+
+        $result = DB::transaction(function() use ($limitArea, $limitSPG, $limitMD){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Additional Display Achievement - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAdditionalDisplayAchievementJob($JobTrace, $limitArea, $limitSPG, $limitMD, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
 
