@@ -37,10 +37,10 @@
       </div>
       <div class="block">        
         <div class="block-content block-content-full">
-          <div class="block-header p-0 mb-20">
-            <div class="block-option">
-              <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-              <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+        <div class="block-header p-0 mb-20">
+          <div class="block-option">
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
             </div>
           </div>
 
@@ -116,7 +116,11 @@
     }
   });
 
-  $("#btnDownloadXLS").on("click", function(){
+  /**
+   * Download OnClick
+   */
+
+   $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function(){
     $.ajax({
       url: $(this).attr("target-url"),
       type: "post",
@@ -128,7 +132,8 @@
       }
     });
   });
-
+</script>
+<script>
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
@@ -235,4 +240,45 @@
   });
   @endif
 </script>
+<script>
+        $('#reportTableArea').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{!! route('availability.dataArea') !!}',
+            drawCallback: function(){
+              $("#btnDownloadXLSAll").attr("target-url","{{ route('availability.exportXLS') }}");
+              $("#btnDownloadXLS").attr("target-url","{{ route('availability.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
+            },
+            columns: [
+              { data: 'id', name: 'id'},
+              { data: 'area', name: 'area'},
+              @foreach($categories as $category)
+              {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
+              @endforeach
+            ],
+            "scrollX":        true, 
+            "scrollCollapse": true,
+        });
+
+        $('#reportTableAccount').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{!! route('availability.dataAccount') !!}',
+            drawCallback: function(){
+              $("#btnDownloadXLSAll").attr("target-url","{{ route('availability.exportXLS') }}");
+              $("#btnDownloadXLS").attr("target-url","{{ route('availability.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
+            },
+            columns: [
+              { data: 'id', name: 'id'},
+              { data: 'area', name: 'area'},
+              @foreach($categories as $category)
+              {data: 'item_{{ $category->name }}', name: 'item_{{ $category->name }}', searchable: false, sortable: false},
+              @endforeach
+            ],
+            "scrollX":        true, 
+            "scrollCollapse": true,
+        });
+
+      });
+  </script>
 @endsection
