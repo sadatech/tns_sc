@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Sales Report - Price Summary")
+@section('title', "Sales Report - Price ")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Price Summary <small>Report</small></h2>
+  <h2 class="content-heading pt-10"> Price <small>Report</small></h2>
   @if($errors->any())
     <div class="alert alert-danger">
       <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -27,21 +27,15 @@
         <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
         <thead>
           <tr>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">CATEGORY</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">PRODUCT</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">PACKAGING</th>
-            @foreach ($accounts as $account)
-            <th colspan="2" style="vertical-align: middle; text-align: center;">{{ $account->name }}</th>
+            <th style="vertical-align: middle; text-align: center;">CATEGORY</th>
+            <th style="vertical-align: middle; text-align: center;">PRODUCT</th>
+            <th style="vertical-align: middle; text-align: center;">PACKAGING</th>
+            @foreach ($stores as $store)
+            <th style="vertical-align: middle; text-align: center;">{{ $store->name1 }}</th>
             @endforeach
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">LOWEST</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">HIGHEST</th>
-            <th rowspan="2" style="vertical-align: middle; text-align: center;">HIGHEST VS LOWEST</th>
-          </tr>
-          <tr>
-            @foreach ($accounts as $account)
-                <th style="vertical-align: middle; text-align: center;">LOWEST</th>
-                <th style="vertical-align: middle; text-align: center;">HIGHEST</th>
-            @endforeach
+            <th style="vertical-align: middle; text-align: center;">LOWEST</th>
+            <th style="vertical-align: middle; text-align: center;">HIGHEST</th>
+            <th style="vertical-align: middle; text-align: center;">HIGHEST VS LOWEST</th>
           </tr>
 
         </thead>
@@ -146,14 +140,13 @@
           $('#reportTable').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('priceData.dataSummary') !!}',
+              ajax: '{!! route('priceData.dataRow') !!}',
               columns: [
                 { data: 'category_name', name: 'category_name'},
                 { data: 'brand_name', name: 'brand_name'},
                 { data: 'name', name: 'name'},
-                  @foreach($accounts as $account)
-                    {data: '{{ $account->id }}_min', name: '{{ $account->id }}_min', searchable: false, sortable: false},
-                    {data: '{{ $account->id }}_max', name: '{{ $account->id }}_max', searchable: false, sortable: false},
+                  @foreach($stores as $store)
+                    {data: '{{ $store->name1 }}_price', name: '{{ $store->name1 }}_price', searchable: false, sortable: false},
                   @endforeach
                 { data: 'lowest', name: 'lowest'},
                 { data: 'highest', name: 'highest'},

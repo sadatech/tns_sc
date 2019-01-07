@@ -411,6 +411,14 @@
                             <li>
                                 <a class="{{ request()->is('report/mtc/additional_display') ? 'active' : '' }}" href="{{ route('additional_display') }}"><span class="sidebar-mini-hide">Additional Display</span></a>
                             </li>                              
+                            {{-- Price Row--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/priceData/row') ? 'active' : '' }}" href="{{ route('priceData.row') }}"><span class="sidebar-mini-hide">Price Row</span></a>
+                            </li>                              
+                            {{-- Price Summary--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/priceData/summary') ? 'active' : '' }}" href="{{ route('priceData.summary') }}"><span class="sidebar-mini-hide">Price Summary</span></a>
+                            </li>                
                             {{-- Availability--}}
                             <li>
                                 <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability</span></a>
