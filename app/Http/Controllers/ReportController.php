@@ -879,7 +879,58 @@ class ReportController extends Controller
     // *********** PRICE SASA VS COMPETITOR ****************** //
 
     public function PriceVsIndex(){
-        return view('report.price-vs-competitor');
+        $subCategories = SubCategory::get();
+        foreach ($subCategories as $category) {
+            $data[$category->name.'products'] = Product::where('products.id_subcategory',$category->id)->get();
+            $data[$category->name.'productCompetitors'] = ProductCompetitor::where('product_competitors.id_subcategory',$category->id)
+                                                                            ->join('brands','product_competitors.id_brand','brands.id')
+                                                                            ->select('product_competitors.*','brands.name as brand_name')->orderBy('brand_name')->get();
+        }
+        $data['subCategories'] = $subCategories;
+        // return response()->json($data);
+
+        return view('report.price-vs-competitor', $data);
+    }
+    public function priceDataVs()
+    {   
+        $store = 1;
+        $products = Product::join('brands','products.id_brand','brands.id')
+        ->join('categories','products.id_subcategory','categories.id')
+        ->select('products.*','brands.name as brand_name','categories.name as category_name')->get();
+        foreach ($products as $product) {
+            $product['competitor_name'] = '';
+            $product['competitor_brand'] = '';
+            $product['price'] = '';
+            $product['price_competitor'] = '';
+
+            $competitors = ProductCompetitor::where('product_competitors.id', $product->id_main_competitor)
+            ->join('brands','product_competitors.id_brand','brands.id')
+            ->select('product_competitors.*','brands.name as brand_name_competitor')->first();
+
+        // return response()->json($competitors);
+            if ($competitors) {
+                $product['competitor_name'] = $competitors->name;
+                $product['competitor_brand'] = $competitors->brand_name_competitor;
+                $priceCompetitor = DataPrice::where('data_price.id_store', $store)
+                        ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
+                        ->where('detail_data_price.id_product',$competitors->id)
+                        ->where('detail_data_price.isSasa',0)->first();
+            }
+
+            $price = DataPrice::where('data_price.id_store', $store)
+                        ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
+                        ->where('detail_data_price.id_product',$product->id)
+                        ->where('detail_data_price.isSasa',1)->first();
+
+            if ($price) {
+                $product['price'] = $price->price;
+            }
+            if ($priceCompetitor) {
+                $product['price_competitor'] = $priceCompetitor->price;
+            }
+        }
+        // return response()->json($products);
+        return Datatables::of($products)->make(true);
     }
 
     public function priceRow (){
