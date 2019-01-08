@@ -34,7 +34,7 @@ class AdditionalDisplayController extends Controller
 
             if ($additionalDisplayHeader) { // If header exist (update and/or create detail)
 
-                // try {
+                try {
                     DB::transaction(function () use ($request, $additionalDisplayHeader, $employee) {
 
                         if ($request['foto_additional'] != null)
@@ -44,6 +44,8 @@ class AdditionalDisplayController extends Controller
                                 public_path('images/report/AdditionalDisplay'),
                                 $req['foto_additional'] = $file_name
                             );
+                        }else{
+                            return response()->json(['status' => false, 'message' => 'Photo Cant be Empyt'], 500);
                         }
                         DetailAdditionalDisplay::create([
                             'id_additional_display' => $additionalDisplayHeader->id,
@@ -53,15 +55,15 @@ class AdditionalDisplayController extends Controller
                         ]);
 
                     });
-                // } catch (\Exception $e) {
-                //     return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 1'], 500);
-                // }
+                } catch (\Exception $e) {
+                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 1'], 500);
+                }
 
                 return response()->json(['status' => true, 'id_transaksi' => $additionalDisplayHeader->id, 'message' => 'Data berhasil di input']);
 
             } else { // If header didn't exist (create header & detail)
 
-                // try {
+                try {
                     DB::transaction(function () use ($request, $employee) {
 
                         // HEADER
@@ -80,6 +82,9 @@ class AdditionalDisplayController extends Controller
                                 $req['foto_additional'] = $file_name
                             );
                         }
+                        }else{
+                            return response()->json(['status' => false, 'message' => 'Photo Cant be Empyt'], 500);
+                        }
                         
                         DetailAdditionalDisplay::create([
                             'id_additional_display' => $transaction->id,
@@ -89,9 +94,9 @@ class AdditionalDisplayController extends Controller
                         ]);
 
                     });
-                // } catch (\Exception $e) {
-                //     return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 2'], 500);
-                // }
+                } catch (\Exception $e) {
+                    return response()->json(['status' => false, 'message' => 'Gagal melakukan transaksi 2'], 500);
+                }
 
                 // Check sell in(Sell Thru) header after insert
                 $additionalDisplayHeaderAfter = AdditionalDisplay::where('id_employee', $employee->id)->where('id_store', $request['store'])->where('date', date('Y-m-d'))->first();
