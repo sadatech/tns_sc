@@ -19,8 +19,8 @@
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ th, td {
    * Download OnClick
    */
 
-   $("#btnDownloadXLS").on("click", function(){
+   $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function(){
     $.ajax({
       url: $(this).attr("target-url"),
       type: "post",
@@ -182,7 +182,8 @@ th, td {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        // $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterStore").val()+"/new");
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}");
+        $("#btnDownloadXLS").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
       },
       columns: [
       { d{ data: 'avai_date', name: 'avai_date'},
