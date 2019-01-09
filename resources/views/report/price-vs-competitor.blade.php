@@ -60,7 +60,7 @@
           </div>
         </div>
       </div>
-      <form action="{{ route('sellin.add') }}" method="post">
+      <form action="{{ route('priceData.store') }}" method="post">
         {!! csrf_field() !!}
         <div class="block-content">
 
@@ -81,11 +81,13 @@
               <div class="row">
                 <div class="form-group col-md-6">
                   <h5><small>{{ $subcategory->name }} -</small> {{ $product->name }} </h5>
+                  <input type="text" name="products[]" id="products" class="form-control" value="{{ $product->id }}" hidden>
                 </div>
                 <div class="form-group col-md-6">
-                  <select name="competitor[]" id="competitor" class="form-control js-select">
+                  <select name="competitors[]" id="competitors" class="form-control js-select">
+                    <option value="">(none)</option>
                     @foreach($$productCompetitors as $productCompetitor)
-                    <option value="{{ $productCompetitor->id }}">{{ $productCompetitor->brand_name .'-'. $productCompetitor->name }}</option>
+                    <option value="{{ $productCompetitor->id }}"@if($product->id_main_competitor == "$productCompetitor->id") selected @endif>{{ $productCompetitor->brand_name .'-'. $productCompetitor->name }}</option>
                     @endforeach
                   </select>
                 </div>
