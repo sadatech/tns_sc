@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
 use App\Components\traits\WeekHelper;
 use App\Category;
 use App\Area;
-use App\subArea;
+use App\SubArea;
 use App\Account;
 use App\DisplayShare;
 use App\DetailAvailability;
@@ -940,7 +940,7 @@ class ReportController extends Controller
         return view('report.price-row', $data);
     }
     public function priceDataRow(){
-        $subareas = subArea::get();
+        $subareas = SubArea::get();
         $account = 1;
         $stores = Store::where('stores.id_account',$account)->orderBy('id_subarea')->get();
                 // ->pluck('stores.id');
@@ -1048,7 +1048,7 @@ class ReportController extends Controller
     }
 
     public function priceDataSummary(){
-        $subareas = subArea::get();
+        $subareas = SubArea::get();
         $accounts = Account::get();
 
         $datas1 = ProductCompetitor::join('brands','product_competitors.id_brand','brands.id')
