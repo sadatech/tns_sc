@@ -35,7 +35,7 @@ class ProductController extends Controller
 						return $q->whereIdSubcategory($request->input('subcategory'));
 					})
 					->when(!empty($request->input('category')), function ($q) use ($request){
-						return $q->whereHas('subcategory', function($q2)
+						return $q->whereHas('subcategory', function($q2) use ($request)
 						{
 							return $q2->whereIdCategory($request->input('category'));
 						});
