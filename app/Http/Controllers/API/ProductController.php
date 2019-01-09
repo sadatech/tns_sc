@@ -37,7 +37,7 @@ class ProductController extends Controller
 					->when(!empty($request->input('category')), function ($q) use ($request){
 						return $q->whereHas('subcategory', function($q2)
 						{
-							return $q->whereIdCategory($request->input('category'));
+							return $q2->whereIdCategory($request->input('category'));
 						});
 					});
 					if ($product->count() > 0) {
