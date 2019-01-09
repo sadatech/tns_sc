@@ -13,33 +13,14 @@
   @endif
   <div class="block block-themed"> 
     <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
-      <h3 class="block-title">Filter</h3>
-    </div>
-    <div class="block">        
-      <div class="block-content block-content-full">
-        <form method="post" id="filter">
-          <div class="row">
-            <div class="col-md-4">
-              <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}">
-            </div>
-          </div>
-          <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
-          <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
-        </form>
-      </div>
-    </div>
-  </div>
-  <div class="block block-themed" id="table-block" style="display: none">
-    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
       <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
           </div>
         </div>
         <center><h3>Area/TL</h3></center>
@@ -324,5 +305,203 @@ $(document).ready(function() {
 
 });
 @endif
+</script>
+<script type="text/javascript">
+  @if(session('type'))
+  $(document).ready(function() {
+    $.notify({
+      title: '<strong>{!! session('title') !!}</strong>',
+      message: '{!! session('message') !!}'
+    }, {
+      type: '{!! session('type') !!}',
+      animate: {
+        enter: 'animated zoomInDown',
+        exit: 'animated zoomOutUp'
+      },
+      placement: {
+        from: 'top',
+        align: 'center'
+      }
+    });
+
+  });
+  @endif
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    /**
+     * Ajax Setup
+     */
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    /**
+     * Download OnClick
+     */
+    $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function() {
+        $.ajax({
+            url: $(this).attr("target-url"),
+            type: "post",
+            success: function(e) {
+                swal("Success!", e.result, "success");
+            },
+            error: function() {
+                swal("Error!", e.result, "error");
+            }
+        });
+    });
+
+    $('#reportTableArea').DataTable({
+        processing: true,
+        serverSide: true,
+        drawCallback: function() {
+            $("#btnDownloadXLSAll").attr("target-url", "{{ route('display_share.report.exportXLS') }}" + "?limitArea=&limitSPG=&limitMD=");
+            $("#btnDownloadXLS").attr("target-url", "{{ route('display_share.report.exportXLS') }}" + "?limitArea=" + $("#reportTableArea_length select").val() + "&limitSPG=" + $("#reportTableSpg_length select").val() + "&limitMD=" + $("#reportTableMd_length select").val());
+        },
+        ajax: '{!! route('display_share.reportDataArea') !!}',
+        columns: [{
+                data: 'name',
+                name: 'name'
+            },
+            {
+                data: 'store_cover',
+                name: 'store_cover'
+            },
+            {
+                data: 'store_panel_cover',
+                name: 'store_panel_cover'
+            },
+            {
+                data: 'hitTargetTB',
+                name: 'hitTargetTB'
+            },
+            {
+                data: 'achTB',
+                name: 'achTB'
+            },
+            {
+                data: 'hitTargetPF',
+                name: 'hitTargetPF'
+            },
+            {
+                data: 'achPF',
+                name: 'achPF'
+            },
+            {
+                data: 'location',
+                name: 'location'
+            },
+        ],
+        "scrollX": true,
+        "scrollCollapse": true,
+        "columnDefs": [{
+            "className": "text-center",
+            "targets": [1, 2, 3, 4, 5, 6, 7]
+        }],
+    });
+
+    $('#reportTableSpg').DataTable({
+        processing: true,
+        serverSide: true,
+        drawCallback: function() {
+            $("#btnDownloadXLSAll").attr("target-url", "{{ route('display_share.report.exportXLS') }}" + "?limitArea=&limitSPG=&limitMD=");
+            $("#btnDownloadXLS").attr("target-url", "{{ route('display_share.report.exportXLS') }}" + "?limitArea=" + $("#reportTableArea_length select").val() + "&limitSPG=" + $("#reportTableSpg_length select").val() + "&limitMD=" + $("#reportTableMd_length select").val());
+        },
+        ajax: '{!! route('display_share.reportDataSpg') !!}',
+        columns: [{
+                data: 'name',
+                name: 'name'
+            },
+            {
+                data: 'store_cover',
+                name: 'store_cover'
+            },
+            {
+                data: 'store_panel_cover',
+                name: 'store_panel_cover'
+            },
+            {
+                data: 'hitTargetTB',
+                name: 'hitTargetTB'
+            },
+            {
+                data: 'achTB',
+                name: 'achTB'
+            },
+            {
+                data: 'hitTargetPF',
+                name: 'hitTargetPF'
+            },
+            {
+                data: 'achPF',
+                name: 'achPF'
+            },
+            {
+                data: 'location',
+                name: 'location'
+            },
+        ],
+        "scrollX": true,
+        "scrollCollapse": true,
+        "columnDefs": [{
+            "className": "text-center",
+            "targets": [1, 2, 3, 4, 5, 6]
+        }],
+    });
+
+    $('#reportTableMd').DataTable({
+        processing: true,
+        serverSide: true,
+        drawCallback: function() {
+            $("#btnDownloadXLSAll").attr("target-url", "{{ route('display_share.report.exportXLS') }}" + "?limitArea=&limitSPG=&limitMD=");
+            $("#btnDownloadXLS").attr("target-url", "{{ route('display_share.report.exportXLS') }}" + "?limitArea=" + $("#reportTableArea_length select").val() + "&limitSPG=" + $("#reportTableSpg_length select").val() + "&limitMD=" + $("#reportTableMd_length select").val());
+        },
+        ajax: '{!! route('display_share.reportDataMd') !!}',
+        columns: [{
+                data: 'name',
+                name: 'name'
+            },
+            {
+                data: 'store_cover',
+                name: 'store_cover'
+            },
+            {
+                data: 'store_panel_cover',
+                name: 'store_panel_cover'
+            },
+            {
+                data: 'hitTargetTB',
+                name: 'hitTargetTB'
+            },
+            {
+                data: 'achTB',
+                name: 'achTB'
+            },
+            {
+                data: 'hitTargetPF',
+                name: 'hitTargetPF'
+            },
+            {
+                data: 'achPF',
+                name: 'achPF'
+            },
+            {
+                data: 'location',
+                name: 'location'
+            },
+        ],
+        "scrollX": true,
+        "scrollCollapse": true,
+        "columnDefs": [{
+            "className": "text-center",
+            "targets": [1, 2, 3, 4, 5, 6, 7]
+        }],
+    });
+
+});
 </script>
 @endsection

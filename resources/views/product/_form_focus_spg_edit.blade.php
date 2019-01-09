@@ -70,10 +70,10 @@ $type = $type ?? '';
                     </select>
                   </div>
                   <div class="form-group col-md-2">
-                    <input class="js-datepicker form-control" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from[]" data-month-highlight="true" required>
+                    <input class="js-datepicker form-control" type="text" placeholder="Month From" id="{{$type}}DateFrom" name="from[]" data-month-highlight="true"  autocomplete="off" required>
                   </div>
                   <div class="form-group col-md-2">
-                    <input class="js-datepicker form-control" type="text" placeholder="Month Until" id="{{$type}}DateTo" name="to[]" data-month-highlight="true" required>
+                    <input class="js-datepicker form-control" type="text" placeholder="Month Until" id="{{$type}}DateTo" name="to[]" data-month-highlight="true"  autocomplete="off" required>
                   </div>
                   <!-- <div class="form-group col-md-1">
                     <a id="buttonRemove" class="btn btn-default hidden" onclick="remLine($(this))"><i class="fa fa-minus"></i></a>
