@@ -37,7 +37,6 @@ class PromoController extends Controller
 					$promo = Promo::create([
 						'id_employee' 	=> $user->id,
 						'id_store' 		=> $request->store,
-						'id_brand' 		=> $request->brand,
 					]);
 					if ($promo) {
 						$res['id'] = $promo->id;
