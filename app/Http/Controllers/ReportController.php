@@ -891,6 +891,27 @@ class ReportController extends Controller
 
         return view('report.price-vs-competitor', $data);
     }
+
+    public function store(Request $request) 
+    {
+        $data = $request->all();
+        // return response()->json($data);
+
+        foreach ($data['products'] as $key => $id_product){
+            $product = Product::where('id',$id_product)->first();
+                $product->update([
+                'id_main_competitor' => $data['competitors'][$key],
+                ]);
+        }
+
+        return redirect()->back()
+        ->with([
+            'type'    => 'success',
+            'title'   => 'Sukses!<br/>',
+            'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah main competitor!'
+        ]);
+    }
+
     public function priceDataVs()
     {   
         $store = 1;

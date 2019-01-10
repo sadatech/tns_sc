@@ -144,7 +144,7 @@ class PromoActivityController extends Controller
            //  ->join('employees', 'promos.id_employee', '=', 'employees.id')
            //  ->join('brands', 'promos.id_brand', '=', 'brands.id')
            //    ->select('promo_details.*', 'employees.name', 'stores.name1', 'brands.name', 'products.name');
-        $promoDetail = PromoDetail::with(['promo', 'product'])
+        $promoDetail = PromoDetail::with(['promo', 'product'])->orderBy('id','desc')
         ->when($request->has('product'), function ($q) use ($request){
             return $q->where('id_product',$request->input('product'));
         })
@@ -209,7 +209,11 @@ class PromoActivityController extends Controller
             }
         })
         ->addColumn('brand', function($promoDetail) {
-            return $promoDetail->promo->brand->name;
+            if (!empty($promoDetail->id_product)) {
+                return $promoDetail->product->brand->name;
+            }else{
+                return $promoDetail->productCompetitor->brand->name;
+            }
         })
         ->rawColumns(['images', 'action'])
         ->make(true);

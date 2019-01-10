@@ -419,6 +419,10 @@
                             <li>
                                 <a class="{{ request()->is('report/mtc/priceData/summary') ? 'active' : '' }}" href="{{ route('priceData.summary') }}"><span class="sidebar-mini-hide">Price Summary</span></a>
                             </li>                
+                            {{-- Price Vs--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/priceData/vs') ? 'active' : '' }}" href="{{ route('priceData.vs') }}"><span class="sidebar-mini-hide">Price Vs Competitor</span></a>
+                            </li>                
                             {{-- Availability--}}
                             <li>
                                 <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability</span></a>
