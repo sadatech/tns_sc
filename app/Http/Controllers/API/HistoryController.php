@@ -151,7 +151,7 @@ class HistoryController extends Controller
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})
 			->when($date != '', function ($q) use ($date){
-				return $q->whereDate('sdate', "'".$date."'");
+				return $q->whereDate('date', $date);
 			})->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
