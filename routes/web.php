@@ -1013,6 +1013,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/employee-select2', 'EmployeeController@getDataWithFilters')->name('employee-select2');
 	Route::post('/employee-select2-for-report', 'EmployeeController@getDataWithFiltersForReport')->name('employee-select2-for-report');
 	Route::post('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
+	Route::post('/account-select2', 'AccountController@getDataWithFilters')->name('account-select2');
 	Route::post('/block-select2', 'EmployeeController@getDataWithFiltersBlock')->name('block-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
 	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');
