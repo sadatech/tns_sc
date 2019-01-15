@@ -1002,6 +1002,8 @@ class ReportController extends Controller
         $stores = Store::where('stores.id_account',$account)->orderBy('id_subarea')->get();
                 // ->pluck('stores.id');
 
+        if ($request->get("storeList") == "yes") return response()->json($stores);
+
         $datas1 = Product::join('brands','products.id_brand','brands.id')
                         ->join('sub_categories','products.id_subcategory','sub_categories.id')
                         ->join('categories','sub_categories.id_category', 'categories.id')
@@ -1096,7 +1098,8 @@ class ReportController extends Controller
         }        
 
         // return response()->json($merged);
-        return Datatables::of($merged)->make(true);
+        return Datatables::of($merged)
+        ->make(true);
     }
 
     public function PriceRowExportXLS(Request $request)
@@ -1221,12 +1224,18 @@ class ReportController extends Controller
         return view('report.availability', $data);
     }
 
-    public function availabilityAccountRowData(){
+    public function availabilityAccountRowData(Request $request){
+        // return response()->json($request);
+
+        if (!empty($request->input('account'))) {
+            $account   = $request->input('account');
+        }else{
+            $account   = '1';
+        }
 
         $categories = Category::get();
 
         $totaltanggal = Carbon::now()->daysInMonth;
-        $account = 1;
         // $stores = Store::where('id_account',$account)->get();
         // $datas = new Collection();
         // $i = 1;
@@ -1246,6 +1255,22 @@ class ReportController extends Controller
                         ->join('detail_availability','availability.id','detail_availability.id_availability')
                         ->leftjoin('accounts','stores.id_account','accounts.id')
                         ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
+                // ->when($request->has('employee'), function ($q) use ($request){
+                //     return $q->where('display_shares.id_employee',$request->input('employee'));
+                // })
+                ->when($request->has('periode'), function ($q) use ($request){
+                    return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+                    ->whereYear('date', substr($request->input('periode'), 3));
+                })
+                ->when(!empty($request->input('store')), function ($q) use ($request){
+                    return $q->where('id_store', $request->input('store'));
+                })
+                ->when($request->has('area'), function ($q) use ($request){
+                    return $q->where('id_area', $request->input('area'));
+                })
+                ->when($request->has('week'), function ($q) use ($request){
+                    return $q->where('availability.week', $request->input('week'));
+                })
                         ->select(
                             'stores.id',
                             'availability.date as avai_date',
