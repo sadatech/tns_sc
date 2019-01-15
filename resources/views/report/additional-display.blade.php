@@ -179,14 +179,8 @@ th, td {
         dataType: 'json',
         dataSrc: function(res) {
           Codebase.layout('header_loader_off');
-          if (res.data == 0) {
-            $('#table-block').hide();
-            swal("Error!", "Data is empty!", "error");
-            return res.data;
-          } else {
             $('#table-block').show();
             return res.data;
-          }
         },
         error: function (data) {
           Codebase.layout('header_loader_off');
