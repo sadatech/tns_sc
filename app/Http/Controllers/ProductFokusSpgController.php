@@ -224,8 +224,8 @@ class ProductFokusSpgController extends Controller
                             {
                                     $temp['id_employee']    = $getEmp->id;
                                     $temp['id_product']     = $getSku->id;
-                                    $temp['from']           = Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'))->toDateString();
-                                    $temp['to']             = Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM'))->toDateString();
+                                    $temp['from']           = Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'))->startOfMonth()->toDateString();
+                                    $temp['to']             = Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM'))->endOfMonth()->toDateString();
 
                             $newDatas->push($temp);
 

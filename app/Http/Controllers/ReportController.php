@@ -939,12 +939,24 @@ class ReportController extends Controller
             $product['competitor_brand'] = '';
             $product['price'] = '';
             $product['price_competitor'] = '';
+            $product['index'] = '';
 
             $competitors = ProductCompetitor::where('product_competitors.id', $product->id_main_competitor)
             ->join('brands','product_competitors.id_brand','brands.id')
             ->select('product_competitors.*','brands.name as brand_name_competitor')->first();
 
         // return response()->json($competitors);
+
+            $price = DataPrice::where('data_price.id_store', $store)
+                        ->whereMonth('data_price.date', $month)
+                        ->whereYear('data_price.date', $year)
+                        ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
+                        ->where('detail_data_price.id_product',$product->id)
+                        ->where('detail_data_price.isSasa',1)->first();
+
+            if ($price) {
+                $product['price'] = $price->price;
+            }
             if ($competitors) {
                 $product['competitor_name'] = $competitors->name;
                 $product['competitor_brand'] = $competitors->brand_name_competitor;
@@ -956,18 +968,10 @@ class ReportController extends Controller
                         ->where('detail_data_price.isSasa',0)->first();
                 if ($priceCompetitor) {
                     $product['price_competitor'] = $priceCompetitor->price;
+                    if($product['price']>0){
+                        $product['index'] = abs($product['price']-$product['price_competitor']); 
+                    }
                 }
-            }
-
-            $price = DataPrice::where('data_price.id_store', $store)
-                        ->whereMonth('data_price.date', $month)
-                        ->whereYear('data_price.date', $year)
-                        ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
-                        ->where('detail_data_price.id_product',$product->id)
-                        ->where('detail_data_price.isSasa',1)->first();
-
-            if ($price) {
-                $product['price'] = $price->price;
             }
         }
         // return response()->json($products);
