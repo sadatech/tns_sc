@@ -215,7 +215,8 @@
               $('.popup-image').magnificPopup({
                 type: 'image',
               });
-              // $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterAccount").val()+"/"+$("#filterStore").val()+"/new");
+        $("#btnDownloadXLS").attr("target-url","{{ route('priceData.row.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&account=" + $("#filterAccount").val() + "&limit=" + $("#reportTable_length select").val());
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.row.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&account=" + $("#filterAccount").val());
             },
             columns: listHeader,
             bDestroy: true

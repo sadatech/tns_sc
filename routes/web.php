@@ -454,7 +454,7 @@ Route::prefix('product')->group(function () {
 		Route::get('/delete/{id}', 'ProductFokusSpgController@delete')->name('fokusSpg.delete')->middleware('auth');
 		Route::get('/download-template', function()
 		{
-			return response()->download(public_path('assets/FokusSpgImport.xlsx'));
+			return response()->download(public_path('assets/FokusSpgPasarImport.xlsx'));
 		})->name('fokusSpg.download-template')->middleware('auth');
 	});
 });
