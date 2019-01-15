@@ -42,8 +42,8 @@
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
           </div>
         </div>
 
@@ -146,7 +146,7 @@
    * Download OnClick
    */
 
-   $("#btnDownloadXLS").on("click", function(){
+  $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function(){
     $.ajax({
       url: $(this).attr("target-url"),
       type: "post",
@@ -225,7 +225,6 @@
         }
       });
 
-
   });
       @if(session('type'))
       $(document).ready(function() {
@@ -251,6 +250,13 @@
               processing: true,
               serverSide: true,
               ajax: '{!! route('priceData.dataRow') !!}',
+              drawCallback: function(){
+        $('.popup-image').magnificPopup({
+          type: 'image',
+        });
+        $("#btnDownloadXLS").attr("target-url","{{ route('priceData.row.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&account=" + $("#filterAccount").val() + "&limit=" + $("#reportTable_length select").val());
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.row.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&account=" + $("#filterAccount").val());
+      },
               columns: [
           { title:'CATEGORY', data: 'category_name', name: 'category_name'},
           { title:'PRODUCT', data: 'brand_name', name: 'brand_name'},
