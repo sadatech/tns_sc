@@ -425,8 +425,9 @@
                             </li>                
                             {{-- Availability--}}
                             <li>
-                                <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability</span></a>
-                            </li> {{-- Promo Activity--}}
+                                <a class="{{ request()->is('report/mtc/availability/row') ? 'active' : '' }}" href="{{ route('availability.row') }}"><span class="sidebar-mini-hide">Availability</span></a>
+                            </li> 
+                            {{-- Promo Activity--}}
                             <li>
                                 <a class="{{ request()->is('promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><span class="sidebar-mini-hide">Promo Activity</span></a>
                             </li>
@@ -444,6 +445,9 @@
                                     <li>
                                         <a class="{{ request()->is('report/mtc/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><span class="sidebar-mini-hide">Ach Additional Display</span></a>
                                     </li>  
+                                    <li>
+                                        <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability</span></a>
+                                    </li> 
                                 </ul>
                             </li>
                         </ul>
