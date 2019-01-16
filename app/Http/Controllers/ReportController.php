@@ -70,6 +70,7 @@ use App\Jobs\ExportMTCDisplayShareAchievementJob;
 use App\Jobs\ExportMTCAdditionalDisplayAchievementJob;
 use App\Jobs\ExportMTCPriceRowJob;
 use App\Jobs\ExportMTCPriceSummaryJob;
+use App\Jobs\ExportMTCPriceCompJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -978,6 +979,34 @@ class ReportController extends Controller
         }
         // return response()->json($products);
         return Datatables::of($products)->make(true);
+    }
+
+    public function priceDataVsExportXLS(Request $request)
+    {
+        $req['periode'] = ($request->periode == "null" || empty($request->periode) ? null : $request->periode);
+        $req['store'] = ($request->store == "null" || empty($request->store) ? 1 : $request->store);
+        $req['limitLs'] = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($req){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Price VS Competitor (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCPriceCompJob($JobTrace, $req, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
     public function priceRow (){
