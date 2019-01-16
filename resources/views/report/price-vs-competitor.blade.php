@@ -45,8 +45,8 @@
             <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-cog mr-2"></i>Setting Main Competitor</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
           </div>
         </div>
 
@@ -209,7 +209,7 @@
    * Download OnClick
    */
 
-   $("#btnDownloadXLS").on("click", function(){
+  $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function(){
     $.ajax({
       url: $(this).attr("target-url"),
       type: "post",
@@ -250,7 +250,8 @@
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        // $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterAccount").val()+"/"+$("#filterStore").val()+"/new");
+        $("#btnDownloadXLS").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&limit=" + $("#reportTable_length select").val());
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val());
       },
       columns: [
         { data: 'category_name', name: 'category_name'},
@@ -294,6 +295,10 @@
               processing: true,
               serverSide: true,
               ajax: '{!! route('priceData.dataVs') !!}',
+              drawCallback: function(){
+                $("#btnDownloadXLS").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&limit=" + $("#reportTable_length select").val());
+                $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val());
+              },
               columns: [
                 { data: 'category_name', name: 'category_name'},
                 { data: 'name', name: 'name'},
