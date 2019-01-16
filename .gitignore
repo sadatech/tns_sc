@@ -11,6 +11,7 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .env
+supervisor_worker.log
 composer.lock
 /public/uploads
 /public/export

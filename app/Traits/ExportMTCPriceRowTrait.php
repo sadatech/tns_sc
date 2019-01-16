@@ -79,7 +79,7 @@ trait ExportMTCPriceRowTrait
 			}
 			
 			$listData["LOWEST"]  = @$item['lowest'];
-			$listData["HIGHEST"] = @$item['higest'];
+			$listData["HIGHEST"] = @$item['highest'];
 			$listData["HIGHEST VS LOWEST"] = @$item['vs'];
 			
 			return $listData;
