@@ -882,8 +882,8 @@ class ReportController extends Controller
     public function PriceVsIndex(){
         $subCategories = SubCategory::get();
         foreach ($subCategories as $category) {
-            $data[$category->name.'products'] = Product::where('products.id_subcategory',$category->id)->get();
-            $data[$category->name.'productCompetitors'] = ProductCompetitor::where('product_competitors.id_subcategory',$category->id)
+            $data['products'.$category->id] = Product::where('products.id_subcategory',$category->id)->get();
+            $data['productCompetitors'.$category->id] = ProductCompetitor::where('product_competitors.id_subcategory',$category->id)
                                                                             ->join('brands','product_competitors.id_brand','brands.id')
                                                                             ->select('product_competitors.*','brands.name as brand_name')->orderBy('brand_name')->get();
         }
@@ -932,7 +932,8 @@ class ReportController extends Controller
         }
         
         $products = Product::join('brands','products.id_brand','brands.id')
-        ->join('categories','products.id_subcategory','categories.id')
+        ->join('sub_categories','products.id_subcategory','sub_categories.id')
+        ->join('categories','sub_categories.id_category','categories.id')
         ->select('products.*','brands.name as brand_name','categories.name as category_name')->get();
         foreach ($products as $product) {
             $product['competitor_name'] = '';

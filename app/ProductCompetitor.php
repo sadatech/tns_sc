@@ -25,6 +25,7 @@ class ProductCompetitor extends Model
     ];
 
     // public static function boot(){
+        // parent::boot();
     //     self::creating(function($model){
     //         $model->id_brand = Brand::defaultBrand()->id;
     //     });
