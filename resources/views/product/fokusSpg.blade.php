@@ -65,6 +65,7 @@
             <table class="table table-bordered table-vcenter">
                 <thead>
                     <tr>
+                        <td><b>Employee</b></td>
                         <td><b>Product</b></td>
                         <td><b>Month From</b></td>
                         <td><b>Month Until</b></td>
@@ -72,11 +73,13 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td>Employee NIK 1</td>
                         <td>Product Name 1</td>
                         <td>Month From 1</td>
                         <td>Month Until 1</td>
                     </tr>
                     <tr>
+                        <td>Employee NIK 2</td>
                         <td>Product Name 2</td>
                         <td>Month From 2</td>
                         <td>Month Until 2</td>

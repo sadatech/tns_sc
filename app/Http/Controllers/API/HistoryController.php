@@ -127,9 +127,10 @@ class HistoryController extends Controller
 
 			if (strtoupper($type) == 'MTC') {
 				$header = Sales::query();
-				$header->when($sales != '', function ($q){
-					return $q->whereType('Sell Out');
-				});
+				$header->whereType('Sell In');
+			}else if (strtoupper($type) == 'MTC-O') {
+				$header = Sales::query();
+				$header->whereType('Sell Out');
 			}else if (strtoupper($type) == 'GTC-MD') {
 				$header = SalesMd::query();
 			}else if (strtoupper($type) == 'GTC-SPG') {

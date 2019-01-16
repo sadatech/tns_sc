@@ -59,6 +59,7 @@
             <th style="vertical-align: middle; text-align: center;">BRAND KOMPETITOR</th>
             <th style="vertical-align: middle; text-align: center;">SASA Price</th>
             <th style="vertical-align: middle; text-align: center;">KOMPETITOR Price</th>
+            <th style="vertical-align: middle; text-align: center;">INDEX</th>
           </tr>
 
         </thead>
@@ -258,6 +259,7 @@
         { data: 'competitor_brand', name: 'competitor_brand'},
         { data: 'price', name: 'price'},
         { data: 'price_competitor', name: 'price_competitor'},
+        { data: 'index', name: 'index'},
       ],
       bDestroy: true
     });
@@ -299,6 +301,7 @@
                 { data: 'competitor_brand', name: 'competitor_brand'},
                 { data: 'price', name: 'price'},
                 { data: 'price_competitor', name: 'price_competitor'},
+                { data: 'index', name: 'index'},
               ],
               "scrollX":        true, 
               "scrollCollapse": true,
