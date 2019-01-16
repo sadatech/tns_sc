@@ -98,26 +98,26 @@
           </div>
           @foreach($subCategories as $subcategory)
             @php
-            $products = $subcategory->name."products";
-            $productCompetitors = $subcategory->name."productCompetitors";
+            $products = "products".$subcategory->id;
+            $productCompetitors = "productCompetitors".$subcategory->id;
             @endphp
-            @foreach($$products as $product)
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <h5><small>{{ $subcategory->name }} -</small> {{ $product->name }} </h5>
-                  <input type="text" name="products[]" id="products" class="form-control" value="{{ $product->id }}" hidden>
-                </div>
-                <div class="form-group col-md-6">
-                  <select name="competitors[]" id="competitors" class="form-control js-select">
-                    <option value="">(none)</option>
-                    @foreach($$productCompetitors as $productCompetitor)
-                    <option value="{{ $productCompetitor->id }}"@if($product->id_main_competitor == "$productCompetitor->id") selected @endif>{{ $productCompetitor->brand_name .'-'. $productCompetitor->name }}</option>
-                    @endforeach
-                  </select>
-                </div>
+              @foreach($$products as $product)
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <h5><small>{{ $subcategory->name }} -</small> {{ $product->name }} </h5>
+                    <input type="text" name="products[]" id="products" class="form-control" value="{{ $product->id }}" hidden>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <select name="competitors[]" id="competitors" class="form-control js-select">
+                      <option value="">(none)</option>
+                      @foreach($$productCompetitors as $productCompetitor)
+                      <option value="{{ $productCompetitor->id }}"@if($product->id_main_competitor == "$productCompetitor->id") selected @endif>{{ $productCompetitor->brand_name .'-'. $productCompetitor->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
-              </div>
-            @endforeach
+                </div>
+              @endforeach
           @endforeach
 
         </div>
