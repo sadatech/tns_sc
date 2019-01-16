@@ -49,7 +49,7 @@
 
         <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
         <thead>
-          <tr>
+          <!-- <tr>
             <th style="vertical-align: middle; text-align: center;">CATEGORY</th>
             <th style="vertical-align: middle; text-align: center;">PRODUCT</th>
             <th style="vertical-align: middle; text-align: center;">PACKAGING</th>
@@ -59,7 +59,7 @@
             <th style="vertical-align: middle; text-align: center;">LOWEST</th>
             <th style="vertical-align: middle; text-align: center;">HIGHEST</th>
             <th style="vertical-align: middle; text-align: center;">HIGHEST VS LOWEST</th>
-          </tr>
+          </tr> -->
 
         </thead>
         </table>
@@ -162,47 +162,70 @@
    $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
+
+    if($.fn.dataTable.isDataTable('#reportTable'))
+    {
+        $('#reportTable').DataTable().clear();
+        $('#reportTable').DataTable().destroy();
+    }
+
     var table = null;
     var url = '{!! route('priceData.dataRow') !!}';
-    table = $('#reportTable').DataTable({
-      processing: true,
-      serverSide: true,
-      scrollX: true,
-      scrollY: "300px",
-      ajax: {
-        url: url + "?" + $("#filter").serialize(),
+
+    listHeader = [
+          { title:'CATEGORY', data: 'category_name', name: 'category_name'},
+          { title:'PRODUCT', data: 'brand_name', name: 'brand_name'},
+          { title:'PACKAGING', data: 'name', name: 'name'},
+      ];
+
+      $.ajax({
+        url: url + "?" + $("#filter").serialize() + "&storeList=yes",
         type: 'GET',
         dataType: 'json',
-        dataSrc: function(res) {
-          Codebase.layout('header_loader_off');
-            $('#table-block').show();
-            return res.data;
-        },
-        error: function (data) {
-          Codebase.layout('header_loader_off');
-          swal("Error!", "Failed to load Data!", "error");
-        },
-      },
-      drawCallback: function(){
-        $('.popup-image').magnificPopup({
-          type: 'image',
-        });
+        success: function(e){
+          console.log(e)
+          e.forEach(function(store){
+            listHeader.push({title:store.name1,  data: store.name1+"_price", name: store.name1+"_price"});
+          })
+
+          listHeader.push({title:'LOWEST',  data: 'lowest', name: 'lowest'});
+          listHeader.push({title:'HIGHEST',  data: 'highest', name: 'highest'});
+          listHeader.push({title:'HIGHEST VS LOWEST',  data: 'vs', name: 'vs'});
+
+          table = $('#reportTable').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            scrollY: "300px",
+            ajax: {
+              url: url + "?" + $("#filter").serialize(),
+              type: 'GET',
+              dataType: 'json',
+              dataSrc: function(res) {
+                Codebase.layout('header_loader_off');
+                  $('#table-block').show();
+                  return res.data;
+              },
+              error: function (data) {
+                Codebase.layout('header_loader_off');
+                swal("Error!", "Failed to load Data!", "error");
+              },
+            },
+            drawCallback: function(){
+              $('.popup-image').magnificPopup({
+                type: 'image',
+              });
         $("#btnDownloadXLS").attr("target-url","{{ route('priceData.row.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&account=" + $("#filterAccount").val() + "&limit=" + $("#reportTable_length select").val());
         $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.row.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&account=" + $("#filterAccount").val());
-      },
-      columns: [
-          { data: 'category_name', name: 'category_name'},
-          { data: 'brand_name', name: 'brand_name'},
-          { data: 'name', name: 'name'},
-            @foreach($stores as $store)
-              {data: '{{ $store->name1 }}_price', name: '{{ $store->name1 }}_price', searchable: false, sortable: false},
-            @endforeach
-          { data: 'lowest', name: 'lowest'},
-          { data: 'highest', name: 'highest'},
-          { data: 'vs', name: 'vs'},
-      ],
-      bDestroy: true
-    });
+            },
+            columns: listHeader,
+            bDestroy: true
+          });
+
+
+        }
+      });
+
   });
       @if(session('type'))
       $(document).ready(function() {
@@ -236,15 +259,15 @@
         $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.row.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&account=" + $("#filterAccount").val());
       },
               columns: [
-          { data: 'category_name', name: 'category_name'},
-          { data: 'brand_name', name: 'brand_name'},
-          { data: 'name', name: 'name'},
+          { title:'CATEGORY', data: 'category_name', name: 'category_name'},
+          { title:'PRODUCT', data: 'brand_name', name: 'brand_name'},
+          { title:'PACKAGING', data: 'name', name: 'name'},
             @foreach($stores as $store)
-              {data: '{{ $store->name1 }}_price', name: '{{ $store->name1 }}_price', searchable: false, sortable: false},
+              { title:'{{ $store->name1 }}', data: '{{ $store->name1 }}_price', name: '{{ $store->name1 }}_price', searchable: false, sortable: false},
             @endforeach
-          { data: 'lowest', name: 'lowest'},
-          { data: 'highest', name: 'highest'},
-          { data: 'vs', name: 'vs'},
+          { title:'LOWEST', data: 'lowest', name: 'lowest'},
+          { title:'HIGHEST', data: 'highest', name: 'highest'},
+          { title:'HIGHEST VS LOWEST', data: 'vs', name: 'vs'},
               ],
               "scrollX":        true, 
               "scrollCollapse": true,

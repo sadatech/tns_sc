@@ -12,8 +12,8 @@ use App\Cbd;
 
 class CbdController extends Controller
 {
-	public function __construct()
-	{
+    public function __construct()
+    {
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
 
