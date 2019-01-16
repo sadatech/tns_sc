@@ -103,7 +103,8 @@ trait ExportMTCPriceCompTrait
 		}
 		
 		$products = Product::join('brands','products.id_brand','brands.id')
-		->join('categories','products.id_subcategory','categories.id')
+		->join('sub_categories','products.id_subcategory','sub_categories.id')
+		->join('categories','sub_categories.id_category','categories.id')
 		->select('products.*','brands.name as brand_name','categories.name as category_name')->get();
 		
 		foreach ($products as $product)
@@ -129,7 +130,7 @@ trait ExportMTCPriceCompTrait
 			{
 				$product['price'] = $price->price;
 			}
-
+			
 			if ($competitors)
 			{
 				$product['competitor_name'] = $competitors->name;
@@ -143,14 +144,16 @@ trait ExportMTCPriceCompTrait
 				if ($priceCompetitor)
 				{
 					$product['price_competitor'] = $priceCompetitor->price;
+					
 					if($product['price']>0)
 					{
 						$product['index'] = abs($product['price']-$product['price_competitor']); 
 					}
 				}
 			}
-			$this->priceCompData[] = $product;
 		}
+		
+		$this->priceCompData = $products;
 	}
 	
 }
