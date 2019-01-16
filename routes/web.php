@@ -359,6 +359,12 @@ Route::prefix('product')->group(function () {
 		Route::post('/create', 'ProductCompetitorController@store')->name('product-competitor.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductCompetitorController@update')->name('product-competitor.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductCompetitorController@delete')->name('product-competitor.delete')->middleware('auth');
+		Route::post('/import', 'ProductCompetitorController@import')->name('product-competitor.import')->middleware('auth');
+		Route::get('/export', 'ProductCompetitorController@export')->name('product-competitor.export')->middleware('auth');
+		Route::get('/download-template', function()
+		{
+			return response()->download(public_path('assets/ProductCompetitorImport.xlsx'));
+		})->name('product-competitor.download-template')->middleware('auth');
 	});
 
 	//Price Pages
