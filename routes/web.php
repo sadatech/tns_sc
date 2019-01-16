@@ -896,6 +896,7 @@ Route::prefix('mtc')->group(function () {
 		Route::post('/row/exportXLS', 'ReportController@priceRowExportXLS')->name('priceData.row.exportXLS')->middleware('auth');
 		Route::get('/vs', 'ReportController@PriceVsIndex')->name('priceData.vs')->middleware('auth');
 		Route::get('/dataVs', 'ReportController@priceDataVs')->name('priceData.dataVs')->middleware('auth');
+		Route::any('/vs/exportXLS', 'ReportController@priceDataVsExportXLS')->name('priceData.dataVs.exportXLS')->middleware('auth');
 		Route::post('/store', 'ReportController@store')->name('priceData.store')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@priceDataUpdate')->name('priceData.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportpriceData')->name('priceData.import')->middleware('auth');
