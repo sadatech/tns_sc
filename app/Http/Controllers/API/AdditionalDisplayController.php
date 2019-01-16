@@ -18,7 +18,7 @@ class AdditionalDisplayController extends Controller
     use WeekHelper;
 
     public function __construct()
-	{
+    {
 		Config::set('auth.providers.users.model', \App\Employee::class);
 	}
 
@@ -55,6 +55,7 @@ class AdditionalDisplayController extends Controller
                         ]);
 
                     });
+
                 } catch (\Exception $e) {
                     return response()->json(['status' => false, 'msg' => 'Gagal melakukan transaksi 1'], 500);
                 }
@@ -85,7 +86,7 @@ class AdditionalDisplayController extends Controller
                         }else{
                             return response()->json(['status' => false, 'msg' => 'Photo Cant be Empyt'], 500);
                         }
-                        
+
                         DetailAdditionalDisplay::create([
                             'id_additional_display' => $transaction->id,
                             'id_jenis_display' => $request['jenis_display'],
@@ -94,6 +95,7 @@ class AdditionalDisplayController extends Controller
                         ]);
 
                     });
+
                 } catch (\Exception $e) {
                     return response()->json(['status' => false, 'msg' => 'Gagal melakukan transaksi 2'], 500);
                 }
@@ -102,7 +104,6 @@ class AdditionalDisplayController extends Controller
                 $additionalDisplayHeaderAfter = AdditionalDisplay::where('id_employee', $employee->id)->where('id_store', $request['store'])->where('date', date('Y-m-d'))->first();
 
                 return response()->json(['status' => true, 'id_transaksi' => $additionalDisplayHeaderAfter->id, 'msg' => 'Data berhasil di input']);
-
             }
 
     }
