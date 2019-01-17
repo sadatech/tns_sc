@@ -13,17 +13,40 @@
   @endif
   <div class="block block-themed"> 
     <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+      <h3 class="block-title">Filter</h3>
+    </div>
+    <div class="block">        
+      <div class="block-content block-content-full">
+        <form method="post" id="filter">
+          <div class="row">
+            <div class="col-md-4">
+              <label>Store:</label>
+              <select class="form-control" id="filterStore" name="store"></select>
+            </div>
+            <div class="col-md-4">
+              <label>Periode:</label>
+              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
+          <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="block block-themed"> 
+    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
         <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
-            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Setting Main Competitor</button>
+            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-cog mr-2"></i>Setting Main Competitor</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-            <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+            <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
           </div>
         </div>
 
@@ -36,6 +59,7 @@
             <th style="vertical-align: middle; text-align: center;">BRAND KOMPETITOR</th>
             <th style="vertical-align: middle; text-align: center;">SASA Price</th>
             <th style="vertical-align: middle; text-align: center;">KOMPETITOR Price</th>
+            <th style="vertical-align: middle; text-align: center;">INDEX</th>
           </tr>
 
         </thead>
@@ -74,26 +98,26 @@
           </div>
           @foreach($subCategories as $subcategory)
             @php
-            $products = $subcategory->name."products";
-            $productCompetitors = $subcategory->name."productCompetitors";
+            $products = "products".$subcategory->id;
+            $productCompetitors = "productCompetitors".$subcategory->id;
             @endphp
-            @foreach($$products as $product)
-              <div class="row">
-                <div class="form-group col-md-6">
-                  <h5><small>{{ $subcategory->name }} -</small> {{ $product->name }} </h5>
-                  <input type="text" name="products[]" id="products" class="form-control" value="{{ $product->id }}" hidden>
-                </div>
-                <div class="form-group col-md-6">
-                  <select name="competitors[]" id="competitors" class="form-control js-select">
-                    <option value="">(none)</option>
-                    @foreach($$productCompetitors as $productCompetitor)
-                    <option value="{{ $productCompetitor->id }}"@if($product->id_main_competitor == "$productCompetitor->id") selected @endif>{{ $productCompetitor->brand_name .'-'. $productCompetitor->name }}</option>
-                    @endforeach
-                  </select>
-                </div>
+              @foreach($$products as $product)
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <h5><small>{{ $subcategory->name }} -</small> {{ $product->name }} </h5>
+                    <input type="text" name="products[]" id="products" class="form-control" value="{{ $product->id }}" hidden>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <select name="competitors[]" id="competitors" class="form-control js-select">
+                      <option value="">(none)</option>
+                      @foreach($$productCompetitors as $productCompetitor)
+                      <option value="{{ $productCompetitor->id }}"@if($product->id_main_competitor == "$productCompetitor->id") selected @endif>{{ $productCompetitor->brand_name .'-'. $productCompetitor->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
 
-              </div>
-            @endforeach
+                </div>
+              @endforeach
           @endforeach
 
         </div>
@@ -112,6 +136,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/magnific-popup/magnific-popup.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
     <style type="text/css">
@@ -127,52 +152,119 @@
 
 @section('script')
 
+<script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
   <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script src="{{ asset('js/select2-handler.js') }}"></script>
   <script type="text/javascript">
+  
+  $('#reset').click(function(){
+    $('.js-datepicker').val(null);
+    setTimeout(function() {
+      $('#filterAccount,#filterStore,#filterArea').val(null).trigger('change');
+    }, 10);
+  });
+  $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', 'Choose your Account', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Choose your Store', function (params) {
+    return filterData('store', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name1}
+      })
+    }
+  }));
+  $(".js-datepicker").datepicker( {
+    format: "mm/yyyy",
+    viewMode: "months",
+    autoclose: true,
+    minViewMode: "months"
+  });
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
 
-        $(document).ready(function() {
-        $.ajaxSetup({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
+  /**
+   * Download OnClick
+   */
+
+  $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function(){
+    $.ajax({
+      url: $(this).attr("target-url"),
+      type: "post",
+      success: function(e){
+        swal("Success!", e.result, "success");
+      },
+      error: function(){
+        swal("Error!", e.result, "error");
+      }
+    });
+  });
+
+   $('#filter').submit(function(e) {
+    Codebase.layout('header_loader_on');
+    e.preventDefault();
+    var table = null;
+    var url = '{!! route('priceData.dataVs') !!}';
+    table = $('#reportTable').DataTable({
+      processing: true,
+      serverSide: true,
+      scrollX: true,
+      scrollY: "300px",
+      ajax: {
+        url: url + "?" + $("#filter").serialize(),
+        type: 'GET',
+        dataType: 'json',
+        dataSrc: function(res) {
+          Codebase.layout('header_loader_off');
+            $('#table-block').show();
+            return res.data;
+        },
+        error: function (data) {
+          Codebase.layout('header_loader_off');
+          swal("Error!", "Failed to load Data!", "error");
+        },
+      },
+      drawCallback: function(){
+        $('.popup-image').magnificPopup({
+          type: 'image',
         });
-
-        $('#employeeSelect').select2(setOptions('{{ route("employee-select2") }}', 'Select Employee', function (params) {
-          return filterData('employee', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.nik+' - '+obj.name}
-            })
-          }
-        }));
-
-        $('#storeSelect').select2(setOptions('{{ route("store-select2") }}', 'Select Store', function (params) {
-          return filterData('store', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name1+' - '+obj.name2}
-            })
-          }
-        }));
-
-
-        $('#productSelect').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
-          return filterData('product', params.term);
-        }, function (data, params) {
-          return {
-            results: $.map(data, function (obj) {                                
-              return {id: obj.id, text: obj.name+' ('+obj.deskripsi+')'}
-            })
-          }
-        }));
-
-      });
+        $("#btnDownloadXLS").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&limit=" + $("#reportTable_length select").val());
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val());
+      },
+      columns: [
+        { data: 'category_name', name: 'category_name'},
+        { data: 'name', name: 'name'},
+        { data: 'competitor_name', name: 'competitor_name'},
+        { data: 'competitor_brand', name: 'competitor_brand'},
+        { data: 'price', name: 'price'},
+        { data: 'price_competitor', name: 'price_competitor'},
+        { data: 'index', name: 'index'},
+      ],
+      bDestroy: true
+    });
+  });
 
 //   $("#datepicker").datepicker( {
 //     format: "mm-yyyy",
@@ -203,6 +295,10 @@
               processing: true,
               serverSide: true,
               ajax: '{!! route('priceData.dataVs') !!}',
+              drawCallback: function(){
+                $("#btnDownloadXLS").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&limit=" + $("#reportTable_length select").val());
+                $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val());
+              },
               columns: [
                 { data: 'category_name', name: 'category_name'},
                 { data: 'name', name: 'name'},
@@ -210,6 +306,7 @@
                 { data: 'competitor_brand', name: 'competitor_brand'},
                 { data: 'price', name: 'price'},
                 { data: 'price_competitor', name: 'price_competitor'},
+                { data: 'index', name: 'index'},
               ],
               "scrollX":        true, 
               "scrollCollapse": true,

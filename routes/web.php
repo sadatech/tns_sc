@@ -454,7 +454,7 @@ Route::prefix('product')->group(function () {
 		Route::get('/delete/{id}', 'ProductFokusSpgController@delete')->name('fokusSpg.delete')->middleware('auth');
 		Route::get('/download-template', function()
 		{
-			return response()->download(public_path('assets/FokusSpgImport.xlsx'));
+			return response()->download(public_path('assets/FokusSpgPasarImport.xlsx'));
 		})->name('fokusSpg.download-template')->middleware('auth');
 	});
 });
@@ -884,10 +884,13 @@ Route::prefix('mtc')->group(function () {
 		Route::get('/', 'ReportController@priceDataIndex')->name('priceData')->middleware('auth');
 		Route::get('/summary', 'ReportController@priceSummary')->name('priceData.summary')->middleware('auth');
 		Route::get('/dataSummary', 'ReportController@priceDataSummary')->name('priceData.dataSummary')->middleware('auth');
+		Route::any('/summary/exportXLS', 'ReportController@priceSummaryExportXLS')->name('priceData.summary.exportXLS')->middleware('auth');
 		Route::get('/row', 'ReportController@priceRow')->name('priceData.row')->middleware('auth');
 		Route::get('/dataRow', 'ReportController@priceDataRow')->name('priceData.dataRow')->middleware('auth');
+		Route::post('/row/exportXLS', 'ReportController@priceRowExportXLS')->name('priceData.row.exportXLS')->middleware('auth');
 		Route::get('/vs', 'ReportController@PriceVsIndex')->name('priceData.vs')->middleware('auth');
 		Route::get('/dataVs', 'ReportController@priceDataVs')->name('priceData.dataVs')->middleware('auth');
+		Route::any('/vs/exportXLS', 'ReportController@priceDataVsExportXLS')->name('priceData.dataVs.exportXLS')->middleware('auth');
 		Route::post('/store', 'ReportController@store')->name('priceData.store')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@priceDataUpdate')->name('priceData.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportpriceData')->name('priceData.import')->middleware('auth');
@@ -1013,6 +1016,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/employee-select2', 'EmployeeController@getDataWithFilters')->name('employee-select2');
 	Route::post('/employee-select2-for-report', 'EmployeeController@getDataWithFiltersForReport')->name('employee-select2-for-report');
 	Route::post('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
+	Route::post('/account-select2', 'AccountController@getDataWithFilters')->name('account-select2');
 	Route::post('/block-select2', 'EmployeeController@getDataWithFiltersBlock')->name('block-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
 	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');

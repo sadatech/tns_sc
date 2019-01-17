@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Product;
 use App\Category;
 use App\SubCategory;
+use App\Employee;
 use App\ProductFokusSpg;
 use DB;
 use Auth;
@@ -17,6 +18,7 @@ use App\ProductStockType;
 use Illuminate\Support\Facades\Input;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\Datatables\Datatables;
+use Illuminate\Support\Collection;
 
 class ProductFokusSpgController extends Controller
 {
@@ -196,63 +198,84 @@ class ProductFokusSpgController extends Controller
             'file' =>   'required'
         ]);
 
-        $transaction = DB::transaction(function () use ($request) {
-            $file = Input::file('file')->getClientOriginalName();
-            $filename = pathinfo($file, PATHINFO_FILENAME);
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
+        $file = Input::file('file')->getClientOriginalName();
+        $filename = pathinfo($file, PATHINFO_FILENAME);
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-            if ($extension != 'xlsx' && $extension !=  'xls') {
-                return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
-            }
-            if($request->hasFile('file')){
-                $file = $request->file('file')->getRealPath();
-                $ext = '';
-                
-                Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
+        if ($extension != 'xlsx' && $extension !=  'xls') {
+            return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
+        }
+
+        if($request->hasFile('file'))
+        {
+            $file = $request->file('file')->getRealPath();
+            $ext = '';
+            Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
+                if (!empty($results->all()))
                 {
+                    $newDatas = new Collection();
                     foreach($results as $row)
                     {
-                        echo "$row<hr>";
-                        $dataProduct['product_name']        = $row->product;
-                        $dataProduct['product_code']        = $row->code;
-                        $dataProduct['subcategory_name']    = $row->subcategory;
-                        $dataProduct['category_name']       = $row->category;
-                        $dataProduct['sku']                 = $row->sku;
-                        $dataProduct['type']                = $row->type;
-                        $dataProduct['value']               = $row->value;
-                        $id_product = $this->findProduct($dataProduct);
+                        $getEmp = Employee::whereRaw("TRIM(UPPER(nik)) = '".trim(strtoupper($row['nik']))."'")->first();
+                        $getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['sku']))."'")->first();
+                        if (isset($getEmp->id))
+                        {
+                            if (isset($getSku->id))
+                            {
+                                    $temp['id_employee']    = $getEmp->id;
+                                    $temp['id_product']     = $getSku->id;
+                                    $temp['from']           = Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'))->startOfMonth()->toDateString();
+                                    $temp['to']             = Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM'))->endOfMonth()->toDateString();
 
-                        // $data1 = Category::where(['id' => $id_product])->first();
-                        // $check = Product::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->category))."'")
-                        // ->where(['id_product' => $data1->id])->count();
-                        // if ($check < 1) {
-                            ProductFokusSpg::create([
-                                'id_product'        => $id_product,
-                                'from'              => Carbon::now(),
-                                'to'                => Carbon::now()
-                            ])->id;
-                        // } else {
-                        //     return false;
-                        // }
+                            $newDatas->push($temp);
+
+                            }else{
+                                return redirect()->back()->with([
+                                    'type' => 'danger',
+                                    'title' => 'Gagal!<br/>',
+                                    'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah fokus spg, tidak ditemukan produk '.$row["sku"].' Silahkan cek data kembali!'
+                                ]);
+                            }
+                        }else{
+                            return redirect()->back()->with([
+                                'type' => 'danger',
+                                'title' => 'Gagal!<br/>',
+                                'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah fokus spg, tidak ditemukan nik '.$row["nik"].' Silahkan cek data kembali!'
+                            ]);
+                        }
                     }
-                },false);
-            }
-            return 'success';
-        });
 
-        if ($transaction == 'success') {
-            return redirect()->back()
-            ->with([
-                'type'      => 'success',
-                'title'     => 'Sukses!<br/>',
-                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
+
+                    foreach ($newDatas as $newData)
+                    {
+                        if (isset(ProductFokusSpg::where("id_employee", $newData["id_employee"])->where("id_product", $newData["id_product"])->where("from", $newData["from"])->where("to", $newData["to"])->first()->id))
+                        {
+                            $skipPF = true;
+                        }
+
+                        if (!isset($skipPF)){
+                            ProductFokusSpg::create([
+                                'id_employee'        => $newData["id_employee"],
+                                'id_product'        => $newData["id_product"],
+                                'from'              => $newData["from"],
+                                'to'                => $newData["to"]
+                            ]);
+                        }
+                    }
+                } else {
+                    throw new Exception("Error Processing Request", 1);
+                }
+            }, false);
+            return redirect()->back()->with([
+                'type' => 'success',
+                'title' => 'Sukses!<br/>',
+                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah fokus spg!'
             ]);
-        }else{
-            return redirect()->back()
-            ->with([
-                'type'    => 'danger',
-                'title'   => 'Gagal!<br/>',
-                'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+        } else {
+            return redirect()->back()->with([
+                'type' => 'danger',
+                'title' => 'Gagal!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>File harus di isi!'
             ]);
         }
     }

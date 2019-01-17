@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class Account extends Model
 {
@@ -18,6 +19,11 @@ class Account extends Model
     public function stores()
     {
     	return $this->hasMany('App\Store', 'id_account');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }
 
