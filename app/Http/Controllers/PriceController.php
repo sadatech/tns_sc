@@ -26,15 +26,15 @@ class PriceController extends Controller
         $price = Price::with('product');
         return Datatables::of($price)
         ->addColumn('product', function($price) {
-            return $price->product->name;
+            return ($price->product->name??'DELETED PRODUCT');
         })
         ->addColumn('category', function($price) {
-            return $price->product->subCategory->name;
+            return ($price->product->subCategory->name??'DELETED PRODUCT');
         })
         ->addColumn('action', function ($price) {
             $data = array(
                 'id'                => $price->id,
-                'product'           => $price->product->id,
+                'product'           => $price->id_product,
                 'rilis'             => $price->rilis,
                 'price'             => $price->price,
             );
@@ -159,7 +159,7 @@ class PriceController extends Controller
                                     continue;
                                 } else {
                                      Price::create([
-                                        'id_product'    => \App\Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['product']))."'")->first()->id,
+                                        'id_product'    => \App\Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['product']))."'")->withTrashed()->first()->id,
                                         'price'         => $row['price'],
                                         'rilis'         => \PHPExcel_Style_NumberFormat::toFormattedString($row['rilis'], 'YYYY-MM-DD'),
 
