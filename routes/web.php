@@ -337,6 +337,16 @@ Route::prefix('product')->group(function () {
 		})->name('sku-unit.download-template')->middleware('auth');
 	});
 
+
+	//Stock Type Pages
+	Route::prefix('stock-type')->group(function () {
+		Route::get('/', 'ProductStockTypeController@baca')->name('stock-type')->middleware('auth');
+		Route::get('/data', 'ProductStockTypeController@data')->name('stock-type.data')->middleware('auth');
+		Route::post('/create', 'ProductStockTypeController@store')->name('stock-type.add')->middleware('auth');
+		Route::put('/update/{id}', 'ProductStockTypeController@update')->name('stock-type.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductStockTypeController@destroy')->name('stock-type.delete')->middleware('auth');
+	});
+
 	//Product Summary Pages
 	Route::prefix('summary')->group(function () {
 		Route::get('/', 'ProductController@baca')->name('product')->middleware('auth');

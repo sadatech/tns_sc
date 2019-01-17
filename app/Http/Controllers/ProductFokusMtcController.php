@@ -52,7 +52,7 @@ class ProductFokusMtcController extends Controller
 				'until' => $doto->to,
 				'product' => (isset($doto->product->name) ? $doto->product->name : "-"),
 				'channel' => (isset($doto->channel->name) ? $doto->channel->name : "-"),
-				'area' => (isset($doto->area->name) ? $doto->area->name : "-"),
+				'area' => (isset($doto->area->name) ? $doto->area->name : "ALL"),
 			);
 		}
 		return Datatables::of($product)
