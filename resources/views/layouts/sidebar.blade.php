@@ -165,6 +165,9 @@
                                 <a class="{{ request()->is('product/sku-unit') ? 'active' : '' }}" href="{{ route('sku-unit') }}">SKU Unit</a>
                             </li> -->
                             <li>
+                                <a class="{{ request()->is('product/stock-type') ? 'active' : '' }}" href="{{ route('stock-type') }}">Stock Type</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
                             @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')

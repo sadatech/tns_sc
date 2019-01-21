@@ -9,5 +9,5 @@ class ProductStockType extends Model
 {
 	use DropDownHelper;
 
-	protected $fillable = ['name', 'value'];
+	protected $fillable = ['name', 'quantity'];
 }
