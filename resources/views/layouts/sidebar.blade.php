@@ -37,14 +37,6 @@
                                 <i class="si si-drop"></i>
                             </a>
                         </li>           
-                        <li class="list-inline-item">
-                            <a class="link-effect text-dual-primary-dark" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="si si-logout"></i>
-                            </a>
-                        </li>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            {{ csrf_field() }}
-                        </form>
                     </ul>
                 </div>
         </div>

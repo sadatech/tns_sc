@@ -20,7 +20,7 @@ $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attribute
 				@endif
 			@endif
 
-				{{ Form::number($name, $value, $config['elOptions']) }}
+				{{ Form::text($name, $value, $config['elOptions']) }}
 
 			@if (!empty($config['addonsConfig']))
 				@if ($config['addonsConfig']['position'] === 'right')

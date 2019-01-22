@@ -13,6 +13,7 @@ use App\Channel;
 use App\Filters\AccountFilters;
 use Yajra\Datatables\Datatables;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Filters\AccountFilters;
 
 class AccountController extends Controller
 {
@@ -26,6 +27,11 @@ class AccountController extends Controller
     {
         $data['channel'] = Channel::get();
         return view('store.account', $data);
+    }
+
+    public function getDataWithFilters(AccountFilters $filters){
+        $data = Account::filter($filters)->get();
+        return $data;
     }
 
     public function data(Request $request)
