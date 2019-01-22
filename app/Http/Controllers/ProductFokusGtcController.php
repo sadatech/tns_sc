@@ -169,7 +169,7 @@ class ProductFokusGtcController extends Controller
         (new FastExcel($fokus))->download($filename, function ($fokus) {
             return [
                 'Product'       => $fokus->product->name,
-                'Area'          => (isset($fokus->area->name) ? $fokus->area->name : ""),
+                'Area'          => (isset($fokus->area->name) ? $fokus->area->name : "All"),
                 'Month From'    => $fokus->from,
                 'Month Until'   => $fokus->to
             ];

@@ -132,7 +132,7 @@ th, td {
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     setTimeout(function() {
-      $('#filterEmployee,#filterStore,#filterArea').val(null).trigger('change');
+      $('#filterAccount,#filterStore,#filterArea').val(null).trigger('change');
     }, 10);
   });
   $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', 'Choose your Account', function (params) {
@@ -144,9 +144,10 @@ th, td {
       })
     }
   }));
-   $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
+    data.unshift({ id: '', name: 'all' });
     return {
       results: $.map(data, function (obj) {                                
         return {id: obj.id, text: obj.name}
