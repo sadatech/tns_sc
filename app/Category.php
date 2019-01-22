@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Components\traits\DropDownHelper;
+use App\Filters\QueryFilters;
 
 class Category extends Model
 {
@@ -25,5 +26,10 @@ class Category extends Model
     public function Pf2()
     {
     	return $this->hasMany('App\Pf', 'id_category2');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }

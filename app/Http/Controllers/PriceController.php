@@ -106,7 +106,7 @@ class PriceController extends Controller
             $data = array();
             foreach ($price->get() as $val) {
                 $data[] = array(
-                    'Product'       => $val->product->name,
+                    'Product'       => $val->product->name??'DELETED PRODUCT',
                     'SubCategory'   => (isset($val->product->subCategory->name) ? $val->product->subCategory->name : "-"),
                     'Price'         => (isset($val->price) ? $val->price : "-"),
                     'Rilis'         => (isset($val->rilis) ? $val->rilis : "-")

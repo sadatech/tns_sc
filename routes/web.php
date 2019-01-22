@@ -1036,6 +1036,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/block-select2', 'EmployeeController@getDataWithFiltersBlock')->name('block-select2');
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
 	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');
+	Route::post('/category-select2', 'CategoryController@getDataWithFilters')->name('category-select2');
 	Route::post('/employee-is-tl-select2', 'EmployeeController@getDataIsTL')->name('employee-is-tl-select2');
 	Route::get('/product-byCategory-select2/{param}', 'ProductController@getProductByCategory')->name('product-byCategory-select2');
 });

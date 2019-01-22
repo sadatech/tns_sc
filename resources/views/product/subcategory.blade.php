@@ -39,7 +39,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+<div class="modal fade" id="tambahModal" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
@@ -60,13 +60,8 @@
             <input type="text" class="form-control" name="name" placeholder="Add new sub category" required>
           </div>
           <div class="form-group">
-            <label>Category</label>
-            <select class="js-select2 form-control" style="width: 100%" name="category">
-            <option disabled selected>Choose your Category</option>
-              @foreach($category as $data)
-                  <option value="{{ $data->id }}">{{ $data->name }}</option>
-              @endforeach
-            </select>
+              <label>Category</label>
+              <select class="form-control" id="categoryadd" name="category"></select>
           </div>
         </div>
         <div class="modal-footer">
@@ -80,7 +75,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
@@ -106,11 +101,7 @@
           <div class="row">
             <div class="form-group col-md-12">
               <label>Category</label>
-              <select class="js-edit form-control" id="subcategoryinput" style="width: 100%" name="category" >
-                @foreach($category as $data)
-                    <option value="{{ $data->id }}">{{ $data->name }}</option>
-                @endforeach
-            </select>
+              <select class="form-control" id="categoryedit" name="category"></select>
             </div>
           </div>
         </div>
@@ -202,12 +193,36 @@
 @section('script')
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+  $('#categoryadd').select2(setOptions('{{ route("category-select2") }}', 'Choose your Category', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#categoryedit').select2(setOptions('{{ route("category-select2") }}', 'Choose your Category', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
   function editModal(json) {
     $('#editModal').modal('show');
     $('#editForm').attr('action', "{{ url('/product/sub-category/update') }}/"+json.id);
     $('#nameInput').val(json.name);
-    $('#subcategoryinput').val(json.category).trigger('change');
+    setSelect2IfPatchModal($("#categoryedit"), json.id_category, json.category);
     console.log(json);
   }
   @if(session('type'))
