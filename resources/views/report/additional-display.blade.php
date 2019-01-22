@@ -49,8 +49,8 @@
     <div class="block">        
       <div class="block-content block-content-full">
         <div class="block-option">
-          <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</button>
-          <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</button>
+          <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (Selected)</a>
+          <a id="btnDownloadXLSAll" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data (All)</a>
         </div>
       </div>
       <hr>
@@ -147,20 +147,19 @@ th, td {
   });
 
   /**
-   * Download OnClick
-   */
-
-   $("#btnDownloadXLS").on("click", function(){
-    $.ajax({
-      url: $(this).attr("target-url"),
-      type: "post",
-      success: function(e){
-        swal("Success!", e.result, "success");
-      },
-      error: function(){
-        swal("Error!", e.result, "error");
-      }
-    });
+    * Download OnClick
+    */
+  $("#btnDownloadXLS, #btnDownloadXLSAll").on("click", function() {
+      $.ajax({
+          url: $(this).attr("target-url"),
+          type: "post",
+          success: function(e) {
+              swal("Success!", e.result, "success");
+          },
+          error: function() {
+              swal("Error!", e.result, "error");
+          }
+      });
   });
 
    $('#filter').submit(function(e) {
@@ -191,7 +190,8 @@ th, td {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        // $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterStore").val()+"/new");
+        $("#btnDownloadXLSAll").attr("target-url", "{{ route('additional_display.exportXLS.index') }}" + "?id_employee=" + $("#filterEmployee").val() + "&id_store=" + $("#filterStore").val() + "&id_area=" + $("#filterArea").val() + "&periode=" + $("#filter .js-datepicker ").val() + "&limit=");
+        $("#btnDownloadXLS").attr("target-url", "{{ route('additional_display.exportXLS.index') }}" + "?id_employee=" + $("#filterEmployee").val() + "&id_store=" + $("#filterStore").val() + "&id_area=" + $("#filterArea").val() + "&periode=" + $("#filter .js-datepicker ").val() + "&limit=" + $("#reportTable_length select").val());
       },
       columns: [
       { data: 'id', name: 'id', visible: false},
