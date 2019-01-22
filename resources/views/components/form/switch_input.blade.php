@@ -9,7 +9,7 @@ if (isset($attributes['useLabel'])) {
 
 $labelText = $labelText = isset($attributes['labelText']) ? $attributes['labelText'] : ucwords(implode(' ', explode('_', $name))) . (isset($attributes['required']) ? ' <span class="status-decline">*</span>' : '');
 
-$formAlignment = 'vertical';
+$formAlignment = 'horizontal';
 if (isset($attributes['formAlignment'])) {
 	$formAlignment = $attributes['formAlignment'];
 	unset($attributes['formAlignment']);
@@ -44,7 +44,7 @@ foreach ($configAttributes as $attribute => $attributeValue) {
 	@if ($useLabel)
 	<div class="row">
 		<div class="{{ $labelContainerClass }}">
-			<label class="form-control-label">
+			<label class="col-form-label">
 				{!! $labelText !!}
 			</label>
 		</div>

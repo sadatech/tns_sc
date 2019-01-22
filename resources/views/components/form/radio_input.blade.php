@@ -1,78 +1,49 @@
 @php
 if (!is_array($attributes)) $attributes = [];
-
-$useLabel = true;
-if (isset($attributes['useLabel'])) {
-	$useLabel = $attributes['useLabel'];
-	unset($attributes['useLabel']);
-}
-
-$orientation = 'horizontal';
-if (isset($attributes['orientation'])) {
-	$orientation = $attributes['orientation'];
-	unset($attributes['orientation']);
-}
-
-$labelText = $labelText = isset($attributes['labelText']) ? $attributes['labelText'] : ucwords(implode(' ', explode('_', $name))) . (isset($attributes['required']) ? ' <span class="status-decline">*</span>' : '');;
-
-$formAlignment = 'vertical';
-if (isset($attributes['formAlignment'])) {
-	$formAlignment = $attributes['formAlignment'];
-	unset($attributes['formAlignment']);
-}
-
-
-$labelContainerClass = $formAlignment === 'vertical' ? 'col-md-12' : 'col-md-3';
-$inputContainerClass = $formAlignment === 'vertical' ? 'col-md-12' : 'col-md-9';
-if ($formAlignment === 'horizontal') {
-	if (isset($attributes['labelContainerClass'])) {
-		$labelContainerClass = $attributes['labelContainerClass'];
-		unset($attributes['labelContainerClass']);
-	}
-	if (isset($attributes['inputContainerClass'])) {
-		$inputContainerClass = $attributes['inputContainerClass'];
-		unset($attributes['inputContainerClass']);
-	}
-}
-
-
-$configAttributes = array_merge([
-	'class' => 'form-control',
-], $attributes);
-
+$attributes['orientation'] = $attributes['orientation'] ?? 'horizontal'; 
+$config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attributes);
 @endphp
 
 <div class="form-group {{ !$errors->has($name) ?: 'has-error' }}">
-	@if ($useLabel)
+	@if ($config['useLabel'])
 	<div class="row">
-		<div class="{{ $labelContainerClass }}">
-			<label class="form-control-label">
-				{!! $labelText !!}
+		<div class="{{ $config['labelContainerClass'] }}">
+			<label class="col-form-label">
+				{!! $config['labelText'] !!}
 			</label>
 		</div>
-		<div class="{{ $inputContainerClass }}">
+		<div class="{{ $config['inputContainerClass'] }}">
 	@endif
 
-			@if (strtolower($orientation) == 'horizontal')
+			@if (strtolower($config['orientation']) == 'horizontal')
+			<div class="m-radio-inline">
+					
 				@foreach ($options as $key => $option)
-				{{ Form::radio($name, $key, $key == $value ? true : false) }} {{ ucwords($option) }}
+				<label class="m-radio">
+					{{ Form::radio($name, $key, $key == $value) }} {{ ucwords($option) }}
+					<span></span>
+				</label>
 				@endforeach
 
-			@elseif (strtolower($orientation) == 'vertical')
+			</div>
+			@elseif (strtolower($config['orientation']) == 'vertical')
+            <div class="m-radio-list">
 				@foreach ($options as $key => $option)
-                    <div class="radio">
-                        <label for="radio{{$key}}" class="form-check-label ">
-							{{ Form::radio($name, $key, $key == $value ? true : false) }} {{ ucwords($option) }}
-                        </label>
-                    </div>
+                    <label class="m-radio">
+						{{ Form::radio($name, $key, $key == $value) }} {{ ucwords($option) }}
+						<span></span>
+                    </label>
 				@endforeach
+            </div>
 			@endif
+
+            {!! $config['info'] !!}
 
 			@if($errors->has($name))
 			<span id="helpBlock2" class="help-block">{{ $errors->first($name) }}</span>	
 			@endif
 
-	@if ($useLabel)
+	@if ($config['useLabel'])
 		</div>
 	</div>
 	@endif
