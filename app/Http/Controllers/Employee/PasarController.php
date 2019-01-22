@@ -163,7 +163,6 @@ class PasarController extends Controller
                 {
                     foreach($results as $row)
                     {
-						echo "$row<hr>";
                         $dataAgency['agency_name']   = $row->agency;
                         $id_agency = $this->findAgen($dataAgency);
 
@@ -174,7 +173,7 @@ class PasarController extends Controller
 						// dd($data2);
 						if ($data2 < 1) {
 							$getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
-							$getPosition 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
+							$getPosition 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
                         	$insert = Employee::create([
                             	'foto_ktp' 			=> "default.png",
 								'foto_tabungan'		=> "default.png",
@@ -185,10 +184,10 @@ class PasarController extends Controller
 								'email'				=> (isset($row->email) ? $row->email : "-"),
 								'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
 								'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
-								'birthdate'			=> Carbon::now(),
+								'joinAt'			=> (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
 								'id_agency'			=> $id_agency,
                             	'id_position'       => ($getPosition ? $getPosition : 4),
-                            	'joinAt'            => Carbon::now(),
+                            	'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
                             	'gender'            => $row->gender,
                             	'education'         => $row->education,
                             	'password'          => bcrypt($row->password),
