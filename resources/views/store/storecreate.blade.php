@@ -71,89 +71,164 @@
             <div class="block-content">
                 <h5><b>Account, Area, and Type</b></h5>
                 <div class="row">
-                      <div class="form-group col-md-6">
-                        <label>Is Jawa</label>
+                      <div class="col-md-6">
+                        {{
+                            Form::select2Input('is_jawa', null, ["Jawa"=>"JAWA","Non Jawa"=>"NON JAWA"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Java / Non Java',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Is Jawa</label>
                         <select class="js-select2 custom-select" name="is_jawa" required>
                             <option value="" disabled selected>Choose Jawa / Non Jawa</option>
                             <option value="Jawa">JAWA</option>
                             <option value="Non Jawa">NON JAWA</option>
-                        </select>
+                        </select> --}}
                     </div>
-                     <div class="form-group col-md-6">
-                        <label>Sales</label>
+                     <div class="col-md-6">
+                        {{-- isset($data->sales->id) ? [$data->sales->id, $data->sales->name] :  --}}
+                        {{ 
+                            Form::select2Input('sales', null, route('sales-tier-select2'), [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Sales',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Sales</label>
                         <select class="form-control form-control-lg" name="sales" required>
                         <option value="" disabled selected>Choose your Sales</option>
                             @foreach($sales as $time)
                                 <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label>Account</label>
+                        {{ 
+                            Form::select2Input('account', null, route('account-select2'), [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Account',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Account</label>
                         <select class="js-select2 custom-select" name="account" required>
                             <option value="" disabled selected>Choose your Account</option>
                             @foreach ($account as $acc)
                             <option value="{{ $acc->id }}">{{ $acc->channel->name }} - {{ $acc->name }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Sub Area/ Area</label>
+                    <div class="col-md-6">
+                        {{ 
+                            Form::select2Input('subarea', null, route('subarea-select2'), [
+                                'labelText' => 'Sub Area',
+                                'text' => 'obj.area_name + " - " + obj.name',
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Subarea',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Sub Area/ Area</label>
                         <select class="js-select2 form-control" name="subarea" required>
                             <option value="" disabled selected>Choose your Subarea</option>
                             @foreach($subarea as $data)
                                 <option value="{{ $data->id }}">{{ $data->area->name }} - {{ $data->name }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Is Vito</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('is_vito', null, ["Vito"=>"VITO","Non Vito"=>"NON VITO"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Vito / Non Vito',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Is Vito</label>
                         <select class="js-select2 custom-select" name="is_vito" required>
                             <option value="" disabled selected>Choose Vito / Non Vito</option>
                             <option value="Vito">VITO</option>
                             <option value="Non Vito">NON VITO</option>
-                        </select>
+                        </select> --}}
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Delivery</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('delivery', null, ["Direct"=>"DIRECT","DC"=>"DC"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Delivery',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Delivery</label>
                         <select class="js-select2 form-control" name="delivery" required>
                             <option value="" disabled selected>Choose Delivery</option>
                                 <option value="Direct">Direct</option>
                                 <option value="DC">DC</option>
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Store Panel</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('store_panel', null, ["YES"=>"YES","NO"=>"NO"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Store Panel',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Store Panel</label>
                         <select class="js-select2 custom-select" name="store_panel" required>
                             <option value="" disabled selected>Choose Store Panel</option>
                             <option value="YES">YES</option>
                             <option value="NO">NO</option>
-                        </select>
+                        </select> --}}
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Coverage</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('coverage', null, ["Direct"=>"DIRECT","In Direct"=>"IN DIRECT"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Coverage',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Coverage</label>
                         <select class="js-select2 form-control" name="coverage" required>
                             <option value="" disabled selected>Choose Coverage</option>
                                 <option value="Direct">Direct</option>
                                 <option value="In Direct">In Direct</option>
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Timezones</label>
+                    <div class="col-md-6">
+                        {{ 
+                            Form::select2Input('timezone', null, route('timezone-select2'), [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Timezone',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Timezones</label>
                         <select class="form-control form-control-lg" name="timezone" required>
                         <option value="" disabled selected>Choose your Timezone</option>
                             @foreach($timezone as $time)
                                 <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="modal-footer">

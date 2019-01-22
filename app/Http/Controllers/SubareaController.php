@@ -44,7 +44,7 @@ class SubareaController extends Controller
     }
 
     public function getDataWithFilters(SubAreaFilters $filters){
-        $data = SubArea::filter($filters)->get();
+        $data = SubArea::filter($filters)->join('areas','sub_areas.id_area','areas.id')->select('sub_areas.*', 'areas.name as area_name')->get();
         return $data;
     }
 

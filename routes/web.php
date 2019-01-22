@@ -1018,6 +1018,14 @@ Route::prefix('select2')->group(function () {
 	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');
 	Route::post('/employee-is-tl-select2', 'EmployeeController@getDataIsTL')->name('employee-is-tl-select2');
 	Route::get('/product-byCategory-select2/{param}', 'ProductController@getProductByCategory')->name('product-byCategory-select2');
+	Route::get('/sales-tier-select2', 'SalesTiersController@getDataWithFilters')->name('sales-tier-select2');
+	Route::get('/account-select2', 'AccountController@getDataWithFilters')->name('account-select2');
+	Route::get('/subarea-select2', 'SubareaController@getDataWithFilters')->name('subarea-select2');
+	Route::get('/timezone-select2', 'TimezoneController@getDataWithFilters')->name('timezone-select2');
+	Route::post('/timezone-select2', 'TimezoneController@getDataWithFilters')->name('timezone-select2');
+	Route::get('/pasar-select2-get', 'PasarController@getDataWithFilters')->name('pasar-select2-get');
+	Route::get('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
+	Route::post('/position-select2', 'PositionController@getDataWithFilters')->name('position-select2');
 });
 
 Route::prefix('promoactivity')->group(function(){

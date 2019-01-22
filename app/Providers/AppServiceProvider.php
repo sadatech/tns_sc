@@ -14,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
 
         // FOR LARAVEL COLLECTIVE
         FormFacade::component('textInput', 'components.form.text_input', ['name', 'value', 'attributes']);
+        FormFacade::component('emailInput', 'components.form.email_input', ['name', 'value', 'attributes']);
         FormFacade::component('textareaInput', 'components.form.textarea_input', ['name', 'value', 'attributes']);
         FormFacade::component('dateInput', 'components.form.date_input', ['name', 'value', 'attributes']);
         FormFacade::component('numberInput', 'components.form.number_input', ['name', 'value', 'attributes']);
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         FormFacade::component('multipleInput', 'components.form.multiple_input', ['name', 'type', 'values' => [''], 'attributes']);
         FormFacade::component('multipleColumnInput', 'components.form.multiple_column_input', ['name', 'values' => [''], 'columns', 'attributes']);
         FormFacade::component('select2Input', 'components.form.select2_input', ['name', 'value', 'options' => [], 'attributes']);
+        FormFacade::component('select2MultipleInput', 'components.form.select2_multiple_input', ['name', 'value', 'options' => [], 'attributes']);
     }
     public function register()
     {
