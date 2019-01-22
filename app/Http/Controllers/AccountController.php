@@ -10,12 +10,19 @@ use File;
 use Excel;
 use App\Account;
 use App\Channel;
+use App\Filters\AccountFilters;
 use Yajra\Datatables\Datatables;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Filters\AccountFilters;
 
 class AccountController extends Controller
 {
+
+    public function getDataWithFilters(AccountFilters $filters){
+        $data = Account::filter($filters)->get();
+        return $data;
+    }
+
     public function baca()
     {
         $data['channel'] = Channel::get();

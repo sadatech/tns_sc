@@ -23,6 +23,18 @@
               <label>Periode:</label>
               <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}">
             </div>
+            <div class="col-md-4">
+          <div class="form-group">
+            <label>Week</label>
+            <select class="js-select form-control" style="width: 100%" id="week" name="week">
+              <option value="">all</option>
+              <option value="(1)">1</option>
+              <option value="(2)">2</option>
+              <option value="(3)">3</option>
+              <option value="(4)">4</option>
+            </select>
+          </div>
+            </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
           <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
@@ -110,6 +122,9 @@
     autoclose: true,
     minViewMode: "months"
   });
+
+  $(".js-select").select2();
+
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -279,6 +294,5 @@
             "scrollCollapse": true,
         });
 
-      });
   </script>
 @endsection

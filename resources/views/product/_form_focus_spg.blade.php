@@ -125,7 +125,9 @@ $type = $type ?? '';
     initSelect2($(this).attr('id'));
   });
   
-  $(".js-select").select2();
+  $(".js-select").select2({
+    dropdownParent: $('#tambahModal')
+  });
 
   function initSelect(){
   $(".js-datepicker").datepicker( {
