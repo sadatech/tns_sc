@@ -144,7 +144,7 @@ class DcController extends Controller
 							'foto_ktp' 			=> "default.png",
 							'foto_tabungan'		=> "default.png",
                             'name'             	=> $row->name,
-							'nik'              	=> $row->nik,
+							'nik'              	=> str_replace("'", "", $row->nik),
 							'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
 							'phone'				=> (isset($row->phone) ? $row->phone : "-"),
 							'email'				=> (isset($row->email) ? $row->email : "-"),
@@ -160,15 +160,17 @@ class DcController extends Controller
                             'id_timezone'       => ($getZone ? $getZone : 1)
 						]);
 						if ($insert) {
-                            $dataSub = array();
-                            $listSub = explode(",", $row->subarea);
-                            foreach ($listSub as $sub) {
-                                $dataSub[] = array(
-                                    'id_subarea'    	=> $this->findSub($sub, $row->area, $row->region),
-                                    'id_employee'       => $insert->id
-                                );
+                            if(!($row->subarea == '' || $row->subarea == null)){
+                                $dataSub = array();
+                                $listSub = explode(",", $row->subarea);
+                                foreach ($listSub as $sub) {
+                                    $dataSub[] = array(
+                                        'id_subarea'    	=> $this->findSub($sub, $row->area, $row->region),
+                                        'id_employee'       => $insert->id
+                                    );
+                                }
+    							DB::table('employee_sub_areas')->insert($dataSub);
                             }
-							DB::table('employee_sub_areas')->insert($dataSub);
                         }
                     }
                 },false);

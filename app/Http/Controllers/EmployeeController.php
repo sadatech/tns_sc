@@ -607,12 +607,14 @@ class EmployeeController extends Controller
 								$id_agency = $this->findAgen($dataAgency);
 								
 								$getPosisi 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
+								// $getPosition = Position::where('level', $row->position)->first()->id;
+
 								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
                             	$insert = Employee::create([
                             		'foto_ktp' 			=> "default.png",
 									'foto_tabungan'		=> "default.png",
 									'nik'              	=> str_replace("'", "", $row['nik']),
-									'name'				=> $row['name'],    
+									'name'				=> $row['name'],   
 									'ktp'				=> (isset($row->ktp) ? $row->ktp : ""),
 									'phone'   			=> (isset($row['phone']) ? $row['phone'] : ""),
 									'email'   			=> (isset($row['email']) ? $row['email'] : ""),
@@ -629,19 +631,21 @@ class EmployeeController extends Controller
 									'status'			=> (isset($row->status) ? $row->status : "")	
                             	]);
                             		if ($insert->status != "")  {
-										$dataStore = array();
-										$listStore = explode(",", $row->store);
-										foreach ($listStore as $store) {
-											$dataStore[] = array(
-												'id_store'    			=> $this->findStore(
-													$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
-													$row->timezone_store, $row->sales_tier
-												),
-												'id_employee'          	=> $insert->id
-											);
+                            			if(!($row->store == '' || $row->store == null)){
+											$dataStore = array();
+											$listStore = explode(",", $row->store);
+											foreach ($listStore as $store) {
+												$dataStore[] = array(
+													'id_store'    			=> $this->findStore(
+														$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
+														$row->timezone_store, $row->sales_tier
+													),
+													'id_employee'          	=> $insert->id
+												);
+											}
+											// dd($store);
+											DB::table('employee_stores')->insert($dataStore);
 										}
-										// dd($store);
-										DB::table('employee_stores')->insert($dataStore);
 									}
 								// }return false;
                             };
