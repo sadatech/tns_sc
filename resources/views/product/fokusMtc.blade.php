@@ -134,6 +134,19 @@
   <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script type="text/javascript">
+    $('#test').hide();
+    $("#example-inline-checkbox2").change(function() {
+        if ($(this).removeAttr("checked")) {
+          $('#test').show();
+        }
+    });
+
+    $("#example-inline-checkbox2").change(function() {
+        if ($(this).prop("checked")) {
+          $('#test').hide();
+          $('#coba').val(null).trigger('change');
+        }
+    });
       @if(session('type'))
       $(document).ready(function() {
           $.notify({
@@ -194,6 +207,12 @@
 	              { data: 'action', name: 'action' },
               ]
           });
+      });
+      $(".js-select2").select2({ 
+        dropdownParent: $("#tambahModal")
+      });
+      $(".js-edit").select2({ 
+        dropdownParent: $("#editModal")
       });
   </script>
 @endsection

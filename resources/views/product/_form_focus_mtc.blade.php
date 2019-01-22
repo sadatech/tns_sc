@@ -43,7 +43,7 @@ $type = $type ?? '';
           <div class="form-group">
             <label>Area</label>
             <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Area" name="id_area">
-              <option value="" disabled selected>Choose your Area</option>
+              <option value="">All</option>
               @foreach(App\Area::get() as $data)
               <option value="{{ $data->id }}">{{ $data->name }} </option>
               @endforeach
