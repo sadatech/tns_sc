@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use App\SalesTiers;
 use Yajra\Datatables\Datatables;
+use App\Filters\SalesTierFilters;
 
 class SalesTiersController extends Controller
 {
@@ -17,6 +18,11 @@ class SalesTiersController extends Controller
     public function index()
     {
         return view('store.sales');
+    }
+
+    public function getDataWithFilters(SalesTierFilters $filters){
+        $data = SalesTiers::filter($filters)->get();
+        return $data;
     }
 
     /**

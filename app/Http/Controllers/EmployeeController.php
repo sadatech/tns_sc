@@ -236,12 +236,17 @@ class EmployeeController extends Controller
 					} else if (!empty($request->input('subarea'))) {
 						$dataSubArea = array();
 						foreach ($request->input('subarea') as $subarea) {
-							if (isset(\App\Position::where(['level' => 'tlmtc'])->first()->id)) {
-								$isTl = true;
-							} else if ($request->input('tl') == true) {
-								$isTl = true;
+							$dcCheck = Position::where('level', 'dc')->first();
+							if ($request->input('position') == $dcCheck->id)
+							{
+								if ($request->input('tl'))
+								{
+									$isTl = true;
+								} else {
+									$isTl = false;
+								}
 							} else {
-								$isTl = false;
+								$isTl = true;
 							}
 							$dataSubArea[] = array(
 								'id_employee' 	=> $insert->id,
@@ -575,9 +580,9 @@ class EmployeeController extends Controller
                 
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
-                   
                     foreach($results as $row)
                     {
+                    	echo $row;
 						$rowRules = [
 							'nik' 		=> 'required|numeric|unique:employees',
 							'name'		=> 'required',	
@@ -604,7 +609,9 @@ class EmployeeController extends Controller
 								$getPosisi 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
 								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
                             	$insert = Employee::create([
-									'nik'              	=> $row['nik'],
+                            		'foto_ktp' 			=> "default.png",
+									'foto_tabungan'		=> "default.png",
+									'nik'              	=> str_replace("'", "", $row['nik']),
 									'name'				=> $row['name'],    
 									'ktp'				=> (isset($row->ktp) ? $row->ktp : ""),
 									'phone'   			=> (isset($row['phone']) ? $row['phone'] : ""),
@@ -612,11 +619,11 @@ class EmployeeController extends Controller
 									'id_timezone'		=> ($getTimezone ? $getTimezone : 1),
 									'rekening'			=> (isset($row->rekening) ? $row->rekening : ""),
 									'bank' 				=> (isset($row->bank) ? $row->bank : ""),
-									'joinAt'			=> Carbon::now(),
+									'joinAt'			=> (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
 									'id_agency'			=> $id_agency,
 									'gender'			=> ($row->gender ? $row->gender : "Perempuan"),
 									'education'			=> ($row->education ? $row->education : "SLTA"),
-									'birthdate'			=> Carbon::now(),
+									'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
 									'password'			=> bcrypt($row['password']),
 									'id_position'		=> ($getPosisi ? $getPosisi : 1),
 									'status'			=> (isset($row->status) ? $row->status : "")	
@@ -628,7 +635,7 @@ class EmployeeController extends Controller
 											$dataStore[] = array(
 												'id_store'    			=> $this->findStore(
 													$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
-													$row->timezonestore, $row->salestier
+													$row->timezone_store, $row->sales_tier
 												),
 												'id_employee'          	=> $insert->id
 											);

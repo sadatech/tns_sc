@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Auth;
 use App\Position;
+use App\Filters\PositionFilters;
 
 class PositionController extends Controller
 {
@@ -13,6 +14,11 @@ class PositionController extends Controller
 	{
 		return view('employee.position');
 	}
+
+	public function getDataWithFilters(PositionFilters $filters){
+        $data = Position::filter($filters)->get();
+        return $data;
+    }
 
 	public function data()
 	{

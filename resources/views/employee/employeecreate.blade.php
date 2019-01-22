@@ -18,7 +18,7 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>NIK</label>
-                        <input type="text" class="form-control" name="nik" value="{{ old('nik') }}" placeholder="Add new nik" required>
+                        <input type="text" id="numNik" class="form-control" name="nik" value="{{ old('nik') }}" placeholder="Add new nik" required>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Name</label>
@@ -96,14 +96,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Timezones</label>
-                        <select class="form-control form-control-lg" name="timezone" required>
-                        <option value="" disabled selected>Choose your Timezone</option>
-                            @foreach($timezone as $option)
-                                <option value="{{ $option->id }}" {{ (collect(old('timezone'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('timezone', null, route('timezone-select2'), [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Timezone',
+                                ]
+                            ]) 
+                        }}
                     </div>
                 </div>
             </div>
@@ -142,13 +143,9 @@
             </div>
             <div class="block-content">
                 <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="col-md-6">
                         <label>Position</label>
                         <select class="form-control form-control-lg" name="position" id="position" required>
-                            <option value="" disabled selected>Choose your Position</option>
-                            @foreach($position as $option)
-                                <option value="{{ $option->id }}" {{ (collect(old('position'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
-                            @endforeach
                         </select>
                     </div>
                     <div class="form-group col-md-6">
@@ -162,14 +159,24 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6" id="subarea" >
-                        <label>Sub Area / Area</label>
+                    <div class="col-md-6" id="subarea" >
+                        {{
+                            Form::select2Input('subarea', null, route('subarea-select2'), [
+                                'textLabel' => 'Sub Area / Area',
+                                'text' => 'obj.area_name + " - " + obj.name',
+                                'elOptions' => [
+                                    'placeholder' => 'Choose your Subarea',
+                                    'id' => 'subareaInput',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Sub Area / Area</label>
                         <select class="js-select2 form-control form-control-lg" style="width: 100%" name="subarea[]" id="subareaInput">
                             <option disabled selected>Choose your Subarea</option>
                             @foreach($subarea as $option)
                             <option value="{{ $option->id }}" {{ (collect(old('subarea'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                     <div class="custom-control custom-checkbox custom-control-inline mt-20" id="tl">
                         <input class="custom-control-input" type="checkbox" name="tl" value="false" id="example-inline-checkbox2">
@@ -190,11 +197,23 @@
                         <label class="col-md-12" style="padding: 0">Store</label>
                         <div class="input-group mb-3 col-md-12" style="padding: 0">
                             <div style="width: 82%">
-                                <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
+                                {{
+                                    Form::select2Input('storesMobile', null, route('store-select2'), [
+                                        'key' => 'obj.id + "|" + obj.name1',
+                                        'text' => 'obj.name1',
+                                        'useLabel' => false,
+                                        'elOptions' => [
+                                            'placeholder' => 'Choose store...',
+                                            'style' => 'width: 100%',
+                                            'id' => 'stores',
+                                        ]
+                                    ]) 
+                                }}
+                                {{-- <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
                                     @foreach($store as $data)
                                     <option value="{{ $data->id.'|'.$data->name1}}">{{ $data->name1 }}</option>
                                     @endforeach
-                                </select>
+                                </select> --}}
                             </div>
                             <div class="input-group-append" style="width: 18%">
                                 <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
@@ -228,11 +247,22 @@
                         <label class="col-md-12" style="padding: 0">Pasar</label>
                         <div class="input-group mb-3 col-md-12" style="padding: 0">
                             <div style="width: 82%">
-                                <select id="pasar" class="js-select2 form-control" style="width: 100%" data-placeholder="Pilih pasar...">
+                                {{
+                                    Form::select2Input('pasarsMobile', null, route('pasar-select2-get'), [
+                                        'key' => 'obj.id + "|" + obj.name',
+                                        'useLabel' => false,
+                                        'elOptions' => [
+                                            'placeholder' => 'Choose Pasar...',
+                                            'style' => 'width: 100%',
+                                            'id' => 'pasar',
+                                        ]
+                                    ]) 
+                                }}
+                                {{-- <select id="pasar" class="js-select2 form-control" style="width: 100%" data-placeholder="Pilih pasar...">
                                     @foreach($pasar as $data)
                                     <option value="{{ $data->id.'|'.$data->name}}">{{ $data->name }}</option>
                                     @endforeach
-                                </select>
+                                </select> --}}
                             </div>
                             <div class="input-group-append" style="width: 18%">
                                 <button id="pasarAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
@@ -263,12 +293,22 @@
                         </div>
                     </div>
                     <div class="form-group col-md-6" id="storeStay">
-                        <label>Store</label>
+                        {{
+                            Form::select2Input('store', null, route('store-select2'), [
+                                'text' => 'obj.name1',
+                                'elOptions' => [
+                                    'placeholder' => 'Choose store...',
+                                    'style' => 'width: 100%',
+                                    'id' => 'storeSelect2',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Store</label>
                         <select class="js-select form-control" style="width: 100%" data-placeholder="Choose store..." name="store" id="stayInput">
                             @foreach($store as $data)
                             <option value="{{ $data->id }}">{{ $data->name1 }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
             </div>
@@ -292,6 +332,7 @@
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
+var filters = [];
 $("#alert").hide();
 $("#test").submit(function(e){
     e.preventDefault();    
@@ -301,12 +342,13 @@ $("#test").submit(function(e){
         type: 'POST',
         data: formData,
         success: function (data) {
+            console.log(data);
             if (data.type == "danger") {
                 $("#alert").show();
                 $("#error").html(data.message);
                 $("html, body").animate({ scrollTop: 0 }, "slow"); 
             } else {
-                window.location.replace('{{ url()->previous() }}');
+                window.location = '{{ url()->previous() }}';
             }
         },
         cache: false,
@@ -320,6 +362,7 @@ $.ajaxSetup({
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
     $('#agencySelect').select2(setOptions('{{ route("agency-select2") }}', 'Choose your Agency', function (params) {
         return filterData('name', params.term);
     }, function (data, params) {
@@ -339,6 +382,18 @@ $.ajaxSetup({
             })
         }
     }));
+
+    $('#position').select2(setOptions('{{ route("position-select2") }}', 'Choose your Position', function (params) {
+        filters['byId'] = byId;
+        return filterData('name', params.term);
+    }, function (data, params) {
+        return {
+            results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+            })
+        }
+    }));
+
 });
 </script>
 <script type="text/javascript">
@@ -353,27 +408,30 @@ $("#example-inline-checkbox2").on('change', function() {
 });
 
     var url = document.referrer;
-    if (url.split("/")[5] == null) {
-        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
-    } else if (url.split("/")[5] == "pasar") {
-        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
-    } else if (url.split("/")[5] == "dc") {
-        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
-
+    var positions = url.split("/");
+    var pos = positions[positions.length -1];
+    var byId = [];
+    if (pos == "summary") {
+        byId.push("{{ App\Position::where(['level' => 'spggtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'mdgtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'motoric'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'tlgtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'dc'])->first()->id }}");
+    }else if (pos == "pasar") {
+        byId.push("{{ App\Position::where(['level' => 'spgmtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'dc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'tlmtc'])->first()->id }}");
+    }else if (pos == "dc") {
+        byId.push("{{ App\Position::where(['level' => 'spggtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'mdgtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'motoric'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'tlgtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'spgmtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}");
+        byId.push("{{ App\Position::where(['level' => 'tlmtc'])->first()->id }}");
     }
+
     var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
     var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;
     $(".js-select2").select2({
@@ -381,6 +439,7 @@ $("#example-inline-checkbox2").on('change', function() {
     });
     $(".js-select").select2();
     $(document).ready(function() {
+        $('#subareaInput').attr('name','subarea[]');
         $('input[type=email]').bind('change', function () {
           var arr = []
           $siblings = $(this).siblings();
@@ -700,6 +759,7 @@ $("#example-inline-checkbox2").on('change', function() {
         
         return false;
     }
+    document.getElementById('numNik').addEventListener('keypress', ForNumbers, false);
     document.getElementById('numKtp').addEventListener('keypress', ForNumbers, false);
     document.getElementById('numPhone').addEventListener('keypress', ForNumbers, false);
 

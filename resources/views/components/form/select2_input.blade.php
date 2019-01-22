@@ -1,111 +1,115 @@
-@push('additional-css')
-<style type="text/css">
-	.select2-container--default {
-		width: 100%!important;
-	}
-</style>
-@endpush
-
 @php
 if (!is_array($attributes)) $attributes = [];
+$isDataRequestByAjax = is_array($options) ? false : true;
+$url = $options;
 
-$useLabel = true;
-if (isset($attributes['useLabel'])) {
-	$useLabel = $attributes['useLabel'];
-	unset($attributes['useLabel']);
-}
+// SET DEFAULT CLASS
+$attributes['elOptions']['class'] = 'select2 form-control';
 
-$pluginOptions = null;
-if (isset($attributes['pluginOptions'])) {
-	$pluginOptions = $attributes['pluginOptions'];
-	unset($attributes['pluginOptions']);
-}
+// SET DEFAULT ID
+$attributes['elOptions']['id'] = $attributes['elOptions']['id'] ?? 'select2-' . $name;
 
-$labelText = isset($attributes['labelText']) ? $attributes['labelText'] : ucwords(implode(' ', explode('_', $name))) . (isset($attributes['required']) ? ' <span class="status-decline">*</span>' : '');
-unset($attributes['labelText']);
+// SET DEFAULT FOR FORMATTED SELECT2 DATA FORMAT
+$attributes['text'] = $attributes['text'] ?? 'obj.name';
+$attributes['key'] = $attributes['key'] ?? 'obj.id';
 
-$formAlignment = 'vertical';
-if (isset($attributes['formAlignment'])) {
-	$formAlignment = $attributes['formAlignment'];
-	unset($attributes['formAlignment']);
-}
+// CALLING SETUP DEFAULT CONFIG
+$config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attributes, true);
+$config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 
-
-$labelContainerClass = $formAlignment === 'vertical' ? 'col-md-12' : 'col-md-3';
-$inputContainerClass = $formAlignment === 'vertical' ? 'col-md-12' : 'col-md-9';
-if ($formAlignment === 'horizontal') {
-	if (isset($attributes['labelContainerClass'])) {
-		$labelContainerClass = $attributes['labelContainerClass'];
-		unset($attributes['labelContainerClass']);
-	}
-	if (isset($attributes['inputContainerClass'])) {
-		$inputContainerClass = $attributes['inputContainerClass'];
-		unset($attributes['inputContainerClass']);
-	}
-}
-
-
-$configAttributes = array_merge([
-	'class' => 'form-control',
-], $attributes);
-
-$configAttributes['id'] = $configAttributes['id'] ?? 'select2-' . $name;
-
-$formattedAttributes = '';
-foreach ($configAttributes as $attribute => $attributeValue) {
-	$formattedAttributes .= $attribute . '="' . $attributeValue . '" ';
-}
-
+// FORMATTING TEXT BY TEMPLATE 
+// if (is_array($config['text'])) {
+// 	$text = null;
+// 	foreach ($config['text']['field'] as $field) {
+// 		$text = str_replace("<<$field>>", "'+ obj.$field +'", $text ?? $config['text']['template']);
+// 	}
+// str_replace_array('<<field>>', $config['text']['field'], $config['text']['template']); // Laravel str helper method 
+// 	$config['text'] = "'" . $text . "'";
+// }
 @endphp
 
 <div class="form-group {{ !$errors->has($name) ?: 'has-error' }}">
-	@if ($useLabel)
+	@if ($config['useLabel'])
 	<div class="row">
-		<div class="{{ $labelContainerClass }}">
-			<label class="form-control-label">
-				{!! $labelText !!}
+		<div class="{{ $config['labelContainerClass'] }}">
+			<label class="{{ $config['labelClass'] }}">
+				{!! $config['labelText'] !!}
 			</label>
 		</div>
-		<div class="{{ $inputContainerClass }}">
+		<div class="{{ $config['inputContainerClass'] }}">
 	@endif
 
-			<select class="select2 form-control" name="{{ isset($configAttributes['multiple']) ? $name . '[]' : $name }}" <?= $formattedAttributes ?>>
-				<option></option>
-				@foreach ($options as $key => $option)
-	                <option value="{{ $key }}">{{ $option }}</option>
-				@endforeach
+			<select name="{{ isset($config['pluginOptions']['multiple']) && $config['pluginOptions']['multiple'] ? $name . '[]' : $name }}" <?= $config['htmlOptions'] ?>>
+				@if (!$isDataRequestByAjax)
+					<option></option>
+					@foreach ($options as $key => $option)
+		                <option value="{{ $key }}">{{ $option }}</option>
+					@endforeach
+				@endif
             </select>
+
+            {!! @$config['info'] !!}
 
 			@if($errors->has($name))
 			<span id="helpBlock2" class="help-block">{{ $errors->first($name) }}</span>	
 			@endif
 
-	@if ($useLabel)
+	@if ($config['useLabel'])
 		</div>
 	</div>
 	@endif
 </div>
 
-@section('select2-plugin-resource')
-<link href="{{asset('assets/vendor/select2/select2.min.css')}}" rel="stylesheet" media="all">
-<script type="text/javascript" src="{{ asset('assets/vendor/select2/select2.min.js')}}"></script>
-@endsection
-
 @push('additional-js')
 <script type="text/javascript">
-	var select2Options_{{$name}} = {
-			placeholder: 'Select...',
-	    	allowClear: true,
+	$(document).ready(function() {
+		var select2Options_{{$name}} = Object.assign({
+				placeholder: "{{ $config['elOptions']['placeholder'] }}",
+		    	allowClear: true,//
+			}, {!! json_encode($config['pluginOptions']) !!}),
+			select2val_{{$name}} = {!! !is_array($value) ? json_encode([$value]) : json_encode($value) !!}
+
+		// IF THE SELECT2 IS REQUEST DATA BY AJAX
+		@if ($isDataRequestByAjax)
+		select2Options_{{$name}}.ajax = {
+			url: "{{ $url }}",
+			processResults: function (data) {
+				var result = {},
+					isPaginate = data.hasOwnProperty('data'),
+					isSimplePaginate = !data.hasOwnProperty('last_page');
+
+	                result.results = $.map(isPaginate ? data.data : data, function (obj) {                                
+	                    return {id: {!! $config['key'] !!}, text: {!! $config['text'] !!} }
+	                })
+
+	                if (isPaginate) {
+	                	result.pagination = {
+		                	more: isSimplePaginate ? data.next_page_url !== null : data.current_page < data.last_page
+		                }
+	                }
+
+				return result;
+			}
 		}
-	var select2val_{{$name}} = {{ !is_array($value) ? json_encode([$value]) : json_encode($value) }}
+		@endif
 
-	@if (isset($pluginOptions['dropdownParent']))
-	    select2Options_{{$name}}.dropdownParent = $('#<?= $pluginOptions["dropdownParent"] ?>')
-	@endif
-	@if(isset($configAttributes['multiple']))
-		select2Options_{{$name}}.multiple = true
-	@endif
+		// FOR SELECT2 DROPDOWNPARENT
+		@if (isset($config['pluginOptions']['dropdownParent']))
+		select2Options_{{$name}}.dropdownParent = $('<?= $config['pluginOptions']["dropdownParent"] ?>')
+		@endif
 
-    $('#{{$configAttributes["id"]}}').select2(select2Options_{{$name}}).val(select2val_{{$name}}).trigger('change');
+		$('#{{ $config['elOptions']['id'] }}').select2(select2Options_{{$name}})
+		@if (!empty($value))
+		$('#{{ $config['elOptions']['id'] }}').select2("trigger", "select", {
+			data: { id: "{{ $value[0]}}", text: "{{ $value[1] }}" }
+		});
+
+        // scroll top
+        setTimeout(function() {
+	        window.scrollTo(0, 0);
+	        $('html, body').scrollTop();
+        }, 200);
+	    @endif
+	})
 </script>
 @endpush

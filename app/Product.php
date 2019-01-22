@@ -21,6 +21,7 @@ class Product extends Model
     protected $dates =['deleted_at'];
 
     public static function boot(){
+        parent::boot();
         self::creating(function($model){
             $model->id_brand = Brand::defaultBrand()->id;
         });
@@ -34,8 +35,6 @@ class Product extends Model
             'code' => 'required|string',
             'panel' => 'required|string',
             'stock_type_id' => 'required|integer',
-            'carton' => 'integer',
-            'pack' => 'integer',
             'pcs' => 'integer',
         ];
     }

@@ -10,15 +10,28 @@ use File;
 use Excel;
 use App\Account;
 use App\Channel;
+use App\Filters\AccountFilters;
 use Yajra\Datatables\Datatables;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Filters\AccountFilters;
 
 class AccountController extends Controller
 {
+
+    public function getDataWithFilters(AccountFilters $filters){
+        $data = Account::filter($filters)->get();
+        return $data;
+    }
+
     public function baca()
     {
         $data['channel'] = Channel::get();
         return view('store.account', $data);
+    }
+
+    public function getDataWithFilters(AccountFilters $filters){
+        $data = Account::filter($filters)->get();
+        return $data;
     }
 
     public function data(Request $request)
@@ -100,7 +113,7 @@ class AccountController extends Controller
 		        	->with([
 		        		'type'    => 'success',
 		        		'title'   => 'Sukses!<br/>',
-		        		'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah channel!'
+		        		'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah account!'
 		        	]);
             } else {
                 return redirect()->back()

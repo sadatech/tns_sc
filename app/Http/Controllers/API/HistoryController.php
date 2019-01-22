@@ -31,6 +31,7 @@ use App\DistributionDetail;
 use App\DistributionMotoric;
 use App\DistributionMotoricDetail;
 use App\Cbd;
+use App\NewCbd;
 use App\PlanDc;
 use App\DocumentationDc;
 use Carbon\Carbon;
@@ -126,9 +127,10 @@ class HistoryController extends Controller
 
 			if (strtoupper($type) == 'MTC') {
 				$header = Sales::query();
-				$header->when($sales != '', function ($q){
-					return $q->whereType('Sell Out');
-				});
+				$header->whereType('Sell In');
+			}else if (strtoupper($type) == 'MTC-O') {
+				$header = Sales::query();
+				$header->whereType('Sell Out');
 			}else if (strtoupper($type) == 'GTC-MD') {
 				$header = SalesMd::query();
 			}else if (strtoupper($type) == 'GTC-SPG') {
@@ -383,6 +385,42 @@ class HistoryController extends Controller
 			$res['code'] = 200;
 
 			$data 	= Cbd::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->orderBy('id','desc')->get();
+
+			if ($data->count() > 0) {
+				$res['success'] = true;
+				$res['cbd'] = $data;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "CBD not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
+	public function newCbdHistory($date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data 	= NewCbd::where('id_employee', $user->id)
 			->when($date != '', function ($q) use ($date){
 				return $q->whereDate('date', $date);
 			})

@@ -37,14 +37,6 @@
                                 <i class="si si-drop"></i>
                             </a>
                         </li>           
-                        <li class="list-inline-item">
-                            <a class="link-effect text-dual-primary-dark" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="si si-logout"></i>
-                            </a>
-                        </li>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            {{ csrf_field() }}
-                        </form>
                     </ul>
                 </div>
         </div>
@@ -165,6 +157,9 @@
                                 <a class="{{ request()->is('product/sku-unit') ? 'active' : '' }}" href="{{ route('sku-unit') }}">SKU Unit</a>
                             </li> -->
                             <li>
+                                <a class="{{ request()->is('product/stock-type') ? 'active' : '' }}" href="{{ route('stock-type') }}">Stock Type</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
                             @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
@@ -272,6 +267,10 @@
                                     {{-- CBD --}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/cbd') ? 'active' : '' }}" href="{{ route('report.cbd') }}"><span class="sidebar-mini-hide">CBD</span></a>
+                                    </li>
+                                    {{-- NEW CBD --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('report.new-cbd') }}"><span class="sidebar-mini-hide">New CBD</span></a>
                                     </li>
                                     {{-- Dist PF MTC--}}
                                     <li>
@@ -407,10 +406,23 @@
                             <li>
                                 <a class="{{ request()->is('report/mtc/additional_display') ? 'active' : '' }}" href="{{ route('additional_display') }}"><span class="sidebar-mini-hide">Additional Display</span></a>
                             </li>                              
+                            {{-- Price Row--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/priceData/row') ? 'active' : '' }}" href="{{ route('priceData.row') }}"><span class="sidebar-mini-hide">Price Row</span></a>
+                            </li>                              
+                            {{-- Price Summary--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/priceData/summary') ? 'active' : '' }}" href="{{ route('priceData.summary') }}"><span class="sidebar-mini-hide">Price Summary</span></a>
+                            </li>                
+                            {{-- Price Vs--}}
+                            <li>
+                                <a class="{{ request()->is('report/mtc/priceData/vs') ? 'active' : '' }}" href="{{ route('priceData.vs') }}"><span class="sidebar-mini-hide">Price Vs Competitor</span></a>
+                            </li>                
                             {{-- Availability--}}
                             <li>
-                                <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability</span></a>
-                            </li> {{-- Promo Activity--}}
+                                <a class="{{ request()->is('report/mtc/availability/row') ? 'active' : '' }}" href="{{ route('availability.row') }}"><span class="sidebar-mini-hide">Availability</span></a>
+                            </li> 
+                            {{-- Promo Activity--}}
                             <li>
                                 <a class="{{ request()->is('promoactivity') ? 'active' : '' }}" href="{{ route('promoactivity') }}"><span class="sidebar-mini-hide">Promo Activity</span></a>
                             </li>
@@ -428,6 +440,9 @@
                                     <li>
                                         <a class="{{ request()->is('report/mtc/additional_display/ach') ? 'active' : '' }}" href="{{ route('additional_display.ach') }}"><span class="sidebar-mini-hide">Ach Additional Display</span></a>
                                     </li>  
+                                    <li>
+                                        <a class="{{ request()->is('report/mtc/availability') ? 'active' : '' }}" href="{{ route('availability') }}"><span class="sidebar-mini-hide">Availability</span></a>
+                                    </li> 
                                 </ul>
                             </li>
                         </ul>

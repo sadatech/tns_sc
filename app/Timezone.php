@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class Timezone extends Model
 {
@@ -18,5 +19,10 @@ class Timezone extends Model
 	   public function stores()
     {
     	return $this->belongsTo('App\Store', 'id_timezone');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }

@@ -136,8 +136,6 @@ class DcController extends Controller
                 {
                     foreach($results as $row)
                     {
-                        echo "$row<hr>";
-
 						$dataAgency['agency_name']   = $row->agency;
 						$id_agency = $this->findAgen($dataAgency);
                         
@@ -152,10 +150,10 @@ class DcController extends Controller
 							'email'				=> (isset($row->email) ? $row->email : "-"),
 							'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
 							'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
-							'birthdate'			=> Carbon::now(),
+							'joinAt'            => (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
 							'id_agency'			=> $id_agency,
                             'id_position'       => 5,
-                            'joinAt'            => Carbon::now(),
+                            'birthdate'         => (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
                             'gender'            => ($row->gender ? $row->gender : "Perempuan"),
                             'education'         => ($row->education ? $row->education : "SLTA"),
                             'password'          => bcrypt($row->password),
