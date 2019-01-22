@@ -580,9 +580,9 @@ class EmployeeController extends Controller
                 
                 Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use ($request)
                 {
-                   
                     foreach($results as $row)
                     {
+                    	echo $row;
 						$rowRules = [
 							'nik' 		=> 'required|numeric|unique:employees',
 							'name'		=> 'required',	
@@ -607,39 +607,45 @@ class EmployeeController extends Controller
 								$id_agency = $this->findAgen($dataAgency);
 								
 								$getPosisi 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
+								// $getPosition = Position::where('level', $row->position)->first()->id;
+
 								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
                             	$insert = Employee::create([
-									'nik'              	=> $row['nik'],
-									'name'				=> $row['name'],    
+                            		'foto_ktp' 			=> "default.png",
+									'foto_tabungan'		=> "default.png",
+									'nik'              	=> str_replace("'", "", $row['nik']),
+									'name'				=> $row['name'],   
 									'ktp'				=> (isset($row->ktp) ? $row->ktp : ""),
 									'phone'   			=> (isset($row['phone']) ? $row['phone'] : ""),
 									'email'   			=> (isset($row['email']) ? $row['email'] : ""),
 									'id_timezone'		=> ($getTimezone ? $getTimezone : 1),
 									'rekening'			=> (isset($row->rekening) ? $row->rekening : ""),
 									'bank' 				=> (isset($row->bank) ? $row->bank : ""),
-									'joinAt'			=> Carbon::now(),
+									'joinAt'			=> (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
 									'id_agency'			=> $id_agency,
 									'gender'			=> ($row->gender ? $row->gender : "Perempuan"),
 									'education'			=> ($row->education ? $row->education : "SLTA"),
-									'birthdate'			=> Carbon::now(),
+									'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
 									'password'			=> bcrypt($row['password']),
 									'id_position'		=> ($getPosisi ? $getPosisi : 1),
 									'status'			=> (isset($row->status) ? $row->status : "")	
                             	]);
                             		if ($insert->status != "")  {
-										$dataStore = array();
-										$listStore = explode(",", $row->store);
-										foreach ($listStore as $store) {
-											$dataStore[] = array(
-												'id_store'    			=> $this->findStore(
-													$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
-													$row->timezonestore, $row->salestier
-												),
-												'id_employee'          	=> $insert->id
-											);
+                            			if(!($row->store == '' || $row->store == null)){
+											$dataStore = array();
+											$listStore = explode(",", $row->store);
+											foreach ($listStore as $store) {
+												$dataStore[] = array(
+													'id_store'    			=> $this->findStore(
+														$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
+														$row->timezone_store, $row->sales_tier
+													),
+													'id_employee'          	=> $insert->id
+												);
+											}
+											// dd($store);
+											DB::table('employee_stores')->insert($dataStore);
 										}
-										// dd($store);
-										DB::table('employee_stores')->insert($dataStore);
 									}
 								// }return false;
                             };
