@@ -10,9 +10,16 @@ use App\Product;
 use App\Category;
 use App\SubCategory;
 use App\Brand;
+use App\Filters\CategoryFilters;
 
 class CategoryController extends Controller
 {
+
+    public function getDataWithFilters(CategoryFilters $filters){
+        $data = Category::filter($filters)->get();
+        return $data;
+    }
+
     public function baca()
     {
         return view('product.category');
