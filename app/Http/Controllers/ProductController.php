@@ -64,7 +64,7 @@ class ProductController extends Controller
             $data = array(
                 'id'            => $product->id,
                 'product'       => $product->id_product,
-                'subcategory'   => $product->subcategory->id,
+                'subcategory'   => $product->subcategory,
                 'name'          => $product->name,
                 'code'          => $product->code,
                 'stock_type_id' => $product->stock_type_id,
