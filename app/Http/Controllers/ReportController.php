@@ -2585,9 +2585,10 @@ class ReportController extends Controller
         return Datatables::of(collect($data))->make(true);
     }
 
-    public function exportMptorikAttandance()
+    public function exportMptorikAttandance(Request $request)
     {
-        $employee = AttendanceBlock::whereMonth('checkin', Carbon::now()->month);
+        $employee = AttendanceBlock::whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3));
         if ($employee->count() > 0) {
 		    foreach ($employee->get() as $val) {
                 if ($val->attendance->employee->position->level == 'motoric') {
@@ -2656,9 +2657,10 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportMotorikDistPF()
+    public function exportMotorikDistPF(Request $request)
     {
-        $dist = DistributionMotoric::whereMonth('date',Carbon::now()->month);
+        $dist = DistributionMotoric::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3));
         if ($dist->count() > 0) {
             foreach ($dist->get() as $key => $value) {
                 if ($value->employee->position->level == 'motoric') {
@@ -2731,9 +2733,10 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportMotorikSales()
+    public function exportMotorikSales(Request $request)
     {
-        $sales = SalesMotoric::whereMonth('date', Carbon::now()->month);
+        $sales = SalesMotoric::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3));
         if ($sales->count() > 0) {
             $product = array();
             foreach ($sales->get() as $key => $value) {
@@ -2849,9 +2852,18 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportDcSales()
+    public function exportDcSales(Request $request)
     {
-        $sales = SalesDc::whereMonth('date', Carbon::now()->month);
+        $sales = SalesDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        }
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         if ($sales->count() > 0) {
             $product = array();
             foreach ($sales->get() as $key => $value) {
@@ -2940,9 +2952,18 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportDcSampling()
+    public function exportDcSampling(Request $request)
     {
-        $sales = SamplingDc::whereMonth('date', Carbon::now()->month);
+        $sales = SamplingDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        }
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
         if ($sales->count() > 0) {
             $product = array();
             foreach ($sales->get() as $key => $value) {
@@ -3025,11 +3046,23 @@ class ReportController extends Controller
         })->make(true);
     }
 
-    public function ExportdocumentationDC()
+    public function ExportdocumentationDC(Request $request)
     {
-        $sales = DocumentationDc::whereMonth('date', Carbon::now()->month);
-        if ($sales->count() > 0) {
-            foreach ($sales->get() as $val) {
+        $doc = DocumentationDc::orderBy('created_at', 'DESC');
+        if ($request->has('employee')) {
+            $doc->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        }
+         if ($request->has('periode')) {
+            $doc->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $doc->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if ($request->has('type')) {
+            $doc->where('type', $request->input('type'));
+        }
+        if ($doc->count() > 0) {
+            foreach ($doc->get() as $val) {
                 if ($val->employee->position->level == 'dc') {
                     $data[] = array(
                         'Nama DC'   =>  $val->employee->name,
