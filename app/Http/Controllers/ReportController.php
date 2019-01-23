@@ -71,6 +71,7 @@ use App\Jobs\ExportMTCAdditionalDisplayAchievementJob;
 use App\Jobs\ExportMTCPriceRowJob;
 use App\Jobs\ExportMTCPriceSummaryJob;
 use App\Jobs\ExportMTCPriceCompJob;
+use App\Jobs\ExportMTCAdditionalDisplayJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -2087,6 +2088,36 @@ class ReportController extends Controller
         return Datatables::of($datas)->make(true);
         return response()->json($datas);
 
+    }
+
+    public function additionalDisplayIndexExportXLS(Request $request)
+    {
+        $data['id_employee'] = ($request->id_employee == "null" || empty($request->id_employee) ? null : $request->id_employee);
+        $data['id_store'] = ($request->id_store == "null" || empty($request->id_store) ? null : $request->id_store);
+        $data['id_area'] = ($request->id_area == "null" || empty($request->id_area) ? null : $request->id_area);
+        $data['periode'] = ($request->periode == "null" || empty($request->periode) ? null : $request->periode);
+        $data['limit'] = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($data){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Additional Display - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAdditionalDisplayJob($JobTrace, $data, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
     public function additionalDisplayAch(){

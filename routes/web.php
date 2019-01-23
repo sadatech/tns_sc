@@ -953,6 +953,7 @@ Route::prefix('mtc')->group(function () {
 	
 	Route::prefix('additional_display')->group(function () {
 		Route::get('/', 'ReportController@additionalDisplayIndex')->name('additional_display')->middleware('auth');
+		Route::any('/exportXLS', 'ReportController@additionalDisplayIndexExportXLS')->name('additional_display.exportXLS.index')->middleware('auth');
 		Route::get('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
 		Route::get('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
 		Route::get('/ach', 'ReportController@additionalDisplayAch')->name('additional_display.ach')->middleware('auth');
