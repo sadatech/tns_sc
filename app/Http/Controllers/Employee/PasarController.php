@@ -22,9 +22,13 @@ use App\SubArea;
 use App\Employee;
 use App\EmployeePasar;
 use App\Filters\EmployeeFilters;
+use App\Traits\StringTrait;
+use App\Traits\FirstOrCreateTrait;
 
 class PasarController extends Controller
 {
+	use StringTrait, FirstOrCreateTrait;
+
 	public function getDataWithFilters(EmployeeFilters $filters){
 		$data = Employee::filter($filters)->get();
 		return $data;
@@ -163,53 +167,47 @@ class PasarController extends Controller
                 {
                     foreach($results as $row)
                     {
-                        $dataAgency['agency_name']   = $row->agency;
-                        $id_agency = $this->findAgen($dataAgency);
+                        $id_agency = $this->findAgen($row->agency);
 
-						$data2 = Employee::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
-						->where(['nik' => $row->nik, 'isResign' => false])
-						->whereIn('id_position', [3,4])
-						->count();
-						// dd($data2);
-						if ($data2 < 1) {
-							$getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
-							// $getPosition 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
-							$getPosition = Position::where('level', $row->position)->first()->id;
+						
+						$getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
+						// $getPosition 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
+						$getPosition = Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
 
-                        	$insert = Employee::create([
-                            	'foto_ktp' 			=> "default.png",
-								'foto_tabungan'		=> "default.png",
+                    	$insert = Employee::updateOrCreate(
+                    		[
+								'nik'              	=> $this->removeFirstQuotes($row->nik),
+								'ktp'				=> (isset($row->ktp) ? $this->removeFirstQuotes($row->ktp) : "-"),
+                    		],
+                        	[
                             	'name'             	=> $row->name,
-								'nik'              	=> str_replace("'", "", $row->nik),
-								'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
-								'phone'				=> (isset($row->phone) ? $row->phone : "-"),
+								'phone'				=> (isset($row->phone) ? $this->removeFirstQuotes($row->phone) : "-"),
 								'email'				=> (isset($row->email) ? $row->email : "-"),
-								'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
-								'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
-								'joinAt'			=> (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
+								'rekening'			=> (isset($row->rekening) ? $this->removeFirstQuotes($row->rekening) : "-"),
+								'bank'				=> (isset($row->bank) ? $row->bank: "-"),
+								'joinAt'			=> (isset($row->join_date) ? Carbon::parse($this->removeFirstQuotes($row->join_date)) : ""),
 								'id_agency'			=> $id_agency,
                             	'id_position'       => ($getPosition ? $getPosition : 4),
-                            	'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
+                            	'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($this->removeFirstQuotes($row->birth_date)) : ""),
                             	'gender'            => $row->gender,
                             	'education'         => $row->education,
                             	'password'          => bcrypt($row->password),
                             	'id_timezone'       => ($getZone ? $getZone : 1),
-							]);
-							if ($insert) {
-								if(!($row->pasar == '' || $row->pasar == null)){
-									$dataPasar = array();
-									$listPasar = explode(",", $row->pasar);
-									foreach ($listPasar as $market) {
-										$dataPasar[] = array(
-											'id_pasar'    			=> $this->findPasar($market, $row->subarea, $row->area, $row->region),
-											'id_employee'          	=> $insert->id,
-										);
-									}									
-									DB::table('employee_pasars')->insert($dataPasar);
-								}								
-							}
-						} else {
-							return false;
+                            	'foto_ktp' 			=> "default.png",
+								'foto_tabungan'		=> "default.png",
+							]
+						);
+						if ($insert) {
+							if(!($row->pasar == '' || $row->pasar == null)){
+								$dataPasar = array();
+								$listPasar = explode(",", $row->pasar);
+								foreach ($listPasar as $market) {
+									EmployeePasar::firstOrCreate([
+										'id_pasar'		=> $this->findPasar($market, $row->subarea, $row->area, $row->region),
+										'id_employee'   => $insert->id,
+									]);
+								}									
+							}								
 						}
                     }
                 },false);
@@ -234,95 +232,4 @@ class PasarController extends Controller
         }
 	}
 
-	public function findPasar($data, $subarea, $area, $region)
-    {
-        $dataPasar = Pasar::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
-        if ($dataPasar->count() == 0) {
-
-			$dataSub['subarea_name']   	= $subarea;
-			$dataSub['area_name']   	= $area;
-			$dataSub['region_name']   	= $region;
-			$id_subarea = $this->findSub($dataSub);
-            $pasar = Pasar::create([
-                'name'       	=> $data,
-				'address'       => "-",
-				'latitude'		=> "",
-				'longitude'		=> "",
-				'id_subarea'	=> $id_subarea
-
-            ]);
-            if ($pasar) {
-                $id_pasar = $pasar->id;
-            }
-        } else {
-            $id_pasar = $dataPasar->first()->id;
-        }
-        return $id_pasar;
-    }
-
-	
-	public function findAgen($data)
-    {
-        $dataAgency = Agency::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['agency_name']))."'")->get();
-        if ($dataAgency != null) {
-            $agency = Agency::create([
-              'name'        => $data['agency_name']
-          ]);
-            $id_agency = $agency->id;
-        } else {
-            $id_agency = $dataAgency->first()->id;
-        }
-        return $id_agency;
-	}
-	
-	public function findSub($data)
-    {
-        $dataSub = SubArea::where('name','like','%'.trim($data['subarea_name']).'%')->get();
-        if ($dataSub != null) {
-
-			$dataArea = $data;
-			$id_area = $this->findArea($dataArea);
-            $subarea = SubArea::create([
-              'name'        => $data['subarea_name'],
-              'id_area'     => $id_area
-          ]);
-            $id_subarea = $subarea->id;
-        }else{
-            $id_subarea = $dataSub->first()->id;
-        }
-        return $id_subarea;
-    }
-
-    public function findArea($data)
-    {
-        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
-        if ($dataArea->count() == 0) {
-
-			$dataRegion = $data;
-			$id_region = $this->findRegion($dataRegion);
-            $area = Area::create([
-              'name'        => $data['area_name'],
-              'id_region'   => $id_region,
-          ]);
-            $id_area = $area->id;
-        }else{
-            $id_area = $dataArea->first()->id;
-        }
-        return $id_area;
-    }
-
-    public function findRegion($data)
-    {
-        $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
-        if ($dataRegion->count() == 0) {
-
-            $region = Region::create([
-              'name'        => $data['region_name'],
-          ]);
-            $id_region = $region->id;
-        }else{
-            $id_region = $dataRegion->first()->id;
-        }
-        return $id_region;
-    }
 }
