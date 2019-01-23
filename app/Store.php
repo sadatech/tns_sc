@@ -63,10 +63,6 @@ class Store extends Model
     {
         return $this->belongsTo('App\SubArea', 'id_subarea');
     }
-    public function scopeFilter($query, QueryFilters $filters)
-    {
-        return $filters->apply($query);
-    }
     public function getDistributorCode()
     {
         return implode(', ', $this->storeDistributor->pluck('distributor.code')->toArray());
@@ -74,5 +70,10 @@ class Store extends Model
     public function getDistributorName()
     {
         return implode(', ', $this->storeDistributor->pluck('distributor.name')->toArray());
+    }
+    
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }

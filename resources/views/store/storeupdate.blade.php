@@ -73,85 +73,158 @@
             <div class="block-content">
                 <h5><b>Account & Area</b></h5>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Is Jawa</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('is_jawa', isset($str->is_jawa) ? [$str->is_jawa, strtoupper($str->is_jawa)] : null, ["Jawa"=>"JAWA","Non Jawa"=>"NON JAWA"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Java / Non Java',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Is Jawa</label>
                         <select class="js-select2 custom-select" name="is_jawa" id="jawa">
                             <option value="" disabled selected>Choose Jawa / Non Jawa</option>
                             <option value="Jawa">JAWA</option>
                             <option value="Non Jawa">NON JAWA</option>
-                        </select>
+                        </select> --}}
                     </div>
-                    <div class="form-group col-md-6">
-                         <label>Sales</label>
+                    <div class="col-md-6">
+                        {{ 
+                            Form::select2Input('sales', isset($str->id_salestier) ? [$str->id_salestier, $str->sales->name] : null, route('sales-tier-select2'), [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Sales',
+                                ]
+                            ]) 
+                        }}
+                         {{-- <label>Sales</label>
                         <select class="js-select2 custom-select" name="sales" id="sales" required>
                             @foreach($sales as $time)
                                 <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Account</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('account', isset($str->id_account) ? [$str->id_account, $str->account->name] : null, route('account-select2'), [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Account',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Account</label>
                         <select class="js-select2 custom-select" name="account" id="account" required>
                             @foreach ($account as $acc)
                             <option value="{{ $acc->id }}">{{ $acc->channel->name }} - {{ $acc->name }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Area / SubArea</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('subarea', isset($str->id_subarea) ? [$str->id_subarea, $str->subarea->name] : null, route('subarea-select2'), [
+                                'text' => 'obj.area_name + " - " + obj.name',
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Subarea',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Area / SubArea</label>
                         <select class="js-select2 custom-select" name="subarea" id="subarea" required>
                             @foreach ($subarea as $data)
                                 <option value="{{ $data->id }}">{{ $data->area->name }} - {{ $data->name }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Is Vito</label>
+                    <div class="col-md-6">
+                        {{
+                            Form::select2Input('is_vito', isset($str->is_vito) ? [$str->is_vito, strtoupper($str->is_vito)] : null, ["Vito"=>"VITO","Non Vito"=>"NON VITO"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Vito / Non Vito',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Is Vito</label>
                         <select class="js-select2 custom-select" name="is_vito" id="is_vito" required>
                             <option value="" disabled selected>Choose Vito / Non Vito</option>
                             <option value="Vito">VITO</option>
                             <option value="Non Vito">NON VITO</option>
-                        </select>
+                        </select> --}}
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Delivery</label>
+                        {{
+                            Form::select2Input('delivery', isset($str->delivery) ? [$str->delivery, strtoupper($str->delivery)] : null, ["Direct"=>"DIRECT","DC"=>"DC"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Delivery',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Delivery</label>
                         <select class="js-select2 form-control" name="delivery" id="delivery" required>
                             <option value="" disabled selected>Choose Delivery</option>
                                 <option value="Direct">Direct</option>
                                 <option value="DC">DC</option>
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label>Store Panel</label>
+                        {{
+                            Form::select2Input('store_panel', isset($str->store_panel) ? [$str->store_panel, strtoupper($str->store_panel)] : null, ["YES"=>"YES","NO"=>"NO"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Store Panel',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Store Panel</label>
                         <select class="js-select2 custom-select" name="store_panel" id="store_panel" required>
                             <option value="" disabled selected>Choose Store Panel</option>
                             <option value="YES">YES</option>
                             <option value="NO">NO</option>
-                        </select>
+                        </select> --}}
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Coverage</label>
+                        {{
+                            Form::select2Input('coverage', isset($str->coverage) ? [$str->coverage, strtoupper($str->coverage)] : null, ["Direct"=>"DIRECT","In Direct"=>"IN DIRECT"], [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose Coverage',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Coverage</label>
                         <select class="js-select2 form-control" name="coverage" id="coverage" required>
                             <option value="" disabled selected>Choose Coverage</option>
                                 <option value="Direct">Direct</option>
                                 <option value="In Direct">In Direct</option>
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
                 <div class="row">
-              <div class="form-group col-md-6">
-                        <label>Timezones</label>
+              <div class="col-md-6">
+                        {{
+                            Form::select2Input('timezone', isset($str->id_timezone) ? [$str->id_timezone, $str->timezone->name] : null, route('timezone-select2'), [
+                                'elOptions' => [
+                                    'required' => 'required',
+                                    'placeholder' => 'Choose your Timezone',
+                                ]
+                            ]) 
+                        }}
+                        {{-- <label>Timezones</label>
                         <select class="js-select2 custom-select" name="timezone" id="timezone" required>
                             @foreach($timezone as $time)
                                 <option value="{{$time->id}}">{{$time->name}}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                     </div>
                 </div>
             </div>
@@ -179,24 +252,25 @@
 <script src="{{ asset('js/locationpicker.jquery.min.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#account option[value="{{ $str->account->id }}"]').attr('selected','selected');
-        $('#subbarea option[value="{{ $str->subarea->id }}"]').attr('selected','selected');
-        $('#timezone option[value="{{ $str->id_timezone }}"]').attr('selected','selected');
-        $('#sales option[value="{{ $str->id_salestier }}"]').attr('selected','selected');
-        $('#is_vito option[value="{{ $str->is_vito }}"]').attr('selected','selected');
-        $('#jawa option[value="{{ $str->is_jawa }}"]').attr('selected','selected');
+        // $('#account option[value="{{ $str->account->id }}"]').attr('selected','selected');
+        // $('#subbarea option[value="{{ $str->subarea->id }}"]').attr('selected','selected');
+        // $('#timezone option[value="{{ $str->id_timezone }}"]').attr('selected','selected');
+        // $('#sales option[value="{{ $str->id_salestier }}"]').attr('selected','selected');
+        // $('#is_vito option[value="{{ $str->is_vito }}"]').attr('selected','selected');
+        {{-- $('#jawa option[value="{{ $str->is_jawa }}"]').attr('selected','selected'); --}}
         $('#coverage option[value="{{ $str->coverage }}"]').attr('selected','selected');
-        $('#store_panel option[value="{{ $str->store_panel }}"]').attr('selected','selected');
-        $('#delivery option[value="{{ $str->delivery }}"]').attr('selected','selected');
-        $('#account').trigger('change');
-        $('#timezone').trigger('change');
-        $('#subbarea').trigger('change');
-        $('#sales').trigger('change');
-        $('#is_vito').trigger('change');
-        $('#jawa').trigger('change');
+        // $('#store_panel option[value="{{ $str->store_panel }}"]').attr('selected','selected');
+        {{-- $('#delivery option[value="{{ $str->delivery }}"]').attr('selected','selected'); --}}
+        // $('#account').trigger('change');
+        // $('#timezone').trigger('change');
+        // $('#subbarea').trigger('change');
+        // $('#sales').trigger('change');
+        // $('#is_vito').trigger('change');
+        // $('#jawa').trigger('change');
         $('#coverage').trigger('change');
-        $('#store_panel').trigger('change');
-        $('#delivery').trigger('change');
+        // $('#store_panel').trigger('change');
+        // $('#delivery').trigger('change');
+        
     });
 
 

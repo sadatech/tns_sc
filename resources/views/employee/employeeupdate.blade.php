@@ -195,11 +195,23 @@
                         <label class="col-md-12" style="padding: 0">Store</label>
                         <div class="input-group mb-3 col-md-12" style="padding: 0">
                             <div style="width: 82%">
-                                <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
+                                {{
+                                    Form::select2Input('storesMobile', null, route('store-select2'), [
+                                        'key' => 'obj.id + "|" + obj.name1',
+                                        'text' => 'obj.name1',
+                                        'useLabel' => false,
+                                        'elOptions' => [
+                                            'placeholder' => 'Choose store...',
+                                            'style' => 'width: 100%',
+                                            'id' => 'stores',
+                                        ]
+                                    ]) 
+                                }}
+                                {{-- <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
                                     @foreach($store as $data)
                                     <option value="{{ $data->id.'|'.$data->name1}}">{{ $data->name1 }}</option>
                                     @endforeach
-                                </select>
+                                </select> --}}
                             </div>
                             <div class="input-group-append" style="width: 18%">
                                 <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>

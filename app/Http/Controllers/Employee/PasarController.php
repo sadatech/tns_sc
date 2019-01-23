@@ -163,7 +163,6 @@ class PasarController extends Controller
                 {
                     foreach($results as $row)
                     {
-						echo "$row<hr>";
                         $dataAgency['agency_name']   = $row->agency;
                         $id_agency = $this->findAgen($dataAgency);
 
@@ -174,36 +173,40 @@ class PasarController extends Controller
 						// dd($data2);
 						if ($data2 < 1) {
 							$getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
-							$getPosition 	= Position::whereRaw("TRIM(UPPER(level)) = '". trim(strtoupper($row->position))."'")->first()->id;
+							// $getPosition 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
+							$getPosition = Position::where('level', $row->position)->first()->id;
+
                         	$insert = Employee::create([
                             	'foto_ktp' 			=> "default.png",
 								'foto_tabungan'		=> "default.png",
                             	'name'             	=> $row->name,
-								'nik'              	=> $row->nik,
+								'nik'              	=> str_replace("'", "", $row->nik),
 								'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
 								'phone'				=> (isset($row->phone) ? $row->phone : "-"),
 								'email'				=> (isset($row->email) ? $row->email : "-"),
 								'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
 								'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
-								'birthdate'			=> Carbon::now(),
+								'joinAt'			=> (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
 								'id_agency'			=> $id_agency,
                             	'id_position'       => ($getPosition ? $getPosition : 4),
-                            	'joinAt'            => Carbon::now(),
+                            	'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
                             	'gender'            => $row->gender,
                             	'education'         => $row->education,
                             	'password'          => bcrypt($row->password),
                             	'id_timezone'       => ($getZone ? $getZone : 1),
 							]);
 							if ($insert) {
-								$dataPasar = array();
-								$listPasar = explode(",", $row->pasar);
-								foreach ($listPasar as $market) {
-									$dataPasar[] = array(
-										'id_pasar'    			=> $this->findPasar($market, $row->subarea, $row->area, $row->region),
-										'id_employee'          	=> $insert->id,
-									);
-								}
-								DB::table('employee_pasars')->insert($dataPasar);
+								if(!($row->pasar == '' || $row->pasar == null)){
+									$dataPasar = array();
+									$listPasar = explode(",", $row->pasar);
+									foreach ($listPasar as $market) {
+										$dataPasar[] = array(
+											'id_pasar'    			=> $this->findPasar($market, $row->subarea, $row->area, $row->region),
+											'id_employee'          	=> $insert->id,
+										);
+									}									
+									DB::table('employee_pasars')->insert($dataPasar);
+								}								
 							}
 						} else {
 							return false;

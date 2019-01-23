@@ -10,6 +10,9 @@ use App\ProductStockType;
 use App\Channel;
 use App\ProductFokusMtc;
 use App\Product;
+use App\FokusArea;
+use App\FokusChannel;
+use App\FokusProduct;
 use Exception;
 use DB;
 use Auth;
@@ -135,7 +138,7 @@ class ProductFokusMtcController extends Controller
 
 	public function importXLS(Request $request)
 	{
-		try {
+		// try {
 			$file = Input::file('file')->getClientOriginalName();
 			$filename = pathinfo($file, PATHINFO_FILENAME);
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
@@ -148,62 +151,73 @@ class ProductFokusMtcController extends Controller
 				$file = $request->file('file')->getRealPath();
 				$ext = '';
 				Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
-					try {
+					// try {
 						DB::beginTransaction();
 						if (!empty($results->all())) {
 							foreach($results as $row)
-							{
-								$fokus = ProductFokus::create([
+							{	
+								// echo $row;
+								$getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['sku']))."'")->first();
+								if (($row['area'] == null)or(trim(strtoupper($row['area'])) == 'ALL')) {
+									$getArea = null;
+								}else{
+									$getArea = Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['area']))."'")->first()->id;
+								}
+								$getChannel = Channel::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['channel']))."'")->first();
+								$fokus = ProductFokusMtc::create([
+									'id_product'    => $getSku->id,
+									'id_area'       => $getArea,
+									'id_channel'    => $getChannel->id,
 									'from'  => \PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'),
 									'to'    => \PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM')
 								]);
-								if (!isset($fokus->id)) {
+								// if (!isset($fokus->id)) {
 
-								} else {
-									$listProduct = explode(",", $row->sku);
-                                    // dd($listProduct);
-									foreach ($listProduct as $key => $product) {
-										$getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($product))."'")->first();
-										if (isset($getSku->id)) {
-											FokusProduct::create([
-												'id_pf'         => $fokus->id,
-												'id_product'    => $getSku->id
-											]);
-										}
-									}
-									$listChannel = explode(",", $row->channel);
-									foreach ($listChannel as $channel) {
-										FokusChannel::create([
-											'id_channel'    => $this->findChannel($channel),
-											'id_pf'         => $fokus->id
-										]);
-									}
-									$listArea = explode(",", $row->area);
-									foreach ($listArea as $area) {
-										$getArea = \App\Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($area))."'")->first();
-										if (isset($getArea->id)) {
-											FokusArea::create([
-												'id_area'            => $getArea->id,
-												'id_pf'              => $fokus->id
-											]);
-										}
-									}
-                                    // dd($listArea);
-                                    // dd($getArea);
-								}
+								// } else {
+								// 	$listProduct = explode(",", $row->sku);
+        //                             // dd($listProduct);
+								// 	foreach ($listProduct as $key => $product) {
+								// 		$getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($product))."'")->first();
+								// 		if (isset($getSku->id)) {
+								// 			FokusProduct::create([
+								// 				'id_pf'         => $fokus->id,
+								// 				'id_product'    => $getSku->id
+								// 			]);
+								// 		}
+								// 	}
+								// 	$listChannel = explode(",", $row->channel);
+								// 	foreach ($listChannel as $channel) {
+								// 		FokusChannel::create([
+								// 			'id_channel'    => $this->findChannel($channel),
+								// 			'id_pf'         => $fokus->id
+								// 		]);
+								// 	}
+								// 	$listArea = explode(",", $row->area);
+								// 	foreach ($listArea as $area) {
+								// 		$getArea = \App\Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($area))."'")->first();
+								// 		if (isset($getArea->id)) {
+								// 			FokusArea::create([
+								// 				'id_area'            => $getArea->id,
+								// 				'id_pf'              => $fokus->id
+								// 			]);
+								// 		}
+								// 	}
+        //                             // dd($listArea);
+        //                             // dd($getArea);
+								// }
 							}
 							DB::commit();
 						} else {
 							throw new Exception("Error Processing Request", 1);
 						}
-					} catch (Exception $e) {
-						DB::rollback();
-						return redirect()->back()->with([
-							'type' => 'danger',
-							'title' => 'Gagal!<br/>',
-							'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
-						]);
-					}
+					// } catch (Exception $e) {
+					// 	DB::rollback();
+					// 	return redirect()->back()->with([
+					// 		'type' => 'danger',
+					// 		'title' => 'Gagal!<br/>',
+					// 		'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
+					// 	]);
+					// }
 				}, false);
 				return redirect()->back()->with([
 					'type' => 'success',
@@ -218,14 +232,14 @@ class ProductFokusMtcController extends Controller
 					'message'=> '<i class="em em-confounded mr-2"></i>File harus di isi!'
 				]);
 			}
-		} catch (Exception $e) {
-			DB::rollback();
-			return redirect()->back()->with([
-				'type' => 'danger',
-				'title' => 'Gagal!<br/>',
-				'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
-			]);
-		}
+		// } catch (Exception $e) {
+		// 	DB::rollback();
+		// 	return redirect()->back()->with([
+		// 		'type' => 'danger',
+		// 		'title' => 'Gagal!<br/>',
+		// 		'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target!'
+		// 	]);
+		// }
 	}
 
 	public function findChannel($channel)
@@ -246,49 +260,57 @@ class ProductFokusMtcController extends Controller
 
 	public function export()
 	{
-		$emp = ProductFokus::orderBy('created_at', 'DESC');
+		$emp = ProductFokusMtc::orderBy('created_at', 'DESC');
 		if ($emp->count() > 0) {
 			foreach ($emp->get() as $val) {
-				$area = FokusArea::where(
-					'id_pf', $val->id
-				)->get();
-				$areaList = array();
-				foreach($area as $dataArea) {
-					if(isset($dataArea->id_area)) {
-						$areaList[] = $dataArea->area->name;
-					} else {
-						$areaList[] = "-";
-					}
-				}
-				$channel = FokusChannel::where(
-					'id_pf', $val->id
-				)->get();
-				$channelList = array();
-				foreach($channel as $dataChannel) {
-					if(isset($dataChannel->id_channel)) {
-						$channelList[] = $dataChannel->channel->name;
-					} else {
-						$channelList[] = "-";
-					}
-				}
-				$product = FokusProduct::where(
-					'id_pf', $val->id
-				)->get();
-				$productList = array();
-				foreach($product as $dataProduct) {
-					if(isset($dataProduct->id_product)) {
-						$productList[] = $dataProduct->product->name;
-					} else {
-						$productList[] = "-";
-					}
-				}
+				// $area = FokusArea::where(
+				// 	'id_pf', $val->id
+				// )->get();
+				// $areaList = array();
+				// foreach($area as $dataArea) {
+				// 	if(isset($dataArea->id_area)) {
+				// 		$areaList[] = $dataArea->area->name;
+				// 	} else {
+				// 		$areaList[] = "-";
+				// 	}
+				// }
+				// $channel = FokusChannel::where(
+				// 	'id_pf', $val->id
+				// )->get();
+				// $channelList = array();
+				// foreach($channel as $dataChannel) {
+				// 	if(isset($dataChannel->id_channel)) {
+				// 		$channelList[] = $dataChannel->channel->name;
+				// 	} else {
+				// 		$channelList[] = "-";
+				// 	}
+				// }
+				// $product = FokusProduct::where(
+				// 	'id_pf', $val->id
+				// )->get();
+				// $productList = array();
+				// foreach($product as $dataProduct) {
+				// 	if(isset($dataProduct->id_product)) {
+				// 		$productList[] = $dataProduct->product->name;
+				// 	} else {
+				// 		$productList[] = "-";
+				// 	}
+				// }
+				// $data[] = array(
+				// 	'Product'		=> rtrim(implode(',', $productList), ','),
+				// 	'Channel'	    => rtrim(implode(',', $channelList), ','),
+				// 	'Area'			=> rtrim(implode(',', $areaList), ','),
+				// 	'Month From'    => (isset($val->from) ? $val->from : "-"),
+				// 	'Month Until'   => (isset($val->to) ? $val->to : "-")
+				// );
 				$data[] = array(
-					'Product'		=> rtrim(implode(',', $productList), ','),
-					'Channel'	    => rtrim(implode(',', $channelList), ','),
-					'Area'			=> rtrim(implode(',', $areaList), ','),
+					'Product'		=> (isset($val->product->name) ? $val->product->name : "-"),
+					'Channel'	    => (isset($val->channel->name) ? $val->channel->name : "-"),
+					'Area'			=> (isset($val->area->name) ? $val->area->name : "ALL"),
 					'Month From'    => (isset($val->from) ? $val->from : "-"),
 					'Month Until'   => (isset($val->to) ? $val->to : "-")
 				);
+				// return response()->json($data);
 			}
 
 			$filename = "ProductFokus_".Carbon::now().".xlsx";
