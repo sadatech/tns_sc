@@ -25,7 +25,7 @@ class SubCategoryController extends Controller
 
     public function data()
     {
-        $subcategory = SubCategory::get();
+        $subcategory = SubCategory::with('category')->get();
         return Datatables::of($subcategory)
         ->addColumn('category', function($subcategory) {
 			if (isset($subcategory->category)) {
@@ -43,7 +43,8 @@ class SubCategoryController extends Controller
 			}
             $data = array(
                 'id'        => $subcategory->id,
-                'category'     => $category,
+                'id_category'     => $subcategory->category->id,
+                'category'     => $subcategory->category->name,
                 'name'      => $subcategory->name
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>

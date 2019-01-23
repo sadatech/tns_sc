@@ -23,7 +23,7 @@
           </h3>
           <div class="block-option">
           <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <a href="{{ route('fokus.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+            <a href="{{ route('fokusMtc.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="promoTable">
@@ -55,11 +55,11 @@
                     </div>
                 </div>
             </div>
-            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('fokus.import') }}">
+            <form id="import-form" method="post" enctype="multipart/form-data" action="{{ route('fokusMtc.import') }}">
                 {{ csrf_field() }}
                 <div class="block-content">
                     <div class="form-group">
-                      <a href="{{ route('fokus.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
+                      <a href="{{ route('fokusMtc.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
                     </div>
                     <div class="block-content">
                         <h5> Sample Data :</h5>
@@ -76,15 +76,22 @@
                             <tbody>
                                 <tr>
                                     <td>SKU 1</td>
-                                    <td>Channel1, Channel2, Channel3</td>
-                                    <td>Area1, Area2</td>
+                                    <td>Channel 1</td>
+                                    <td>Area 1</td>
                                     <td>11-2018</td>
                                     <td>12-2018</td>
                                 </tr>
                                 <tr>
-                                    <td>SKU 3, SKU 4</td>
-                                    <td>Channel1, Channel3</td>
+                                    <td>SKU 2</td>
+                                    <td>Channel 2</td>
                                     <td></td>
+                                    <td>1-2019</td>
+                                    <td>2-2019</td>
+                                </tr>
+                                <tr>
+                                    <td>SKU 3</td>
+                                    <td>Channel 3</td>
+                                    <td>ALL</td>
                                     <td>1-2019</td>
                                     <td>2-2019</td>
                                 </tr>
