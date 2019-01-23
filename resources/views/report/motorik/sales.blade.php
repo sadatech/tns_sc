@@ -39,7 +39,7 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('report.motorik.sales.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="onTargetTable">
@@ -62,6 +62,7 @@
 @endsection
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/magnific-popup/magnific-popup.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
@@ -78,6 +79,7 @@ table.table thead tr th {
 @endsection
 
 @section('script')
+<script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
@@ -94,6 +96,12 @@ table.table thead tr th {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
+
+  $("#btnDownloadXLS").on("click", function(){
+      var url= "{{ route('report.motorik.sales.export') }}"+"?periode="+$(".js-datepicker").val();
+      window.location.href=url;
+  });
+
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
@@ -136,5 +144,25 @@ table.table thead tr th {
       bDestroy: true
     });
   });
+
+   @if(session('type'))
+     $(document).ready(function() {
+      $.notify({
+        title: '<strong>{!! session('title') !!}</strong>',
+        message: '{!! session('message') !!}'
+      }, {
+        type: '{!! session('type') !!}',
+        animate: {
+          enter: 'animated zoomInDown',
+          exit: 'animated zoomOutUp'
+        },
+        placement: {
+          from: 'top',
+          align: 'center'
+        }
+      });
+
+    });
+   @endif
 </script>
 @endsection
