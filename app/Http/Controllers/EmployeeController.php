@@ -582,7 +582,6 @@ class EmployeeController extends Controller
                 {
                     foreach($results as $row)
                     {
-                    	echo $row;
 						$rowRules = [
 							'nik' 		=> 'required|numeric|unique:employees',
 							'name'		=> 'required',	
