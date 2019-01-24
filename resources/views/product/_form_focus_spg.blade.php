@@ -60,7 +60,10 @@ $type = $type ?? '';
             <label>Employee <span style="color: red;">*</span></label>
             <select class="js-select form-control" style="width: 100%" id="addEmployee" name="id_employee" required>
               <option value="" disabled selected>Choose your Employee</option>
-              @foreach(App\Employee::where('id_position','3')->get() as $data)
+              @foreach(App\Employee::whereHas('position', function($q)
+              {
+                return $q->whereLevel('spggtc');
+              })->get() as $data)
               <option value="{{ $data->id }}">{{ $data->name }} </option>
               @endforeach
             </select>

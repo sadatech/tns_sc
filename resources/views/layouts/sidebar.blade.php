@@ -209,7 +209,7 @@
                             </li>-->
                             @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                             <li>
-                                <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
+                                <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">VDO</a>
                             </li>
                             @endif
                             <!--<li>
