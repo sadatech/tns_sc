@@ -254,7 +254,7 @@
                         <ul>
                             {{-- SMD PASAR --}}
                             <li class="{{ request()->is('report/gtc/smd/*') ? 'open' : '' }}">
-                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SMD Pasar</span></a>
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">VDO</span></a>
                                 <ul>
                                     {{-- ATTENDANCE SMD --}}
                                     <li>
@@ -365,7 +365,7 @@
                         <ul>
                             {{-- MOTORIK --}}
                             <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
-                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motorik</span></a>
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motoris</span></a>
                             <ul>
                                 {{-- ATTENDANCE MOTORIK --}}
                                 <li>
