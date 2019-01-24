@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+<div class="modal fade" id="tambahModal" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
@@ -113,10 +113,6 @@
 <style type="text/css">
 [data-notify="container"] {
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
-}
-
-.select2-container--open {
-    z-index: 9999999
 }
 </style>
 @endsection
