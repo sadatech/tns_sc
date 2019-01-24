@@ -53,9 +53,9 @@ class EmployeeController extends Controller
 		return $data;
 	}
 
-	public function getDataIsTL()
+	public function getDataIsTL(EmployeeFilters $filters)
 	{
-		$data = Employee::where("id_position", 5)
+		$data = Employee::filter($filters)->where("id_position", 5)
 		->whereHas("employeeSubArea", function($query){
 			$query->where("isTl", 1);
 		})
@@ -475,7 +475,7 @@ class EmployeeController extends Controller
 			if ($data['globalPosition'] == "summary") {
 				return redirect()->route('employee')
 				->with($statusParam);
-			}else if ($data['globalPosition'] == "pasar") {
+		}else if ($data['globalPosition'] == "pasar") {
 				return redirect()->route('employee.pasar')
 				->with($statusParam);
 			}else{

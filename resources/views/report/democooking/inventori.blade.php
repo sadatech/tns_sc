@@ -114,6 +114,10 @@
 [data-notify="container"] {
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
+
+.select2-container--open {
+    z-index: 9999999
+}
 </style>
 @endsection
 
