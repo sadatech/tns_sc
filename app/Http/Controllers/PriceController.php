@@ -12,9 +12,12 @@ use Excel;
 use Carbon\Carbon;
 use App\Price;
 use App\Product;
+use App\Traits\StringTrait;
 
 class PriceController extends Controller
 {
+    use StringTrait;
+
     public function baca()
     {
         $data['product'] = Product::get();
@@ -25,6 +28,9 @@ class PriceController extends Controller
     {
         $price = Price::with('product');
         return Datatables::of($price)
+        ->editColumn('price', function($price) {
+            return ($price->price? $this->numberToPrice('Rp', $price->price) : '');
+        })
         ->addColumn('product', function($price) {
             return ($price->product->name??'DELETED PRODUCT');
         })

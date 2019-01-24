@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+<div class="modal fade" id="tambahModal" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
