@@ -797,7 +797,7 @@ Route::prefix('report')->group(function () {
 					return view('report.democooking.sampling', $data);
 				})->name('report.demo.sampling')->middleware('auth');
 				Route::post('/data', 'ReportController@DcSampling')->name('dc.sampling.data')->middleware('auth');
-				Route::get('/export', 'ReportController@exportDcSampling')->name('dc.sampling.export')->middleware('auth');
+				Route::any('/export', 'ReportController@exportDcSampling')->name('dc.sampling.export')->middleware('auth');
 			});
 
 			Route::prefix('salesDC')->group(function(){
@@ -807,7 +807,7 @@ Route::prefix('report')->group(function () {
 					return view('report.democooking.salesDC', $data);
 				})->name('report.demo.salesDC')->middleware('auth');
 				Route::post('/data', 'ReportController@DcSales')->name('dc.sales.data')->middleware('auth');
-				Route::get('/export', 'ReportController@exportDcSales')->name('dc.sales.export')->middleware('auth');
+				Route::any('/export', 'ReportController@exportDcSales')->name('dc.sales.export')->middleware('auth');
 			});
 
 			Route::prefix('activity')->group(function () {
@@ -815,7 +815,7 @@ Route::prefix('report')->group(function () {
 					return view('report.democooking.activity');
 				})->name('report.demo.activity')->middleware('auth');
 				Route::post('/data', 'ReportController@documentationDC')->name('dc.documentation.data')->middleware('auth');
-				Route::get('/export', 'ReportController@ExportdocumentationDC')->name('dc.documentation.export')->middleware('auth');
+				Route::any('/export', 'ReportController@ExportdocumentationDC')->name('dc.documentation.export')->middleware('auth');
 			});
 
 			Route::prefix('cashAdvance')->group(function () {
@@ -847,7 +847,7 @@ Route::prefix('report')->group(function () {
 					return view('report.motorik.attendance');
 				})->name('report.motorik.attendance')->middleware('auth');
 				Route::post('/data', 'ReportController@Motorikattendance')->name('report.motorik.attendance.data')->middleware('auth');
-				Route::get('/export', 'ReportController@exportMptorikAttandance')->name('report.motorik.attendance.export')->middleware('auth');
+				Route::any('/export', 'ReportController@exportMptorikAttandance')->name('report.motorik.attendance.export')->middleware('auth');
 			});
 
 			Route::prefix('distPF')->group(function () {
@@ -857,7 +857,7 @@ Route::prefix('report')->group(function () {
 					return view('report.motorik.distPF', $data);
 				})->name('report.motorik.distPF')->middleware('auth');
 				Route::post('/data', 'ReportController@motorikDistPF')->name('report.motorik.distPF.data')->middleware('auth');
-				Route::get('/export', 'ReportController@exportMotorikDistPF')->name('report.motorik.distPF.export')->middleware('auth');
+				Route::any('/export', 'ReportController@exportMotorikDistPF')->name('report.motorik.distPF.export')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -867,7 +867,7 @@ Route::prefix('report')->group(function () {
 					return view('report.motorik.sales', $data);
 				})->name('report.motorik.sales')->middleware('auth');
 				Route::post('/data', 'ReportController@MotorikSales')->name('report.motorik.sales.data')->middleware('auth');
-				Route::get('/export', 'ReportController@exportMotorikSales')->name('report.motorik.sales.export')->middleware('auth');
+				Route::any('/export', 'ReportController@exportMotorikSales')->name('report.motorik.sales.export')->middleware('auth');
 			});
 
 		});
