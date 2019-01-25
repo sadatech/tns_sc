@@ -58,12 +58,25 @@ class NewCbdController extends Controller
 					$image_compress = Image::make($path.'/'.$photo)->orientate();
 					$image_compress->save($path.'/'.$photo, 50);
 				}
+
+				if ($image 	= $request->file('photo2')) {
+					$photo2 	= time()."_".$image->getClientOriginalName();
+					$path 	= 'uploads/cbd';
+					$image->move($path, $photo2);
+					$image_compress = Image::make($path.'/'.$photo2)->orientate();
+					$image_compress->save($path.'/'.$photo2, 50);
+				}
+
 				$insert = NewCbd::create([
 					'id_employee'			=> $user->id,
 					'id_outlet'				=> $request->outlet,
 					'date'					=> Carbon::today()->toDateString(),
-					'photo'					=> $photo,
-					'posm'					=> $request->posm,
+					'photo'					=> $photo?? null,
+					'photo2'				=> $photo2?? null,
+					'posm_shop_sign'		=> $request->posm_shop_sign?? null,
+					'posm_others'			=> $request->posm_others?? null,
+					'posm_hangering_mobile'	=> $request->posm_hangering_mobile?? null,
+					'posm_poster'			=> $request->posm_poster?? null,
 					'cbd_competitor'		=> $request->cbd_competitor,
 					'cbd_position'			=> $request->cbd_position,
 					'outlet_type'			=> $request->outlet_type,
