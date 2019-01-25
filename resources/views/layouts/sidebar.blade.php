@@ -264,13 +264,9 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/stockist') ? 'active' : '' }}" href="{{ route('report.stockist') }}"><span class="sidebar-mini-hide">Stockist</span></a>
                                     </li>
-                                    {{-- CBD --}}
-                                    <li>
-                                        <a class="{{ request()->is('report/gtc/smd/cbd') ? 'active' : '' }}" href="{{ route('report.cbd') }}"><span class="sidebar-mini-hide">CBD</span></a>
-                                    </li>
                                     {{-- NEW CBD --}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('report.new-cbd') }}"><span class="sidebar-mini-hide">New CBD</span></a>
+                                        <a class="{{ request()->is('report/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('report.new-cbd') }}"><span class="sidebar-mini-hide">CBD</span></a>
                                     </li>
                                     {{-- Dist PF MTC--}}
                                     <li>
