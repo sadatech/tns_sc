@@ -194,9 +194,8 @@ class PasarController extends Controller
                         $dataSub['region_name']    = $row->region;
                         $id_subarea = $this->findSub($dataSub);
 
-                        $data1 = SubArea::where(['id' => $id_subarea])->first();
                         $check = Pasar::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->pasar))."'")
-                        ->where(['id_subarea' => $data1->id])->count();
+                        ->where(['id_subarea' => $id_subarea])->count();
                         if ($check < 1) {
                             Pasar::create([
                                 'name'              => $row->pasar,

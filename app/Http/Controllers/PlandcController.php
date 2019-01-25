@@ -120,7 +120,7 @@ class PlandcController extends Controller
                             $insert = PlanDc::create([
                                 'date'              => \PHPExcel_Style_NumberFormat::toFormattedString($row['date'], 'YYYY-MM-DD'),
                                 'plan'              => $row['plan'],
-                                'stocklist'         => (isset($row->stocklist) ? $row->stocklist : "-"),
+                                'stocklist'         => (isset($row->stockist) ? $row->stockist : "-"),
                                 'channel'           => (isset($row->channel) ? $row->channel : "-")
                             ]);
                             if (!empty($insert)) 
