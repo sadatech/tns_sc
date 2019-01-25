@@ -223,15 +223,15 @@ class ProductController extends Controller
                 {
                     foreach($results as $row)
                     {
-                        echo "$row<hr>";
+                        // echo "$row<hr>";
                         $dataProduct['subcategory_name']    = $row->subcategory;
                         $dataProduct['category_name']       = $row->category;
                         $id_subcategory = $this->findSub($dataProduct);
 
                         $data1 = SubCategory::where(['id' => $id_subcategory])->first();
-                        $check = Product::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->sku))."'")
+                        $check = Product::whereRaw("TRIM(UPPER(code)) = '". trim(strtoupper($row->code))."'")
                         ->where(['id_subcategory' => $data1->id])->count();
-                        if ($check < 1) {
+                        if ($check == 0) {
                             $getType = ProductStockType::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->type))."'")->first()->id;
                             $insert = Product::create([
                                 'id_brand'          => 1,
@@ -254,8 +254,6 @@ class ProductController extends Controller
                             //         );
                             //     }
                             //     DB::table('product_units')->insert($dataSku);                
-                        } else {
-                            return false;
                         }
                     }
                 },false);

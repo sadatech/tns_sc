@@ -42,7 +42,7 @@
 </div>
 
 {{-- MODAL EDIT TARGET --}}
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">

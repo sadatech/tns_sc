@@ -53,9 +53,9 @@ class EmployeeController extends Controller
 		return $data;
 	}
 
-	public function getDataIsTL()
+	public function getDataIsTL(EmployeeFilters $filters)
 	{
-		$data = Employee::where("id_position", 5)
+		$data = Employee::filter($filters)->where("id_position", 5)
 		->whereHas("employeeSubArea", function($query){
 			$query->where("isTl", 1);
 		})
@@ -310,7 +310,7 @@ class EmployeeController extends Controller
 				'id'        	=> (isset($employee->id) ? $employee->id : ""),
 				'store'    		=> $store
 			);
-			return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+			return "<a href=".route('ubah.employee', $employee->id)."/mtc"." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
 			<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
 			<button onclick='viewModal(".json_encode($data).")' class='btn btn-sm btn-warning btn-square' title='View Store'><i class='si si-picture mr-2'></i> STORE</button>
 			<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
@@ -419,18 +419,20 @@ class EmployeeController extends Controller
 			/*
 			*	Process Update
 			*/
+			$statusParam = [
+					'type' 		=> 'success',
+					'title' 	=> 'Sukses!<br/>',
+					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
+				];
+
 			if ($request->input('status') == 'Stay') {
 				EmployeeStore::where('id_employee', $id)->delete();
 				EmployeeStore::create([
 					'id_store' 		=> $request->input('store'),
 					'id_employee' 	=> $id,
 				]);
-				return redirect()->route('employee')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				// return redirect()->route('employee')
+				// ->with($statusParam);
 			} else if($request->input('status') == 'Mobile') {
 				EmployeeStore::where('id_employee', $id)->delete();
 				$dataStore = array();
@@ -441,12 +443,8 @@ class EmployeeController extends Controller
 					);
 				}
 				DB::table('employee_stores')->insert($dataStore);
-				return redirect()->route('employee')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				// return redirect()->route('employee')
+				// ->with($statusParam);
 			} else if (!empty($request->input('pasar'))) {
 				EmployeePasar::where('id_employee', $id)->delete();
 				$dataPasar = array();
@@ -457,12 +455,8 @@ class EmployeeController extends Controller
 					);
 				}
 				DB::table('employee_pasars')->insert($dataPasar);
-				return redirect()->route('employee.pasar')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				// return redirect()->route('employee.pasar')
+				// ->with($statusParam);
 			} else if (!empty($request->input('subarea'))) {
 				EmployeeSubArea::where('id_employee', $id)->delete();
 				$dataSubArea = array();
@@ -474,12 +468,19 @@ class EmployeeController extends Controller
 					);
 				}
 				DB::table('employee_sub_areas')->insert($dataSubArea);
+				// return redirect()->route('employee.dc')
+				// ->with($statusParam);
+			}
+
+			if ($data['globalPosition'] == "summary") {
+				return redirect()->route('employee')
+				->with($statusParam);
+		}else if ($data['globalPosition'] == "pasar") {
+				return redirect()->route('employee.pasar')
+				->with($statusParam);
+			}else{
 				return redirect()->route('employee.dc')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				->with($statusParam);
 			}
 		}
 	}
