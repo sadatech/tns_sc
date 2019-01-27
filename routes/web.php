@@ -788,6 +788,7 @@ Route::prefix('report')->group(function () {
 					return view('report.democooking.kunjungan');
 				})->name('report.demo.kunjungan')->middleware('auth');
 				Route::post('/data', 'ReportController@kunjunganDc')->name('dc.kunjungan.data')->middleware('auth');
+				Route::any('/export', 'ReportController@exportKunjunganDc')->name('dc.kunjungan.export')->middleware('auth');
 			});
 
 			Route::prefix('sampling')->group(function () {
@@ -935,7 +936,7 @@ Route::prefix('mtc')->group(function () {
 
 		Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
 
-		Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
+		Route::any('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
 		Route::any('/dataSpg/exportXLS', 'ReportController@displayShareSpgDataExportXLS')->name('display_share.dataSpg.exportXLS')->middleware('auth');
 
 		Route::get('/ach', 'ReportController@displayShareAch')->name('display_share.ach')->middleware('auth');
