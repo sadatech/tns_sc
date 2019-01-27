@@ -788,6 +788,7 @@ Route::prefix('report')->group(function () {
 					return view('report.democooking.kunjungan');
 				})->name('report.demo.kunjungan')->middleware('auth');
 				Route::post('/data', 'ReportController@kunjunganDc')->name('dc.kunjungan.data')->middleware('auth');
+				Route::any('/export', 'ReportController@exportKunjunganDc')->name('dc.kunjungan.export')->middleware('auth');
 			});
 
 			Route::prefix('sampling')->group(function () {
@@ -910,12 +911,17 @@ Route::prefix('mtc')->group(function () {
 		Route::post('/store', 'ReportController@store')->name('priceData.store')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@priceDataUpdate')->name('priceData.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportpriceData')->name('priceData.import')->middleware('auth');
-		Route::get('/download-template', function()
-		{
-			return response()->download(public_path('assets/SellinImport.xlsx'));
-		})->name('SellIn.download-template')->middleware('auth');
 	});
 
+
+	Route::prefix('oos')->group(function () {
+		Route::get('/', 'ReportController@oosIndex')->name('oos')->middleware('auth');
+		Route::get('/row', 'ReportController@oosRow')->name('oos.row')->middleware('auth');
+		Route::get('/dataAccountRow', 'ReportController@oosAccountRowData')->name('oos.dataAccountRow')->middleware('auth');
+		Route::any('/exportXLS', 'ReportController@oosExportXLS')->name('oos.exportXLS')->middleware('auth');
+		Route::post('/edit/{id}', 'ReportController@oosUpdate')->name('oos.edit')->middleware('auth');
+		Route::post('/import', 'ImportQueueController@Importoos')->name('oos.import')->middleware('auth');
+	});
 
 	Route::prefix('availability')->group(function () {
 		Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
@@ -926,16 +932,13 @@ Route::prefix('mtc')->group(function () {
 		Route::any('/exportXLS', 'ReportController@availabilityExportXLS')->name('availability.exportXLS')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@availabilityUpdate')->name('availability.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@Importavailability')->name('availability.import')->middleware('auth');
-		Route::get('/download-template', function(){
-			return response()->download(public_path('assets/SellinImport.xlsx'));
-		})->name('SellIn.download-template')->middleware('auth');
 	});
 	
 	Route::prefix('display_share')->group(function () {
 
 		Route::get('/', 'ReportController@displayShareIndex')->name('display_share')->middleware('auth');
 
-		Route::get('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
+		Route::any('/dataSpg', 'ReportController@displayShareSpgData')->name('display_share.dataSpg')->middleware('auth');
 		Route::any('/dataSpg/exportXLS', 'ReportController@displayShareSpgDataExportXLS')->name('display_share.dataSpg.exportXLS')->middleware('auth');
 
 		Route::get('/ach', 'ReportController@displayShareAch')->name('display_share.ach')->middleware('auth');
@@ -946,9 +949,6 @@ Route::prefix('mtc')->group(function () {
 
 		Route::post('/edit/{id}', 'ReportController@displayShareUpdate')->name('display_share.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportdisplayShare')->name('display_share.import')->middleware('auth');
-		Route::get('/download-template', function(){
-			return response()->download(public_path('assets/SellinImport.xlsx'));
-		})->name('SellIn.download-template')->middleware('auth');
 	});
 	
 	Route::prefix('additional_display')->group(function () {
@@ -963,10 +963,6 @@ Route::prefix('mtc')->group(function () {
 		Route::get('/reportDataMd', 'ReportController@additionalDisplayReportMdData')->name('additional_display.reportDataMd')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@additionalDisplayUpdate')->name('additional_display.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@ImportadditionalDisplay')->name('additional_display.import')->middleware('auth');
-		Route::get('/download-template', function()
-		{
-			return response()->download(public_path('assets/SellinImport.xlsx'));
-		})->name('SellIn.download-template')->middleware('auth');
 	});
 
 });

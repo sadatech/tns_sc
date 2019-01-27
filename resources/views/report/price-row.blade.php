@@ -103,7 +103,7 @@
       $('#filterAccount,#filterStore,#filterArea').val(null).trigger('change');
     }, 10);
   });
-  $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', 'Choose your Account', function (params) {
+  $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', '{{App\Account::first()->name}}', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {

@@ -28,10 +28,10 @@ class AccountController extends Controller
         return view('store.account', $data);
     }
 
-    public function getDataWithFilters(AccountFilters $filters){
-        $data = Account::filter($filters)->get();
-        return $data;
-    }
+    // public function getDataWithFilters(AccountFilters $filters){
+    //     $data = Account::filter($filters)->get();
+    //     return $data;
+    // }
 
     public function data(Request $request)
     {
