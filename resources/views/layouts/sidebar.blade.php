@@ -209,7 +209,7 @@
                             </li>-->
                             @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                             <li>
-                                <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">SMD Pasar</a>
+                                <a class="{{ request()->is('target/smd') ? 'active' : '' }}" href="{{ route('target.smd') }}">VDO</a>
                             </li>
                             @endif
                             <!--<li>
@@ -254,7 +254,7 @@
                         <ul>
                             {{-- SMD PASAR --}}
                             <li class="{{ request()->is('report/gtc/smd/*') ? 'open' : '' }}">
-                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SMD Pasar</span></a>
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">VDO</span></a>
                                 <ul>
                                     {{-- ATTENDANCE SMD --}}
                                     <li>
@@ -264,13 +264,9 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/stockist') ? 'active' : '' }}" href="{{ route('report.stockist') }}"><span class="sidebar-mini-hide">Stockist</span></a>
                                     </li>
-                                    {{-- CBD --}}
-                                    <li>
-                                        <a class="{{ request()->is('report/gtc/smd/cbd') ? 'active' : '' }}" href="{{ route('report.cbd') }}"><span class="sidebar-mini-hide">CBD</span></a>
-                                    </li>
                                     {{-- NEW CBD --}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('report.new-cbd') }}"><span class="sidebar-mini-hide">New CBD</span></a>
+                                        <a class="{{ request()->is('report/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('report.new-cbd') }}"><span class="sidebar-mini-hide">CBD</span></a>
                                     </li>
                                     {{-- Dist PF MTC--}}
                                     <li>
@@ -365,7 +361,7 @@
                         <ul>
                             {{-- MOTORIK --}}
                             <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
-                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motorik</span></a>
+                            <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motoris</span></a>
                             <ul>
                                 {{-- ATTENDANCE MOTORIK --}}
                                 <li>

@@ -9,4 +9,9 @@ trait StringTrait
     	return str_replace("'", "", $string);
     }
 
+    public function numberToPrice($currency, $string)
+    {
+    	return $currency.'. '.number_format($string);
+    }
+
 }

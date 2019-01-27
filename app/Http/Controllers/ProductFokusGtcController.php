@@ -190,48 +190,52 @@ class ProductFokusGtcController extends Controller
         {
             $file = $request->file('file')->getRealPath();
             $ext = '';
-            Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request) {
+            $availPF = false;
+            Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results) use($request, &$availPF) {
                 if (!empty($results->all()))
                 {
                     foreach($results as $row)
                     {
+                        $fokusGTC = [];
                         $listProduct = explode(",", $row->sku);
                         foreach ($listProduct as $key => $product) {
                             $getSku = Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($product))."'")->first();
                             if (isset($getSku->id))
                             {
-                                $fokusGTCTmplt[$getSku->id] = [
+                                $fokusGTCTmplt = [
                                     'id_product' => $getSku->id,
                                     'from'       => Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['from'], 'YYYY-MM'))->toDateString(),
                                     'to'         => Carbon::parse(\PHPExcel_Style_NumberFormat::toFormattedString($row['until'], 'YYYY-MM'))->toDateString()
                                 ];
 
                                 $listArea = explode(",", $row->area);
-                                foreach ($listArea as $area) {
-                                    $getArea = \App\Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($area))."'")->first();
-                                    if (isset($getArea->id)) {
-                                        $fokusGTC[$getSku->id][] = array_merge($fokusGTCTmplt[$getSku->id], ["id_area"=>$getArea->id]);
+                                if (empty($listArea)) {
+                                    foreach ($listArea as $area) {
+                                        $getArea = \App\Area::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($area))."'")->first();
+                                        if (isset($getArea->id)) {
+                                            $fokusGTC[] = array_merge($fokusGTCTmplt, ["id_area"=>$getArea->id]);
+                                        }
                                     }
+                                }else{
+                                    $fokusGTC[] = $fokusGTCTmplt;
                                 }
                             }
                         }
 
                         DB::beginTransaction();
-                        $skipped = false;
-                        foreach ($fokusGTC[$getSku->id] as $fokusGTCData)
+                        foreach ($fokusGTC as $fokusGTCData)
                         {
                             // validate if periode exists
-                            if (!$skipped)
+                            $skipped = false;
+                            if (isset(ProductFokusGtc::where("id_product", $fokusGTCData["id_product"])->where("from", $fokusGTCData["from"])->where("to", $fokusGTCData["to"])->first()->id))
                             {
-                                if (isset(ProductFokusGtc::where("id_product", $fokusGTCData["id_product"])->where("from", $fokusGTCData["from"])->where("to", $fokusGTCData["to"])->first()->id))
-                                {
-                                    $availPF = true;
-                                    $skipPF = true;
-                                }
+                                $availPF = true;
+                                $skipped = true;
                             }
 
-                            if (!isset($skipPF)) $PFGTCObj = ProductFokusGtc::create($fokusGTCData);
-                            $skipped = true;
+                            if (!$skipped){
+                                $PFGTCObj = ProductFokusGtc::create($fokusGTCData);
+                            } 
 
                         }
                         DB::commit();
@@ -240,12 +244,12 @@ class ProductFokusGtcController extends Controller
                     throw new Exception("Error Processing Request", 1);
                 }
             }, false);
-            if (isset($availPF))
+            if ($availPF)
             {
                 return redirect()->back()->with([
                     'type' => 'danger',
                     'title' => 'Gagal!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Gagal menambah produk target, Silahkan cek data periode!'
+                    'message'=> '<i class="em em-confounded mr-2"></i>Ada kegagalan tambah produk target, Silahkan cek data periode!'
                 ]);
             } else {
                 return redirect()->back()->with([

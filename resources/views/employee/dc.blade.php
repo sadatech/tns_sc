@@ -225,8 +225,8 @@
             { data: 'gender'},
             { data: 'education'},
             { data: 'birthdate'},
+            { data: 'position'},
             { data: 'timezone'},
-            { data: 'position'}
             ]
         });
     });

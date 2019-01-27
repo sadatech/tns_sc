@@ -18,6 +18,7 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>NIK</label>
+                        <input type="hidden" name="globalPosition" id="globalPosition">
                         <input type="text" id="numNik" class="form-control" name="nik" value="{{ old('nik') }}" placeholder="Add new nik" required>
                     </div>
                     <div class="form-group col-md-6">
@@ -410,6 +411,7 @@ $("#example-inline-checkbox2").on('change', function() {
     var url = document.referrer;
     var positions = url.split("/");
     var pos = positions[positions.length -1];
+    $("#globalPosition").val(pos);
     var byId = [];
     if (pos == "summary") {
         byId.push("{{ App\Position::where(['level' => 'spggtc'])->first()->id }}");

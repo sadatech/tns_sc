@@ -2,55 +2,52 @@
 namespace App\Traits;
 
 use App\Agency;
+use App\Account;
 use App\SubArea;
 use App\Area;
 use App\Region;
 use App\Pasar;
 use App\Store;
+use App\Timezone;
+use App\SalesTiers;
 
 trait FirstOrCreateTrait
 {
 	public function findStore($data, $subarea, $area, $region, $account, $channel, $timezonestore, $salestier)
     {
-        $dataPasar = Store::whereRaw("TRIM(UPPER(name1)) = '". trim(strtoupper($data))."'");
-        if ($dataPasar->count() == 0) {
 
-			$dataSub['subarea_name']   	= $subarea;
-			$dataSub['area_name']   	= $area;
-			$dataSub['region_name']   	= $region;
-			$id_subarea = $this->findSub($dataSub);
+		$dataSub['subarea_name']   	= $subarea;
+		$dataSub['area_name']   	= $area;
+		$dataSub['region_name']   	= $region;
+		$id_subarea = $this->findSub($dataSub);
 
-			$dataAcc['account']   	= $account;
-			$dataAcc['channel']   	= $channel;
-			$id_account = $this->findAcc($dataAcc);
+		$dataAcc['account']   	= $account;
+		$dataAcc['channel']   	= $channel;
+		$id_account = $this->findAcc($dataAcc);
 
-			$id_sales = $this->findSales($salestier);
+		$id_sales = $this->findSales($salestier);
 
-			$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($timezonestore))."'")->first()->id;
-            $pasar = Store::create([
-                'name1'       	=> $data,
-				'name2'       	=> "-",
-				'address'		=> "-",
-				'longitude'		=> "",
-				'latitude'		=> "",
-				'delivery'		=> "default delivery",
-				'is_jawa'		=> "default is_jawa",
-				'is_vito'		=> "default is_vito",
-				'coverage'		=> "default coverage",
-				'store_panel'	=> "default store_panel",
-				'id_subarea'	=> $id_subarea,
-				'id_account'	=> $id_account,
-				'id_salestier'	=> $id_sales,
-				'id_timezone'	=> ($getTimezone ? $getTimezone : 1)
-
-            ]);
-            if ($pasar) {
-                $id_pasar = $pasar->id;
-            }
-        } else {
-            $id_pasar = $dataPasar->first()->id;
-        }
-        return $id_pasar;
+		$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($timezonestore))."'")->first()->id;
+        $store = Store::updateOrCreate([
+            'code'          => $data['code'],
+        ],[
+            'name1'         => $data['name'],
+			'name2'       	=> $data['name2'],
+			'address'		=> $data['address'],
+			'longitude'		=> "",
+			'latitude'		=> "",
+			'delivery'		=> $data['delivery'],
+			'is_jawa'		=> $data['is_jawa'],
+			'is_vito'		=> $data['is_vito'],
+			'coverage'		=> $data['coverage'],
+			'store_panel'	=> $data['store_panel'],
+			'id_subarea'	=> $id_subarea,
+			'id_account'	=> $id_account,
+			'id_salestier'	=> $id_sales,
+			'id_timezone'	=> ($getTimezone ? $getTimezone : 1)
+        ]);
+            
+        return $store->id;
     }
 
     public function findSales($data)

@@ -2886,19 +2886,23 @@ class ReportController extends Controller
 
     public function DcSales(Request $request)
     {
-        $sales = SalesDc::orderBy('created_at', 'DESC');
-        if ($request->has('employee')) {
-            $sales->whereHas('employee', function($q) use ($request){
-                return $q->where('id_employee', $request->input('employee'));
+        $sales = SalesDc::orderBy('created_at', 'DESC')
+        ->when($request->has('employee'), function($q) use ($request)
+        {
+            return $q->whereHas('employee', function($q2) use ($request){
+                return $q2->where('id_employee', $request->input('employee'));
             });
-        } 
-         if ($request->has('periode')) {
-            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
-            $sales->whereYear('date', substr($request->input('periode'), 3));
-        }
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+         
         $data = array();
         $id = 1;
-        foreach ($sales->get() as $value) {
+        foreach ($sales as $value) {
             if ($value->employee->position->level == 'dc') {
                 $data[] = array(
                     'id'        => $id++,
@@ -3526,7 +3530,11 @@ class ReportController extends Controller
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
-                    'posm'          => $val->posm,
+                    'photo2'         => (isset($val->photo2) ? "<a href=".asset('/uploads/cbd/'.$val->photo2)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                    'posm_shop_sign'       => ($val->posm_shop_sign == 1) ? 'Yes' : 'No',
+                    'posm_hangering_mobile'=> ($val->posm_hangering_mobile == 1) ? 'Yes' : 'No',
+                    'posm_poster'          => ($val->posm_poster == 1) ? 'Yes' : 'No',
+                    'posm_others'          => $val->posm_others?? '-',
                     'cbd_competitor'=> $val->cbd_competitor,
                     'cbd_position'  => $val->cbd_position,
                     'outlet_type'   => $val->outlet_type,
@@ -3537,7 +3545,7 @@ class ReportController extends Controller
 
         $dt = Datatables::of(collect($data));
         
-        return $dt->rawColumns(['photo'])->make(true);
+        return $dt->rawColumns(['photo','photo2'])->make(true);
     }
 
     public function getCbd($data, $periode, $day)
