@@ -1275,6 +1275,123 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
+
+    // *********** OOSTOCK ****************** //
+
+
+    public function oosRow(){
+        $data['categories'] = Category::get();
+        $data['products'] = Product::get();
+        $data['jml_product'] = Product::get()->count();
+        $data['categories'] = Category::get();
+        $data['brands'] = Brand::get();
+        $data['jml_brand'] = Brand::get()->count();
+        return view('report.oos', $data);
+    }
+
+    public function oosAccountRowData(Request $request){
+        // return response()->json($request);
+
+        if (!empty($request->input('account'))) {
+            $account   = $request->input('account');
+        }else{
+            $account   = Account::first()->id;
+        }
+
+        $categories = Category::get();
+
+        $totaltanggal = Carbon::now()->daysInMonth;
+        // $stores = Store::where('id_account',$account)->get();
+        // $datas = new Collection();
+        // $i = 1;
+        // while ( $i<=$totaltanggal ) {
+        //     foreach ($stores as $store) {
+        //         $item['date'] = $i;
+        //         $item['store'] = $store->name1;
+        //         $item['account'] = $store->account->name;
+        //         $item['subarea'] = $store->subarea->name;
+        //     $datas->push($item);
+        //     }
+        //     $i++;
+        // }
+
+        $datas = Store::where('stores.id_account',$account)
+                        ->join('oos','stores.id','oos.id_store')
+                        ->join('oos_details','oos.id','oos_details.id_oos')
+                        ->leftjoin('accounts','stores.id_account','accounts.id')
+                        ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
+                // ->when($request->has('employee'), function ($q) use ($request){
+                //     return $q->where('display_shares.id_employee',$request->input('employee'));
+                // })
+                ->when($request->has('periode'), function ($q) use ($request){
+                    return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+                    ->whereYear('date', substr($request->input('periode'), 3));
+                })
+                ->when(!empty($request->input('store')), function ($q) use ($request){
+                    return $q->where('id_store', $request->input('store'));
+                })
+                ->when($request->has('area'), function ($q) use ($request){
+                    return $q->where('id_area', $request->input('area'));
+                })
+                ->when($request->has('week'), function ($q) use ($request){
+                    return $q->where('oos.week', $request->input('week'));
+                })
+                        ->select(
+                            'stores.id',
+                            'oos.date as oos_date',
+                            'stores.name1',
+                            'stores.name2',
+                            'accounts.name as account_name',
+                            'sub_areas.name as area_name',
+                            'oos_details.id as oos_id'
+                            )->orderBy('oos_date')->get();
+
+        foreach($datas as $data) {
+                        $data['cek'] = 'NO';
+            foreach ($categories as $category) {
+                $data[$category->id] = $category->name;
+                $data[$category->id.'sum'] = 0;
+                $data[$category->id.'sumAvailable'] = 0;
+                $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+                                ->join('categories','sub_categories.id_category', 'categories.id')
+                                ->join('product_stock_types','products.stock_type_id','product_stock_types.id')
+                                ->where('categories.id',$category->id)
+                                ->select('products.*','product_stock_types.quantity as type_qty')->get();
+                foreach ($products as $product) {
+                    $data[$category->id.'_'.$product->id] = '-';
+                    $detail_data = OosDetail::where('oos_details.id', $data->oos_id)
+                                                    ->where('oos_details.id_product',$product->id)
+                                                    ->first();
+                    if ($detail_data) {
+                        if ($detail_data->qty >= $product->type_qty) {
+                            $data[$category->id.'_'.$product->id] = 1;
+                        }else{
+                            $data[$category->id.'_'.$product->id] = 0;
+                        }
+                        $data[$category->id.'_'.$product->id] = $detail_data->available;
+                        $data[$category->id.'sumAvailable'] += $detail_data->available;
+                        $data[$category->id.'sum'] += 1;
+                        $data['cek'] = 'CEK';
+                    }
+
+                }
+                    if ($data[$category->id.'sum'] > 0){
+                        $data[$category->id.'oos'] = round($data[$category->id.'sumAvailable'] / $data[$category->id.'sum'] * 100, 2).'%';
+
+                    }else{
+                        $data[$category->id.'oos'] = 'mobile';
+                    }
+            }
+
+        } 
+
+        // return response()->json($datas);
+
+        return Datatables::of($datas)->make(true);
+        // return response()->json($data);
+    }
+
+
     // *********** AVAILABILITY ****************** //
 
     public function availabilityRow(){
