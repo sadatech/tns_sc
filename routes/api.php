@@ -107,6 +107,10 @@ Route::prefix('availability')->group(function () {
 	Route::post('/set', 'API\AvailabilityController@store')->name('api.availability.set');
 });
 
+Route::prefix('oos')->group(function () {
+	Route::post('/add', 'API\OosController@store')->name('api.oos.set');
+});
+
 Route::prefix('display-share')->group(function () {
 	Route::post('/add', 'API\DisplayShareController@store')->name('api.display-share.add');
 });

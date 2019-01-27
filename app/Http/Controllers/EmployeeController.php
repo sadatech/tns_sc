@@ -639,20 +639,24 @@ class EmployeeController extends Controller
 
                             		if ($insert->status != "")  {
                             			if(!($row->store == '' || $row->store == null)){
-											$dataStore = array();
-											$listStore = explode(",", $row->store);
-											foreach ($listStore as $store) {
-												EmployeeStore::firstOrCreate(
-													[
-														'id_store'		=> $this->findStore(
-															$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
-															$row->timezone_store, $row->sales_tier
-														),
-														'id_employee'	=> $employee_id
-													]
-												);
-											}
-											
+											$dataStore['name'] 	= $row->store ?? '';
+											$dataStore['name2'] = $row->optional_name ?? '';
+											$dataStore['code'] 	= $row->code ?? '';
+											$dataStore['address'] 		= $row->address ?? '';
+											$dataStore['delivery'] 		= (strtoupper($row->delivery) == 'DIRECT')? 'Direct' : 'DC';
+											$dataStore['is_jawa'] 		= ($row->is_jawa == 'Y')?'Jawa' : 'Non Jawa';
+											$dataStore['is_vito'] 		= ($row->is_vito == 'Y')?'Vito' : 'Non Vito';
+											$dataStore['coverage'] 		= (strtoupper($row->coverage) == 'DIRECT')? 'Direct' : 'In Direct';
+											$dataStore['store_panel'] 	= ($row->store_panel == 'Y')?'YES' : 'NO';
+											EmployeeStore::firstOrCreate(
+												[
+													'id_store'		=> $this->findStore(
+														$dataStore, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
+														$row->timezone_store, $row->sales_tier
+													),
+													'id_employee'	=> $employee_id
+												]
+											);
 										}
 									}
 								// }return false;
