@@ -21,7 +21,7 @@
           <div class="row">
             <div class="col-md-6">
               <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" value="{{ Carbon\Carbon::now()->format('m/Y') }}" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
             </div>
             <div class="col-md-6">
                 <div class="font-size-sm font-w600 text-uppercase text-muted">Employee</div>
@@ -29,6 +29,7 @@
             </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
+          <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
         </form>
       </div>
     </div>
@@ -43,7 +44,7 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('export.spg.attendance') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
@@ -106,6 +107,13 @@ $(document).ready(function() {
       }
     }));
   });
+ $('#reset').click(function(){
+    $('.js-datepicker').val(null);
+    $('#filterEmployee').val(null).trigger('change');
+    setTimeout(function() {
+      $('#filterEmployee').val(null).trigger('change');
+    }, 10);
+  });
   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
@@ -117,6 +125,12 @@ $(document).ready(function() {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
+
+  $("#btnDownloadXLS").on("click", function(){
+      var url= "{{ route('export.spg.attendance') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val();
+      window.location.href=url;
+  });
+
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();

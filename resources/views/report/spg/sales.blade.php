@@ -98,6 +98,9 @@ table.table thead tr th {
     $('.js-datepicker').val(null);
     $('#filterEmployee').val(null).trigger('change');
     $('#filterPasar').val(null).trigger('change');
+    setTimeout(function() {
+      $('#filterEmployee,#filterPasar').val(null).trigger('change');
+    }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
