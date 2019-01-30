@@ -2752,20 +2752,24 @@ class ReportController extends Controller
         })
         ->get();
 
+        $id = 1;
         if ($employeeAtt->count() > 0) {
             foreach ($employeeAtt as $val) {
                 if ($val->attendance->employee->position->level == 'mdgtc') {
-                    $data[] = array(
-                        'region'    => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                        'area'      => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
-                        'subarea'   => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
-                        'nama'      => (isset($val->attendance->employee->name) ? $val->outlet->employee->name : ""),
-                        'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
-                        'pasar'     => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                        'outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-"),
-                        'tanggal'   => Carbon::parse($val->checkin)->day,
-                        'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
-                        'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
+                $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
+                $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
+                $data[] = array(
+                    'id' => $id++,
+                    'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                    'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
+                    'nama' => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                    'jabatan' => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                    'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
+                    'tanggal' => Carbon::parse($val->checkin)->day,
+                    'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
+                    'checkout' => $checkout." ".$val->attendance->employee->timezone->name
                     );
                 }
             }
@@ -2899,15 +2903,15 @@ class ReportController extends Controller
                     'Block'         => (isset($value->block->name) ? $value->block->name : "-"),
                     'Tanggal'       => Carbon::parse($value->date)->day
                     );
+                    $getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
                 }
-            }
-            $getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
-            $productList = \App\Product::whereIn('id', $getId)->get();
-            foreach ($productList as $pro) {
-                $data[$key][$pro->name] = "-";
-            }
-            foreach ($detail as $det) {
-                $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
             }
         
 		    $filename = "ReportMotorikDistPF".Carbon::now().".xlsx";
@@ -3529,23 +3533,23 @@ class ReportController extends Controller
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
 
         $dist = Distribution::orderBy('created_at', 'DESC')
-        ->when($employee, function($q) use ($employee)
-        {
-            $q->whereHas('employee', function($q2) use ($employee){
-                return $q2->where('id_employee', $employee);
-            });
-        })
-        ->when($pasar, function($q) use ($pasar)
-        {
-            $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
-                return $q2->where('id_pasar', $pasar);
-            });
-        })
-        ->when($request->has('periode'), function($q) use ($request)
-        {
-            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
-            ->whereYear('date', substr($request->input('periode'), 3));
-        })
+        // ->when($employee, function($q) use ($employee)
+        // {
+        //     $q->whereHas('employee', function($q2) use ($employee){
+        //         return $q2->where('id_employee', $employee);
+        //     });
+        // })
+        // ->when($pasar, function($q) use ($pasar)
+        // {
+        //     $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
+        //         return $q2->where('id_pasar', $pasar);
+        //     });
+        // })
+        // ->when($request->has('periode'), function($q) use ($request)
+        // {
+        //     return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+        //     ->whereYear('date', substr($request->input('periode'), 3));
+        // })
         ->get();
 
         if ($dist->count() > 0) {
@@ -3558,17 +3562,17 @@ class ReportController extends Controller
                         'Tanggal'   => (isset($val->date) ? $val->date : ""),
                         'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
                     );
+
+                $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
                 }
             }
-
-            $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
-                $productList = \App\Product::whereIn('id', $getId)->get();
-                foreach ($productList as $pro) {
-                    $data[$key][$pro->name] = "-";
-                }
-                foreach ($detail as $det) {
-                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
-                }
         
             $filename = "ReportDistPf".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
@@ -4030,11 +4034,11 @@ class ReportController extends Controller
                     'id_pasar' => $value->id_pasar,
                     'date' => $value->date,
                     'id_employee' => $value->id_employee,
-                    'nama_spg' => $this->isset($value->employee->name),
-                    'pasar' => $this->isset($value->pasar->name),
-                    'tanggal' => $this->isset($value->date),
-                    'nama' => $this->isset($value->name),
-                    'phone' => $this->isset($value->phone)
+                    'nama_spg' => $value->employee->name ?? "-",
+                    'pasar' => $value->pasar->name ?? "-",
+                    'tanggal' => $value->date ?? "-",
+                    'nama' => $value->name ?? "-",
+                    'phone' => $value->phone ?? "-",
                 );
             }
         }
@@ -4113,9 +4117,9 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            $filename = "SalesSPGReport".Carbon::now();
             return Excel::create($filename, function($excel) use ($data) {
-                $excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
+                $excel->sheet('SalesSPGReport', function($sheet) use ($data)
                 {
                     $sheet->fromArray($data);
                 });
@@ -4190,7 +4194,6 @@ class ReportController extends Controller
         })
         ->get();
 
-        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month);
         if ($rekap->count() > 0) {
             foreach ($rekap as $val) {
                 if ($val->employee->position->level == 'spggtc') {
@@ -4204,9 +4207,10 @@ class ReportController extends Controller
                     );
                 }
             }
+
             $filename = "SPGRekap".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
-                $excel->sheet('SPGReakp', function($sheet) use ($data)
+                $excel->sheet('SPGRekap', function($sheet) use ($data)
                 {
                     $sheet->fromArray($data);
                 });
@@ -4223,10 +4227,15 @@ class ReportController extends Controller
 
     public function SPGattendance(Request $request)
     {
-        $employee = AttendancePasar::whereHas('attendance.employee', function($query) use ($request){
-            return $query->where('id_employee', $request->input('employee'));
+        // return response()->json($request);
+        $employee = AttendancePasar::when($request->has('employee'), function($q) use ($request)
+        {
+            $q->whereHas('attendance.employee', function($query) use ($request){
+                return $query->where('id_employee', $request->input('employee'));
+            });
         })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
         ->whereYear('checkin', substr($request->input('periode'), 3))->get();
+        // return response()->json($employee);
         $data = array();
         $absen = array();
         $id = 1;
@@ -4236,11 +4245,11 @@ class ReportController extends Controller
                 $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
                 $data[] = array(
                     'id' => $id++,
-                    'area' => $this->isset($val->pasar->subarea->area->name),
-                    'subarea' => $this->isset($val->pasar->subarea->name),
-                    'nama' => $this->isset($val->attendance->employee->name),
-                    'jabatan' => $this->isset($val->attendance->employee->position->name),
-                    'pasar' => $this->isset($val->pasar->name),
+                    'area' => $val->pasar->subarea->area->name ?? "-",
+                    'subarea' => $val->pasar->subarea->name ?? "-",
+                    'nama' => $val->attendance->employee->name ?? "-",
+                    'jabatan' => $val->attendance->employee->position->name ?? "-",
+                    'pasar' => $val->pasar->name ?? "-",
                     'tanggal' => Carbon::parse($val->checkin)->day,
                     'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
                     'checkout' => $checkout." ".$val->attendance->employee->timezone->name
@@ -4256,12 +4265,14 @@ class ReportController extends Controller
 
         $employeeAtt = AttendancePasar::when($employee, function($q) use ($employee)
         {
-            return $q->where('id_employee',  $employee);
+            $q->whereHas('attendance.employee', function($query) use ($employee){
+                return $query->where('id_employee', $employee);
+            });
         })
         ->when($request->has('periode'), function($q) use ($request)
         {
-            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
-            ->whereYear('date', substr($request->input('periode'), 3));
+            return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
+            ->whereYear('checkin', substr($request->input('periode'), 3));
         })
         ->get();
 
