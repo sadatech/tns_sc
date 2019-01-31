@@ -132,7 +132,7 @@ th, td {
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     setTimeout(function() {
-      $('#filterAccount,#filterStore,#filterArea').val(null).trigger('change');
+      $('#filterAccount,#filterStore,#filterArea,#week').val(null).trigger('change');
     }, 10);
   });
   $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', '{{App\Account::first()->name}}', function (params) {

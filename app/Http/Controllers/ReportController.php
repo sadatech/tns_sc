@@ -24,6 +24,8 @@ use App\DataPrice;
 use App\DetailDataPrice;
 use App\EmployeeStore;
 use App\Store;
+use App\Oos;
+use App\OosDetail;
 use App\EmployeeSubArea;
 use App\Brand;
 use Auth;
@@ -1317,7 +1319,7 @@ class ReportController extends Controller
 
         $datas = Store::where('stores.id_account',$account)
                         ->join('oos','stores.id','oos.id_store')
-                        ->join('oos_details','oos.id','oos_details.id_oos')
+                        // ->join('oos_details','oos.id','oos_details.id_oos')
                         ->leftjoin('accounts','stores.id_account','accounts.id')
                         ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
                 // ->when($request->has('employee'), function ($q) use ($request){
@@ -1343,9 +1345,12 @@ class ReportController extends Controller
                             'stores.name2',
                             'accounts.name as account_name',
                             'sub_areas.name as area_name',
-                            'oos_details.id as oos_id'
-                            )->orderBy('oos_date')->get();
+                            'oos.id as oos_id'
+                            )
+                        ->orderBy('oos_date')
+                        ->get();
 
+        // return response()->json($datas);
         foreach($datas as $data) {
                         $data['cek'] = 'NO';
             foreach ($categories as $category) {
@@ -1359,7 +1364,7 @@ class ReportController extends Controller
                                 ->select('products.*','product_stock_types.quantity as type_qty')->get();
                 foreach ($products as $product) {
                     $data[$category->id.'_'.$product->id] = '-';
-                    $detail_data = OosDetail::where('oos_details.id', $data->oos_id)
+                    $detail_data = OosDetail::where('oos_details.id_oos', $data->oos_id)
                                                     ->where('oos_details.id_product',$product->id)
                                                     ->first();
                     if ($detail_data) {
@@ -1368,8 +1373,7 @@ class ReportController extends Controller
                         }else{
                             $data[$category->id.'_'.$product->id] = 0;
                         }
-                        $data[$category->id.'_'.$product->id] = $detail_data->available;
-                        $data[$category->id.'sumAvailable'] += $detail_data->available;
+                        $data[$category->id.'sumAvailable'] += $data[$category->id.'_'.$product->id];
                         $data[$category->id.'sum'] += 1;
                         $data['cek'] = 'CEK';
                     }
@@ -1432,7 +1436,7 @@ class ReportController extends Controller
 
         $datas = Store::where('stores.id_account',$account)
                         ->join('availability','stores.id','availability.id_store')
-                        ->join('detail_availability','availability.id','detail_availability.id_availability')
+                        // ->join('detail_availability','availability.id','detail_availability.id_availability')
                         ->leftjoin('accounts','stores.id_account','accounts.id')
                         ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
                 // ->when($request->has('employee'), function ($q) use ($request){
@@ -1458,7 +1462,7 @@ class ReportController extends Controller
                             'stores.name2',
                             'accounts.name as account_name',
                             'sub_areas.name as area_name',
-                            'detail_availability.id as availability_id'
+                            'availability.id as availability_id'
                             )->orderBy('avai_date')->get();
 
         foreach($datas as $data) {
@@ -1471,10 +1475,12 @@ class ReportController extends Controller
                                 ->join('categories','sub_categories.id_category', 'categories.id')
                                 ->where('categories.id',$category->id)
                                 ->select('products.*')->get();
+        // return response()->json($products);
+
                 foreach ($products as $product) {
-                    $data[$category->id.'_'.$product->id] = $product->name;
+                    $data[$category->id.'_'.$product->id.'name'] = $product->name;
                     $data[$category->id.'_'.$product->id] = '-';
-                    $detail_data = DetailAvailability::where('detail_availability.id', $data->availability_id)
+                    $detail_data = DetailAvailability::where('detail_availability.id_availability', $data->availability_id)
                                                     ->where('detail_availability.id_product',$product->id)
                                                     ->first();
                     if ($detail_data) {
