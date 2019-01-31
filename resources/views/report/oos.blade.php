@@ -132,7 +132,7 @@ th, td {
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     setTimeout(function() {
-      $('#filterAccount,#filterStore,#filterArea').val(null).trigger('change');
+      $('#filterAccount,#filterStore,#filterArea,#week').val(null).trigger('change');
     }, 10);
   });
   $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', '{{App\Account::first()->name}}', function (params) {
@@ -224,7 +224,7 @@ th, td {
         $("#btnDownloadXLS").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
       },
       columns: [
-      { data: 'avai_date', name: 'avai_date'},
+      { data: 'oos_date', name: 'oos_date'},
       { data: 'name1', name: 'name1'},
       { data: 'account_name', name: 'account_name'},
       { data: 'area_name', name: 'area_name'},
