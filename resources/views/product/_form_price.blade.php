@@ -3,7 +3,7 @@ $type = $type ?? '';
 $action = $action ?? '';
 @endphp
 
-<div class="modal fade" id="{{ $id }}" tabindex="-1" role="dialog" aria-labelledby="{{ $id }}" aria-hidden="true">
+<div class="modal fade" id="{{ $id }}" role="dialog" aria-labelledby="{{ $id }}" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
@@ -21,15 +21,12 @@ $action = $action ?? '';
         {!! method_field('PUT') !!}
         @endif
         <div class="block-content">
-          <div class="form-group">
-            <label>Category & Name Product</label>
-            <select class="{{$type}}-js-select2 form-control" style="width: 100%" name="id_product" required id="{{ $type }}Product">
-              <option value="" disabled selected>Choose your Product</option>
-              @foreach($product as $data)
-              <option value="{{ $data->id }}">{{ $data->subCategory->name }} - {{ $data->name }}</option>
-              @endforeach
-            </select>
-          </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                          <label>Product</label>
+                          <select class="form-control" id="{{$type}}Product" name="id_product"></select>
+                        </div>
+                    </div>
           <div class="row">
             <div class="form-group col-md-6">
               <label >Price</label>
@@ -61,6 +58,23 @@ $action = $action ?? '';
 
 @push('additional-js')
 <script type="text/javascript">
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+    $('#{{$type}}Product').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
+        return filterData('product', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
   $(".currency").keydown(function (e) {
     if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
         (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
@@ -79,10 +93,12 @@ $action = $action ?? '';
   function editModal(json) {
     $('#editModal').modal('show');
     $('#{{$type}}Form').attr('action', "{{ url('/product/price/update') }}/"+json.id);
-    $('#{{$type}}Product').val(json.product).trigger('change');
+    if (json.product) {
+            setSelect2IfPatchModal($("#{{$type}}Product"), json.product.id, json.product.name);
+    };
     $('#{{$type}}Price').val(json.price);
     $('#{{$type}}Rilis').val(json.rilis);
-      // console.log(json);
+      console.log(json);
   }
   @endif
 </script>

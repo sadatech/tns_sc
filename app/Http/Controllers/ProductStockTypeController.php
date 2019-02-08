@@ -56,7 +56,7 @@ class ProductStockTypeController extends Controller
             ->with([
                 'type' => 'success',
                 'title' => 'Sukses!<br/>',
-                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Category Product!'
+                'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah stock Type Product!'
             ]);
         }
     }
@@ -83,7 +83,7 @@ class ProductStockTypeController extends Controller
             ->with([
                 'type'    => 'success',
                 'title'   => 'Sukses!<br/>',
-                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah category product!'
+                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah stock Type product!'
             ]);
         }
     }

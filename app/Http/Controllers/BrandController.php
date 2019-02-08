@@ -9,9 +9,15 @@ use App\Brand;
 use App\Employee;
 use App\Category;
 use App\Product;
+use App\Filters\BrandFilters;
 
 class BrandController extends Controller
 {
+    public function getDataWithFilters(BrandFilters $filters){
+        $data = Brand::filter($filters)->where('id','!=','1')->get();
+        return $data;
+    }
+
     public function baca()
     {
         return view('product.brand');

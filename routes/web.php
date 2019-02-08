@@ -919,6 +919,7 @@ Route::prefix('mtc')->group(function () {
 		Route::get('/row', 'ReportController@oosRow')->name('oos.row')->middleware('auth');
 		Route::get('/dataAccountRow', 'ReportController@oosAccountRowData')->name('oos.dataAccountRow')->middleware('auth');
 		Route::any('/exportXLS', 'ReportController@oosExportXLS')->name('oos.exportXLS')->middleware('auth');
+		Route::post('/row/exportXLS', 'ReportController@OosRowExportXLS')->name('oos.row.exportXLS')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@oosUpdate')->name('oos.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@Importoos')->name('oos.import')->middleware('auth');
 	});
@@ -929,6 +930,7 @@ Route::prefix('mtc')->group(function () {
 		Route::get('/dataAccountRow', 'ReportController@availabilityAccountRowData')->name('availability.dataAccountRow')->middleware('auth');
 		Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
 		Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
+		Route::post('/row/exportXLS', 'ReportController@AvailabilityRowExportXLS')->name('availability.row.exportXLS')->middleware('auth');
 		Route::any('/exportXLS', 'ReportController@availabilityExportXLS')->name('availability.exportXLS')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@availabilityUpdate')->name('availability.edit')->middleware('auth');
 		Route::post('/import', 'ImportQueueController@Importavailability')->name('availability.import')->middleware('auth');
@@ -1044,6 +1046,7 @@ Route::prefix('select2')->group(function () {
 	Route::get('/pasar-select2-get', 'PasarController@getDataWithFilters')->name('pasar-select2-get');
 	Route::get('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
 	Route::post('/position-select2', 'PositionController@getDataWithFilters')->name('position-select2');
+	Route::post('/brandXSASA-select2', 'BrandController@getDataWithFilters')->name('brandXSASA-select2');
 });
 
 Route::prefix('promoactivity')->group(function(){

@@ -13,17 +13,17 @@ use App\Product;
 use App\DataPrice;
 use App\Category;
 use App\ProductCompetitor;
-use App\DetailAvailability;
+use App\OosDetail;
 
 use Illuminate\Database\Eloquent\Collection;
 
-trait ExportMTCAvailabilityRowTrait
+trait ExportMTCOosRowTrait
 {
-	protected $request, $AvailabilityRowData, $filecode;
+	protected $request, $OosRowData, $filecode;
 	
-	public function MTCAvailabilityRowExportTrait($request, $filecode)
+	public function MTCOosRowExportTrait($request, $filecode)
 	{
-		$this->AvailabilityRowData = [];
+		$this->OosRowData = [];
 		$this->request = $request;
 		$this->filecode = $filecode;
 		
@@ -31,15 +31,15 @@ trait ExportMTCAvailabilityRowTrait
 		return $this->createXLS($this->xlsHelper());
 	}
 
-	private function createXLS($AvailabilityRowData)
+	private function createXLS($OosRowData)
 	{
-		$filename = 'MTC - AVAILABILITY ROW - '.Carbon::parse('01/'.$this->request['periode'])->format('F').' '.Carbon::parse('01/'.$this->request['periode'])->format('Y') . " (" . $this->filecode . ")";
-		$excel = Excel::create($filename, function($excel) use ($AvailabilityRowData){
+		$filename = 'MTC - OOS ROW - '.Carbon::parse('01/'.$this->request['periode'])->format('F').' '.Carbon::parse('01/'.$this->request['periode'])->format('Y') . " (" . $this->filecode . ")";
+		$excel = Excel::create($filename, function($excel) use ($OosRowData){
             /** Set information */
-            $excel->setTitle('MTC - Report Availability Row');
+            $excel->setTitle('MTC - Report OOS Row');
             $excel->setCreator('SADA');
             $excel->setCompany('SADA');
-            $excel->setDescription('MTC - Report Availability Row');
+            $excel->setDescription('MTC - Report OOS Row');
 
             /** */
             $excel->getDefaultStyle()
@@ -48,7 +48,7 @@ trait ExportMTCAvailabilityRowTrait
             ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
             /**  */
-            $excel->sheet('AVAILABILITY ROW', function ($sheet) use ($AvailabilityRowData){
+            $excel->sheet('AVAILABILITY ROW', function ($sheet) use ($OosRowData){
 
 				$sheet->setHeight(1, 20);
 				$sheet->setHeight(2, 20);
@@ -104,9 +104,9 @@ trait ExportMTCAvailabilityRowTrait
 				});
 
 				$valueRow = 3;
-				foreach($AvailabilityRowData as $AvaibilityRowItem)
+				foreach($OosRowData as $OosRowItem)
 				{
-					$sheet->row($valueRow, $AvaibilityRowItem);
+					$sheet->row($valueRow, $OosRowItem);
 					$valueRow++;
 				}
             });
@@ -120,11 +120,11 @@ trait ExportMTCAvailabilityRowTrait
 	private function xlsHelper()
 	{
 		$categories = Category::get();
-		$collection = collect($this->AvailabilityRowData)->take($this->request['limitLs']);
+		$collection = collect($this->OosRowData)->take($this->request['limitLs']);
 
 		$collection = $collection->map(function($item) use ($categories){
 			$listData = [
-				@$item['avai_date'],
+				@$item['oos_date'],
 				@$item['name1'],
 				@$item['account_name'],
 				@$item['area_name'],
@@ -154,13 +154,11 @@ trait ExportMTCAvailabilityRowTrait
         }else{
             $account   = Account::first()->id;
         }
-
         $categories = Category::get();
 
-
         $datas = Store::where('stores.id_account',$account)
-                        ->join('availability','stores.id','availability.id_store')
-                        // ->join('detail_availability','availability.id','detail_availability.id_availability')
+                        ->join('oos','stores.id','oos.id_store')
+                        // ->join('oos_details','oos.id','oos_details.id_oos')
                         ->leftjoin('accounts','stores.id_account','accounts.id')
                         ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
                 // ->when($this->request['employee'], function ($q){
@@ -181,14 +179,17 @@ trait ExportMTCAvailabilityRowTrait
                 })
                         ->select(
                             'stores.id',
-                            'availability.date as avai_date',
+                            'oos.date as oos_date',
                             'stores.name1',
                             'stores.name2',
                             'accounts.name as account_name',
                             'sub_areas.name as area_name',
-                            'availability.id as availability_id'
-                            )->orderBy('avai_date')->get();
+                            'oos.id as oos_id'
+                            )
+                        ->orderBy('oos_date')
+                        ->get();
 
+        // return response()->json($datas);
         foreach($datas as $data) {
                         $data['cek'] = 'NO';
             foreach ($categories as $category) {
@@ -197,34 +198,38 @@ trait ExportMTCAvailabilityRowTrait
                 $data[$category->id.'sumAvailable'] = 0;
                 $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
                                 ->join('categories','sub_categories.id_category', 'categories.id')
+                                ->join('product_stock_types','products.stock_type_id','product_stock_types.id')
                                 ->where('categories.id',$category->id)
-                                ->select('products.*')->get();
-        // return response()->json($products);
-
+                                ->select('products.*','product_stock_types.quantity as type_qty')->get();
                 foreach ($products as $product) {
-                    $data[$category->id.'_'.$product->id.'name'] = $product->name;
                     $data[$category->id.'_'.$product->id] = '-';
-                    $detail_data = DetailAvailability::where('detail_availability.id_availability', $data->availability_id)
-                                                    ->where('detail_availability.id_product',$product->id)
+                    $detail_data = OosDetail::where('oos_details.id_oos', $data->oos_id)
+                                                    ->where('oos_details.id_product',$product->id)
                                                     ->first();
                     if ($detail_data) {
-                        $data[$category->id.'_'.$product->id] = $detail_data->available;
-                        $data[$category->id.'sumAvailable'] += $detail_data->available;
+                        if ($detail_data->qty >= $product->type_qty) {
+                            $data[$category->id.'_'.$product->id] = 1;
+                        }else{
+                            $data[$category->id.'_'.$product->id] = 0;
+                        }
+                        $data[$category->id.'sumAvailable'] += $data[$category->id.'_'.$product->id];
                         $data[$category->id.'sum'] += 1;
                         $data['cek'] = 'CEK';
                     }
 
                 }
                     if ($data[$category->id.'sum'] > 0){
-                        $data[$category->id.'availability'] = round($data[$category->id.'sumAvailable'] / $data[$category->id.'sum'] * 100, 2).'%';
+                        $data[$category->id.'oos'] = round($data[$category->id.'sumAvailable'] / $data[$category->id.'sum'] * 100, 2).'%';
 
                     }else{
-                        $data[$category->id.'availability'] = 'mobile';
+                        $data[$category->id.'oos'] = 'mobile';
                     }
             }
 
-        }
-		$this->AvailabilityRowData = $datas; // Contains foo and bar.
+        } 
+
+
+		$this->OosRowData = $datas; // Contains foo and bar.
 	}
 	
 }

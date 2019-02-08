@@ -88,15 +88,16 @@ $action = $action ?? '';
     }
   });
 
-$('#{{$type}}SubCategory').select2(setOptions('{{ route("sub-category-select2") }}', 'Select Sub Category', function (params) {
-return filterData('name', params.term);
-}, function (data, params) {
-return {
-  results: $.map(data, function (obj) {                                
-    return {id: obj.id, text: obj.name}
-  })
-}
-}));
+    $('#{{$type}}SubCategory').select2(setOptions('{{ route("sub-category-select2") }}', 'Select Sub Category', function (params) {
+        return filterData('name', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
 
 $("#example-inline-checkbox1").change(function() {
     if ($(this).removeAttr("checked")) {
