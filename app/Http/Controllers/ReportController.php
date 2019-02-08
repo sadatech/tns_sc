@@ -74,6 +74,8 @@ use App\Jobs\ExportMTCPriceRowJob;
 use App\Jobs\ExportMTCPriceSummaryJob;
 use App\Jobs\ExportMTCPriceCompJob;
 use App\Jobs\ExportMTCAdditionalDisplayJob;
+use App\Jobs\ExportMTCAvailabilityRowJob;
+use App\Jobs\ExportMTCOosRowJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -1106,6 +1108,8 @@ class ReportController extends Controller
             foreach ($stores as $store ) {
                 $data2[$store->name1.'_price'] = '';
                 $price = DataPrice::where('data_price.id_store',$store->id)
+                            ->whereMonth('data_price.date', $month)
+                            ->whereYear('data_price.date', $year)
                             ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
                             ->where('detail_data_price.id_product',$data2->id)
                             ->where('detail_data_price.isSasa',0)->first();
@@ -1395,6 +1399,37 @@ class ReportController extends Controller
         // return response()->json($data);
     }
 
+    public function OosRowExportXLS(Request $request)
+    {
+        $req['account'] = ($request->account == "null" || empty($request->account) ? null : $request->account);
+        $req['periode'] = ($request->periode == "null" || empty($request->periode) ? null : $request->periode);
+        $req['store'] = ($request->store == "null" || empty($request->store) ? null : $request->store);
+        $req['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        $req['week'] = ($request->week == "null" || empty($request->week) ? null : $request->week);
+        $req['limitLs'] = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($req){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Oos Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCOosRowJob($JobTrace, $req, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
 
     // *********** AVAILABILITY ****************** //
 
@@ -1507,6 +1542,37 @@ class ReportController extends Controller
         // return response()->json($data);
     }
 
+
+    public function AvailabilityRowExportXLS(Request $request)
+    {
+        $req['account'] = ($request->account == "null" || empty($request->account) ? null : $request->account);
+        $req['periode'] = ($request->periode == "null" || empty($request->periode) ? null : $request->periode);
+        $req['store'] = ($request->store == "null" || empty($request->store) ? null : $request->store);
+        $req['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        $req['week'] = ($request->week == "null" || empty($request->week) ? null : $request->week);
+        $req['limitLs'] = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($req){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Availability Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAvailabilityRowJob($JobTrace, $req, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
 
     public function availabilityIndex(){
         $data['categories'] = Category::get();

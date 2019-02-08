@@ -220,9 +220,8 @@ th, td {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        $("#btnDownloadXLSAll").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}");
-        $("#btnDownloadXLS").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
-      },
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('oos.row.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&account="+$("#filterAccount").val()+"&store="+$("#filterStore").val()+"&area="+$("#filterArea").val()+"&week="+$("#week").val());
+        $("#btnDownloadXLS").attr("target-url","{{ route('oos.row.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&account="+$("#filterAccount").val()+"&store="+$("#filterStore").val()+"&area="+$("#filterArea").val()+"&week="+$("#week").val()+"&limit=" + $("#reportTable_length select").val());      },
       columns: [
       { data: 'oos_date', name: 'oos_date'},
       { data: 'name1', name: 'name1'},
