@@ -17,7 +17,7 @@ class PlanDc extends Model
 
     public function toArray(){
         $array = parent::toArray();
-        $array['photo_url'] = isset($this->photo) ? asset('uploads/plan/'.$this->photo) : null;
+        $array['photo_url'] = isset($this->photo) ? str_replace('https:', 'http:', asset('uploads/plan/'.$this->photo)) : null;
         return $array;
     }
 }
