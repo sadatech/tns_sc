@@ -207,7 +207,7 @@ table.table thead tr th {
           });
         });
 
-    });
+      });
       
 
     $("#filterReset").click(function () {

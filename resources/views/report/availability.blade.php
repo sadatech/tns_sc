@@ -132,10 +132,10 @@ th, td {
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     setTimeout(function() {
-      $('#filterAccount,#filterStore,#filterArea').val(null).trigger('change');
+      $('#filterAccount,#filterStore,#filterArea,#week').val(null).trigger('change');
     }, 10);
   });
-  $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', 'Choose your Account', function (params) {
+  $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', '{{App\Account::first()->name}}', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {
@@ -220,8 +220,8 @@ th, td {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        $("#btnDownloadXLSAll").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}");
-        $("#btnDownloadXLS").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}?limitArea="+$("#reportTableArea_length select").val()+"&limitAccount="+$("#reportTableAccount_length select").val());
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('availability.row.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&account="+$("#filterAccount").val()+"&store="+$("#filterStore").val()+"&area="+$("#filterArea").val()+"&week="+$("#week").val());
+        $("#btnDownloadXLS").attr("target-url","{{ route('availability.row.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&account="+$("#filterAccount").val()+"&store="+$("#filterStore").val()+"&area="+$("#filterArea").val()+"&week="+$("#week").val()+"&limit=" + $("#reportTable_length select").val());
       },
       columns: [
       { data: 'avai_date', name: 'avai_date'},

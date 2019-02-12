@@ -54,9 +54,9 @@ class ProductCompetitorController extends Controller
         ->addColumn('action', function ($productCompetitor) {
             $data = array(
                 'id'            => $productCompetitor->id,
-                'brand'         => $productCompetitor->brand->id,
-                'subcategory'   => (isset($productCompetitor->product->id)) ? $productCompetitor->product->id : '',
-                'product'       => $productCompetitor->product->id,
+                'brand'         => $productCompetitor->brand,
+                'subcategory'   => $productCompetitor->subcategory,
+                'product'       => (isset($productCompetitor->product)) ? $productCompetitor->product : '',
                 'name'          => $productCompetitor->name,
                 'deskrispi'     => $productCompetitor->deskripsi
             );

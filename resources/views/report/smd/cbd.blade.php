@@ -94,7 +94,9 @@ table.table thead tr th {
 <script type="text/javascript">
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
+    setTimeout(function() {
+      $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
+    }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
