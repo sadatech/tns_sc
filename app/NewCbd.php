@@ -23,8 +23,8 @@ class NewCbd extends Model
     public function toArray(){
         $array = parent::toArray();
         $array['outlet_name'] = $this->outlet->name;
-        $array['photo1_url'] = !empty($this->photo) ? asset('uploads/cbd/'.$this->photo) : '';
-        $array['photo2_url'] = !empty($this->photo2) ? asset('uploads/cbd/'.$this->photo2) : '';
+        $array['photo1_url'] = !empty($this->photo) ? str_replace('https:', 'http:', asset('uploads/cbd/'.$this->photo)) : '';
+        $array['photo2_url'] = !empty($this->photo2) ? str_replace('https:', 'http:', asset('uploads/cbd/'.$this->photo2)) : '';
         return $array;
     }
 }
