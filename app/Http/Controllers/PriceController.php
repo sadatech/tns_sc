@@ -40,7 +40,7 @@ class PriceController extends Controller
         ->addColumn('action', function ($price) {
             $data = array(
                 'id'                => $price->id,
-                'product'           => $price->id_product,
+                'product'           => $price->product,
                 'rilis'             => $price->rilis,
                 'price'             => $price->price,
             );

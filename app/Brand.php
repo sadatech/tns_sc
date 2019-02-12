@@ -4,6 +4,7 @@ namespace App;
 
 use App\Components\traits\DropDownHelper;
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class Brand extends Model
 {
@@ -21,6 +22,11 @@ class Brand extends Model
     public function product()
     {
     	return $this->hasMany('App\Product', 'id_brand');
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 
 }

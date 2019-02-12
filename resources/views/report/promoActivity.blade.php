@@ -163,7 +163,7 @@
     }, 10);
   });
   $('#filterProduct').select2(setOptions('{{ route("product-select2") }}', 'Choose your Product', function (params) {
-    return filterData('name', params.term);
+    return filterData('product', params.term);
   }, function (data, params) {
     return {
       results: $.map(data, function (obj) {                                

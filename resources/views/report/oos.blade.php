@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Sales Report - Availability")
+@section('title', "Sales Report - Oos")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Display Share <small>Report</small></h2>
+  <h2 class="content-heading pt-10"> Oos <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -20,8 +20,8 @@
         <form method="post" id="filter">
           <div class="row">
             <div class="col-md-4">
-              <label>Employee:</label>
-              <select class="form-control" id="filterEmployee" name="employee"></select>
+              <label>Account:</label>
+              <select class="form-control" id="filterAccount" name="account"></select>
             </div>
             <div class="col-md-4">
               <label>Store:</label>
@@ -34,6 +34,16 @@
             <div class="col-md-4">
               <label>Periode:</label>
               <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}" required>
+            </div>
+            <div class="col-md-4">
+              <label>Week</label>
+              <select class="js-select form-control" style="width: 100%" id="week" name="week">
+                <option value="">all</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
             </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
@@ -55,36 +65,30 @@
           </div>
         </div>
 
+        <div class="block-header p-0 mb-20">
+        </div>
         <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
           <thead>
             <tr>
-              <th rowspan="3" style="vertical-align: middle; text-align: center;">REGION</th>
-              <th rowspan="3" style="vertical-align: middle; text-align: center;">AREA</th>
-              <th rowspan="3" style="vertical-align: middle; text-align: center;">TL</th>
-              <th rowspan="3" style="vertical-align: middle; text-align: center;">NAMA SPG</th>
-              <th rowspan="3" style="vertical-align: middle; text-align: center;">JABATAN</th>
-              <th rowspan="3" style="vertical-align: middle; text-align: center;">STORE</th>
-              <th rowspan="3" style="vertical-align: middle; text-align: center;">ACCOUNT</th>
+              <th rowspan="2" style="vertical-align: middle; text-align: center;">DATE</th>
+              <th rowspan="2" style="vertical-align: middle; text-align: center;">STORE NAME</th>
+              <th rowspan="2" style="vertical-align: middle; text-align: center;">ACCOUNT</th>
+              <th rowspan="2" style="vertical-align: middle; text-align: center;">AREA</th>
+              <th rowspan="2" style="vertical-align: middle; text-align: center;">CEK/NO</th>
               @foreach ($categories as $category)
-              <th colspan="{{ ($jml_brand + 1)*2 }}" style="vertical-align: middle; text-align: center;">{{ $category->name }}</th>
+              <th colspan="{{ App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+              ->join('categories','sub_categories.id_category', 'categories.id')
+              ->where('categories.id',$category->id)
+              ->count() }}" style="vertical-align: middle; text-align: center;">{{ $category->name }}</th>
               @endforeach
             </tr>
             <tr>
               @foreach ($categories as $category)
-              @foreach ($brands as $brand)
-              <th colspan="2" style="vertical-align: middle; text-align: center;">{{ $brand->name }}</th>
+              @foreach (App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+              ->join('categories','sub_categories.id_category', 'categories.id')
+              ->where('categories.id',$category->id)->select('products.*')->get() as $product)
+              <th style="vertical-align: middle; text-align: center;">{{ $product->name }}</th>
               @endforeach
-              <th colspan="2" style="vertical-align: middle; text-align: center;">Total</th>
-              @endforeach
-            </tr>
-            <tr>
-              @foreach ($categories as $category)
-              @foreach ($brands as $brand)
-              <th style="vertical-align: middle; text-align: center;">tier</th>
-              <th style="vertical-align: middle; text-align: center;">depth</th>
-              @endforeach
-              <th style="vertical-align: middle; text-align: center;">tier</th>
-              <th style="vertical-align: middle; text-align: center;">depth</th>
               @endforeach
             </tr>
 
@@ -123,13 +127,15 @@ th, td {
 <script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
 
+
+  $(".js-select").select2();
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     setTimeout(function() {
-      $('#filterEmployee,#filterStore,#filterArea').val(null).trigger('change');
+      $('#filterAccount,#filterStore,#filterArea,#week').val(null).trigger('change');
     }, 10);
   });
-  $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
+  $('#filterAccount').select2(setOptions('{{ route("account-select2") }}', '{{App\Account::first()->name}}', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {
@@ -141,13 +147,14 @@ th, td {
   $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
+    data.unshift({ id: '', name: 'all' });
     return {
       results: $.map(data, function (obj) {                                
         return {id: obj.id, text: obj.name}
       })
     }
   }));
-  $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Choose your Store', function (params) {
+   $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Choose your Store', function (params) {
     return filterData('store', params.term);
   }, function (data, params) {
     return {
@@ -156,13 +163,13 @@ th, td {
       })
     }
   }));
-  $(".js-datepicker").datepicker( {
+   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
     autoclose: true,
     minViewMode: "months"
   });
-  $.ajaxSetup({
+   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
@@ -189,7 +196,7 @@ th, td {
     Codebase.layout('header_loader_on');
     e.preventDefault();
     var table = null;
-    var url = '{!! route('display_share.dataSpg') !!}';
+    var url = '{!! route('oos.dataAccountRow') !!}';
     table = $('#reportTable').DataTable({
       processing: true,
       serverSide: true,
@@ -197,7 +204,7 @@ th, td {
       scrollY: "300px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
-        type: 'POST',
+        type: 'GET',
         dataType: 'json',
         dataSrc: function(res) {
           Codebase.layout('header_loader_off');
@@ -213,25 +220,21 @@ th, td {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        $("#btnDownloadXLSAll").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&id_employee="+$("#filterEmployee").val()+"&id_store="+$("#filterStore").val()+"&id_area="+$("#filterArea").val()+"&@@limit=" + $("#reportTable_length select").val());
-        $("#btnDownloadXLS").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&id_employee="+$("#filterEmployee").val()+"&id_store="+$("#filterStore").val()+"&id_area="+$("#filterArea").val()+"&limit=" + $("#reportTable_length select").val());
-      },
+        $("#btnDownloadXLSAll").attr("target-url","{{ route('oos.row.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&account="+$("#filterAccount").val()+"&store="+$("#filterStore").val()+"&area="+$("#filterArea").val()+"&week="+$("#week").val());
+        $("#btnDownloadXLS").attr("target-url","{{ route('oos.row.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&account="+$("#filterAccount").val()+"&store="+$("#filterStore").val()+"&area="+$("#filterArea").val()+"&week="+$("#week").val()+"&limit=" + $("#reportTable_length select").val());      },
       columns: [
-        { data: 'region_name', name: 'region_name'},
-        { data: 'area_name', name: 'area_name'},
-        { data: 'tl_name', name: 'tl_name'},
-        { data: 'emp_name', name: 'emp_name'},
-        { data: 'jabatan', name: 'jabatan'},
-        { data: 'store_name', name: 'store_name'},
-        { data: 'account_name', name: 'account_name'},
-        @foreach($categories as $category)
-          @foreach($brands as $brand)
-            {data: '{{ $category->id }}_{{ $brand->id }}_tier', name: '{{ $category->id }}_{{ $brand->id }}_tier', searchable: false, sortable: false},
-            {data: '{{ $category->id }}_{{ $brand->id }}_depth', name: '{{ $category->id }}_{{ $brand->id }}_depth', searchable: false, sortable: false},
-          @endforeach
-          {data: '{{ $category->id }}_total_tier', name: '{{ $category->id }}_total_tier', searchable: false, sortable: false},
-          {data: '{{ $category->id }}_total_depth', name: '{{ $category->id }}_total_depth', searchable: false, sortable: false},
-        @endforeach
+      { data: 'oos_date', name: 'oos_date'},
+      { data: 'name1', name: 'name1'},
+      { data: 'account_name', name: 'account_name'},
+      { data: 'area_name', name: 'area_name'},
+      { data: 'cek', name: 'cek'},
+      @foreach($categories as $category)
+      @foreach(App\Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+        ->join('categories','sub_categories.id_category', 'categories.id')
+        ->where('categories.id',$category->id)->select('products.*')->get() as $product)
+      { data: '{{ $category->id }}_{{ $product->id }}', name: '{{ $category->id }}_{{ $product->id }}', searchable: false, sortable: false},
+      @endforeach
+      @endforeach
       ],
       bDestroy: true
     });
