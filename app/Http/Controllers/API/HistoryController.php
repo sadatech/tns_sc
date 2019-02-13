@@ -34,6 +34,15 @@ use App\Cbd;
 use App\NewCbd;
 use App\PlanDc;
 use App\DocumentationDc;
+use App\DisplayShare;
+use App\AdditionalDisplay;
+use App\Availability;
+use App\Promo;
+use App\PromoDetail;
+use App\Oos;
+use App\OosDetail;
+use App\DataPrice;
+use App\DetailDataPrice;
 use Carbon\Carbon;
 use Config;
 use JWTAuth;
@@ -574,6 +583,234 @@ class HistoryController extends Controller
 			} else {
 				$res['success'] = false;
 				$res['msg'] 	= "Documentation not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
+	public function displayShareHistory($date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data 	= DisplayShare::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->orderBy('id','desc')->get();
+
+			if ($data->count() > 0) {
+				$res['success'] 		= true;
+				$res['data'] 	= $data;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "Display Share not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
+	public function additionalDisplayHistory($date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data 	= AdditionalDisplay::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->orderBy('id','desc')->get();
+
+			if ($data->count() > 0) {
+				$res['success'] 		= true;
+				$res['data'] 	= $data;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "Additional Display not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
+	public function availabilityHistory($date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data 	= Availability::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->orderBy('id','desc')->get();
+
+			if ($data->count() > 0) {
+				$res['success'] 		= true;
+				$res['data'] 	= $data;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "Availability not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
+	public function promoHistory($date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data 	= Promo::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->orderBy('id','desc')->get();
+
+			foreach ($data as $key => $value) {
+				$value[$key]['detail'] = PromoDetail::whereIdPromo($value->id)->get();
+			}
+
+			if ($data->count() > 0) {
+				$res['success'] 		= true;
+				$res['data'] 	= $data;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "Promo not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
+	public function stockHistory($date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data 	= Oos::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->orderBy('id','desc')->get();
+
+			foreach ($data as $key => $value) {
+				$value[$key]['detail'] = OosDetail::whereIdOos($value->id)->get();
+			}
+
+			if ($data->count() > 0) {
+				$res['success'] 		= true;
+				$res['data'] 	= $data;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "Stock not Found.";
+			}
+		}else{
+			$res = $check;
+		}
+
+		$code = $res['code'];
+		unset($res['code']);
+
+		return response()->json($res);
+	}
+
+	public function priceHistory($date = '')
+	{
+		$check = $this->authCheck();
+		if ($check['success'] == true) {
+
+			$user = $check['user'];
+			$res['code'] = 200;
+
+			$data 	= DataPrice::where('id_employee', $user->id)
+			->when($date != '', function ($q) use ($date){
+				return $q->whereDate('date', $date);
+			})
+			->when($date == '', function ($q){
+				$now 	= Carbon::now();
+				$year 	= $now->year;
+				$month 	= $now->month;
+				return $q->whereMonth('date', $month)->whereYear('date', $year);
+			})->orderBy('id','desc')->get();
+
+			foreach ($data as $key => $value) {
+				$value[$key]['detail'] = DataPriceDetail::whereIdDataPrice($value->id)->get();
+			}
+
+			if ($data->count() > 0) {
+				$res['success'] 		= true;
+				$res['data'] 	= $data;
+			} else {
+				$res['success'] = false;
+				$res['msg'] 	= "Price not Found.";
 			}
 		}else{
 			$res = $check;
