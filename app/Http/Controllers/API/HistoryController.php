@@ -712,20 +712,20 @@ class HistoryController extends Controller
 
 			$data 	= Promo::where('id_employee', $user->id)
 			->when($date != '', function ($q) use ($date){
-				return $q->whereDate('date', $date);
+				return $q->whereDate('created_at', $date);
 			})
 			->when($date == '', function ($q){
 				$now 	= Carbon::now();
 				$year 	= $now->year;
 				$month 	= $now->month;
-				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->orderBy('id','desc')->get();
+				return $q->whereMonth('created_at', $month)->whereYear('created_at', $year);
+			})->orderBy('id','desc')->get()->toArray();
 
 			foreach ($data as $key => $value) {
-				$value[$key]['detail'] = PromoDetail::whereIdPromo($value->id)->get();
+				$data[$key]['detail'] = PromoDetail::whereIdPromo($value['id'])->get();
 			}
 
-			if ($data->count() > 0) {
+			if (count($data) > 0) {
 				$res['success'] 		= true;
 				$res['data'] 	= $data;
 			} else {
@@ -759,13 +759,13 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->orderBy('id','desc')->get();
+			})->orderBy('id','desc')->get()->toArray();
 
 			foreach ($data as $key => $value) {
-				$value[$key]['detail'] = OosDetail::whereIdOos($value->id)->get();
+				$data[$key]['detail'] = OosDetail::whereIdOos($value['id'])->get();
 			}
 
-			if ($data->count() > 0) {
+			if (count($data) > 0) {
 				$res['success'] 		= true;
 				$res['data'] 	= $data;
 			} else {
@@ -799,13 +799,13 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->orderBy('id','desc')->get();
+			})->orderBy('id','desc')->get()->toArray();
 
 			foreach ($data as $key => $value) {
-				$value[$key]['detail'] = DataPriceDetail::whereIdDataPrice($value->id)->get();
+				$data[$key]['detail'] = DetailDataPrice::whereIdDataPrice($value['id'])->get();
 			}
 
-			if ($data->count() > 0) {
+			if (count($data) > 0) {
 				$res['success'] 		= true;
 				$res['data'] 	= $data;
 			} else {
