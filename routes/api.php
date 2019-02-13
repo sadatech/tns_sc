@@ -225,6 +225,12 @@ Route::prefix('history')->group(function () {
 	Route::get('/dc/{type?}/{date?}', 'API\HistoryController@dcHistory')->name('api.dc-history.list');
 	Route::get('/plan/{date?}', 'API\HistoryController@planHistory')->name('api.plan-history.list');
 	Route::get('/documentation/{date?}', 'API\HistoryController@documentationHistory')->name('api.documentation-history.list');
+	Route::get('/display-share/{date?}', 'API\HistoryController@displayShareHistory')->name('api.display-share-history.list');
+	Route::get('/additional-display/{date?}', 'API\HistoryController@additionalDisplayHistory')->name('api.additional-display-history.list');
+	Route::get('/promo/{date?}', 'API\HistoryController@promoHistory')->name('api.promo-history.list');
+	Route::get('/stock/{date?}', 'API\HistoryController@stockHistory')->name('api.stock-history.list');
+	Route::get('/price/{date?}', 'API\HistoryController@priceHistory')->name('api.price-history.list');
+
 });
 
 /**
