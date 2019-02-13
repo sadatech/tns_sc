@@ -230,6 +230,7 @@ Route::prefix('history')->group(function () {
 	Route::get('/promo/{date?}', 'API\HistoryController@promoHistory')->name('api.promo-history.list');
 	Route::get('/stock/{date?}', 'API\HistoryController@stockHistory')->name('api.stock-history.list');
 	Route::get('/price/{date?}', 'API\HistoryController@priceHistory')->name('api.price-history.list');
+	Route::get('/availability/{date?}', 'API\HistoryController@availabilityHistory')->name('api.availability-history.list');
 
 });
 
