@@ -31,9 +31,13 @@ use App\Block;
 use App\EmployeeStore;
 use App\Filters\EmployeeFilters;
 use App\Filters\BlockFilters;
+use App\Traits\StringTrait;
+use App\Traits\FirstOrCreateTrait;
 
 class EmployeeController extends Controller
 {
+	use StringTrait, FirstOrCreateTrait;
+
 	public function getDataWithFilters(EmployeeFilters $filters){
 		$data = Employee::filter($filters)->where('isResign', 0)->get();
 		return $data;
@@ -49,9 +53,9 @@ class EmployeeController extends Controller
 		return $data;
 	}
 
-	public function getDataIsTL()
+	public function getDataIsTL(EmployeeFilters $filters)
 	{
-		$data = Employee::where("id_position", 5)
+		$data = Employee::filter($filters)->where("id_position", 5)
 		->whereHas("employeeSubArea", function($query){
 			$query->where("isTl", 1);
 		})
@@ -306,7 +310,7 @@ class EmployeeController extends Controller
 				'id'        	=> (isset($employee->id) ? $employee->id : ""),
 				'store'    		=> $store
 			);
-			return "<a href=".route('ubah.employee', $employee->id)." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
+			return "<a href=".route('ubah.employee', $employee->id)."/mtc"." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
 			<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
 			<button onclick='viewModal(".json_encode($data).")' class='btn btn-sm btn-warning btn-square' title='View Store'><i class='si si-picture mr-2'></i> STORE</button>
 			<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
@@ -320,7 +324,7 @@ class EmployeeController extends Controller
 			foreach ($store as $data) {
 				$storeList[] = $data->store->name1;
 			}
-			return rtrim(implode(',', $storeList), ',');
+			return rtrim(implode(', ', $storeList), ',');
 		})
 		->addColumn('position', function($employee) {
 			return $employee->position->name;
@@ -415,18 +419,20 @@ class EmployeeController extends Controller
 			/*
 			*	Process Update
 			*/
+			$statusParam = [
+					'type' 		=> 'success',
+					'title' 	=> 'Sukses!<br/>',
+					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
+				];
+
 			if ($request->input('status') == 'Stay') {
 				EmployeeStore::where('id_employee', $id)->delete();
 				EmployeeStore::create([
 					'id_store' 		=> $request->input('store'),
 					'id_employee' 	=> $id,
 				]);
-				return redirect()->route('employee')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				// return redirect()->route('employee')
+				// ->with($statusParam);
 			} else if($request->input('status') == 'Mobile') {
 				EmployeeStore::where('id_employee', $id)->delete();
 				$dataStore = array();
@@ -437,12 +443,8 @@ class EmployeeController extends Controller
 					);
 				}
 				DB::table('employee_stores')->insert($dataStore);
-				return redirect()->route('employee')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				// return redirect()->route('employee')
+				// ->with($statusParam);
 			} else if (!empty($request->input('pasar'))) {
 				EmployeePasar::where('id_employee', $id)->delete();
 				$dataPasar = array();
@@ -453,12 +455,8 @@ class EmployeeController extends Controller
 					);
 				}
 				DB::table('employee_pasars')->insert($dataPasar);
-				return redirect()->route('employee.pasar')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				// return redirect()->route('employee.pasar')
+				// ->with($statusParam);
 			} else if (!empty($request->input('subarea'))) {
 				EmployeeSubArea::where('id_employee', $id)->delete();
 				$dataSubArea = array();
@@ -470,12 +468,19 @@ class EmployeeController extends Controller
 					);
 				}
 				DB::table('employee_sub_areas')->insert($dataSubArea);
+				// return redirect()->route('employee.dc')
+				// ->with($statusParam);
+			}
+
+			if ($data['globalPosition'] == "summary") {
+				return redirect()->route('employee')
+				->with($statusParam);
+		}else if ($data['globalPosition'] == "pasar") {
+				return redirect()->route('employee.pasar')
+				->with($statusParam);
+			}else{
 				return redirect()->route('employee.dc')
-				->with([
-					'type' 		=> 'success',
-					'title' 	=> 'Sukses!<br/>',
-					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
-				]);
+				->with($statusParam);
 			}
 		}
 	}
@@ -582,12 +587,9 @@ class EmployeeController extends Controller
                 {
                     foreach($results as $row)
                     {
-                    	echo $row;
 						$rowRules = [
-							'nik' 		=> 'required|numeric|unique:employees',
+							'nik' 		=> 'required|numeric',
 							'name'		=> 'required',	
-							'phone'		=> 'unique:employees',
-							'email'		=> 'unique:employees',
 							'password'	=> 'required',
 							'agency'	=> 'required'
 						];
@@ -603,48 +605,58 @@ class EmployeeController extends Controller
 							// ->count();
 
 							// if ($check < 1) {
-								$dataAgency['agency']   = $row['agency'];
-								$id_agency = $this->findAgen($dataAgency);
+								$id_agency = $this->findAgen($row['agency']);
 								
 								$getPosisi 	= Position::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->position))."'")->first()->id;
 								// $getPosition = Position::where('level', $row->position)->first()->id;
 
 								$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row['timezone']))."'")->first()->id;
-                            	$insert = Employee::create([
-                            		'foto_ktp' 			=> "default.png",
-									'foto_tabungan'		=> "default.png",
-									'nik'              	=> str_replace("'", "", $row['nik']),
-									'name'				=> $row['name'],   
-									'ktp'				=> (isset($row->ktp) ? $row->ktp : ""),
-									'phone'   			=> (isset($row['phone']) ? $row['phone'] : ""),
-									'email'   			=> (isset($row['email']) ? $row['email'] : ""),
-									'id_timezone'		=> ($getTimezone ? $getTimezone : 1),
-									'rekening'			=> (isset($row->rekening) ? $row->rekening : ""),
-									'bank' 				=> (isset($row->bank) ? $row->bank : ""),
-									'joinAt'			=> (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
-									'id_agency'			=> $id_agency,
-									'gender'			=> ($row->gender ? $row->gender : "Perempuan"),
-									'education'			=> ($row->education ? $row->education : "SLTA"),
-									'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
-									'password'			=> bcrypt($row['password']),
-									'id_position'		=> ($getPosisi ? $getPosisi : 1),
-									'status'			=> (isset($row->status) ? $row->status : "")	
-                            	]);
+                            	$insert = Employee::updateOrCreate(
+                            		[
+										'nik'              	=> $this->removeFirstQuotes($row['nik']),
+										'ktp'				=> (isset($row->ktp) ? $this->removeFirstQuotes($row->ktp) : ""),
+									],[
+										'phone'   			=> (isset($row['phone']) ? $this->removeFirstQuotes($row['phone']) : ""),
+										'email'   			=> (isset($row['email']) ? $row['email'] : ""),
+										'name'				=> $row['name'],   
+										'id_timezone'		=> ($getTimezone ? $getTimezone : 1),
+										'rekening'			=> (isset($row->rekening) ? $this->removeFirstQuotes($row->rekening) : ""),
+										'bank' 				=> (isset($row->bank) ? $row->bank : ""),
+										'joinAt'			=> (isset($row->join_date) ? Carbon::parse($this->removeFirstQuotes($row->join_date)) : ""),
+										'id_agency'			=> $id_agency,
+										'gender'			=> ($row->gender ? $row->gender : "Perempuan"),
+										'education'			=> ($row->education ? $row->education : "SLTA"),
+										'birthdate'			=> (isset($row->birth_date) ? Carbon::parse($this->removeFirstQuotes($row->birth_date)) : ""),
+										'password'			=> bcrypt($row['password']),
+										'id_position'		=> ($getPosisi ? $getPosisi : 1),
+										'status'			=> (isset($row->status) ? $row->status : ""),
+	                            		'foto_ktp' 			=> "default.png",
+										'foto_tabungan'		=> "default.png",
+	                            	]
+	                            );                            	
+								
+								$employee_id = $insert->id;
+
                             		if ($insert->status != "")  {
                             			if(!($row->store == '' || $row->store == null)){
-											$dataStore = array();
-											$listStore = explode(",", $row->store);
-											foreach ($listStore as $store) {
-												$dataStore[] = array(
-													'id_store'    			=> $this->findStore(
-														$store, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
+											$dataStore['name'] 	= $row->store ?? '';
+											$dataStore['name2'] = $row->optional_name ?? '';
+											$dataStore['code'] 	= $row->code ?? '';
+											$dataStore['address'] 		= $row->address ?? '';
+											$dataStore['delivery'] 		= (strtoupper($row->delivery) == 'DIRECT')? 'Direct' : 'DC';
+											$dataStore['is_jawa'] 		= ($row->is_jawa == 'Y')?'Jawa' : 'Non Jawa';
+											$dataStore['is_vito'] 		= ($row->is_vito == 'Y')?'Vito' : 'Non Vito';
+											$dataStore['coverage'] 		= (strtoupper($row->coverage) == 'DIRECT')? 'Direct' : 'In Direct';
+											$dataStore['store_panel'] 	= ($row->store_panel == 'Y')?'YES' : 'NO';
+											EmployeeStore::firstOrCreate(
+												[
+													'id_store'		=> $this->findStore(
+														$dataStore, $row->subarea, $row->area, $row->region, $row->account, $row->channel,
 														$row->timezone_store, $row->sales_tier
 													),
-													'id_employee'          	=> $insert->id
-												);
-											}
-											// dd($store);
-											DB::table('employee_stores')->insert($dataStore);
+													'id_employee'	=> $employee_id
+												]
+											);
 										}
 									}
 								// }return false;
@@ -672,161 +684,4 @@ class EmployeeController extends Controller
         }
 	}
 	
-	public function findStore($data, $subarea, $area, $region, $account, $channel, $timezonestore, $salestier)
-    {
-        $dataPasar = Store::whereRaw("TRIM(UPPER(name1)) = '". trim(strtoupper($data))."'");
-        if ($dataPasar->count() == 0) {
-
-			$dataSub['subarea_name']   	= $subarea;
-			$dataSub['area_name']   	= $area;
-			$dataSub['region_name']   	= $region;
-			$id_subarea = $this->findSub($dataSub);
-
-			$dataAcc['account']   	= $account;
-			$dataAcc['channel']   	= $channel;
-			$id_account = $this->findAcc($dataAcc);
-
-			$dataSales['sales']   	= $salestier;
-			$id_sales = $this->findSales($dataSales);
-
-			$getTimezone = Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($timezonestore))."'")->first()->id;
-            $pasar = Store::create([
-                'name1'       	=> $data,
-				'name2'       	=> "-",
-				'address'		=> "-",
-				'longitude'		=> "",
-				'latitude'		=> "",
-				'delivery'		=> "default delivery",
-				'is_jawa'		=> "default is_jawa",
-				'is_vito'		=> "default is_vito",
-				'coverage'		=> "default coverage",
-				'store_panel'	=> "default store_panel",
-				'id_subarea'	=> $id_subarea,
-				'id_account'	=> $id_account,
-				'id_salestier'	=> $id_sales,
-				'id_timezone'	=> ($getTimezone ? $getTimezone : 1)
-
-            ]);
-            if ($pasar) {
-                $id_pasar = $pasar->id;
-            }
-        } else {
-            $id_pasar = $dataPasar->first()->id;
-        }
-        return $id_pasar;
-    }
-
-	
-	public function findAgen($data)
-    {
-        $dataAgency = Agency::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['agency']))."'")->get();
-        if ($dataAgency != null) {
-            $agency = Agency::create([
-              'name'        => $data['agency']
-          ]);
-            $id_agency = $agency->id;
-        } else {
-            $id_agency = $dataAgency->first()->id;
-        }
-        return $id_agency;
-	}
-
-	public function findSales($data)
-    {
-        $dataAgency = SalesTiers::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['sales']))."'")->get();
-        if ($dataAgency != null) {
-            $agency = SalesTiers::create([
-              'name'        => $data['sales']
-          ]);
-            $id_sales = $agency->id;
-        } else {
-            $id_sales = $dataAgency->first()->id;
-		}
-		return $id_sales;
-	}
-
-	public function findAcc($data)
-    {
-        $dataArea = Account::where('name','like','%'.trim($data['account']).'%');
-        if ($dataArea->count() == 0) {
-
-			$dataAccount = $data;
-			$id_channel = $this->findChannel($dataAccount);
-            $area = Account::create([
-              'name'        => $data['account'],
-              'id_channel'   => $id_channel,
-          ]);
-            $id_account = $area->id;
-        }else{
-            $id_account = $dataArea->first()->id;
-        }
-        return $id_account;
-    }
-
-    public function findChannel($data)
-    {
-        $dataRegion = Channel::where('name','like','%'.trim($data['channel']).'%');
-        if ($dataRegion->count() == 0) {
-
-            $region = Channel::create([
-              'name'        => $data['channel'],
-          ]);
-            $id_region = $region->id;
-        }else{
-            $id_region = $dataRegion->first()->id;
-        }
-        return $id_region;
-    }
-       
-	
-	public function findSub($data)
-    {
-        $dataSub = SubArea::where('name','like','%'.trim($data['subarea_name']).'%')->get();
-        if ($dataSub != null) {
-
-			$dataArea = $data;
-			$id_area = $this->findArea($dataArea);
-            $subarea = SubArea::create([
-              'name'        => $data['subarea_name'],
-              'id_area'     => $id_area
-          ]);
-            $id_subarea = $subarea->id;
-        }else{
-            $id_subarea = $dataSub->first()->id;
-        }
-        return $id_subarea;
-    }
-
-    public function findArea($data)
-    {
-        $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
-        if ($dataArea->count() == 0) {
-
-			$dataRegion = $data;
-			$id_region = $this->findRegion($dataRegion);
-            $area = Area::create([
-              'name'        => $data['area_name'],
-              'id_region'   => $id_region,
-          ]);
-            $id_area = $area->id;
-        }else{
-            $id_area = $dataArea->first()->id;
-        }
-        return $id_area;
-    }
-
-    public function findRegion($data)
-    {
-        $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
-        if ($dataRegion->count() == 0) {
-
-            $region = Region::create([
-              'name'        => $data['region_name'],
-          ]);
-            $id_region = $region->id;
-        }else{
-            $id_region = $dataRegion->first()->id;
-        }
-        return $id_region;
-    }
 }

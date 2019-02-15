@@ -70,7 +70,7 @@
                     <div class="form-group">
                         <a href="{{ route('employee.download-template') }}" class="btn btn-sm btn-info" style="float: right;">Download Import Format</a>
                     </div>
-                    <div class="block-content">
+                    <div class="block-content" style="display: none;">
                         <h5> Sample Data :</h5>
                         <table class="table table-bordered table-responsive table-vcenter">
                             <thead>

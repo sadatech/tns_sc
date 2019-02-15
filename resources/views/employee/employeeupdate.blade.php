@@ -23,6 +23,7 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label>NIK</label>
+                        <input type="hidden" name="globalPosition" id="globalPosition">
                         <input type="text" class="form-control" name="nik" value="{{$emp->nik}}" placeholder="Add new nik" required>
                     </div>
                     <div class="form-group col-md-6">
@@ -318,18 +319,22 @@
     });
 
     var url = document.referrer;
-    if (url.split("/")[5] == null) {
+    var positions = url.split("/");
+    var pos = positions[positions.length -1];
+    $("#globalPosition").val(pos);
+
+    if (pos == "summary") {
         $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
-    } else if (url.split("/")[5] == "pasar") {
+    } else if (pos == "pasar") {
         $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
-    } else if (url.split("/")[5] == "dc") {
+    } else if (pos == "dc") {
         $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
         $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();

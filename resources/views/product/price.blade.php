@@ -127,6 +127,7 @@
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
 $('#currency').on('change', function() {
     window.location.href = $(this).val();

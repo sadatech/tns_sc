@@ -3,7 +3,7 @@ $type = $type ?? '';
 $action = $action ?? '';
 @endphp
 
-<div class="modal fade" id="{{ $id }}" tabindex="-1" role="dialog" aria-labelledby="{{ $id }}" aria-hidden="true">
+<div class="modal fade" id="{{ $id }}" role="dialog" aria-labelledby="{{ $id }}" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">

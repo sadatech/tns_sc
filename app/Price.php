@@ -22,6 +22,7 @@ class Price extends BaseModel
 	{
 		return $this->belongsTo('App\Product', 'id_product');
     }
+    
     public static function rule()
     {
         return [

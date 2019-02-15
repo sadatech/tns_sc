@@ -17,9 +17,9 @@ class DocumentationDc extends Model
 
     public function toArray(){
         $array = parent::toArray();
-        $array['photo1_url'] = !empty($this->photo1) ? ('uploads/documentation/'.$this->photo1) : '';
-        $array['photo2_url'] = !empty($this->photo2) ? ('uploads/documentation/'.$this->photo2) : '';
-        $array['photo3_url'] = !empty($this->photo3) ? ('uploads/documentation/'.$this->photo3) : '';
+        $array['photo1_url'] = !empty($this->photo1) ? str_replace('https:', 'http:', asset('uploads/documentation/'.$this->photo1)) : '';
+        $array['photo2_url'] = !empty($this->photo2) ? str_replace('https:', 'http:', asset('uploads/documentation/'.$this->photo2)) : '';
+        $array['photo3_url'] = !empty($this->photo3) ? str_replace('https:', 'http:', asset('uploads/documentation/'.$this->photo3)) : '';
         return $array;
     }
 }

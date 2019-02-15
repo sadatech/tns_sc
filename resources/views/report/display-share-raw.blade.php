@@ -197,7 +197,7 @@ th, td {
       scrollY: "300px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         dataSrc: function(res) {
           Codebase.layout('header_loader_off');
@@ -217,21 +217,21 @@ th, td {
         $("#btnDownloadXLS").attr("target-url","{{ route('display_share.dataSpg.exportXLS') }}"+"?periode="+$(".js-datepicker").val()+"&id_employee="+$("#filterEmployee").val()+"&id_store="+$("#filterStore").val()+"&id_area="+$("#filterArea").val()+"&limit=" + $("#reportTable_length select").val());
       },
       columns: [
-      { data: 'region_name', name: 'region_name'},
-      { data: 'area_name', name: 'area_name'},
-      { data: 'tl_name', name: 'tl_name'},
-      { data: 'emp_name', name: 'emp_name'},
-      { data: 'jabatan', name: 'jabatan'},
-      { data: 'store_name', name: 'store_name'},
-      { data: 'account_name', name: 'account_name'},
-      @foreach($categories as $category)
-      @foreach($brands as $brand)
-      {data: '{{ $category->id }}_{{ $brand->id }}_tier', name: '{{ $category->id }}_{{ $brand->id }}_tier', searchable: false, sortable: false},
-      {data: '{{ $category->id }}_{{ $brand->id }}_depth', name: '{{ $category->id }}_{{ $brand->id }}_depth', searchable: false, sortable: false},
-      @endforeach
-      {data: '{{ $category->id }}_total_tier', name: '{{ $category->id }}_total_tier', searchable: false, sortable: false},
-      {data: '{{ $category->id }}_total_depth', name: '{{ $category->id }}_total_depth', searchable: false, sortable: false},
-      @endforeach
+        { data: 'region_name', name: 'region_name'},
+        { data: 'area_name', name: 'area_name'},
+        { data: 'tl_name', name: 'tl_name'},
+        { data: 'emp_name', name: 'emp_name'},
+        { data: 'jabatan', name: 'jabatan'},
+        { data: 'store_name', name: 'store_name'},
+        { data: 'account_name', name: 'account_name'},
+        @foreach($categories as $category)
+          @foreach($brands as $brand)
+            {data: '{{ $category->id }}_{{ $brand->id }}_tier', name: '{{ $category->id }}_{{ $brand->id }}_tier', searchable: false, sortable: false},
+            {data: '{{ $category->id }}_{{ $brand->id }}_depth', name: '{{ $category->id }}_{{ $brand->id }}_depth', searchable: false, sortable: false},
+          @endforeach
+          {data: '{{ $category->id }}_total_tier', name: '{{ $category->id }}_total_tier', searchable: false, sortable: false},
+          {data: '{{ $category->id }}_total_depth', name: '{{ $category->id }}_total_depth', searchable: false, sortable: false},
+        @endforeach
       ],
       bDestroy: true
     });

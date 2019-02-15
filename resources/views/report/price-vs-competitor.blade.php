@@ -184,7 +184,7 @@
       })
     }
   }));
-  $('#filterStore').select2(setOptions('{{ route("store-select2") }}', 'Choose your Store', function (params) {
+  $('#filterStore').select2(setOptions('{{ route("store-select2") }}', '{{App\Store::first()->name1}}', function (params) {
     return filterData('store', params.term);
   }, function (data, params) {
     return {

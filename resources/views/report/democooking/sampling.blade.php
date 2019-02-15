@@ -44,7 +44,7 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-              <a href="{{ route('dc.sampling.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+              <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
@@ -91,7 +91,9 @@ table.table thead tr th {
 <script type="text/javascript">
 $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee').val(null).trigger('change');
+    setTimeout(function() {
+      $('#filterEmployee').val(null).trigger('change');
+    }, 10);
   });
 $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
@@ -113,6 +115,12 @@ $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choo
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
+
+  $("#btnDownloadXLS").on("click", function(){
+      var url= "{{ route('dc.sampling.export') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val();
+      window.location.href=url;
+  });
+
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();

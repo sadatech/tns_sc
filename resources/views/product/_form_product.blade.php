@@ -20,13 +20,13 @@ $action = $action ?? '';
             {{ Form::open(['url' => $action, 'id' => $type . 'Form']) }}
                 {!! $type == 'edit' ? method_field('PUT') : "" !!}
                 <div class="block-content">
-                    {{ 
-                        Form::select2Input('id_subcategory', old('id_subcategory'), App\SubCategory::toDropDownData(), [
-                            'labelText' => 'Sub Category Product',
-                            'required' => '',
-                            'id' => $type . 'SubCategory'
-                        ])
-                    }}
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                          <label>Sub Category Product</label>
+                          <select class="form-control" id="{{$type}}SubCategory" name="id_subcategory"></select>
+                        </div>
+                    </div>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -82,6 +82,23 @@ $action = $action ?? '';
 
 @push('additional-js')
 <script type="text/javascript">
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+    $('#{{$type}}SubCategory').select2(setOptions('{{ route("sub-category-select2") }}', 'Select Sub Category', function (params) {
+        return filterData('name', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
 $("#example-inline-checkbox1").change(function() {
     if ($(this).removeAttr("checked")) {
         $("#Input1").hide();
@@ -112,6 +129,7 @@ $("#example-inline-checkbox2").change(function() {
             $('#{{$type}}Name').val(json.name);
             $('#{{$type}}Code').val(json.code);
             $('#{{$type}}SubCategory').val(json.subcategory).trigger('change');
+            setSelect2IfPatchModal($("#{{$type}}SubCategory"), json.subcategory.id, json.subcategory.name);
             $('#{{$type}}Product').val(json.product).trigger('change');
             $('#{{$type}}Panel').val(json.panel).trigger('change');
             $('#{{$type}}StockType').val(json.stock_type_id).trigger('change');

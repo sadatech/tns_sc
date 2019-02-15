@@ -19,9 +19,13 @@ use App\Region;
 use App\Timezone;
 use App\EmployeeSubArea;
 use App\Filters\EmployeeFilters;
+use App\Traits\StringTrait;
+use App\Traits\FirstOrCreateTrait;
 
 class DcController extends Controller
 {
+    use StringTrait, FirstOrCreateTrait;
+
 	public function getDataWithFilters(EmployeeFilters $filters){
         $data = Employee::filter($filters)->get();
         return $data;
@@ -58,7 +62,7 @@ class DcController extends Controller
 			foreach ($subarea as $data) {
 				$subareaList[] = $data->subarea->name;
 			}
-			return rtrim(implode(',', $subareaList), ',');
+			return rtrim(implode(', ', $subareaList), ',');
 		})
 		->addColumn('position', function($employee) {
 			return $employee->position->name;
@@ -136,40 +140,46 @@ class DcController extends Controller
                 {
                     foreach($results as $row)
                     {
-						$dataAgency['agency_name']   = $row->agency;
-						$id_agency = $this->findAgen($dataAgency);
+						$id_agency = $this->findAgen($row->agency);
                         
                         $getZone 		= Timezone::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->timezone))."'")->first()->id;
-                        $insert = Employee::create([
-							'foto_ktp' 			=> "default.png",
-							'foto_tabungan'		=> "default.png",
-                            'name'             	=> $row->name,
-							'nik'              	=> str_replace("'", "", $row->nik),
-							'ktp'				=> (isset($row->ktp) ? $row->ktp : "-"),
-							'phone'				=> (isset($row->phone) ? $row->phone : "-"),
-							'email'				=> (isset($row->email) ? $row->email : "-"),
-							'rekening'			=> (isset($row->rekening) ? $row->rekening : "-"),
-							'bank'				=> (isset($row->bank) ? $row->rekening: "-"),
-							'joinAt'            => (isset($row->join_date) ? Carbon::parse($row->join_date) : ""),
-							'id_agency'			=> $id_agency,
-                            'id_position'       => 5,
-                            'birthdate'         => (isset($row->birth_date) ? Carbon::parse($row->birth_date) : ""),
-                            'gender'            => ($row->gender ? $row->gender : "Perempuan"),
-                            'education'         => ($row->education ? $row->education : "SLTA"),
-                            'password'          => bcrypt($row->password),
-                            'id_timezone'       => ($getZone ? $getZone : 1)
-						]);
+                        $insert = Employee::updateOrCreate(
+                            [
+                                'nik'               => $this->removeFirstQuotes($row->nik),
+                                'ktp'               => (isset($row->ktp) ? $this->removeFirstQuotes($row->ktp) : "-"),
+                            ],[
+                                'name'              => $row->name,
+                                'phone'             => (isset($row->phone) ? $this->removeFirstQuotes($row->phone) : "-"),
+                                'email'             => (isset($row->email) ? $row->email : "-"),
+                                'rekening'          => (isset($row->rekening) ? $this->removeFirstQuotes($row->rekening) : "-"),
+                                'bank'              => (isset($row->bank) ? $row->bank: "-"),
+                                'joinAt'            => (isset($row->join_date) ? Carbon::parse($this->removeFirstQuotes($row->join_date)) : ""),
+                                'id_agency'         => $id_agency,
+                                'id_position'       => 5,
+                                'birthdate'         => (isset($row->birth_date) ? Carbon::parse($this->removeFirstQuotes($row->birth_date)) : ""),
+                                'gender'            => ($row->gender ? $row->gender : "Perempuan"),
+                                'education'         => ($row->education ? $row->education : "SLTA"),
+                                'password'          => bcrypt($row->password),
+                                'id_timezone'       => ($getZone ? $getZone : 1),
+    							'foto_ktp' 			=> "default.png",
+    							'foto_tabungan'		=> "default.png",
+    						]
+                        );
+                        
+                        $employee_id = $insert->id;
+
 						if ($insert) {
                             if(!($row->subarea == '' || $row->subarea == null)){
-                                $dataSub = array();
                                 $listSub = explode(",", $row->subarea);
                                 foreach ($listSub as $sub) {
-                                    $dataSub[] = array(
-                                        'id_subarea'    	=> $this->findSub($sub, $row->area, $row->region),
-                                        'id_employee'       => $insert->id
-                                    );
+                                    $data['subarea_name']   = $sub;
+                                    $data['area_name']      = $row->area;
+                                    $data['region_name']    = $row->region;
+                                    EmployeeSubArea::firstOrCreate([
+                                        'id_subarea'    	=> $this->findSub($data),
+                                        'id_employee'       => $employee_id
+                                    ]);
                                 }
-    							DB::table('employee_sub_areas')->insert($dataSub);
                             }
                         }
                     }
@@ -193,75 +203,6 @@ class DcController extends Controller
                 'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
             ]);
         }
-	}
-
-	public function findAgen($data)
-    {
-        $dataAgency = Agency::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data['agency_name']))."'")->get();
-        if ($dataAgency != null) {
-            $agency = Agency::create([
-              'name'        => $data['agency_name']
-          ]);
-            $id_agency = $agency->id;
-        } else {
-            $id_agency = $dataAgency->first()->id;
-        }
-        return $id_agency;
-    }
-
-	
-	public function findSub($data, $area, $region)
-    {
-        $dataSub = SubArea::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($data))."'");
-        if ($dataSub->count() < 1 ) {
-
-            $dataArea['area']  = $area;
-            $dataArea['region'] = $region;
-            $id_area = $this->findArea($dataArea);
-            $subarea = SubArea::create([
-              'name'        => $data,
-              'id_area'     => $id_area
-          ]);
-            $id_subarea = $subarea->id;
-        }else{
-            $id_subarea = $dataSub->first()->id;
-        }
-        return $id_subarea;
-    }
-
-
-    public function findArea($data)
-    {
-        $dataArea = Area::where('name','like','%'.trim($data['area']).'%');
-        if ($dataArea->count() == 0) {
-            
-            $dataRegion  = $data;
-            $id_region = $this->findRegion($dataRegion);
-
-            $area = Area::create([
-              'name'        => $data['area'],
-              'id_region'   => $id_region,
-            ]);
-            $id_area = $area->id;
-        }else{
-            $id_area = $dataArea->first()->id;
-        }
-      return $id_area;
-    }
-
-    public function findRegion($data)
-    {
-        $dataRegion = Region::where('name','like','%'.trim($data['region']).'%');
-        if ($dataRegion->count() == 0) {
-            
-            $region = Region::create([
-              'name'        => $data['region'],
-            ]);
-            $id_region = $region->id;
-        }else{
-            $id_region = $dataRegion->first()->id;
-        }
-      return $id_region;
 	}
 	
 }

@@ -24,6 +24,8 @@ use App\DataPrice;
 use App\DetailDataPrice;
 use App\EmployeeStore;
 use App\Store;
+use App\Oos;
+use App\OosDetail;
 use App\EmployeeSubArea;
 use App\Brand;
 use Auth;
@@ -71,6 +73,9 @@ use App\Jobs\ExportMTCAdditionalDisplayAchievementJob;
 use App\Jobs\ExportMTCPriceRowJob;
 use App\Jobs\ExportMTCPriceSummaryJob;
 use App\Jobs\ExportMTCPriceCompJob;
+use App\Jobs\ExportMTCAdditionalDisplayJob;
+use App\Jobs\ExportMTCAvailabilityRowJob;
+use App\Jobs\ExportMTCOosRowJob;
 use App\Product;
 use App\ProductCompetitor;
 use App\SalesSpgPasar;
@@ -930,7 +935,7 @@ class ReportController extends Controller
         if (!empty($request->input('store'))) {
             $store   = $request->input('store');
         }else{
-            $store   = '1';
+            $store   = Store::first()->id;
         }
         
         $products = Product::join('brands','products.id_brand','brands.id')
@@ -1010,7 +1015,7 @@ class ReportController extends Controller
     }
 
     public function priceRow (){
-        $account = 1;
+        $account = Account::first()->id;
         $data['stores'] = Store::where('stores.id_account',$account)->orderBy('id_subarea')->get();
         // return response()->json($datas2);
         return view('report.price-row', $data);
@@ -1103,6 +1108,8 @@ class ReportController extends Controller
             foreach ($stores as $store ) {
                 $data2[$store->name1.'_price'] = '';
                 $price = DataPrice::where('data_price.id_store',$store->id)
+                            ->whereMonth('data_price.date', $month)
+                            ->whereYear('data_price.date', $year)
                             ->join('detail_data_price','data_price.id','detail_data_price.id_data_price')
                             ->where('detail_data_price.id_product',$data2->id)
                             ->where('detail_data_price.isSasa',0)->first();
@@ -1274,6 +1281,156 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
+
+    // *********** OOSTOCK ****************** //
+
+
+    public function oosRow(){
+        $data['categories'] = Category::get();
+        $data['products'] = Product::get();
+        $data['jml_product'] = Product::get()->count();
+        $data['categories'] = Category::get();
+        $data['brands'] = Brand::get();
+        $data['jml_brand'] = Brand::get()->count();
+        return view('report.oos', $data);
+    }
+
+    public function oosAccountRowData(Request $request){
+        // return response()->json($request);
+
+        if (!empty($request->input('account'))) {
+            $account   = $request->input('account');
+        }else{
+            $account   = Account::first()->id;
+        }
+
+        $categories = Category::get();
+
+        $totaltanggal = Carbon::now()->daysInMonth;
+        // $stores = Store::where('id_account',$account)->get();
+        // $datas = new Collection();
+        // $i = 1;
+        // while ( $i<=$totaltanggal ) {
+        //     foreach ($stores as $store) {
+        //         $item['date'] = $i;
+        //         $item['store'] = $store->name1;
+        //         $item['account'] = $store->account->name;
+        //         $item['subarea'] = $store->subarea->name;
+        //     $datas->push($item);
+        //     }
+        //     $i++;
+        // }
+
+        $datas = Store::where('stores.id_account',$account)
+                        ->join('oos','stores.id','oos.id_store')
+                        // ->join('oos_details','oos.id','oos_details.id_oos')
+                        ->leftjoin('accounts','stores.id_account','accounts.id')
+                        ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
+                // ->when($request->has('employee'), function ($q) use ($request){
+                //     return $q->where('display_shares.id_employee',$request->input('employee'));
+                // })
+                ->when($request->has('periode'), function ($q) use ($request){
+                    return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+                    ->whereYear('date', substr($request->input('periode'), 3));
+                })
+                ->when(!empty($request->input('store')), function ($q) use ($request){
+                    return $q->where('id_store', $request->input('store'));
+                })
+                ->when($request->has('area'), function ($q) use ($request){
+                    return $q->where('id_area', $request->input('area'));
+                })
+                ->when($request->has('week'), function ($q) use ($request){
+                    return $q->where('oos.week', $request->input('week'));
+                })
+                        ->select(
+                            'stores.id',
+                            'oos.date as oos_date',
+                            'stores.name1',
+                            'stores.name2',
+                            'accounts.name as account_name',
+                            'sub_areas.name as area_name',
+                            'oos.id as oos_id'
+                            )
+                        ->orderBy('oos_date')
+                        ->get();
+
+        // return response()->json($datas);
+        foreach($datas as $data) {
+                        $data['cek'] = 'NO';
+            foreach ($categories as $category) {
+                $data[$category->id] = $category->name;
+                $data[$category->id.'sum'] = 0;
+                $data[$category->id.'sumAvailable'] = 0;
+                $products = Product::join('sub_categories','products.id_subcategory','sub_categories.id')
+                                ->join('categories','sub_categories.id_category', 'categories.id')
+                                ->join('product_stock_types','products.stock_type_id','product_stock_types.id')
+                                ->where('categories.id',$category->id)
+                                ->select('products.*','product_stock_types.quantity as type_qty')->get();
+                foreach ($products as $product) {
+                    $data[$category->id.'_'.$product->id] = '-';
+                    $detail_data = OosDetail::where('oos_details.id_oos', $data->oos_id)
+                                                    ->where('oos_details.id_product',$product->id)
+                                                    ->first();
+                    if ($detail_data) {
+                        if ($detail_data->qty >= $product->type_qty) {
+                            $data[$category->id.'_'.$product->id] = 1;
+                        }else{
+                            $data[$category->id.'_'.$product->id] = 0;
+                        }
+                        $data[$category->id.'sumAvailable'] += $data[$category->id.'_'.$product->id];
+                        $data[$category->id.'sum'] += 1;
+                        $data['cek'] = 'CEK';
+                    }
+
+                }
+                    if ($data[$category->id.'sum'] > 0){
+                        $data[$category->id.'oos'] = round($data[$category->id.'sumAvailable'] / $data[$category->id.'sum'] * 100, 2).'%';
+
+                    }else{
+                        $data[$category->id.'oos'] = 'mobile';
+                    }
+            }
+
+        } 
+
+        // return response()->json($datas);
+
+        return Datatables::of($datas)->make(true);
+        // return response()->json($data);
+    }
+
+    public function OosRowExportXLS(Request $request)
+    {
+        $req['account'] = ($request->account == "null" || empty($request->account) ? null : $request->account);
+        $req['periode'] = ($request->periode == "null" || empty($request->periode) ? null : $request->periode);
+        $req['store'] = ($request->store == "null" || empty($request->store) ? null : $request->store);
+        $req['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        $req['week'] = ($request->week == "null" || empty($request->week) ? null : $request->week);
+        $req['limitLs'] = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($req){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Oos Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCOosRowJob($JobTrace, $req, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
+
     // *********** AVAILABILITY ****************** //
 
     public function availabilityRow(){
@@ -1292,7 +1449,7 @@ class ReportController extends Controller
         if (!empty($request->input('account'))) {
             $account   = $request->input('account');
         }else{
-            $account   = '1';
+            $account   = Account::first()->id;
         }
 
         $categories = Category::get();
@@ -1314,7 +1471,7 @@ class ReportController extends Controller
 
         $datas = Store::where('stores.id_account',$account)
                         ->join('availability','stores.id','availability.id_store')
-                        ->join('detail_availability','availability.id','detail_availability.id_availability')
+                        // ->join('detail_availability','availability.id','detail_availability.id_availability')
                         ->leftjoin('accounts','stores.id_account','accounts.id')
                         ->leftjoin('sub_areas','stores.id_subarea','sub_areas.id')
                 // ->when($request->has('employee'), function ($q) use ($request){
@@ -1340,7 +1497,7 @@ class ReportController extends Controller
                             'stores.name2',
                             'accounts.name as account_name',
                             'sub_areas.name as area_name',
-                            'detail_availability.id as availability_id'
+                            'availability.id as availability_id'
                             )->orderBy('avai_date')->get();
 
         foreach($datas as $data) {
@@ -1353,10 +1510,12 @@ class ReportController extends Controller
                                 ->join('categories','sub_categories.id_category', 'categories.id')
                                 ->where('categories.id',$category->id)
                                 ->select('products.*')->get();
+        // return response()->json($products);
+
                 foreach ($products as $product) {
-                    $data[$category->id.'_'.$product->id] = $product->name;
+                    $data[$category->id.'_'.$product->id.'name'] = $product->name;
                     $data[$category->id.'_'.$product->id] = '-';
-                    $detail_data = DetailAvailability::where('detail_availability.id', $data->availability_id)
+                    $detail_data = DetailAvailability::where('detail_availability.id_availability', $data->availability_id)
                                                     ->where('detail_availability.id_product',$product->id)
                                                     ->first();
                     if ($detail_data) {
@@ -1383,6 +1542,37 @@ class ReportController extends Controller
         // return response()->json($data);
     }
 
+
+    public function AvailabilityRowExportXLS(Request $request)
+    {
+        $req['account'] = ($request->account == "null" || empty($request->account) ? null : $request->account);
+        $req['periode'] = ($request->periode == "null" || empty($request->periode) ? null : $request->periode);
+        $req['store'] = ($request->store == "null" || empty($request->store) ? null : $request->store);
+        $req['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        $req['week'] = ($request->week == "null" || empty($request->week) ? null : $request->week);
+        $req['limitLs'] = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($req){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Availability Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAvailabilityRowJob($JobTrace, $req, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
 
     public function availabilityIndex(){
         $data['categories'] = Category::get();
@@ -2089,6 +2279,36 @@ class ReportController extends Controller
 
     }
 
+    public function additionalDisplayIndexExportXLS(Request $request)
+    {
+        $data['id_employee'] = ($request->id_employee == "null" || empty($request->id_employee) ? null : $request->id_employee);
+        $data['id_store'] = ($request->id_store == "null" || empty($request->id_store) ? null : $request->id_store);
+        $data['id_area'] = ($request->id_area == "null" || empty($request->id_area) ? null : $request->id_area);
+        $data['periode'] = ($request->periode == "null" || empty($request->periode) ? null : $request->periode);
+        $data['limit'] = ($request->limit == "null" || empty($request->limit) ? null : $request->limit);
+
+        $result = DB::transaction(function() use ($data){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "MTC - Report Additional Display - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportMTCAdditionalDisplayJob($JobTrace, $data, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e;
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
     public function additionalDisplayAch(){
         return view('report.additional-display-ach');
     }
@@ -2267,7 +2487,7 @@ class ReportController extends Controller
         $report = array();
         $id = 1;
         $periode = $request->input('periode');
-        if (Carbon::now()->month == substr($periode, 0, 2)) {
+        if ((Carbon::now()->month == substr($periode, 0, 2))and(Carbon::now()->year == substr($periode, 3))) {
             $date = Carbon::now();
             $day = $date->day;
         } else {
@@ -2437,35 +2657,48 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportSMDsummary()
+    public function exportSMDsummary(Request $request)
     {
         $employeePasar = EmployeePasar::with([
             'employee','pasar','pasar.subarea.area',
             'employee.position'
         ])->select('employee_pasars.*');
+        $report = array();
+        $id = 1;
+        $periode = $request->input('periode');
+        if ((Carbon::now()->month == substr($periode, 0, 2))and(Carbon::now()->year == substr($periode, 3))) {
+            $date = Carbon::now();
+            $day = $date->day;
+        } else {
+            $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
+            $day = $date->endOfMonth()->day;
+        }
         if ($employeePasar->count() > 0) {
-            $report = array();
-            for ($i=1; $i <= Carbon::now()->day ; $i++) {
+            for ($i=1; $i <= $day; $i++) {
                 foreach ($employeePasar->get() as $data) {
                     if ($data->employee->position->level == 'mdgtc') {
                         $report[] = array(
+                            'id' => $id++,
+                            // 'id_ep' => $data->id,
+                            // 'id_emp' => $data->employee->id,
+                            // 'id_pasar' => $data->pasar->id,
                             'area' => $data->pasar->subarea->area->name,
                             'nama' => $data->employee->name,
                             'jabatan' => $data->employee->position->name,
                             'pasar' =>   $data->pasar->name,
-                            'stockist' => $this->getStockist($data, $i),
-                            'bulan' => Carbon::now()->month,
+                            'stockist' => ($this->getStockist($data, $periode, $i) ?: "-"),
+                            'bulan' => $date->month,
                             'tanggal' => $i,
-                            'call' => ($this->getCall($data, $i) ?: "-"),
-                            'ro' => ($this->getRo($data, $i) ?: "-"),
-                            'cbd' => ($this->getCbd($data, $i) ?: "-"),
+                            'call' => ($this->getCall($data, $periode, $i) ?: "-"),
+                            'ro' => ($this->getRo($data, $periode, $i) ?: "-"),
+                            'cbd' => ($this->getCbd($data, $periode, $i) ?: "-")
                         );
                     }
                 }
             }
-            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            $filename = "SummarySMDReport".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($report) {
-                $excel->sheet('AttandanceSPGReport', function($sheet) use ($report)
+                $excel->sheet('SummarySMDReport', function($sheet) use ($report)
                 {
                     $sheet->fromArray($report);
                 });
@@ -2559,6 +2792,78 @@ class ReportController extends Controller
         // })->make(true);
     }
 
+    public function exportAttandance(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
+
+        $employeeAtt = AttendanceOutlet::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('attendance.employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($pasar, function($q) use ($pasar)
+        {
+            $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
+                return $q2->where('id_pasar', $pasar);
+            });
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
+            ->whereYear('checkin', substr($request->input('periode'), 3));
+        })
+        ->get();
+
+        $id = 1;
+        if ($employeeAtt->count() > 0) {
+            foreach ($employeeAtt as $val) {
+                if ($val->attendance->employee->position->level == 'mdgtc') {
+                $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
+                $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
+                $data[] = array(
+                    'id' => $id++,
+                    'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                    'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
+                    'nama' => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                    'jabatan' => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                    'pasar' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'outlet' => (isset($val->outlet->name) ? $val->outlet->name : ""),
+                    'tanggal' => Carbon::parse($val->checkin)->day,
+                    'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
+                    'checkout' => $checkout." ".$val->attendance->employee->timezone->name
+                    );
+                }
+            }
+        
+            $filename = "AttandanceReport".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('AttandanceReport', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+
     // ************ MOTORIK ************ //
     public function Motorikattendance(Request $request)
     {
@@ -2585,9 +2890,10 @@ class ReportController extends Controller
         return Datatables::of(collect($data))->make(true);
     }
 
-    public function exportMptorikAttandance()
+    public function exportMptorikAttandance(Request $request)
     {
-        $employee = AttendanceBlock::whereMonth('checkin', Carbon::now()->month);
+        $employee = AttendanceBlock::whereMonth('checkin', substr($request->input('periode'), 0, 2))
+        ->whereYear('checkin', substr($request->input('periode'), 3));
         if ($employee->count() > 0) {
 		    foreach ($employee->get() as $val) {
                 if ($val->attendance->employee->position->level == 'motoric') {
@@ -2656,9 +2962,10 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportMotorikDistPF()
+    public function exportMotorikDistPF(Request $request)
     {
-        $dist = DistributionMotoric::whereMonth('date',Carbon::now()->month);
+        $dist = DistributionMotoric::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3));
         if ($dist->count() > 0) {
             foreach ($dist->get() as $key => $value) {
                 if ($value->employee->position->level == 'motoric') {
@@ -2668,15 +2975,15 @@ class ReportController extends Controller
                     'Block'         => (isset($value->block->name) ? $value->block->name : "-"),
                     'Tanggal'       => Carbon::parse($value->date)->day
                     );
+                    $getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
                 }
-            }
-            $getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
-            $productList = \App\Product::whereIn('id', $getId)->get();
-            foreach ($productList as $pro) {
-                $data[$key][$pro->name] = "-";
-            }
-            foreach ($detail as $det) {
-                $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
             }
         
 		    $filename = "ReportMotorikDistPF".Carbon::now().".xlsx";
@@ -2731,9 +3038,10 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportMotorikSales()
+    public function exportMotorikSales(Request $request)
     {
-        $sales = SalesMotoric::whereMonth('date', Carbon::now()->month);
+        $sales = SalesMotoric::whereMonth('date', substr($request->input('periode'), 0, 2))
+        ->whereYear('date', substr($request->input('periode'), 3));
         if ($sales->count() > 0) {
             $product = array();
             foreach ($sales->get() as $key => $value) {
@@ -2804,21 +3112,77 @@ class ReportController extends Controller
         })->make(true);
     }
 
+    public function exportKunjunganDc(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        
+        $plan = PlanDc::with('planEmployee')->orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('planEmployee.employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+        // return response()->json($plan);
+        if ($plan->count() > 0) {
+            $product = array();
+            foreach ($plan as $key => $value) {
+                $dist = PlanEmployee::where(['id_plandc'=>$value->id])->pluck('id_employee');
+        // return response()->json($dist);
+                $emplist = implode(', ', Employee::whereIn('id', $dist)->pluck('name')->toArray());
+
+
+                $data[] = array(
+                        'Nama Demo Cooking'=> (isset($emplist) ? $emplist : ""),
+                        'Date'             => (isset($value->date) ? $value->date : ""),
+                        'Plan'             => (isset($value->plan) ? $value->plan : ""),
+                        'Stockist'         => (isset($value->stocklist) ? $value->stocklist : ""),
+                        'channel'          => (isset($value->channel) ? $value->channel : ""),
+                    );
+            }
+            $filename = "DemoCookingPlan".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('DemoCooking', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+
+    }
+
     public function DcSales(Request $request)
     {
-        $sales = SalesDc::orderBy('created_at', 'DESC');
-        if ($request->has('employee')) {
-            $sales->whereHas('employee', function($q) use ($request){
-                return $q->where('id_employee', $request->input('employee'));
+        $sales = SalesDc::orderBy('created_at', 'DESC')
+        ->when($request->has('employee'), function($q) use ($request)
+        {
+            return $q->whereHas('employee', function($q2) use ($request){
+                return $q2->where('id_employee', $request->input('employee'));
             });
-        } 
-         if ($request->has('periode')) {
-            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
-            $sales->whereYear('date', substr($request->input('periode'), 3));
-        }
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+         
         $data = array();
         $id = 1;
-        foreach ($sales->get() as $value) {
+        foreach ($sales as $value) {
             if ($value->employee->position->level == 'dc') {
                 $data[] = array(
                     'id'        => $id++,
@@ -2849,18 +3213,34 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportDcSales()
+    public function exportDcSales(Request $request)
     {
-        $sales = SalesDc::whereMonth('date', Carbon::now()->month);
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+
+        // return response()->json($request);
+        $sales = SalesDc::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            return $q->where('id_employee', $employee);
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+
         if ($sales->count() > 0) {
             $product = array();
-            foreach ($sales->get() as $key => $value) {
+            foreach ($sales as $key => $value) {
                 if ($value->employee->position->level == 'dc') {
                     $detail = SalesDcDetail::where('id_sales',$value->id)->get();
                     $data[] = array(
                         'Nama Demo Cooking' => (isset($value->employee->name) ? $value->employee->name : ""),
                         'Place'             => (isset($value->place) ? $value->place : ""),
                         'Date'              => (isset($value->date) ? $value->date : ""),
+                        'Icip-icip'         => (isset($value->icip_icip) ? $value->icip_icip : ""),
+                        'Effective Contact' => (isset($value->effective_contact) ? $value->effective_contact : ""),
                     );
                     $getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
@@ -2940,12 +3320,24 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function exportDcSampling()
+    public function exportDcSampling(Request $request)
     {
-        $sales = SamplingDc::whereMonth('date', Carbon::now()->month);
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+
+        $sales = SamplingDc::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            return $q->where('id_employee', $employee);
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
         if ($sales->count() > 0) {
             $product = array();
-            foreach ($sales->get() as $key => $value) {
+            foreach ($sales as $key => $value) {
                 if ($value->employee->position->level == 'dc') {
                     $detail = SamplingDcDetail::where('id_sales',$value->id)->get();
                     $data[] = array(
@@ -2963,7 +3355,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "DemoCookingSales".Carbon::now().".xlsx";
+            $filename = "DemoCookingSalesSampling".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCooking', function($sheet) use ($data)
                 {
@@ -3025,11 +3417,29 @@ class ReportController extends Controller
         })->make(true);
     }
 
-    public function ExportdocumentationDC()
+    public function ExportdocumentationDC(Request $request)
     {
-        $sales = DocumentationDc::whereMonth('date', Carbon::now()->month);
-        if ($sales->count() > 0) {
-            foreach ($sales->get() as $val) {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $type = ($request->type == "null" || empty($request->type) ? null : $request->type);
+
+        $doc = DocumentationDc::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            return $q->where('id_employee', $employee);
+        })
+        ->when($type, function($q) use ($type)
+        {
+            return $q->where('type', $type);
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+
+        if ($doc->count() > 0) {
+            foreach ($doc as $val) {
                 if ($val->employee->position->level == 'dc') {
                     $data[] = array(
                         'Nama DC'   =>  $val->employee->name,
@@ -3189,6 +3599,70 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
+    public function exportSmdDist(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+
+        $dist = Distribution::orderBy('created_at', 'DESC')
+        // ->when($employee, function($q) use ($employee)
+        // {
+        //     $q->whereHas('employee', function($q2) use ($employee){
+        //         return $q2->where('id_employee', $employee);
+        //     });
+        // })
+        // ->when($pasar, function($q) use ($pasar)
+        // {
+        //     $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
+        //         return $q2->where('id_pasar', $pasar);
+        //     });
+        // })
+        // ->when($request->has('periode'), function($q) use ($request)
+        // {
+        //     return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+        //     ->whereYear('date', substr($request->input('periode'), 3));
+        // })
+        ->get();
+
+        if ($dist->count() > 0) {
+            foreach ($dist as $key => $val) {
+                if($val->employee->position->level == 'mdgtc') {
+                    $detail = DistributionDetail::where('id_distribution',$val->id)->get();
+                    $data[] = array(
+                        'Employee'  => $val->employee->name,
+                        'Pasar'     => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                        'Tanggal'   => (isset($val->date) ? $val->date : ""),
+                        'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
+                    );
+
+                $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
+                }
+            }
+        
+            $filename = "ReportDistPf".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('ReportDistPf', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
     public function SMDsales(Request $request)
     {
         $sales = SalesMd::orderBy('created_at', 'DESC');
@@ -3259,6 +3733,71 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
+
+    public function exportMdPasar(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+
+        $sales = SalesMD::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($pasar, function($q) use ($pasar)
+        {
+            $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
+                return $q2->where('id_pasar', $pasar);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+
+        if ($sales->count() > 0) {
+            foreach ($sales as $key => $val) {
+                if ($val->employee->position->level == 'mdgtc'){
+                    $detail = SalesMdDetail::where('id_sales',$val->id)->get();
+                    $data[] = array(
+                        'Employee'  => (isset($val->employee->name) ? $val->employee->name : ""),
+                        'Pasar'     => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                        'Tanggal'   => (isset($val->date) ? $val->date : ""),
+                        'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
+                    );
+                    $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
+                }
+            }
+        
+            $filename = "ReportSalesMD".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('SalesMdPasar', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+
     public function SMDstockist(Request $request)
     {
         $stock = StockMD::orderBy('created_at', 'DESC');
@@ -3306,6 +3845,69 @@ class ReportController extends Controller
             });
         }
         return $dt->make(true);
+    }
+
+    public function exportSMDstocking(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+
+        $stock = StockMD::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($pasar, function($q) use ($pasar)
+        {
+            $q->whereHas('pasar', function($q2) use ($pasar){
+                return $q2->where('id_pasar', $pasar);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+
+        if ($stock->count() > 0) {
+            foreach ($stock as $key => $val) {
+                if ($val->employee->position->level == 'mdgtc') {
+                    $detail = StockMdDetail::where('id_stock',$val->id)->get();
+                    $data[] = array(
+                        'Name'      => (isset($val->employee->name) ? $val->employee->name : "-"),
+                        'Pasar'     => (isset($val->pasar->name) ? $val->pasar->name : "-"),
+                        'Date'      => (isset($val->date) ? $val->date : ""),
+                        'Week'      => (isset($val->week) ? $val->week : ""),
+                        'Stockist'  => (isset($val->stockist) ? $val->stockist : "-")
+                    );
+                    $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->oos;
+                    }
+                }
+            }
+            $filename = "ReportSMDStokist".Carbon::now().".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('ReportSMDStokist', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
     }
 
     public function SMDcbd(Request $request)
@@ -3367,7 +3969,11 @@ class ReportController extends Controller
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
-                    'posm'          => $val->posm,
+                    'photo2'         => (isset($val->photo2) ? "<a href=".asset('/uploads/cbd/'.$val->photo2)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
+                    'posm_shop_sign'       => ($val->posm_shop_sign == 1) ? 'Yes' : 'No',
+                    'posm_hangering_mobile'=> ($val->posm_hangering_mobile == 1) ? 'Yes' : 'No',
+                    'posm_poster'          => ($val->posm_poster == 1) ? 'Yes' : 'No',
+                    'posm_others'          => $val->posm_others?? '-',
                     'cbd_competitor'=> $val->cbd_competitor,
                     'cbd_position'  => $val->cbd_position,
                     'outlet_type'   => $val->outlet_type,
@@ -3378,7 +3984,7 @@ class ReportController extends Controller
 
         $dt = Datatables::of(collect($data));
         
-        return $dt->rawColumns(['photo'])->make(true);
+        return $dt->rawColumns(['photo','photo2'])->make(true);
     }
 
     public function getCbd($data, $periode, $day)
@@ -3443,163 +4049,6 @@ class ReportController extends Controller
         return $ro->count();
     }
 
-    public function exportSmdDist()
-    {
-        $dist = Distribution::whereMonth('date',Carbon::now()->month);
-        if ($dist->count() > 0) {
-		    foreach ($dist->get() as $key => $val) {
-                if($val->employee->position->level == 'mdgtc') {
-                    $detail = DistributionDetail::where('id_distribution',$val->id)->get();
-		    	    $data[] = array(
-                        'Employee'  => $val->employee->name,
-                        'Pasar'     => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                        'Tanggal'   => (isset($val->date) ? $val->date : ""),
-                        'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
-                    );
-                }
-            }
-
-            $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
-                $productList = \App\Product::whereIn('id', $getId)->get();
-                foreach ($productList as $pro) {
-                    $data[$key][$pro->name] = "-";
-                }
-                foreach ($detail as $det) {
-                    $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
-                }
-        
-		    $filename = "ReportDistPf".Carbon::now().".xlsx";
-		    return Excel::create($filename, function($excel) use ($data) {
-		    	$excel->sheet('ReportDistPf', function($sheet) use ($data)
-		    	{
-		    		$sheet->fromArray($data);
-		    	});
-            })->download();
-        } else {
-            return redirect()->back()
-            ->with([
-                    'type'   => 'danger',
-                    'title'  => 'Gagal Unduh!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
-            ]);
-        }
-    }
-
-    public function exportAttandance()
-    {
-        $employee = AttendanceOutlet::whereMonth('checkin', Carbon::now()->month);
-        if ($employee->count() > 0) {
-		    foreach ($employee->get() as $val) {
-                if ($val->attendance->employee->position->level == 'mdgtc') {
-		    	    $data[] = array(
-                        'region'    => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                        'area'      => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
-                        'subarea'   => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
-                        'nama'      => (isset($val->attendance->employee->name) ? $val->outlet->employee->name : ""),
-                        'jabatan'   => $val->attendance->employee->position->name,
-                        'pasar'     => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                        'outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-"),
-                        'tanggal'   => Carbon::parse($val->checkin)->day,
-                        'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
-                        'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
-                    );
-                }
-            }
-        
-		    $filename = "AttandanceReport".Carbon::now().".xlsx";
-		    return Excel::create($filename, function($excel) use ($data) {
-		    	$excel->sheet('AttandanceReport', function($sheet) use ($data)
-		    	{
-		    		$sheet->fromArray($data);
-		    	});
-            })->download();
-        } else {
-            return redirect()->back()
-            ->with([
-                    'type'   => 'danger',
-                    'title'  => 'Gagal Unduh!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
-            ]);
-        }
-    }
-
-    public function exportSpgAttandance()
-    {
-        $employee = AttendancePasar::whereMonth('checkin', Carbon::now()->month);
-        if ($employee->count() > 0) {
-		    foreach ($employee->get() as $val) {
-                if($val->attendance->employee->position->level == 'spggtc') {
-		    	    $data[] = array(
-                    'area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
-                    'subarea'   => (isset($val->pasar->subarea->name) ?  $val->pasar->subarea->area->name : ""),
-                    'nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
-                    'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
-                    'pasar'     => (isset($val->pasar->name) ? $val->pasar->name : ""),
-                    'tanggal'   => Carbon::parse($val->checkin)->day,
-                    'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
-                    'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
-                    );
-                }
-            }
-        
-		    $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
-		    return Excel::create($filename, function($excel) use ($data) {
-		    	$excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
-		    	{
-		    		$sheet->fromArray($data);
-		    	});
-            })->download();
-        } else {
-            return redirect()->back()
-            ->with([
-                    'type'   => 'danger',
-                    'title'  => 'Gagal Unduh!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
-            ]);
-        }
-    }
-
-    public function exportMdPasar()
-    {
-        $sales = SalesMD::whereMonth('date', Carbon::now()->month);
-        if ($sales->count() > 0) {
-		    foreach ($sales->get() as $key => $val) {
-                if ($val->employee->position->level == 'mdgtc'){
-                    $detail = SalesMdDetail::where('id_sales',$val->id)->get();
-		    	    $data[] = array(
-                        'Employee'  => (isset($val->employee->name) ? $val->employee->name : ""),
-                        'Pasar'     => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
-                        'Tanggal'   => (isset($val->date) ? $val->date : ""),
-                        'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
-                    );
-                    $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
-                    $productList = \App\Product::whereIn('id', $getId)->get();
-                    foreach ($productList as $pro) {
-                        $data[$key][$pro->name] = "-";
-                    }
-                    foreach ($detail as $det) {
-                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
-                    }
-                }
-            }
-        
-		    $filename = "ReportSalesMD".Carbon::now().".xlsx";
-		    return Excel::create($filename, function($excel) use ($data) {
-		    	$excel->sheet('SalesMdPasar', function($sheet) use ($data)
-		    	{
-		    		$sheet->fromArray($data);
-		    	});
-            })->download();
-        } else {
-            return redirect()->back()
-            ->with([
-                    'type'   => 'danger',
-                    'title'  => 'Gagal Unduh!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
-            ]);
-        }
-    }
-
     public function getAchievement($date = '')
     {
         $str = 
@@ -3657,11 +4106,11 @@ class ReportController extends Controller
                     'id_pasar' => $value->id_pasar,
                     'date' => $value->date,
                     'id_employee' => $value->id_employee,
-                    'nama_spg' => $this->isset($value->employee->name),
-                    'pasar' => $this->isset($value->pasar->name),
-                    'tanggal' => $this->isset($value->date),
-                    'nama' => $this->isset($value->name),
-                    'phone' => $this->isset($value->phone)
+                    'nama_spg' => $value->employee->name ?? "-",
+                    'pasar' => $value->pasar->name ?? "-",
+                    'tanggal' => $value->date ?? "-",
+                    'nama' => $value->name ?? "-",
+                    'phone' => $value->phone ?? "-",
                 );
             }
         }
@@ -3691,6 +4140,72 @@ class ReportController extends Controller
         $dt->rawColumns($columns);
         return $dt->make(true);
     }
+
+    // EXPORT SPG
+    public function exportSpgSales(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+
+        $sales = SalesSpgPasar::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($pasar, function($q) use ($pasar)
+        {
+            $q->whereHas('pasar', function($q2) use ($pasar){
+                return $q2->where('id_pasar', $pasar);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+
+        if ($sales->count() > 0) {
+            $product = array();
+            foreach ($sales as $key => $value) {
+                if ($value->employee->position->level == 'spggtc') {
+                    $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
+                    $data[] = array(
+                        'Nama SPG'              => (isset($value->employee->name) ? $value->employee->name : ""),
+                        'Pasar'                 => (isset($value->pasar->name) ? $value->pasar->name : ""),
+                        'Date'                  => (isset($value->date) ? $value->date  : ""),
+                        'Nama Pemilik Pasar'    => (isset($value->name) ? $value->name : ""),
+                        'Phone Pemilik Pasar'   => (isset($value->phone) ? $value->phone : "")
+                    );
+                    $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+                    $productList = \App\Product::whereIn('id', $getId)->get();
+                    foreach ($productList as $pro) {
+                        $data[$key][$pro->name] = "-";
+                    }
+                    foreach ($detail as $det) {
+                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
+                    }
+                }
+            }
+            $filename = "SalesSPGReport".Carbon::now();
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('SalesSPGReport', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
 
     public function SPGrekap(Request $request)
     {
@@ -3733,11 +4248,26 @@ class ReportController extends Controller
         })->make(true);
     }
 
-    public function exportSPGrekap()
+    public function exportSPGrekap(Request $request)
     {
-        $rekap = SalesRecap::whereMonth('date', Carbon::now()->month);
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+
+        $rekap = SalesRecap::orderBy('created_at', 'DESC')
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->get();
+
         if ($rekap->count() > 0) {
-            foreach ($rekap->get() as $val) {
+            foreach ($rekap as $val) {
                 if ($val->employee->position->level == 'spggtc') {
                     $data[] = array(
                         'Name' => (isset($val->employee->name) ? $val->employee->name : "-"),
@@ -3749,9 +4279,10 @@ class ReportController extends Controller
                     );
                 }
             }
+
             $filename = "SPGRekap".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
-                $excel->sheet('SPGReakp', function($sheet) use ($data)
+                $excel->sheet('SPGRekap', function($sheet) use ($data)
                 {
                     $sheet->fromArray($data);
                 });
@@ -3768,10 +4299,15 @@ class ReportController extends Controller
 
     public function SPGattendance(Request $request)
     {
-        $employee = AttendancePasar::whereHas('attendance.employee', function($query) use ($request){
-            return $query->where('id_employee', $request->input('employee'));
+        // return response()->json($request);
+        $employee = AttendancePasar::when($request->has('employee'), function($q) use ($request)
+        {
+            $q->whereHas('attendance.employee', function($query) use ($request){
+                return $query->where('id_employee', $request->input('employee'));
+            });
         })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
         ->whereYear('checkin', substr($request->input('periode'), 3))->get();
+        // return response()->json($employee);
         $data = array();
         $absen = array();
         $id = 1;
@@ -3781,11 +4317,11 @@ class ReportController extends Controller
                 $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
                 $data[] = array(
                     'id' => $id++,
-                    'area' => $this->isset($val->pasar->subarea->area->name),
-                    'subarea' => $this->isset($val->pasar->subarea->name),
-                    'nama' => $this->isset($val->attendance->employee->name),
-                    'jabatan' => $this->isset($val->attendance->employee->position->name),
-                    'pasar' => $this->isset($val->pasar->name),
+                    'area' => $val->pasar->subarea->area->name ?? "-",
+                    'subarea' => $val->pasar->subarea->name ?? "-",
+                    'nama' => $val->attendance->employee->name ?? "-",
+                    'jabatan' => $val->attendance->employee->position->name ?? "-",
+                    'pasar' => $val->pasar->name ?? "-",
                     'tanggal' => Carbon::parse($val->checkin)->day,
                     'checkin' => $checkin." ".$val->attendance->employee->timezone->name,
                     'checkout' => $checkout." ".$val->attendance->employee->timezone->name
@@ -3795,32 +4331,39 @@ class ReportController extends Controller
         return Datatables::of(collect($data))->make(true);
     }
 
-    // EXPORT SPG
-    public function exportSpgSales()
+    public function exportSpgAttandance(Request $request)
     {
-        $sales = SalesSpgPasar::whereMonth('date', Carbon::now()->month);
-        if ($sales->count() > 0) {
-            $product = array();
-            foreach ($sales->get() as $key => $value) {
-                if ($value->employee->position->level == 'spggtc') {
-                    $detail = SalesSpgPasarDetail::where('id_sales',$value->id)->get();
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+
+        $employeeAtt = AttendancePasar::when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('attendance.employee', function($query) use ($employee){
+                return $query->where('id_employee', $employee);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
+            ->whereYear('checkin', substr($request->input('periode'), 3));
+        })
+        ->get();
+
+        if ($employeeAtt->count() > 0) {
+            foreach ($employeeAtt as $val) {
+                if($val->attendance->employee->position->level == 'spggtc') {
                     $data[] = array(
-                        'Nama SPG'              => (isset($value->employee->name) ? $value->employee->name : ""),
-                        'Pasar'                 => (isset($value->pasar->name) ? $value->pasar->name : ""),
-                        'Date'                  => (isset($value->date) ? $value->date  : ""),
-                        'Nama Pemilik Pasar'    => (isset($value->name) ? $value->name : ""),
-                        'Phone Pemilik Pasar'   => (isset($value->phone) ? $value->phone : "")
+                    'area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
+                    'subarea'   => (isset($val->pasar->subarea->name) ?  $val->pasar->subarea->area->name : ""),
+                    'nama'      => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
+                    'jabatan'   => (isset($val->attendance->employee->position->name) ? $val->attendance->employee->position->name : ""),
+                    'pasar'     => (isset($val->pasar->name) ? $val->pasar->name : ""),
+                    'tanggal'   => Carbon::parse($val->checkin)->day,
+                    'checkin'   => Carbon::parse($val->checkin)->format('H:m:s'),
+                    'checkout'  => ($val->checkout ? Carbon::parse($val->checkout)->format('H:m:s') : "Belum Check-out")
                     );
-                    $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
-                    $productList = \App\Product::whereIn('id', $getId)->get();
-                    foreach ($productList as $pro) {
-                        $data[$key][$pro->name] = "-";
-                    }
-                    foreach ($detail as $det) {
-                        $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
-                    }
                 }
             }
+        
             $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
@@ -3831,81 +4374,11 @@ class ReportController extends Controller
         } else {
             return redirect()->back()
             ->with([
-                'type'   => 'danger',
-                'title'  => 'Gagal Unduh!<br/>',
-                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
-            ]);
-        }
-    }
-
-    public function exportSMDstocking()
-    {
-        $stock = StockMD::whereMonth('date', Carbon::now()->month);
-        if ($stock->count() > 0) {
-		    foreach ($stock->get() as $key => $val) {
-                if ($val->employee->position->level == 'mdgtc') {
-                    $detail = StockMdDetail::where('id_stock',$val->id)->get();
-		    	    $data[] = array(
-                        'Name'      => (isset($val->employee->name) ? $val->employee->name : "-"),
-                        'Pasar'     => (isset($val->pasar->name) ? $val->pasar->name : "-"),
-                        'Date'      => (isset($val->date) ? $val->date : ""),
-                        'Week'      => (isset($val->week) ? $val->week : ""),
-                        'Stockist'  => (isset($val->stockist) ? $val->stockist : "-")
-                    );
-                    $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
-                    $productList = \App\Product::whereIn('id', $getId)->get();
-                    foreach ($productList as $pro) {
-                        $data[$key][$pro->name] = "-";
-                    }
-                    foreach ($detail as $det) {
-                        $data[$key][$det->product->name] = $det->oos;
-                    }
-                }
-            }
-		    $filename = "ReportSMDStokist".Carbon::now().".xlsx";
-		    return Excel::create($filename, function($excel) use ($data) {
-		    	$excel->sheet('ReportSMDStokist', function($sheet) use ($data)
-		    	{
-		    		$sheet->fromArray($data);
-		    	});
-            })->download();
-        } else {
-            return redirect()->back()
-            ->with([
                     'type'   => 'danger',
                     'title'  => 'Gagal Unduh!<br/>',
                     'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
             ]);
         }
-    }
-
-    public function isset($val)
-    {
-        return (isset($val) ? $val : "-");
-    }
-
-    public function SPGsalesSummary_exportXLS($id_subcategory, $filterMonth)
-    {
-        $result = DB::transaction(function() use ($id_subcategory, $filterMonth){
-            try
-            {
-                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
-                $JobTrace = JobTrace::create([
-                    'id_user' => Auth::user()->id,
-                    'date' => Carbon::now(),
-                    'title' => "SPG Pasar - Report Sales Summary " . SubCategory::where("id", $id_subcategory)->first()->name . " " . Carbon::parse($filterMonth)->format("M-Y") . " (" .$filecode . ")",
-                    'status' => 'PROCESSING',
-                ]);
-                dispatch(new ExportSPGPasarSalesSummaryJob($JobTrace, [$id_subcategory, $filterMonth, $filecode]));
-                return 'Export succeed, please go to download page';
-            }
-            catch(\Exception $e)
-            {
-                DB::rollback();
-                return 'Export request failed '.$e->getMessage();
-            }
-        });
-        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
     public function SPGsalesSummary(Request $request)

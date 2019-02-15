@@ -41,7 +41,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="tambahModal" tabindex="-1" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
+<div class="modal fade" id="tambahModal" role="dialog" aria-labelledby="tambahModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
@@ -57,34 +57,23 @@
             <form action="{{ route('product-competitor.add') }}" method="post">
                 {!! csrf_field() !!}
                 <div class="block-content">
-                    <div class="form-group">
-                      <label>Brand Product</label>
-                      <select class="js-select2 form-control" style="width: 100%" name="brand">
-                      <option disabled selected>Choose your Brand</option>
-                        @foreach($brand as $data)
-                        @if($data->id != 1)
-                            <option value="{{ $data->id }}">{{ $data->name }}</option>
-                        @endif
-                        @endforeach
-                      </select>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                          <label>Brand Product</label>
+                          <select class="form-control" id="Brand" name="brand"></select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>SASA Product</label>
-                        <select class="js-select2 form-control" style="width: 100%" name="product" >
-                        <option disabled selected>Choose your Sasa Product</option>
-                            @foreach(App\Product::where('id_brand',1)->get() as $data)
-                                <option value="{{ $data->id }}">{{ $data->name}}</option>
-                            @endforeach
-                        </select>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                          <label>Choose your Sasa Product</label>
+                          <select class="form-control" id="Product" name="product"></select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Sub Category Product</label>
-                        <select class="js-select2 form-control" style="width: 100%" name="subcategory">
-                        <option disabled selected>Choose your Sub Category</option>
-                            @foreach($subcategory as $data)
-                                <option value="{{ $data->id }}">{{ $data->name }}</option>
-                            @endforeach
-                        </select>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                          <label>Sub Category Product</label>
+                          <select class="form-control" id="SubCategory" name="subcategory"></select>
+                        </div>
                     </div>
                     <div class="form-group">
                       <label>SKU Product</label>
@@ -114,7 +103,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+<div class="modal fade" id="editModal"  role="dialog" aria-labelledby="editModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
@@ -133,34 +122,20 @@
                 <div class="block-content">
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label>Brand Product</label>
-                            <select class="js-edit form-control" id="brandinput" style="width: 100%" name="brand" >
-                                @foreach($brand as $data)
-                                @if($data->id != 1)
-                                    <option value="{{ $data->id }}">{{ $data->name }}</option>
-                                @endif
-                                @endforeach
-                            </select>
+                          <label>Brand Product</label>
+                          <select class="form-control" id="brandinput" name="brand"></select>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label>Product</label>
-                            <select class="js-edit form-control" id="productinput" style="width: 100%" name="product" >
-                                @foreach(App\Product::where('id_brand',1)->get() as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name}}</option>
-                                @endforeach
-                            </select>
+                          <label>Choose your Sasa Product</label>
+                          <select class="form-control" id="productinput" name="product"></select>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label>Sub Category Product</label>
-                            <select class="js-edit form-control" id="subcategoryinput" style="width: 100%" name="subcategory" >
-                                @foreach($subcategory as $data)
-                                    <option value="{{ $data->id }}">{{ $data->name}}</option>
-                                @endforeach
-                            </select>
+                          <label>Sub Category Product</label>
+                          <select class="form-control" id="subcategoryinput" name="subcategory"></select>
                         </div>
                     </div>
                     <div class="row">
@@ -275,15 +250,89 @@
 @section('script')
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+
+    $('#Brand').select2(setOptions('{{ route("brandXSASA-select2") }}', 'Select Brand', function (params) {
+        return filterData('name', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
+    $('#Product').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
+        return filterData('product', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
+    $('#SubCategory').select2(setOptions('{{ route("sub-category-select2") }}', 'Select Sub Category', function (params) {
+        return filterData('name', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
+    $('#brandinput').select2(setOptions('{{ route("brandXSASA-select2") }}', 'Select Brand', function (params) {
+        return filterData('name', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
+    $('#productinput').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
+        return filterData('product', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
+    $('#subcategoryinput').select2(setOptions('{{ route("sub-category-select2") }}', 'Select Sub Category', function (params) {
+        return filterData('name', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+        }
+    ));
+
     function editModal(json) {
         $('#editModal').modal('show');
         $('#editForm').attr('action', "{{ url('/product/product-competitor/update') }}/"+json.id);
         $('#nameInput').val(json.name);
         $('#deskripsiInput').val(json.deskrispi);
-        $('#brandinput').val(json.brand).trigger('change');
-        $('#subcategoryinput').val(json.subcategory).trigger('change');
-        $('#productinput').val(json.product).trigger('change');
+            setSelect2IfPatchModal($("#brandinput"), json.brand.id, json.brand.name);
+            setSelect2IfPatchModal($("#productinput"), json.product.id, json.product.name);
+            setSelect2IfPatchModal($("#subcategoryinput"), json.subcategory.id, json.subcategory.name);
         // console.log(json);
     }
     @if(session('type'))

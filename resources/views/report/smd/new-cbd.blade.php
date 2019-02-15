@@ -59,12 +59,16 @@
               <th>Employee</th>
               <th>Outlet</th>
               <th>Date</th>
-              <th>Photo</th>
+              <th>Photo Before</th>
+              <th>Photo After</th>
               <th>Total Hanger</th>
               <th>Outlet Type</th>
               <th>CBD Position</th>
               <th>CBD Competitor</th>
-              <th>POSM</th>
+              <th>POSM Shop Sign</th>
+              <th>POSM Hangering Mobile</th>
+              <th>POSM Poster</th>
+              <th>POSM Other</th>
             </tr>
           </thead>
         </table>
@@ -101,6 +105,9 @@ table.table thead tr th {
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     $('#filterEmployee,#filterOutlet').val(null).trigger('change');
+    setTimeout(function() {
+      $('#filterEmployee,#filterOutlet').val(null).trigger('change');
+    }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
     return filterData('name', params.term);
@@ -190,11 +197,15 @@ table.table thead tr th {
       { data: 'outlet' },
       { data: 'date' },
       { data: 'photo' },
+      { data: 'photo2' },
       { data: 'total_hanger' },
       { data: 'outlet_type' },
       { data: 'cbd_position' },
       { data: 'cbd_competitor' },
-      { data: 'posm' },
+      { data: 'posm_shop_sign' },
+      { data: 'posm_hangering_mobile' },
+      { data: 'posm_poster' },
+      { data: 'posm_others' },
       ],
       bDestroy: true
     });

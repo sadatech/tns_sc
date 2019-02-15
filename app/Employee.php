@@ -933,7 +933,7 @@ class Employee extends Model implements AuthenticatableContract, JWTSubject
 
     public function toArray(){
         $array = parent::toArray();
-        $array['foto_profil_url'] = !empty($this->foto_profil) ? asset($this->foto_profil) : '';
+        $array['foto_profil_url'] = !empty($this->foto_profil) ? str_replace('https:', 'http:', asset($this->foto_profil)) : '';
         return $array;
     }
 }

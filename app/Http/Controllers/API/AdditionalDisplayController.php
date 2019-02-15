@@ -82,7 +82,6 @@ class AdditionalDisplayController extends Controller
                                 public_path('images/report/AdditionalDisplay'),
                                 $req['foto_additional'] = $file_name
                             );
-                        }
                         }else{
                             return response()->json(['status' => false, 'msg' => 'Photo Cant be Empyt'], 500);
                         }
