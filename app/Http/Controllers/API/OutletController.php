@@ -36,7 +36,8 @@ class OutletController extends Controller
 				} else {
 					$emp = EmployeePasar::where([
 						'id_pasar' => $data['pasar'],
-						'id_employee' => $user->id
+						'id_employee' => $user->id,
+						'active'	=> '1'
 					])->first();
 					if (!empty($emp)) {
 						// $outlets = array();
@@ -138,7 +139,7 @@ class OutletController extends Controller
 						$activeStatus = "tidak aktif";
 					}
 					$outlet = Outlet::where('active', $active)->whereHas('employeePasar', function($query) use ($user) {
-						return $query->where('id_employee', $user->id);
+						return $query->where('id_employee', $user->id)->whereActive('1');
 					})->get();
 					$code = 200;
 					if ($outlet->count() > 0) {
