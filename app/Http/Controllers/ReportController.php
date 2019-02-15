@@ -3548,7 +3548,13 @@ class ReportController extends Controller
 
     public function SMDdistpf(Request $request)
     {
-        
+
+        if (!empty($request->input('area'))) {
+            $area   = $request->input('area');
+        }else{
+            $area   = Area::first()->id;
+        }
+
         $dist = Distribution::orderBy('created_at', 'DESC');
         if ($request->has('employee')) {
             $dist->whereHas('employee', function($q) use ($request){
@@ -3564,6 +3570,9 @@ class ReportController extends Controller
                 return $q->where('id_pasar', $request->input('pasar'));
             });
         } 
+            $dist->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($area){
+                return $q->where('id_area', $area);
+            });
         $data = array();
         $product = array();
         $id = 1;
@@ -3611,6 +3620,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $dist = Distribution::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -3629,6 +3639,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
