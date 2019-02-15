@@ -999,7 +999,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Price VS Competitor (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Price VS Competitor (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " .
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCPriceCompJob($JobTrace, $req, $filecode));
@@ -1157,7 +1158,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Price ROW (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Price ROW (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCPriceRowJob($JobTrace, $req, $filecode));
@@ -1266,7 +1268,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Price Summary (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Price Summary (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCPriceSummaryJob($JobTrace, $req, $filecode));
@@ -1415,7 +1418,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Oos Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Oos Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCOosRowJob($JobTrace, $req, $filecode));
@@ -1559,7 +1563,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Availability Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Availability Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCAvailabilityRowJob($JobTrace, $req, $filecode));
@@ -2294,7 +2299,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Additional Display - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Additional Display - " . 
+                    Carbon::parse(substr($data['periode'], 3)."-".substr($data['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCAdditionalDisplayJob($JobTrace, $data, $filecode));
@@ -2696,7 +2702,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "SummarySMDReport".Carbon::now().".xlsx";
+            $filename = "SummarySMDReport".Carbon::parse(substr($periode, 3)."-".substr($periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($report) {
                 $excel->sheet('SummarySMDReport', function($sheet) use ($report)
                 {
@@ -2846,7 +2852,7 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "AttandanceReport".Carbon::now().".xlsx";
+            $filename = "AttandanceReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('AttandanceReport', function($sheet) use ($data)
                 {
@@ -2911,7 +2917,7 @@ class ReportController extends Controller
                 }
             }
         
-		    $filename = "AttandanceMotorikReport".Carbon::now().".xlsx";
+		    $filename = "AttandanceMotorikReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
 		    	$excel->sheet('AttandanceMotorikReport', function($sheet) use ($data)
 		    	{
@@ -2986,7 +2992,7 @@ class ReportController extends Controller
                 }
             }
         
-		    $filename = "ReportMotorikDistPF".Carbon::now().".xlsx";
+		    $filename = "ReportMotorikDistPF ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
 		    	$excel->sheet('ReportMotorikDistPF', function($sheet) use ($data)
 		    	{
@@ -3062,7 +3068,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "MotorikSales".Carbon::now().".xlsx";
+            $filename = "MotorikSales ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('MotorikSales', function($sheet) use ($data)
                 {
@@ -3146,7 +3152,7 @@ class ReportController extends Controller
                         'channel'          => (isset($value->channel) ? $value->channel : ""),
                     );
             }
-            $filename = "DemoCookingPlan".Carbon::now().".xlsx";
+            $filename = "DemoCookingPlan ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCooking', function($sheet) use ($data)
                 {
@@ -3252,7 +3258,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "DemoCookingSales".Carbon::now().".xlsx";
+            $filename = "DemoCookingSales ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCooking', function($sheet) use ($data)
                 {
@@ -3355,7 +3361,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "DemoCookingSalesSampling".Carbon::now().".xlsx";
+            $filename = "DemoCookingSalesSampling ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCooking', function($sheet) use ($data)
                 {
@@ -3422,6 +3428,8 @@ class ReportController extends Controller
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $type = ($request->type == "null" || empty($request->type) ? null : $request->type);
 
+        $date = Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
+
         $doc = DocumentationDc::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
         {
@@ -3450,7 +3458,7 @@ class ReportController extends Controller
                     );
                 }
             }
-            $filename = "DemoCookingDocumentation".Carbon::now().".xlsx";
+            $filename = "DemoCookingDocumentation".$date.".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCookingDocumentation', function($sheet) use ($data)
                 {
@@ -3605,23 +3613,23 @@ class ReportController extends Controller
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
 
         $dist = Distribution::orderBy('created_at', 'DESC')
-        // ->when($employee, function($q) use ($employee)
-        // {
-        //     $q->whereHas('employee', function($q2) use ($employee){
-        //         return $q2->where('id_employee', $employee);
-        //     });
-        // })
-        // ->when($pasar, function($q) use ($pasar)
-        // {
-        //     $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
-        //         return $q2->where('id_pasar', $pasar);
-        //     });
-        // })
-        // ->when($request->has('periode'), function($q) use ($request)
-        // {
-        //     return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
-        //     ->whereYear('date', substr($request->input('periode'), 3));
-        // })
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($pasar, function($q) use ($pasar)
+        {
+            $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
+                return $q2->where('id_pasar', $pasar);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
         ->get();
 
         if ($dist->count() > 0) {
@@ -3646,7 +3654,7 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "ReportDistPf".Carbon::now().".xlsx";
+            $filename = "ReportDistPf ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('ReportDistPf', function($sheet) use ($data)
                 {
@@ -3780,7 +3788,7 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "ReportSalesMD".Carbon::now().".xlsx";
+            $filename = "ReportSalesMD ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SalesMdPasar', function($sheet) use ($data)
                 {
@@ -3893,7 +3901,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "ReportSMDStokist".Carbon::now().".xlsx";
+            $filename = "ReportSMDStokist ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('ReportSMDStokist', function($sheet) use ($data)
                 {
@@ -4189,7 +4197,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "SalesSPGReport".Carbon::now();
+            $filename = "SalesSPGReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SalesSPGReport', function($sheet) use ($data)
                 {
@@ -4280,7 +4288,7 @@ class ReportController extends Controller
                 }
             }
 
-            $filename = "SPGRekap".Carbon::now().".xlsx";
+            $filename = "SPGRekap ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SPGRekap', function($sheet) use ($data)
                 {
@@ -4364,7 +4372,7 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            $filename = "AttandanceSPGReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
                 {

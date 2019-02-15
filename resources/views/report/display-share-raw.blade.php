@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Sales Report - Availability")
+@section('title', "Sales Report - Display Share")
 @section('content')
 <div class="content">
   <h2 class="content-heading pt-10"> Display Share <small>Report</small></h2>
