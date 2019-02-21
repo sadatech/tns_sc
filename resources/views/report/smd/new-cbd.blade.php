@@ -28,6 +28,10 @@
               <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
             <div class="col-md-4">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
+            <div class="col-md-4">
               <label>Outlet:</label>
               <select class="form-control" id="filterOutlet" name="outlet"></select>
             </div>
@@ -104,9 +108,9 @@ table.table thead tr th {
 <script type="text/javascript">
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet').val(null).trigger('change');
+    $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee,#filterOutlet').val(null).trigger('change');
+      $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
     }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
@@ -119,6 +123,15 @@ table.table thead tr th {
     }
   }));
   $('#filterOutlet').select2(setOptions('{{ route("outlet-select2") }}', 'Choose your Outlet', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {

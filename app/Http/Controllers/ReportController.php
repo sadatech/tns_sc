@@ -3703,7 +3703,12 @@ class ReportController extends Controller
             $sales->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
                 return $q->where('id_pasar', $request->input('pasar'));
             });
-        } 
+        }
+        if ($request->has('area')) {
+            $sales->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         $data = array();
         $id = 1;
         foreach ($sales->get() as $value) {
@@ -3762,6 +3767,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $sales = SalesMD::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -3780,6 +3786,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -3839,6 +3851,11 @@ class ReportController extends Controller
                 return $q->where('id_pasar', $request->input('pasar'));
             });
         } 
+        if ($request->has('area')) {
+            $stock->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         $data = array();
         $id = 1;
         foreach ($stock->get() as $val) {
@@ -3875,6 +3892,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $stock = StockMD::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -3893,6 +3911,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -3946,7 +3970,11 @@ class ReportController extends Controller
         })
         ->when($request->has('outlet'), function ($q) use ($request){
             return $q->where('id_outlet', $request->input('outlet'));
-        })->get();
+        })
+        ->when($request->has('area'), function ($q) use ($request){
+            return $q->where('id_area', $request->input('area'));
+        })
+        ->get();
 
         $data = array();
         $id = 1;
@@ -3981,7 +4009,13 @@ class ReportController extends Controller
             $q->whereHas('outlet', function($q2) use ($request){
                 return $q2->where('id_outlet', $request->input('outlet'));
             });
-        })->get();
+        })
+        ->when($request->has('area'), function ($q) use ($request){
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($request){
+                return $q2->where('id_area', $request->input('area'));
+            });
+        })
+        ->get();
 
         $data = array();
         $id = 1;
