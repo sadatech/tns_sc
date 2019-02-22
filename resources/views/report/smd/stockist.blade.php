@@ -28,6 +28,10 @@
               <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
             <div class="col-md-4">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
+            <div class="col-md-4">
               <label>Pasar:</label>
               <select class="form-control" id="filterPasar" name="pasar"></select>
             </div>
@@ -119,6 +123,15 @@ table.table thead tr th {
       })
     }
   }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
@@ -132,7 +145,7 @@ table.table thead tr th {
   });
 
   $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('export.smd.stockist') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val()+"&pasar="+$("#filterPasar").val();
+      var url= "{{ route('export.smd.stockist') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val()+"&pasar="+$("#filterPasar").val()+"&area="+$("#filterArea").val();
       window.location.href=url;
   });
 
