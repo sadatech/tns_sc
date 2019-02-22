@@ -35,8 +35,11 @@ use App\NewCbd;
 use App\PlanDc;
 use App\DocumentationDc;
 use App\DisplayShare;
+use App\DetailDisplayShare;
 use App\AdditionalDisplay;
+use App\DetailAdditionalDisplay;
 use App\Availability;
+use App\DetailAvailability;
 use App\Promo;
 use App\PromoDetail;
 use App\Oos;
@@ -611,9 +614,13 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->orderBy('id','desc')->get();
+			})->orderBy('id','desc')->get()->toArray();
 
-			if ($data->count() > 0) {
+			foreach ($data as $key => $value) {
+				$data[$key]['detail'] = DetailDisplayShare::whereIdDisplayShare($value['id'])->get();
+			}
+
+			if (count($data) > 0) {
 				$res['success'] 		= true;
 				$res['data'] 	= $data;
 			} else {
@@ -647,9 +654,13 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->orderBy('id','desc')->get();
+			})->orderBy('id','desc')->get()->toArray();
 
-			if ($data->count() > 0) {
+			foreach ($data as $key => $value) {
+			$data[$key]['detail'] = DetailAdditionalDisplay::whereIdAdditionalDisplay($value['id'])->get();
+			}
+
+			if (count($data) > 0) {
 				$res['success'] 		= true;
 				$res['data'] 	= $data;
 			} else {
@@ -683,10 +694,14 @@ class HistoryController extends Controller
 				$year 	= $now->year;
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
-			})->orderBy('id','desc')->get();
+			})->orderBy('id','desc')->get()->toArray();
 
-			if ($data->count() > 0) {
-				$res['success'] 		= true;
+			foreach ($data as $key => $value) {
+				$data[$key]['detail'] = DetailAvailability::whereIdAvailability($value['id'])->get();
+			}
+
+			if (count($data) > 0) {
+				$res['success'] = true;
 				$res['data'] 	= $data;
 			} else {
 				$res['success'] = false;

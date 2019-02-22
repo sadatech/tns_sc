@@ -21,6 +21,12 @@ class Availability extends Model
     }
 
     public function store(){
-    	return $this->belongsTo(Store::class);
+    	return $this->belongsTo(Store::class, 'id_store');
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['store_name'] = $this->store->name1?? '-';
+        return $array;
     }
 }
