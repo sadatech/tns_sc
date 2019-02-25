@@ -17,10 +17,16 @@ class DisplayShare extends Model
     }
 
     public function employee(){
-    	return $this->belongsTo(Employee::class);
+    	return $this->belongsTo(Employee::class, 'id_employee');
     }
 
     public function store(){
-    	return $this->belongsTo(Store::class);
+    	return $this->belongsTo(Store::class, 'id_store');
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['store_name'] = $this->store->name1??'-';
+        return $array;
     }
 }

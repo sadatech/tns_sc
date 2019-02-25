@@ -13,16 +13,16 @@ class DetailAvailability extends Model
     ];
     
     public function availability(){
-    	return $this->belongsTo(Availability::class);
+    	return $this->belongsTo(Availability::class, 'id_availability');
     }
     
     public function product(){
-    	return $this->belongsTo(Product::class);
+    	return $this->belongsTo(Product::class, 'id_product');
     }
 
     public function toArray(){
         $array = parent::toArray();
-        $array['product_name'] = $this->product->name;
+        $array['product_name'] = $this->product->name ?? '-';
         return $array;
     }
 }
