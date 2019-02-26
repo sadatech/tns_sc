@@ -202,7 +202,7 @@ table.table thead tr th {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/new");
+        $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
       },
       columns: [
       { data: 'id' },
