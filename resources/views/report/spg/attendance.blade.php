@@ -19,13 +19,17 @@
       <div class="block-content block-content-full">
         <form method="post" id="filter">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label>Periode:</label>
               <input class="js-datepicker form-control" value="{{ Carbon\Carbon::now()->format('m/Y') }}" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
             </div>
-            <div class="col-md-6">
-                <div class="font-size-sm font-w600 text-uppercase text-muted">Employee</div>
-                <select id="filterEmployee" class="inputFilter" name="employee"></select>
+            <div class="col-md-4">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
+            <div class="col-md-4">
+              <label>Employee:</label>
+              <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
@@ -106,12 +110,21 @@ $(document).ready(function() {
         })
       }
     }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
   });
  $('#reset').click(function(){
     $('.js-datepicker').val(null);
     $('#filterEmployee').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee').val(null).trigger('change');
+      $('#filterEmployee,#filterArea').val(null).trigger('change');
     }, 10);
   });
   $(".js-datepicker").datepicker( {
@@ -127,7 +140,7 @@ $(document).ready(function() {
   });
 
   $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('export.spg.attendance') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val();
+      var url= "{{ route('export.spg.attendance') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val()+"&area="+$("#filterArea").val();
       window.location.href=url;
   });
 
