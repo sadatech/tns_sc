@@ -2748,7 +2748,7 @@ class ReportController extends Controller
                 return $q->where('id_pasar', $request->input('pasar'));
             });
         } 
-         if ($request->has('area')) {
+        if ($request->has('area')) {
             $employee->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             });
@@ -4167,6 +4167,11 @@ class ReportController extends Controller
             $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
             $sales->whereYear('date', substr($request->input('periode'), 3));
         }
+        if ($request->has('area')) {
+            $sales->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         $data = array();
         $product = array();
         $id = 1;
@@ -4217,6 +4222,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $sales = SalesSpgPasar::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -4235,6 +4241,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -4290,6 +4302,11 @@ class ReportController extends Controller
             $rekap->whereMonth('date', substr($request->input('periode'), 0, 2));
             $rekap->whereYear('date', substr($request->input('periode'), 3));
         }
+        if ($request->has('area')) {
+            $rekap->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            });
+        }
         $id = 1;
         $data = array();
         foreach ($rekap->get() as $val) {
@@ -4322,6 +4339,7 @@ class ReportController extends Controller
     public function exportSPGrekap(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $rekap = SalesRecap::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -4334,6 +4352,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -4377,7 +4401,14 @@ class ReportController extends Controller
                 return $query->where('id_employee', $request->input('employee'));
             });
         })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
+        ->whereYear('checkin', substr($request->input('periode'), 3))
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($request){
+                return $q2->where('id_area', $request->input('area'));
+            });
+        })
+        ->get();
         // return response()->json($employee);
         $data = array();
         $absen = array();
@@ -4405,6 +4436,7 @@ class ReportController extends Controller
     public function exportSpgAttandance(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $employeeAtt = AttendancePasar::when($employee, function($q) use ($employee)
         {
@@ -4416,6 +4448,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
             ->whereYear('checkin', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -4476,6 +4514,12 @@ class ReportController extends Controller
 
         // return $sales->first()->getProductsValue();
         
+        if ($request->has('area')) {
+            $sales->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+
         $dt = Datatables::of($sales);
 
         /* SALES PER PRODUCT(S) */
