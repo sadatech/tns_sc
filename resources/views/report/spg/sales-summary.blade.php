@@ -24,15 +24,21 @@
         <form id="filterForm" method="post" action="#">
           <div class="row items-push">
               <div class="col-4 col-sm-4 text-center text-sm-left">
-                  <div class="font-size-sm font-w600 text-uppercase text-muted">Sub Category</div>
-                  <select id="filterSubCategory" class="inputFilter" name="id_subcategory"></select>
-              </div>
-              <div class="col-4 col-sm-4 text-center text-sm-left">
                   <span>
                     <i class="fa fa-calendar"></i> Periode
                   </span>
                   <input type="text" id="filterMonth" class="form-control" placeholder="Periode" name="periode">
               </div>
+              <div class="col-4 col-sm-4 text-center text-sm-left">
+                  <div class="font-size-sm font-w600 text-uppercase text-muted">Sub Category</div>
+                  <select id="filterSubCategory" class="inputFilter" name="id_subcategory"></select>
+              </div>
+            <div class="col-md-4">
+                <div class="font-size-sm font-w600 text-uppercase text-muted">Area:</div>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
+          </div>
+          <div class="row items-push">
           </div>
           <div class="row col-sm-12 col-md-12">
             <p class="btn btn-sm btn-primary" id="filterSearch"><i class="fa fa-search"></i> Search</p>
@@ -157,7 +163,17 @@ table.table thead tr th {
               autoclose: true,
           });
 
-          $('#filterMonth').val(moment().format("MMMM Y"));  
+          $('#filterMonth').val(moment().format("MMMM Y"));
+            
+          $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
 
           $('#filterSubCategory').select2(setOptions('{{ route("sub-category-select2") }}', 'Select Sub Category', function (params) {
             return filterData('name', params.term);

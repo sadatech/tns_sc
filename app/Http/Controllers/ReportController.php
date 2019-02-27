@@ -696,14 +696,14 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
-    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterEmployee, $filterOutlet, $new = '')
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterEmployee, $filterOutlet, $filterArea, $new = '')
     {
         $filters['month']       = $filterMonth;
         $filters['year']        = $filterYear;
         $filters['employee']    = $filterEmployee;
         $filters['outlet']      = $filterOutlet;
+        $filters['area']        = $filterArea;
         $filters['new']         = $new;
-        
         $result = DB::transaction(function() use ($filters){
             try
             {
@@ -711,7 +711,7 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "GTC - CBD " . Carbon::parse('1/'.$filters['month'].'/'.$filters['year'])->format("F Y") ." (" . $filecode . ")",
+                    'title' => "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-1')->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportGTCCbdJob($JobTrace, $filters, $filecode));
@@ -2500,6 +2500,11 @@ class ReportController extends Controller
             $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
             $day = $date->endOfMonth()->day;
         }
+        if ($request->has('area')) {
+            $employeePasar->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         for ($i=1; $i <= $day; $i++) {
             foreach ($employeePasar->get() as $data) {
                 if ($data->employee->position->level == 'mdgtc') {
@@ -2665,6 +2670,8 @@ class ReportController extends Controller
 
     public function exportSMDsummary(Request $request)
     {
+        $request->area = ($request->area == "null" || empty($request->area) ? null : $request->area);
+
         $employeePasar = EmployeePasar::with([
             'employee','pasar','pasar.subarea.area',
             'employee.position'
@@ -2678,6 +2685,11 @@ class ReportController extends Controller
         } else {
             $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
             $day = $date->endOfMonth()->day;
+        }
+        if ($request->has('area')) {
+            $employeePasar->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
         }
         if ($employeePasar->count() > 0) {
             for ($i=1; $i <= $day; $i++) {
@@ -2736,7 +2748,7 @@ class ReportController extends Controller
                 return $q->where('id_pasar', $request->input('pasar'));
             });
         } 
-         if ($request->has('area')) {
+        if ($request->has('area')) {
             $employee->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             });
@@ -4041,6 +4053,7 @@ class ReportController extends Controller
         }
 
         $dt = Datatables::of(collect($data));
+        // return response()->json($data);
         
         return $dt->rawColumns(['photo','photo2'])->make(true);
     }
@@ -4154,6 +4167,11 @@ class ReportController extends Controller
             $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
             $sales->whereYear('date', substr($request->input('periode'), 3));
         }
+        if ($request->has('area')) {
+            $sales->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         $data = array();
         $product = array();
         $id = 1;
@@ -4204,6 +4222,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $sales = SalesSpgPasar::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -4222,6 +4241,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -4277,6 +4302,11 @@ class ReportController extends Controller
             $rekap->whereMonth('date', substr($request->input('periode'), 0, 2));
             $rekap->whereYear('date', substr($request->input('periode'), 3));
         }
+        if ($request->has('area')) {
+            $rekap->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            });
+        }
         $id = 1;
         $data = array();
         foreach ($rekap->get() as $val) {
@@ -4309,6 +4339,7 @@ class ReportController extends Controller
     public function exportSPGrekap(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $rekap = SalesRecap::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -4321,6 +4352,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -4364,7 +4401,14 @@ class ReportController extends Controller
                 return $query->where('id_employee', $request->input('employee'));
             });
         })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
+        ->whereYear('checkin', substr($request->input('periode'), 3))
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($request){
+                return $q2->where('id_area', $request->input('area'));
+            });
+        })
+        ->get();
         // return response()->json($employee);
         $data = array();
         $absen = array();
@@ -4392,6 +4436,7 @@ class ReportController extends Controller
     public function exportSpgAttandance(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $employeeAtt = AttendancePasar::when($employee, function($q) use ($employee)
         {
@@ -4403,6 +4448,12 @@ class ReportController extends Controller
         {
             return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
             ->whereYear('checkin', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -4463,6 +4514,12 @@ class ReportController extends Controller
 
         // return $sales->first()->getProductsValue();
         
+        if ($request->has('area')) {
+            $sales->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+
         $dt = Datatables::of($sales);
 
         /* SALES PER PRODUCT(S) */
@@ -4728,6 +4785,12 @@ class ReportController extends Controller
                                  // ->orderBy('outlets.id_pasar', 'ASC');
 
         // return $sales->get();
+
+        if ($request->has('area')) {
+            $sales->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         
         $dt = Datatables::of($sales);
 
@@ -4799,6 +4862,13 @@ class ReportController extends Controller
             return $query->where('level', 'mdgtc');
         });
 
+        if($request->area != null && $request->area != 'null'){
+            $target_kpi = $target_kpi->join('employee_pasars','employees.id','employee_pasars.id_employee')
+                                    ->join('pasars','employee_pasars.id_pasar','pasars.id')
+                                    ->join('sub_areas','pasars.id_subarea','sub_areas.id')
+                                    ->where('sub_areas.id_area', $request->area);
+        }
+
         // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
 
         // return array_key_exists('hk', $target_kpi->first()->getTarget($request->periode)) ? $target_kpi->first()->getTarget($request->periode)['hk'] : 0;
@@ -4860,6 +4930,13 @@ class ReportController extends Controller
             return $query->where('level', 'mdgtc');
         });
 
+        if($request->area != null && $request->area != 'null'){
+            $target_kpi = $target_kpi->join('employee_pasars','employees.id','employee_pasars.id_employee')
+                                    ->join('pasars','employee_pasars.id_pasar','pasars.id')
+                                    ->join('sub_areas','pasars.id_subarea','sub_areas.id')
+                                    ->where('sub_areas.id_area', $request->area);
+        }
+        // return response()->json($target_kpi);
         // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
 
         // return array_key_exists('hk', $target_kpi->first()->getTarget($request->periode)) ? $target_kpi->first()->getTarget($request->periode)['hk'] : 0;

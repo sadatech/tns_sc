@@ -671,7 +671,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.new-cbd');
 				})->name('report.new-cbd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
-				Route::post('/export/{month?}/{year?}/{employee?}/{outlet?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
+				Route::post('/export/{month?}/{year?}/{employee?}/{outlet?}/{area?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -732,7 +732,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.kpi');
 				})->name('report.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDKpi')->name('smd.pasar.kpi.data')->middleware('auth');
-				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDKpiExportXLS')->name('smd.pasar.kpi.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDKpiExportXLS')->name('smd.pasar.kpi.exportXLS')->middleware('auth');
 			});
 
 		});

@@ -24,6 +24,10 @@
               <input class="js-datepicker form-control" value="{{ Carbon\Carbon::now()->format('m/Y') }}" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
             </div>
             <div class="col-md-4">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
+            <div class="col-md-4">
               <label>Employee:</label>
               <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
@@ -91,12 +95,21 @@ table.table thead tr th {
 <script type="text/javascript">
  $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#typeFilter').val(null).trigger('change');
+    $('#filterEmployee,#filterArea').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee,#typeFilter').val(null).trigger('change');
+      $('#filterEmployee,#filterArea').val(null).trigger('change');
     }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {
@@ -118,7 +131,7 @@ table.table thead tr th {
   });
 
   $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('spg.pasar.recap.export') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val();
+      var url= "{{ route('spg.pasar.recap.export') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val()+"&area="+$("#filterArea").val();
       window.location.href=url;
   });
 
