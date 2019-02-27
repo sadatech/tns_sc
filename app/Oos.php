@@ -9,7 +9,7 @@ class Oos extends Model
     protected $table = 'oos';
 
     protected $fillable = [
-        'id_store', 'id_employee', 'date', 'week'
+        'id_store', 'id_employee', 'date', 'week',
     ];
     
     public function detail(){
