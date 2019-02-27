@@ -136,22 +136,21 @@ class HistoryController extends Controller
 			
 			$user = $check['user'];
 			$res['code'] = 200;
+			$type = strtoupper($type);
 
-			if (strtoupper($type) == 'MTC') {
+			if ($type == 'MTC') {
 				$header = Sales::query();
-				$header->whereType('Sell In');
-			}else if (strtoupper($type) == 'MTC-O') {
+			}else if ($type == 'MTC-O') {
 				$header = Sales::query();
-				$header->whereType('Sell Out');
-			}else if (strtoupper($type) == 'GTC-MD') {
+			}else if ($type == 'GTC-MD') {
 				$header = SalesMd::query();
-			}else if (strtoupper($type) == 'GTC-SPG') {
+			}else if ($type == 'GTC-SPG') {
 				$header = SalesSpgPasar::query();
-			}else if (strtoupper($type) == 'GTC-DC') {
+			}else if ($type == 'GTC-DC') {
 				$header = SalesDc::query();
-			}else if (strtoupper($type) == 'GTC-SAMPLING') {
+			}else if ($type == 'GTC-SAMPLING') {
 				$header = SamplingDc::query();
-			}else if (strtoupper($type) == 'GTC-MOTORIC') {
+			}else if ($type == 'GTC-MOTORIC') {
 				$header = SalesMotoric::query();
 			}
 
@@ -162,24 +161,37 @@ class HistoryController extends Controller
 				$month 	= $now->month;
 				return $q->whereMonth('date', $month)->whereYear('date', $year);
 			})
-			->when($date != '', function ($q) use ($date){
+			->when($date != '' && ($type == 'MTC-O' || $type == 'MTC'), function ($q) use ($date){
+				$firstDate 	= $date."-1";
+				$lastDate 	= Carbon::parse($firstDate)->endOfMonth()->format('Y-m-d');
+				return $q->whereDate('date', '>=', $firstDate)->whereDate('date', '<=', $lastDate);
+				return $q->whereBetween('date', [$firstDate, $lastDate]);
+			})
+			->when($date != '' && $type != 'MTC-O' && $type != 'MTC', function ($q) use ($date){
 				return $q->whereDate('date', $date);
-			})->orderBy('id','desc');
+			})
+			->when($type == 'MTC', function ($q){
+				return $q->whereType("Sell In");
+			})
+			->when($type == 'MTC-O', function ($q){
+				return $q->whereType("Sell Out");
+			})
+			->orderBy('id','desc');
 
 			if ($header->get()->count() > 0) {
 				$dataArr = array();
 				foreach ($header->get() as $key => $head) {
 					if ($type == 'MTC') {
 						$detail = DetailSales::query();
-					}else if (strtoupper($type) == 'GTC-MD') {
+					}else if ($type == 'GTC-MD') {
 						$detail = SalesMdDetail::query();
-					}else if (strtoupper($type) == 'GTC-SPG') {
+					}else if ($type == 'GTC-SPG') {
 						$detail = SalesSpgPasarDetail::query();
-					}else if (strtoupper($type) == 'GTC-DC') {
+					}else if ($type == 'GTC-DC') {
 						$detail = SalesDcDetail::query();
-					}else if (strtoupper($type) == 'GTC-SAMPLING') {
+					}else if ($type == 'GTC-SAMPLING') {
 						$detail = SamplingDcDetail::query();
-					}else if (strtoupper($type) == 'GTC-MOTORIC') {
+					}else if ($type == 'GTC-MOTORIC') {
 						$detail = SalesMotoricDetail::query();
 					}
 
