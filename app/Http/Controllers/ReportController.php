@@ -3100,7 +3100,7 @@ class ReportController extends Controller
        // ************ DEMO COOKING ************ //
     public function kunjunganDc(Request $request)
     {
-        $plan = PlanDc::with('planEmployee')->orderBy('created_at', 'DESC');
+        $plan = PlanDc::with('planEmployee')->orderBy('plan_dcs.created_at', 'DESC');
         if ($request->has('employee')) {
             $plan->whereHas('planEmployee.employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
@@ -3110,6 +3110,14 @@ class ReportController extends Controller
             $plan->whereMonth('date', substr($request->input('periode'), 0, 2));
             $plan->whereYear('date', substr($request->input('periode'), 3));
         } 
+        if($request->area != null && $request->area != 'null'){
+            $plan = $plan->join('plan_employees','plan_dcs.id','plan_employees.id_plandc')
+                        ->join('employees','plan_employees.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->area)
+                        ->select('plan_dcs.*');
+        }
         return Datatables::of($plan->get())
         ->addColumn('action', function ($plan) {
             if (isset($plan->photo)) {
@@ -3133,8 +3141,9 @@ class ReportController extends Controller
     public function exportKunjunganDc(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
         
-        $plan = PlanDc::with('planEmployee')->orderBy('created_at', 'DESC')
+        $plan = PlanDc::with('planEmployee')->orderBy('plan_dcs.created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
         {
             $q->whereHas('planEmployee.employee', function($q2) use ($employee){
@@ -3145,6 +3154,15 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('plan_employees','plan_dcs.id','plan_employees.id_plandc')
+                        ->join('employees','plan_employees.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'))
+                        ->select('plan_dcs.*');
         })
         ->get();
         // return response()->json($plan);
@@ -3184,7 +3202,8 @@ class ReportController extends Controller
 
     public function DcSales(Request $request)
     {
-        $sales = SalesDc::orderBy('created_at', 'DESC')
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        $sales = SalesDc::orderBy('sales_dcs.created_at', 'DESC')
         ->when($request->has('employee'), function($q) use ($request)
         {
             return $q->whereHas('employee', function($q2) use ($request){
@@ -3195,6 +3214,13 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sales_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'));
         })
         ->get();
          
@@ -3234,9 +3260,10 @@ class ReportController extends Controller
     public function exportDcSales(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         // return response()->json($request);
-        $sales = SalesDc::orderBy('created_at', 'DESC')
+        $sales = SalesDc::orderBy('sales_dcs.created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
         {
             return $q->where('id_employee', $employee);
@@ -3245,6 +3272,13 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sales_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'));
         })
         ->get();
 
@@ -3289,7 +3323,7 @@ class ReportController extends Controller
 
     public function DcSampling(Request $request)
     {
-        $sales = SamplingDc::orderBy('created_at', 'DESC');
+        $sales = SamplingDc::orderBy('sampling_dcs.created_at', 'DESC');
         if ($request->has('employee')) {
             $sales->whereHas('employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
@@ -3298,6 +3332,13 @@ class ReportController extends Controller
          if ($request->has('periode')) {
             $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
             $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if($request->area != null && $request->area != 'null'){
+            $sales = $sales->join('employees','sampling_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->area)
+                        ->select('sampling_dcs.*');
         }
         $data = array();
         $id = 1;
@@ -3341,6 +3382,7 @@ class ReportController extends Controller
     public function exportDcSampling(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $sales = SamplingDc::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -3351,6 +3393,14 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sampling_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'))
+                        ->select('sampling_dcs.*');
         })
         ->get();
         if ($sales->count() > 0) {
@@ -3393,7 +3443,7 @@ class ReportController extends Controller
     public function documentationDC(Request $request)
     {
         $data = array();
-        $employee = DocumentationDc::orderBy('created_at', 'DESC');
+        $employee = DocumentationDc::orderBy('documentation_dcs.created_at', 'DESC');
         if ($request->has('employee')) {
             $employee->whereHas('employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
@@ -3406,6 +3456,13 @@ class ReportController extends Controller
         if ($request->has('type')) {
             $employee->where('type', $request->input('type'));
         } 
+        if($request->area != null && $request->area != 'null'){
+            $employee = $employee->join('employees','documentation_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->area)
+                        ->select('documentation_dcs.*');
+        }
         $id = 1;
         foreach ($employee->get() as $val) {
             if ($val->employee->position->level == 'dc') {
@@ -3439,10 +3496,11 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $type = ($request->type == "null" || empty($request->type) ? null : $request->type);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $date = Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
 
-        $doc = DocumentationDc::orderBy('created_at', 'DESC')
+        $doc = DocumentationDc::orderBy('documentation_dcs.created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
         {
             return $q->where('id_employee', $employee);
@@ -3455,6 +3513,14 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','documentation_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'))
+                        ->select('documentation_dcs.*');
         })
         ->get();
 
