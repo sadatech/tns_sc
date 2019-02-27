@@ -46,7 +46,7 @@ class ExportSMDReportSalesSummaryJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->SMDReportSalesSummaryExportTrait($this->params[0], $this->params[1]), // return excel file location
+            'results' => $this->SMDReportSalesSummaryExportTrait($this->params[0], $this->params[1], $this->params[2]), // return excel file location
         ]);
     }
 
