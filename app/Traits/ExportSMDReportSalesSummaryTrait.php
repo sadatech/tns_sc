@@ -29,7 +29,7 @@ trait ExportSMDReportSalesSummaryTrait
 	private $value_list = [];
 	private $tempData = [];
 
-	public function SMDReportSalesSummaryExportTrait($filterPeriode, $filecode)
+	public function SMDReportSalesSummaryExportTrait($filterPeriode, $filterArea, $filecode)
 	{
 		$periode = Carbon::parse($filterPeriode)->format('Y-m-d');
 
@@ -72,6 +72,12 @@ trait ExportSMDReportSalesSummaryTrait
 		->orderBy('date', 'DESC')
 		->orderBy('id_employee', 'ASC');
 
+        if($filterArea != null && $filterArea != 'null'){
+            $sales->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($filterArea){
+                return $q->where('id_area', $filterArea);
+            }); 
+        }
+        
 		foreach ($sales->get() as $salesData)
 		{
 			$csm = [
@@ -111,11 +117,11 @@ trait ExportSMDReportSalesSummaryTrait
 			$this->value_list[] = $csm;
 		}
 
-		return $this->makeXLSX($filterPeriode, $filecode);
+		return $this->makeXLSX($filterPeriode, $filterArea, $filecode);
 	}
 
 
-	private function makeXLSX($filterPeriode, $filecode)
+	private function makeXLSX($filterPeriode, $filterArea, $filecode)
 	{
 		$data = [];
 

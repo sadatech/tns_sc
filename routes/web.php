@@ -716,7 +716,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.sales-summary');
 				})->name('report.sales.summary.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDsalesSummary')->name('smd.pasar.sales.summary.data')->middleware('auth');
-				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDsalesSummaryExportXLS')->name('smd.pasar.sales.summary.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDsalesSummaryExportXLS')->name('smd.pasar.sales.summary.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('target-kpi')->group(function () {
@@ -724,7 +724,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.target-kpi');
 				})->name('report.target.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDTargetKpi')->name('smd.pasar.target.kpi.data')->middleware('auth');
-				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDTargetKpiExportXLS')->name('smd.pasar.target.kpi.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDTargetKpiExportXLS')->name('smd.pasar.target.kpi.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('kpi')->group(function () {

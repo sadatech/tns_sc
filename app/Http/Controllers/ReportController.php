@@ -64,6 +64,7 @@ use App\Jobs\ExportSPGPasarSalesSummaryJob;
 use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
+use App\Jobs\ExportSMDReportTargetKPIJob;
 use App\Jobs\ExportMTCAchievementJob;
 use App\Jobs\ExportGTCCbdJob;
 use App\Jobs\ExportMTCDisplayShareJob;
@@ -4898,9 +4899,9 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function SMDsalesSummaryExportXLS($filterPeriode)
+    public function SMDsalesSummaryExportXLS($filterPeriode, $filterArea)
     {
-        $result = DB::transaction(function() use ($filterPeriode){
+        $result = DB::transaction(function() use ($filterPeriode, $filterArea){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -4910,7 +4911,7 @@ class ReportController extends Controller
                     'title' => "SMD Pasar - Report Sales Summary " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSMDReportSalesSummaryJob($JobTrace, [$filterPeriode, $filecode]));
+                dispatch(new ExportSMDReportSalesSummaryJob($JobTrace, [$filterPeriode, $filterArea, $filecode]));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
@@ -4966,9 +4967,9 @@ class ReportController extends Controller
 
     }
 
-    public function SMDTargetKpiExportXLS($filterPeriode)
+    public function SMDTargetKpiExportXLS($filterPeriode, $filterArea)
     {
-        $result = DB::transaction(function() use ($filterPeriode){
+        $result = DB::transaction(function() use ($filterPeriode, $filterArea){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -4978,7 +4979,7 @@ class ReportController extends Controller
                     'title' => "SMD Pasar - Report Target KPI " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSMDReportTargetKPIJob($JobTrace, $filterPeriode, $filecode));
+                dispatch(new ExportSMDReportTargetKPIJob($JobTrace, $filterPeriode, $filterArea, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
@@ -5085,9 +5086,10 @@ class ReportController extends Controller
 
     }
 
-    public function SMDKpiExportXLS($filterPeriode)
+    public function SMDKpiExportXLS($filterPeriode, $filterArea)
     {
-        $result = DB::transaction(function() use ($filterPeriode){
+
+        $result = DB::transaction(function() use ($filterPeriode, $filterArea){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -5097,7 +5099,7 @@ class ReportController extends Controller
                     'title' => "SMD Pasar - Report KPI " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSMDReportKPIJob($JobTrace, $filterPeriode, $filecode));
+                dispatch(new ExportSMDReportKPIJob($JobTrace, $filterPeriode, $filterArea, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
