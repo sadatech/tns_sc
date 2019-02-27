@@ -23,8 +23,13 @@
               <label>Periode:</label>
               <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
             </div>
+            <div class="col-md-6">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
+          <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
         </form>
       </div>
     </div>
@@ -92,16 +97,33 @@ table.table thead tr th {
 @endsection
 
 @section('script')
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
-    $(".js-datepicker").datepicker( {
+  $('#reset').click(function(){
+    $('.js-datepicker').val(null);
+    $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
+    setTimeout(function() {
+      $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
+    }, 10);
+  });
+  $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
     autoclose: true,
     minViewMode: "months"
   });
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -109,7 +131,7 @@ table.table thead tr th {
   });
 
   $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('export.summary.smd') }}"+"?periode="+$(".js-datepicker").val();
+      var url= "{{ route('export.summary.smd') }}"+"?periode="+$(".js-datepicker").val()+"&area="+$("#filterArea").val();
       window.location.href=url;
   });
 
