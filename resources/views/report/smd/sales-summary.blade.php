@@ -30,7 +30,9 @@
                 <input type="text" id="filterMonth" class="form-control" placeholder="Periode" name="periode">
             </div>
             <div class="col-md-4">
-              <label>Area:</label>
+                <span>
+                  <i class="fa fa-map"></i> Area:
+                </span>
               <select class="form-control" id="filterArea" name="area"></select>
             </div>
           </div>

@@ -21,7 +21,11 @@
           <div class="row">
             <div class="col-md-4">
               <label>Periode:</label>
-              <input class="js-datepicker form-control" value="{{ Carbon\Carbon::now()->format('m/Y') }}" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" value="{{ Carbon\Carbon::now()->format('m/Y') }}" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true">
+            </div>
+            <div class="col-md-4">
+                <label>Date:</label>
+                <input type="text" id="filterDate" class="form-control" placeholder="Date" name="date" autocomplete="off">
             </div>
             <div class="col-md-4">
               <label>Area:</label>
@@ -96,6 +100,19 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+  $(document).ready(function() {
+
+      $('.js-datepicker').change(function(){
+          console.log(filters);
+          $('#filterDate').val('');
+      });
+
+      $('#filterDate').change(function(){
+          console.log(filters);
+          $('.js-datepicker').val('');
+      });
+
+  });
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -119,12 +136,12 @@ $(document).ready(function() {
       })
     }
   }));
-  });
+});
  $('#reset').click(function(){
     $('.js-datepicker').val(null);
     $('#filterEmployee').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee,#filterArea').val(null).trigger('change');
+      $('#filterEmployee,#filterArea,#filterDate').val(null).trigger('change');
     }, 10);
   });
   $(".js-datepicker").datepicker( {
@@ -133,6 +150,12 @@ $(document).ready(function() {
     autoclose: true,
     minViewMode: "months"
   });
+  $('#filterDate').datepicker({
+      format: "mm/yyyy/dd",
+      startView: "0",
+      minView: "0",
+      autoclose: true,
+  });
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -140,7 +163,7 @@ $(document).ready(function() {
   });
 
   $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('export.spg.attendance') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val()+"&area="+$("#filterArea").val();
+      var url= "{{ route('export.spg.attendance') }}"+"?periode="+$(".js-datepicker").val()+"&date="+$("#filterDate").val()+"&employee="+$("#filterEmployee").val()+"&area="+$("#filterArea").val();
       window.location.href=url;
   });
 

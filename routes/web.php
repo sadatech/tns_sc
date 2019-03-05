@@ -643,7 +643,7 @@ Route::prefix('report')->group(function () {
 				return view('report.attendance-smd');
 			})->name('report.attendance.smd')->middleware('auth');
 			Route::post('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
-			Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+			Route::post('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 			Route::get('/attendance/export', 'ReportController@exportAttandance')->name('export.attendance.smd.pasar')->middleware('auth');
 
 			Route::prefix('stockist')->group(function () {
@@ -671,7 +671,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.new-cbd');
 				})->name('report.new-cbd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
-				Route::post('/export/{month?}/{year?}/{employee?}/{outlet?}/{area?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
+				Route::post('/export/{month?}/{year?}/{date?}/{employee?}/{outlet?}/{area?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {

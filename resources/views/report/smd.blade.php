@@ -21,7 +21,11 @@
           <div class="row">
             <div class="col-md-6">
               <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}">
+            </div>
+            <div class="col-md-6">
+                <label>Date:</label>
+                <input type="text" id="filterDate" class="form-control" placeholder="Date" name="date" autocomplete="off">
             </div>
             <div class="col-md-6">
               <label>Area:</label>
@@ -102,6 +106,19 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+  $(document).ready(function() {
+
+      $('.js-datepicker').change(function(){
+          console.log(filters);
+          $('#filterDate').val('');
+      });
+
+      $('#filterDate').change(function(){
+          console.log(filters);
+          $('.js-datepicker').val('');
+      });
+
+  });
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
@@ -114,6 +131,12 @@ table.table thead tr th {
     viewMode: "months",
     autoclose: true,
     minViewMode: "months"
+  });
+  $('#filterDate').datepicker({
+      format: "mm/yyyy/dd",
+      startView: "0",
+      minView: "0",
+      autoclose: true,
   });
   $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
     return filterData('name', params.term);
@@ -131,7 +154,7 @@ table.table thead tr th {
   });
 
   $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('export.summary.smd') }}"+"?periode="+$(".js-datepicker").val()+"&area="+$("#filterArea").val();
+      var url= "{{ route('export.summary.smd') }}"+"?periode="+$(".js-datepicker").val()+"&date="+$("#filterDate").val()+"&area="+$("#filterArea").val();
       window.location.href=url;
   });
 
