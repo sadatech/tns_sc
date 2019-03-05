@@ -115,7 +115,7 @@ class PasarController extends Controller
             ->withInput();
         } else {
             $data = SubArea::where(['id' => $request->input('subarea')])->first();
-            $check = Pasar::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($request->input('name')))."'")
+            $check = Pasar::where('id','!=',$id)->whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($request->input('name')))."'")
             ->where(['id_subarea' => $data->id])->count();
             if ($check < 1) {
                 $dataPasar = Pasar::find($id);
