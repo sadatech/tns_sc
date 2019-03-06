@@ -99,12 +99,12 @@
     $('#us3Input').locationpicker({
         location: {
             @if ($str->latitude)
-                @if ($str->latitude != '-')
-                latitude: {{ $str->latitude }},
-                longitude: {{ $str->longitude }}
+                @if ($str->latitude == '-' or $str->longitude == '-')
+                    latitude: lat,
+                    longitude: long
                 @else
-                latitude: lat,
-                longitude: long
+                    latitude: {{ $str->latitude }},
+                    longitude: {{ $str->longitude }}
                 @endif
             @else
             latitude: lat,
