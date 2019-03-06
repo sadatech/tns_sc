@@ -204,7 +204,7 @@ th, td {
       scrollY: "300px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         dataSrc: function(res) {
           Codebase.layout('header_loader_off');

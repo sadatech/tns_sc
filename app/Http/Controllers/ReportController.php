@@ -3132,10 +3132,15 @@ class ReportController extends Controller
                 return $q->where('id_employee', $request->input('employee'));
             });
         } 
-         if ($request->has('periode')) {
+        if ($request->has('periode')) {
             $plan->whereMonth('date', substr($request->input('periode'), 0, 2));
             $plan->whereYear('date', substr($request->input('periode'), 3));
-        } 
+        }
+        if ($request->has('date')) {
+            $plan->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
         if($request->area != null && $request->area != 'null'){
             $plan = $plan->join('plan_employees','plan_dcs.id','plan_employees.id_plandc')
                         ->join('employees','plan_employees.id_employee','employees.id')
@@ -3180,6 +3185,11 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         })
         ->when($request->has('area'), function($q) use ($request)
         {
@@ -3241,6 +3251,11 @@ class ReportController extends Controller
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
         })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->when($request->has('area'), function($q) use ($request)
         {
             return $q->join('employees','sales_dcs.id_employee','employees.id')
@@ -3298,6 +3313,11 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         })
         ->when($request->has('area'), function($q) use ($request)
         {
@@ -3358,6 +3378,11 @@ class ReportController extends Controller
          if ($request->has('periode')) {
             $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
             $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if ($request->has('date')) {
+            $sales->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         }
         if($request->area != null && $request->area != 'null'){
             $sales = $sales->join('employees','sampling_dcs.id_employee','employees.id')
@@ -3420,6 +3445,11 @@ class ReportController extends Controller
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
         })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->when($request->has('area'), function($q) use ($request)
         {
             return $q->join('employees','sampling_dcs.id_employee','employees.id')
@@ -3478,6 +3508,11 @@ class ReportController extends Controller
          if ($request->has('periode')) {
             $employee->whereMonth('date', substr($request->input('periode'), 0, 2));
             $employee->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if ($request->has('date')) {
+            $employee->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         }
         if ($request->has('type')) {
             $employee->where('type', $request->input('type'));
@@ -3539,6 +3574,11 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         })
         ->when($request->has('area'), function($q) use ($request)
         {

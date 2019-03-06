@@ -173,7 +173,7 @@
       scrollY: "300px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         dataSrc: function(res) {
           Codebase.layout('header_loader_off');
@@ -230,7 +230,10 @@
           $('#reportTable').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('priceData.dataSummary') !!}',
+              ajax: {
+                url: '{!! route('priceData.dataSummary') !!}',
+                type: 'POST',
+              },
               drawCallback: function(){
         $('.popup-image').magnificPopup({
           type: 'image',
