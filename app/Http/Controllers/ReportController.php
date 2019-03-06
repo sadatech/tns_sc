@@ -697,10 +697,11 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
-    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterEmployee, $filterOutlet, $filterArea, $new = '')
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $new = '')
     {
         $filters['month']       = $filterMonth;
         $filters['year']        = $filterYear;
+        $filters['day']        = $filterDay;
         $filters['employee']    = $filterEmployee;
         $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
@@ -712,7 +713,7 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-1')->format("F Y") ." (" . $filecode . ")",
+                    'title' => "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportGTCCbdJob($JobTrace, $filters, $filecode));
@@ -2493,20 +2494,25 @@ class ReportController extends Controller
         ])->select('employee_pasars.*');
         $report = array();
         $id = 1;
-        $periode = $request->input('periode');
-        if ((Carbon::now()->month == substr($periode, 0, 2))and(Carbon::now()->year == substr($periode, 3))) {
-            $date = Carbon::now();
-            $day = $date->day;
-        } else {
-            $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
+        if ($request->has('periode')) {
+            $periode = $request->input('periode');
+            $date = Carbon::parse(substr($periode, 3)."-".substr($periode, 0, 2)."-01");
+            $i = 1;
             $day = $date->endOfMonth()->day;
+        }
+        if ($request->has('date')) {
+            $periode = $request->input('date');
+            $date = Carbon::parse(substr($periode, 3, 4)."-".substr($periode, 0, 2)."-".substr($periode, 8));
+            $periode = substr($periode, 0, 6);
+            $i = $date->day;
+            $day = $date->day;
         }
         if ($request->has('area')) {
             $employeePasar->whereHas('pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             }); 
         }
-        for ($i=1; $i <= $day; $i++) {
+        for ($i; $i <= $day; $i++) {
             foreach ($employeePasar->get() as $data) {
                 if ($data->employee->position->level == 'mdgtc') {
                     $report[] = array(
@@ -2679,21 +2685,26 @@ class ReportController extends Controller
         ])->select('employee_pasars.*');
         $report = array();
         $id = 1;
-        $periode = $request->input('periode');
-        if ((Carbon::now()->month == substr($periode, 0, 2))and(Carbon::now()->year == substr($periode, 3))) {
-            $date = Carbon::now();
-            $day = $date->day;
-        } else {
-            $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
+        if ($request->has('periode')) {
+            $periode = $request->input('periode');
+            $date = Carbon::parse(substr($periode, 3)."-".substr($periode, 0, 2)."-01");
+            $i = 1;
             $day = $date->endOfMonth()->day;
         }
-        if ($request->has('area')) {
+        if ($request->has('date')) {
+            $periode = $request->input('date');
+            $date = Carbon::parse(substr($periode, 3, 4)."-".substr($periode, 0, 2)."-".substr($periode, 8));
+            $periode = substr($periode, 0, 6);
+            $i = $date->day;
+            $day = $date->day;
+        }
+        if ($request->area) {
             $employeePasar->whereHas('pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             }); 
         }
         if ($employeePasar->count() > 0) {
-            for ($i=1; $i <= $day; $i++) {
+            for ($i; $i <= $day; $i++) {
                 foreach ($employeePasar->get() as $data) {
                     if ($data->employee->position->level == 'mdgtc') {
                         $report[] = array(
@@ -2753,6 +2764,11 @@ class ReportController extends Controller
             $employee->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             });
+        }
+        if($request->has('date')) {
+            $employee->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
         }
         $data = array();
         $absen = array();
@@ -2841,6 +2857,11 @@ class ReportController extends Controller
             return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
             ->whereYear('checkin', substr($request->input('periode'), 3));
         })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
+        })
         ->get();
 
         $id = 1;
@@ -2865,7 +2886,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "AttandanceReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            if ($request->has('periode')) {
+                $filename = "AttandanceReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "AttandanceReport ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('AttandanceReport', function($sheet) use ($data)
                 {
@@ -3648,7 +3673,12 @@ class ReportController extends Controller
             $dist->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
                 return $q->where('id_pasar', $request->input('pasar'));
             });
-        } 
+        }
+        if($request->has('date')) {
+            $dist->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
             $dist->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($area){
                 return $q->where('id_area', $area);
             });
@@ -3719,6 +3749,11 @@ class ReportController extends Controller
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
         })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->when($area, function($q) use ($area)
         {
             $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
@@ -3749,7 +3784,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "ReportDistPf ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            if ($request->has('periode')) {
+                $filename = "ReportDistPf ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "ReportDistPf ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('ReportDistPf', function($sheet) use ($data)
                 {
@@ -3787,6 +3826,11 @@ class ReportController extends Controller
             $sales->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             }); 
+        }
+        if($request->has('date')) {
+            $sales->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         }
         $data = array();
         $id = 1;
@@ -3866,6 +3910,11 @@ class ReportController extends Controller
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
         })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->when($area, function($q) use ($area)
         {
             $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
@@ -3895,7 +3944,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "ReportSalesMD ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            if ($request->has('periode')) {
+                $filename = "ReportSalesMD ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "ReportSalesMD ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SalesMdPasar', function($sheet) use ($data)
                 {
@@ -3934,6 +3987,11 @@ class ReportController extends Controller
             $stock->whereHas('pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             }); 
+        }
+        if($request->has('date')) {
+            $stock->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         }
         $data = array();
         $id = 1;
@@ -3997,6 +4055,11 @@ class ReportController extends Controller
                 return $q2->where('id_area', $area);
             });
         })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->get();
 
         if ($stock->count() > 0) {
@@ -4020,7 +4083,12 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "ReportSMDStokist ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+        
+            if ($request->has('periode')) {
+                $filename = "ReportSMDStokist ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "ReportSMDStokist ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('ReportSMDStokist', function($sheet) use ($data)
                 {
@@ -4083,6 +4151,11 @@ class ReportController extends Controller
         ->when($request->has('periode'), function ($q) use ($request){
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         })
         ->when($request->has('outlet'), function ($q) use ($request){
             $q->whereHas('outlet', function($q2) use ($request){
@@ -4239,6 +4312,11 @@ class ReportController extends Controller
                 return $q->where('id_area', $request->input('area'));
             }); 
         }
+        if($request->has('date')) {
+            $sales->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
         $data = array();
         $product = array();
         $id = 1;
@@ -4315,6 +4393,11 @@ class ReportController extends Controller
                 return $q2->where('id_area', $area);
             });
         })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->get();
 
         if ($sales->count() > 0) {
@@ -4374,6 +4457,11 @@ class ReportController extends Controller
                 return $q->where('id_area', $request->input('area'));
             });
         }
+        if($request->has('date')) {
+            $rekap->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
         $id = 1;
         $data = array();
         foreach ($rekap->get() as $val) {
@@ -4426,6 +4514,11 @@ class ReportController extends Controller
                 return $q2->where('id_area', $area);
             });
         })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->get();
 
         if ($rekap->count() > 0) {
@@ -4442,7 +4535,12 @@ class ReportController extends Controller
                 }
             }
 
-            $filename = "SPGRekap ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
+        
+            if ($request->has('periode')) {
+                $filename = "SPGRekap ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "SPGRekap ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SPGRekap', function($sheet) use ($data)
                 {
@@ -4467,13 +4565,21 @@ class ReportController extends Controller
             $q->whereHas('attendance.employee', function($query) use ($request){
                 return $query->where('id_employee', $request->input('employee'));
             });
-        })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))
+        })
+        ->when($request->has('periode'), function($q) use ($request) {
+            return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
+            ->whereYear('checkin', substr($request->input('periode'), 3));
+        })
         ->when($request->has('area'), function($q) use ($request)
         {
             $q->whereHas('pasar.subarea.area', function($q2) use ($request){
                 return $q2->where('id_area', $request->input('area'));
             });
+        })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
         })
         ->get();
         // return response()->json($employee);
@@ -4522,6 +4628,11 @@ class ReportController extends Controller
                 return $q2->where('id_area', $area);
             });
         })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
+        })
         ->get();
 
         if ($employeeAtt->count() > 0) {
@@ -4540,7 +4651,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "AttandanceSPGReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
+            if ($request->has('periode')) {
+                $filename = "AttandanceSPGReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "AttandanceSPGReport ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
                 {

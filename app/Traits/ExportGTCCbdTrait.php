@@ -41,6 +41,10 @@ trait ExportGTCCbdTrait
 		
 		$data->whereMonth('date',$this->tempVar['filters']['month'])
 		->whereYear('date',$this->tempVar['filters']['year'])
+		->when($this->tempVar['filters']['day'] != 'null', function($q)
+		{
+			return $q->whereDay('date',$this->tempVar['filters']['day']);
+		})
 		->when($this->tempVar['filters']['employee'] != 'null', function($q)
 		{
 			return $q->whereIdEmployee($this->tempVar['filters']['employee']);
