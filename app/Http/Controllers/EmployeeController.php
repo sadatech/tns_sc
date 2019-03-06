@@ -463,6 +463,9 @@ class EmployeeController extends Controller
 			} else if (!empty($request->input('subarea'))) {
 				EmployeeSubArea::where('id_employee', $id)->delete();
 				$dataSubArea = array();
+				if ($request->input('tl') == null) {
+					$request['tl'] = '0';
+				}
 				foreach ($request->input('subarea') as $subarea) {
 					$dataSubArea[] = array(
 						'id_employee' 	=> $id,
