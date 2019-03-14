@@ -66,6 +66,7 @@
               <th class="text-center" style="width: 70px;"></th>
               <th>Employee</th>
               <th>Outlet</th>
+              <th>Area</th>
               <th>Date</th>
               <th>Photo Before</th>
               <th>Photo After</th>
@@ -235,6 +236,7 @@ table.table thead tr th {
       { data: 'id' },
       { data: 'employee' },
       { data: 'outlet' },
+      { data: 'area' },
       { data: 'date' },
       { data: 'photo' },
       { data: 'photo2' },
