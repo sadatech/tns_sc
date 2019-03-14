@@ -28,9 +28,10 @@ trait ExportSMDReportKPITrait
 	private $valueList = [];
 	private $tempVar = [];
 
-	public function SMDReportKPIExportTrait($filterPeriode, $filecode)
+	public function SMDReportKPIExportTrait($filterPeriode, $filterArea, $filecode)
 	{
 		$this->tempVar['periode'] = $filterPeriode;
+		$this->tempVar['area'] = $filterArea;
 		$this->tempVar['filecode'] = $filecode;
 
 		$this->createHeader();
@@ -69,6 +70,13 @@ trait ExportSMDReportKPITrait
 		$TargetKPI = TargetKpiMd::whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
+
+        if($this->tempVar['area'] != null && $this->tempVar['area'] != 'null'){
+            $TargetKPI = $TargetKPI->join('employee_pasars','employees.id','employee_pasars.id_employee')
+                                    ->join('pasars','employee_pasars.id_pasar','pasars.id')
+                                    ->join('sub_areas','pasars.id_subarea','sub_areas.id')
+                                    ->where('sub_areas.id_area', $this->tempVar['area']);
+        }
 
         foreach ($TargetKPI->get() as $KPIData)
         {

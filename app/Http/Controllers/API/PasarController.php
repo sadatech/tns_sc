@@ -29,7 +29,8 @@ class PasarController extends Controller
 					$res['msg'] = "User not found.";
 				} else {
 					$store = EmployeePasar::where([
-						'id_employee' => $user->id
+						'id_employee' => $user->id,
+						'active' => '1',
 					])->with('pasar.subarea')->get(['id_pasar']);
 					if (!$store->isEmpty()) {
 						$storeArr = array();

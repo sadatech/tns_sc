@@ -41,6 +41,10 @@ trait ExportGTCCbdTrait
 		
 		$data->whereMonth('date',$this->tempVar['filters']['month'])
 		->whereYear('date',$this->tempVar['filters']['year'])
+		->when($this->tempVar['filters']['day'] != 'null', function($q)
+		{
+			return $q->whereDay('date',$this->tempVar['filters']['day']);
+		})
 		->when($this->tempVar['filters']['employee'] != 'null', function($q)
 		{
 			return $q->whereIdEmployee($this->tempVar['filters']['employee']);
@@ -48,7 +52,13 @@ trait ExportGTCCbdTrait
 		->when($this->tempVar['filters']['outlet'] != 'null', function($q)
 		{
 			return $q->whereIdOutlet($this->tempVar['filters']['outlet']);
-		});
+		})
+        ->when($this->tempVar['filters']['area'] != 'null', function($q){
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2){
+                return $q2->where('id_area', $this->tempVar['filters']['area']);
+            });
+        })
+        ;
 
 		foreach ($data->get() as $a => $d)
 		{
@@ -140,10 +150,15 @@ trait ExportGTCCbdTrait
 	            	$imgDrawing = new PHPExcel_Worksheet_Drawing;
 	            	if (isset($this->photoList[$valueTLKey]))
 	            	{
-	            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
-	            		$imgDrawing->setCoordinates("D".($startTLRow));
-	            		$imgDrawing->setWorksheet($sheet);
-	            		$imgDrawing->setWidth(40);
+	            		if (file_exists(public_path("/uploads/cbd/".($this->photoList[$valueTLKey]))))
+	            		{
+		            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
+		            		$imgDrawing->setCoordinates("D".($startTLRow));
+		            		$imgDrawing->setWorksheet($sheet);
+		            		$imgDrawing->setWidth(40);
+	            		}else{
+		            		$sheet->setCellValue('D'.$startTLRow, "not found")->setAutoSize(true);
+	            		}
 	            	}
 
 					$startTLRow++;

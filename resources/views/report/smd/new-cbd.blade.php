@@ -21,11 +21,19 @@
           <div class="row">
             <div class="col-md-4">
               <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}">
+            </div>
+            <div class="col-md-4">
+                <label>Date:</label>
+                <input type="text" id="filterDate" class="form-control" placeholder="Date" name="date" autocomplete="off">
             </div>
             <div class="col-md-4">
               <label>Employee:</label>
               <select class="form-control" id="filterEmployee" name="employee"></select>
+            </div>
+            <div class="col-md-4">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
             </div>
             <div class="col-md-4">
               <label>Outlet:</label>
@@ -102,11 +110,24 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+  $(document).ready(function() {
+
+      $('.js-datepicker').change(function(){
+          console.log(filters);
+          $('#filterDate').val('');
+      });
+
+      $('#filterDate').change(function(){
+          console.log(filters);
+          $('.js-datepicker').val('');
+      });
+
+  });
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet').val(null).trigger('change');
+    $('#filterEmployee,#filterOutlet,#filterArea,#filterDate').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee,#filterOutlet').val(null).trigger('change');
+      $('#filterEmployee,#filterOutlet,#filterArea,#filterDate').val(null).trigger('change');
     }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
@@ -127,6 +148,21 @@ table.table thead tr th {
       })
     }
   }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterDate').datepicker({
+      format: "mm/yyyy/dd",
+      startView: "0",
+      minView: "0",
+      autoclose: true,
+  });
   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
@@ -189,7 +225,11 @@ table.table thead tr th {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/new");
+        if ($("#filterDate").val()=='') {
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
+        }else{
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
+        };
       },
       columns: [
       { data: 'id' },

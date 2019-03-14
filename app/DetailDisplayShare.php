@@ -16,9 +16,16 @@ class DetailDisplayShare extends Model
     	return $this->belongsTo(DisplayShare::class);
     }
     public function category(){
-    	return $this->belongsTo(Category::class);
+    	return $this->belongsTo(Category::class, 'id_category');
     }
     public function brand(){
-    	return $this->belongsTo(Brand::class);
+    	return $this->belongsTo(Brand::class, 'id_brand');
+    }
+
+    public function toArray(){
+        $array = parent::toArray();
+        $array['category_name'] = $this->category->name??'-';
+        $array['brand_name']    = $this->brand->name??'-';
+        return $array;
     }
 }

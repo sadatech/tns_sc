@@ -643,7 +643,7 @@ Route::prefix('report')->group(function () {
 				return view('report.attendance-smd');
 			})->name('report.attendance.smd')->middleware('auth');
 			Route::post('/data/attendance', 'ReportController@SMDattendance')->name('data.attendance.smd.pasar')->middleware('auth');
-			Route::get('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
+			Route::post('/data', 'ReportController@SMDpasar')->name('data.smd.pasar')->middleware('auth');
 			Route::get('/attendance/export', 'ReportController@exportAttandance')->name('export.attendance.smd.pasar')->middleware('auth');
 
 			Route::prefix('stockist')->group(function () {
@@ -671,7 +671,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.new-cbd');
 				})->name('report.new-cbd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
-				Route::post('/export/{month?}/{year?}/{employee?}/{outlet?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
+				Route::post('/export/{month?}/{year?}/{date?}/{employee?}/{outlet?}/{area?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -716,7 +716,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.sales-summary');
 				})->name('report.sales.summary.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDsalesSummary')->name('smd.pasar.sales.summary.data')->middleware('auth');
-				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDsalesSummaryExportXLS')->name('smd.pasar.sales.summary.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDsalesSummaryExportXLS')->name('smd.pasar.sales.summary.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('target-kpi')->group(function () {
@@ -724,7 +724,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.target-kpi');
 				})->name('report.target.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDTargetKpi')->name('smd.pasar.target.kpi.data')->middleware('auth');
-				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDTargetKpiExportXLS')->name('smd.pasar.target.kpi.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDTargetKpiExportXLS')->name('smd.pasar.target.kpi.exportXLS')->middleware('auth');
 			});
 
 			Route::prefix('kpi')->group(function () {
@@ -732,7 +732,7 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.kpi');
 				})->name('report.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDKpi')->name('smd.pasar.kpi.data')->middleware('auth');
-				Route::any('/exportXLS/{filterdate?}', 'ReportController@SMDKpiExportXLS')->name('smd.pasar.kpi.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDKpiExportXLS')->name('smd.pasar.kpi.exportXLS')->middleware('auth');
 			});
 
 		});
@@ -900,13 +900,13 @@ Route::prefix('mtc')->group(function () {
 	Route::prefix('priceData')->group(function () {
 		Route::get('/', 'ReportController@priceDataIndex')->name('priceData')->middleware('auth');
 		Route::get('/summary', 'ReportController@priceSummary')->name('priceData.summary')->middleware('auth');
-		Route::get('/dataSummary', 'ReportController@priceDataSummary')->name('priceData.dataSummary')->middleware('auth');
+		Route::any('/dataSummary', 'ReportController@priceDataSummary')->name('priceData.dataSummary')->middleware('auth');
 		Route::any('/summary/exportXLS', 'ReportController@priceSummaryExportXLS')->name('priceData.summary.exportXLS')->middleware('auth');
-		Route::get('/row', 'ReportController@priceRow')->name('priceData.row')->middleware('auth');
-		Route::get('/dataRow', 'ReportController@priceDataRow')->name('priceData.dataRow')->middleware('auth');
+		Route::any('/row', 'ReportController@priceRow')->name('priceData.row')->middleware('auth');
+		Route::any('/dataRow', 'ReportController@priceDataRow')->name('priceData.dataRow')->middleware('auth');
 		Route::post('/row/exportXLS', 'ReportController@priceRowExportXLS')->name('priceData.row.exportXLS')->middleware('auth');
-		Route::get('/vs', 'ReportController@PriceVsIndex')->name('priceData.vs')->middleware('auth');
-		Route::get('/dataVs', 'ReportController@priceDataVs')->name('priceData.dataVs')->middleware('auth');
+		Route::any('/vs', 'ReportController@PriceVsIndex')->name('priceData.vs')->middleware('auth');
+		Route::any('/dataVs', 'ReportController@priceDataVs')->name('priceData.dataVs')->middleware('auth');
 		Route::any('/vs/exportXLS', 'ReportController@priceDataVsExportXLS')->name('priceData.dataVs.exportXLS')->middleware('auth');
 		Route::post('/store', 'ReportController@store')->name('priceData.store')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@priceDataUpdate')->name('priceData.edit')->middleware('auth');
@@ -916,8 +916,8 @@ Route::prefix('mtc')->group(function () {
 
 	Route::prefix('oos')->group(function () {
 		Route::get('/', 'ReportController@oosIndex')->name('oos')->middleware('auth');
-		Route::get('/row', 'ReportController@oosRow')->name('oos.row')->middleware('auth');
-		Route::get('/dataAccountRow', 'ReportController@oosAccountRowData')->name('oos.dataAccountRow')->middleware('auth');
+		Route::any('/row', 'ReportController@oosRow')->name('oos.row')->middleware('auth');
+		Route::any('/dataAccountRow', 'ReportController@oosAccountRowData')->name('oos.dataAccountRow')->middleware('auth');
 		Route::any('/exportXLS', 'ReportController@oosExportXLS')->name('oos.exportXLS')->middleware('auth');
 		Route::post('/row/exportXLS', 'ReportController@OosRowExportXLS')->name('oos.row.exportXLS')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@oosUpdate')->name('oos.edit')->middleware('auth');
@@ -926,10 +926,10 @@ Route::prefix('mtc')->group(function () {
 
 	Route::prefix('availability')->group(function () {
 		Route::get('/', 'ReportController@availabilityIndex')->name('availability')->middleware('auth');
-		Route::get('/row', 'ReportController@availabilityRow')->name('availability.row')->middleware('auth');
-		Route::get('/dataAccountRow', 'ReportController@availabilityAccountRowData')->name('availability.dataAccountRow')->middleware('auth');
-		Route::get('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
-		Route::get('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
+		Route::any('/row', 'ReportController@availabilityRow')->name('availability.row')->middleware('auth');
+		Route::any('/dataAccountRow', 'ReportController@availabilityAccountRowData')->name('availability.dataAccountRow')->middleware('auth');
+		Route::any('/dataArea', 'ReportController@availabilityAreaData')->name('availability.dataArea')->middleware('auth');
+		Route::any('/dataAccount', 'ReportController@availabilityAccountData')->name('availability.dataAccount')->middleware('auth');
 		Route::post('/row/exportXLS', 'ReportController@AvailabilityRowExportXLS')->name('availability.row.exportXLS')->middleware('auth');
 		Route::any('/exportXLS', 'ReportController@availabilityExportXLS')->name('availability.exportXLS')->middleware('auth');
 		Route::post('/edit/{id}', 'ReportController@availabilityUpdate')->name('availability.edit')->middleware('auth');
@@ -956,8 +956,8 @@ Route::prefix('mtc')->group(function () {
 	Route::prefix('additional_display')->group(function () {
 		Route::get('/', 'ReportController@additionalDisplayIndex')->name('additional_display')->middleware('auth');
 		Route::any('/exportXLS', 'ReportController@additionalDisplayIndexExportXLS')->name('additional_display.exportXLS.index')->middleware('auth');
-		Route::get('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
-		Route::get('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
+		Route::any('/dataArea', 'ReportController@additionalDisplayAreaData')->name('additional_display.dataArea')->middleware('auth');
+		Route::any('/dataSpg', 'ReportController@additionalDisplaySpgData')->name('additional_display.dataSpg')->middleware('auth');
 		Route::get('/ach', 'ReportController@additionalDisplayAch')->name('additional_display.ach')->middleware('auth');
 		Route::any('/ach/exportXLS', 'ReportController@additionalDisplayExportXLS')->name('additional_display.exportXLS')->middleware('auth');
 		Route::get('/reportDataArea', 'ReportController@additionalDisplayReportAreaData')->name('additional_display.reportDataArea')->middleware('auth');

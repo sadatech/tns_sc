@@ -93,10 +93,23 @@
         $('#subbarea option[value="{{ $str->subarea->id }}"]').attr('selected','selected').trigger('change');
 
     });
+    var lat     = -6.21;
+    var long    = 106.85;
+    console.log(long);
     $('#us3Input').locationpicker({
         location: {
-            latitude: {{ $str->latitude }},
-            longitude: {{ $str->longitude }}
+            @if ($str->latitude)
+                @if ($str->latitude == '-' or $str->longitude == '-')
+                    latitude: lat,
+                    longitude: long
+                @else
+                    latitude: {{ $str->latitude }},
+                    longitude: {{ $str->longitude }}
+                @endif
+            @else
+            latitude: lat,
+            longitude: long
+            @endif
         },
         radius: 5,
         inputBinding: {

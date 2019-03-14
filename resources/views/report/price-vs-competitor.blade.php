@@ -234,7 +234,7 @@
       scrollY: "300px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         dataSrc: function(res) {
           Codebase.layout('header_loader_off');
@@ -294,7 +294,10 @@
           $('#reportTable').DataTable({
               processing: true,
               serverSide: true,
-              ajax: '{!! route('priceData.dataVs') !!}',
+              ajax: {
+                url: '{!! route('priceData.dataVs') !!}',
+                type: 'POST',
+              },
               drawCallback: function(){
                 $("#btnDownloadXLS").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val() + "&limit=" + $("#reportTable_length select").val());
                 $("#btnDownloadXLSAll").attr("target-url","{{ route('priceData.dataVs.exportXLS') }}"+"?periode=" + $(".form-control[name=periode]").val());

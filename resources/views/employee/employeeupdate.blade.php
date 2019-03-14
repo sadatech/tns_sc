@@ -310,14 +310,12 @@
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>
 <script type="text/javascript">
 
-    $("#example-inline-checkbox2").change(function() {
-        if ($(this).Attr("checked")) {
-            $('#example-inline-checkbox2').val(1);
-        } else {
-            $('#example-inline-checkbox2').val(0);
-        }
-    });
-
+    $(function() {
+      $('#example-inline-checkbox2').on('change', function(e) {
+        e.stopPropagation();
+        this.value = this.checked ? '1' : '0';
+      });
+    })
     var url = document.referrer;
     var positions = url.split("/");
     var pos = positions[positions.length -1];

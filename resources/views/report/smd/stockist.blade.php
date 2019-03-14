@@ -21,11 +21,19 @@
           <div class="row">
             <div class="col-md-4">
               <label>Periode:</label>
-              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}" required>
+              <input class="js-datepicker form-control" type="text" placeholder="Select Periode" name="periode" data-month-highlight="true" value="{{ Carbon\Carbon::now()->format('m/Y') }}">
+            </div>
+            <div class="col-md-4">
+              <label>Date:</label>
+              <input type="text" id="filterDate" class="form-control" placeholder="Date" name="date" autocomplete="off">
             </div>
             <div class="col-md-4">
               <label>Employee:</label>
               <select class="form-control" id="filterEmployee" name="employee"></select>
+            </div>
+            <div class="col-md-4">
+              <label>Area:</label>
+              <select class="form-control" id="filterArea" name="area"></select>
             </div>
             <div class="col-md-4">
               <label>Pasar:</label>
@@ -94,6 +102,19 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+  $(document).ready(function() {
+
+      $('.js-datepicker').change(function(){
+          console.log(filters);
+          $('#filterDate').val('');
+      });
+
+      $('#filterDate').change(function(){
+          console.log(filters);
+          $('.js-datepicker').val('');
+      });
+
+  });
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
     $('#filterEmployee,#filterPasar,#filterArea').val(null).trigger('change');
@@ -119,11 +140,26 @@ table.table thead tr th {
       })
     }
   }));
+  $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
     autoclose: true,
     minViewMode: "months"
+  });
+  $('#filterDate').datepicker({
+      format: "mm/yyyy/dd",
+      startView: "0",
+      minView: "0",
+      autoclose: true,
   });
   $.ajaxSetup({
     headers: {
@@ -132,7 +168,7 @@ table.table thead tr th {
   });
 
   $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('export.smd.stockist') }}"+"?periode="+$(".js-datepicker").val()+"&employee="+$("#filterEmployee").val()+"&pasar="+$("#filterPasar").val();
+      var url= "{{ route('export.smd.stockist') }}"+"?periode="+$(".js-datepicker").val()+"&date="+$("#filterDate").val()+"&employee="+$("#filterEmployee").val()+"&pasar="+$("#filterPasar").val()+"&area="+$("#filterArea").val();
       window.location.href=url;
   });
 

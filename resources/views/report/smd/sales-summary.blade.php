@@ -23,12 +23,18 @@
       <div class="block-content bg-white">
         <form id="filterForm" method="post" action="#">
           <div class="row items-push">
-              <div class="col-4 col-sm-4 text-center text-sm-left">
-                  <span>
-                    <i class="fa fa-calendar"></i> Periode
-                  </span>
-                  <input type="text" id="filterMonth" class="form-control" placeholder="Periode" name="periode">
-              </div>
+            <div class="col-4 col-sm-4 text-center text-sm-left">
+                <span>
+                  <i class="fa fa-calendar"></i> Periode
+                </span>
+                <input type="text" id="filterMonth" class="form-control" placeholder="Periode" name="periode">
+            </div>
+            <div class="col-md-4">
+                <span>
+                  <i class="fa fa-map"></i> Area:
+                </span>
+              <select class="form-control" id="filterArea" name="area"></select>
+            </div>
           </div>
           <div class="row col-sm-12 col-md-12">
             <p class="btn btn-sm btn-primary" id="filterSearch"><i class="fa fa-search"></i> Search</p>
@@ -168,6 +174,15 @@ table.table thead tr th {
           });
         });
 
+        $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+          return filterData('name', params.term);
+        }, function (data, params) {
+          return {
+            results: $.map(data, function (obj) {                                
+              return {id: obj.id, text: obj.name}
+            })
+          }
+        }));
 
           $('#filterMonth').datetimepicker({
               format: "MM yyyy",
@@ -215,6 +230,10 @@ table.table thead tr th {
       $('#filterMonth').val(moment().format("MMMM Y"));
 
       $('#panelData').attr("style", "display:none;");
+      
+      setTimeout(function() {
+        $('#filterEmployee,#filterOutlet,#filterArea').val(null).trigger('change');
+      }, 10);
     })
 
     $("#filterSearch").click(function() {
@@ -254,7 +273,7 @@ table.table thead tr th {
           console.log(tableColumns);
           // return
 
-          $("#btnDownloadXLS").attr("target-url", "{{ route('smd.pasar.sales.summary.exportXLS') }}" + "/" + $('#filterMonth').val());
+          $("#btnDownloadXLS").attr("target-url", "{{ route('smd.pasar.sales.summary.exportXLS') }}" + "/" + $('#filterMonth').val()+"/"+$("#filterArea").val());
 
           $('#summaryTable').dataTable({
             "fnCreatedRow": function (nRow, data) {

@@ -64,6 +64,7 @@ use App\Jobs\ExportSPGPasarSalesSummaryJob;
 use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
+use App\Jobs\ExportSMDReportTargetKPIJob;
 use App\Jobs\ExportMTCAchievementJob;
 use App\Jobs\ExportGTCCbdJob;
 use App\Jobs\ExportMTCDisplayShareJob;
@@ -696,14 +697,15 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
-    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterEmployee, $filterOutlet, $new = '')
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $new = '')
     {
         $filters['month']       = $filterMonth;
         $filters['year']        = $filterYear;
+        $filters['day']        = $filterDay;
         $filters['employee']    = $filterEmployee;
         $filters['outlet']      = $filterOutlet;
+        $filters['area']        = $filterArea;
         $filters['new']         = $new;
-        
         $result = DB::transaction(function() use ($filters){
             try
             {
@@ -711,7 +713,7 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "GTC - CBD " . Carbon::parse('1/'.$filters['month'].'/'.$filters['year'])->format("F Y") ." (" . $filecode . ")",
+                    'title' => "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportGTCCbdJob($JobTrace, $filters, $filecode));
@@ -999,7 +1001,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Price VS Competitor (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Price VS Competitor (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " .
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCPriceCompJob($JobTrace, $req, $filecode));
@@ -1157,7 +1160,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Price ROW (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Price ROW (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCPriceRowJob($JobTrace, $req, $filecode));
@@ -1266,7 +1270,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Price Summary (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Price Summary (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCPriceSummaryJob($JobTrace, $req, $filecode));
@@ -1415,7 +1420,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Oos Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Oos Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCOosRowJob($JobTrace, $req, $filecode));
@@ -1559,7 +1565,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Availability Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Availability Row (" . ($req['limitLs'] == null ? "All Data" : $req['limitLs'] . " Data") . ") - " . 
+                    Carbon::parse(substr($req['periode'], 3)."-".substr($req['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCAvailabilityRowJob($JobTrace, $req, $filecode));
@@ -2294,7 +2301,8 @@ class ReportController extends Controller
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "MTC - Report Additional Display - " . Carbon::now()->format("F Y") ." (" . $filecode . ")",
+                    'title' => "MTC - Report Additional Display - " . 
+                    Carbon::parse(substr($data['periode'], 3)."-".substr($data['periode'], 0, 2)."-01")->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportMTCAdditionalDisplayJob($JobTrace, $data, $filecode));
@@ -2486,15 +2494,25 @@ class ReportController extends Controller
         ])->select('employee_pasars.*');
         $report = array();
         $id = 1;
-        $periode = $request->input('periode');
-        if ((Carbon::now()->month == substr($periode, 0, 2))and(Carbon::now()->year == substr($periode, 3))) {
-            $date = Carbon::now();
-            $day = $date->day;
-        } else {
-            $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
+        if ($request->has('periode')) {
+            $periode = $request->input('periode');
+            $date = Carbon::parse(substr($periode, 3)."-".substr($periode, 0, 2)."-01");
+            $i = 1;
             $day = $date->endOfMonth()->day;
         }
-        for ($i=1; $i <= $day; $i++) {
+        if ($request->has('date')) {
+            $periode = $request->input('date');
+            $date = Carbon::parse(substr($periode, 3, 4)."-".substr($periode, 0, 2)."-".substr($periode, 8));
+            $periode = substr($periode, 0, 6);
+            $i = $date->day;
+            $day = $date->day;
+        }
+        if ($request->has('area')) {
+            $employeePasar->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+        for ($i; $i <= $day; $i++) {
             foreach ($employeePasar->get() as $data) {
                 if ($data->employee->position->level == 'mdgtc') {
                     $report[] = array(
@@ -2659,22 +2677,34 @@ class ReportController extends Controller
 
     public function exportSMDsummary(Request $request)
     {
+        $request->area = ($request->area == "null" || empty($request->area) ? null : $request->area);
+
         $employeePasar = EmployeePasar::with([
             'employee','pasar','pasar.subarea.area',
             'employee.position'
         ])->select('employee_pasars.*');
         $report = array();
         $id = 1;
-        $periode = $request->input('periode');
-        if ((Carbon::now()->month == substr($periode, 0, 2))and(Carbon::now()->year == substr($periode, 3))) {
-            $date = Carbon::now();
-            $day = $date->day;
-        } else {
-            $date = Carbon::parse(substr($periode, 3)."-".substr($request->input('periode'), 0, 2)."-01");
+        if ($request->has('periode')) {
+            $periode = $request->input('periode');
+            $date = Carbon::parse(substr($periode, 3)."-".substr($periode, 0, 2)."-01");
+            $i = 1;
             $day = $date->endOfMonth()->day;
         }
+        if ($request->has('date')) {
+            $periode = $request->input('date');
+            $date = Carbon::parse(substr($periode, 3, 4)."-".substr($periode, 0, 2)."-".substr($periode, 8));
+            $periode = substr($periode, 0, 6);
+            $i = $date->day;
+            $day = $date->day;
+        }
+        if ($request->area) {
+            $employeePasar->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         if ($employeePasar->count() > 0) {
-            for ($i=1; $i <= $day; $i++) {
+            for ($i; $i <= $day; $i++) {
                 foreach ($employeePasar->get() as $data) {
                     if ($data->employee->position->level == 'mdgtc') {
                         $report[] = array(
@@ -2696,7 +2726,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "SummarySMDReport".Carbon::now().".xlsx";
+            $filename = "SummarySMDReport".Carbon::parse(substr($periode, 3)."-".substr($periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($report) {
                 $excel->sheet('SummarySMDReport', function($sheet) use ($report)
                 {
@@ -2730,10 +2760,15 @@ class ReportController extends Controller
                 return $q->where('id_pasar', $request->input('pasar'));
             });
         } 
-         if ($request->has('area')) {
+        if ($request->has('area')) {
             $employee->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
                 return $q->where('id_area', $request->input('area'));
             });
+        }
+        if($request->has('date')) {
+            $employee->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
         }
         $data = array();
         $absen = array();
@@ -2822,6 +2857,11 @@ class ReportController extends Controller
             return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
             ->whereYear('checkin', substr($request->input('periode'), 3));
         })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
+        })
         ->get();
 
         $id = 1;
@@ -2846,7 +2886,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "AttandanceReport".Carbon::now().".xlsx";
+            if ($request->has('periode')) {
+                $filename = "AttandanceReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "AttandanceReport ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('AttandanceReport', function($sheet) use ($data)
                 {
@@ -2911,7 +2955,7 @@ class ReportController extends Controller
                 }
             }
         
-		    $filename = "AttandanceMotorikReport".Carbon::now().".xlsx";
+		    $filename = "AttandanceMotorikReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
 		    	$excel->sheet('AttandanceMotorikReport', function($sheet) use ($data)
 		    	{
@@ -2986,7 +3030,7 @@ class ReportController extends Controller
                 }
             }
         
-		    $filename = "ReportMotorikDistPF".Carbon::now().".xlsx";
+		    $filename = "ReportMotorikDistPF ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
 		    return Excel::create($filename, function($excel) use ($data) {
 		    	$excel->sheet('ReportMotorikDistPF', function($sheet) use ($data)
 		    	{
@@ -3062,7 +3106,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "MotorikSales".Carbon::now().".xlsx";
+            $filename = "MotorikSales ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('MotorikSales', function($sheet) use ($data)
                 {
@@ -3082,16 +3126,29 @@ class ReportController extends Controller
        // ************ DEMO COOKING ************ //
     public function kunjunganDc(Request $request)
     {
-        $plan = PlanDc::with('planEmployee')->orderBy('created_at', 'DESC');
+        $plan = PlanDc::with('planEmployee')->orderBy('plan_dcs.created_at', 'DESC');
         if ($request->has('employee')) {
             $plan->whereHas('planEmployee.employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
             });
         } 
-         if ($request->has('periode')) {
+        if ($request->has('periode')) {
             $plan->whereMonth('date', substr($request->input('periode'), 0, 2));
             $plan->whereYear('date', substr($request->input('periode'), 3));
-        } 
+        }
+        if ($request->has('date')) {
+            $plan->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
+        if($request->area != null && $request->area != 'null'){
+            $plan = $plan->join('plan_employees','plan_dcs.id','plan_employees.id_plandc')
+                        ->join('employees','plan_employees.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->area)
+                        ->select('plan_dcs.*');
+        }
         return Datatables::of($plan->get())
         ->addColumn('action', function ($plan) {
             if (isset($plan->photo)) {
@@ -3115,8 +3172,9 @@ class ReportController extends Controller
     public function exportKunjunganDc(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
         
-        $plan = PlanDc::with('planEmployee')->orderBy('created_at', 'DESC')
+        $plan = PlanDc::with('planEmployee')->orderBy('plan_dcs.created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
         {
             $q->whereHas('planEmployee.employee', function($q2) use ($employee){
@@ -3127,6 +3185,20 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('plan_employees','plan_dcs.id','plan_employees.id_plandc')
+                        ->join('employees','plan_employees.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'))
+                        ->select('plan_dcs.*');
         })
         ->get();
         // return response()->json($plan);
@@ -3146,7 +3218,7 @@ class ReportController extends Controller
                         'channel'          => (isset($value->channel) ? $value->channel : ""),
                     );
             }
-            $filename = "DemoCookingPlan".Carbon::now().".xlsx";
+            $filename = "DemoCookingPlan ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCooking', function($sheet) use ($data)
                 {
@@ -3166,7 +3238,8 @@ class ReportController extends Controller
 
     public function DcSales(Request $request)
     {
-        $sales = SalesDc::orderBy('created_at', 'DESC')
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        $sales = SalesDc::orderBy('sales_dcs.created_at', 'DESC')
         ->when($request->has('employee'), function($q) use ($request)
         {
             return $q->whereHas('employee', function($q2) use ($request){
@@ -3177,6 +3250,18 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sales_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'));
         })
         ->get();
          
@@ -3216,9 +3301,10 @@ class ReportController extends Controller
     public function exportDcSales(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         // return response()->json($request);
-        $sales = SalesDc::orderBy('created_at', 'DESC')
+        $sales = SalesDc::orderBy('sales_dcs.created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
         {
             return $q->where('id_employee', $employee);
@@ -3227,6 +3313,18 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sales_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'));
         })
         ->get();
 
@@ -3252,7 +3350,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "DemoCookingSales".Carbon::now().".xlsx";
+            $filename = "DemoCookingSales ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCooking', function($sheet) use ($data)
                 {
@@ -3271,7 +3369,7 @@ class ReportController extends Controller
 
     public function DcSampling(Request $request)
     {
-        $sales = SamplingDc::orderBy('created_at', 'DESC');
+        $sales = SamplingDc::orderBy('sampling_dcs.created_at', 'DESC');
         if ($request->has('employee')) {
             $sales->whereHas('employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
@@ -3280,6 +3378,18 @@ class ReportController extends Controller
          if ($request->has('periode')) {
             $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
             $sales->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if ($request->has('date')) {
+            $sales->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
+        if($request->area != null && $request->area != 'null'){
+            $sales = $sales->join('employees','sampling_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->area)
+                        ->select('sampling_dcs.*');
         }
         $data = array();
         $id = 1;
@@ -3323,6 +3433,7 @@ class ReportController extends Controller
     public function exportDcSampling(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $sales = SamplingDc::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -3333,6 +3444,19 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sampling_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'))
+                        ->select('sampling_dcs.*');
         })
         ->get();
         if ($sales->count() > 0) {
@@ -3355,7 +3479,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "DemoCookingSalesSampling".Carbon::now().".xlsx";
+            $filename = "DemoCookingSalesSampling ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCooking', function($sheet) use ($data)
                 {
@@ -3375,7 +3499,7 @@ class ReportController extends Controller
     public function documentationDC(Request $request)
     {
         $data = array();
-        $employee = DocumentationDc::orderBy('created_at', 'DESC');
+        $employee = DocumentationDc::orderBy('documentation_dcs.created_at', 'DESC');
         if ($request->has('employee')) {
             $employee->whereHas('employee', function($q) use ($request){
                 return $q->where('id_employee', $request->input('employee'));
@@ -3385,9 +3509,21 @@ class ReportController extends Controller
             $employee->whereMonth('date', substr($request->input('periode'), 0, 2));
             $employee->whereYear('date', substr($request->input('periode'), 3));
         }
+        if ($request->has('date')) {
+            $employee->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
         if ($request->has('type')) {
             $employee->where('type', $request->input('type'));
         } 
+        if($request->area != null && $request->area != 'null'){
+            $employee = $employee->join('employees','documentation_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->area)
+                        ->select('documentation_dcs.*');
+        }
         $id = 1;
         foreach ($employee->get() as $val) {
             if ($val->employee->position->level == 'dc') {
@@ -3421,8 +3557,11 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $type = ($request->type == "null" || empty($request->type) ? null : $request->type);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
-        $doc = DocumentationDc::orderBy('created_at', 'DESC')
+        $date = Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
+
+        $doc = DocumentationDc::orderBy('documentation_dcs.created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
         {
             return $q->where('id_employee', $employee);
@@ -3435,6 +3574,19 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','documentation_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'))
+                        ->select('documentation_dcs.*');
         })
         ->get();
 
@@ -3450,7 +3602,7 @@ class ReportController extends Controller
                     );
                 }
             }
-            $filename = "DemoCookingDocumentation".Carbon::now().".xlsx";
+            $filename = "DemoCookingDocumentation".$date.".xlsx";
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('DemoCookingDocumentation', function($sheet) use ($data)
                 {
@@ -3540,7 +3692,13 @@ class ReportController extends Controller
 
     public function SMDdistpf(Request $request)
     {
-        
+
+        if (!empty($request->input('area'))) {
+            $area   = $request->input('area');
+        }else{
+            $area   = Area::first()->id;
+        }
+
         $dist = Distribution::orderBy('created_at', 'DESC');
         if ($request->has('employee')) {
             $dist->whereHas('employee', function($q) use ($request){
@@ -3555,7 +3713,15 @@ class ReportController extends Controller
             $dist->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
                 return $q->where('id_pasar', $request->input('pasar'));
             });
-        } 
+        }
+        if($request->has('date')) {
+            $dist->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
+            $dist->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($area){
+                return $q->where('id_area', $area);
+            });
         $data = array();
         $product = array();
         $id = 1;
@@ -3603,25 +3769,37 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $dist = Distribution::orderBy('created_at', 'DESC')
-        // ->when($employee, function($q) use ($employee)
-        // {
-        //     $q->whereHas('employee', function($q2) use ($employee){
-        //         return $q2->where('id_employee', $employee);
-        //     });
-        // })
-        // ->when($pasar, function($q) use ($pasar)
-        // {
-        //     $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
-        //         return $q2->where('id_pasar', $pasar);
-        //     });
-        // })
-        // ->when($request->has('periode'), function($q) use ($request)
-        // {
-        //     return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
-        //     ->whereYear('date', substr($request->input('periode'), 3));
-        // })
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($pasar, function($q) use ($pasar)
+        {
+            $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
+                return $q2->where('id_pasar', $pasar);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
+        })
         ->get();
 
         if ($dist->count() > 0) {
@@ -3646,7 +3824,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "ReportDistPf".Carbon::now().".xlsx";
+            if ($request->has('periode')) {
+                $filename = "ReportDistPf ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "ReportDistPf ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('ReportDistPf', function($sheet) use ($data)
                 {
@@ -3679,7 +3861,17 @@ class ReportController extends Controller
             $sales->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
                 return $q->where('id_pasar', $request->input('pasar'));
             });
-        } 
+        }
+        if ($request->has('area')) {
+            $sales->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+        if($request->has('date')) {
+            $sales->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
         $data = array();
         $id = 1;
         foreach ($sales->get() as $value) {
@@ -3738,6 +3930,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $sales = SalesMD::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -3756,6 +3949,17 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
         })
         ->get();
 
@@ -3780,7 +3984,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "ReportSalesMD".Carbon::now().".xlsx";
+            if ($request->has('periode')) {
+                $filename = "ReportSalesMD ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "ReportSalesMD ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SalesMdPasar', function($sheet) use ($data)
                 {
@@ -3815,6 +4023,16 @@ class ReportController extends Controller
                 return $q->where('id_pasar', $request->input('pasar'));
             });
         } 
+        if ($request->has('area')) {
+            $stock->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+        if($request->has('date')) {
+            $stock->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
         $data = array();
         $id = 1;
         foreach ($stock->get() as $val) {
@@ -3851,6 +4069,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $stock = StockMD::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -3869,6 +4088,17 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         })
         ->get();
 
@@ -3893,7 +4123,12 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "ReportSMDStokist".Carbon::now().".xlsx";
+        
+            if ($request->has('periode')) {
+                $filename = "ReportSMDStokist ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "ReportSMDStokist ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('ReportSMDStokist', function($sheet) use ($data)
                 {
@@ -3922,7 +4157,11 @@ class ReportController extends Controller
         })
         ->when($request->has('outlet'), function ($q) use ($request){
             return $q->where('id_outlet', $request->input('outlet'));
-        })->get();
+        })
+        ->when($request->has('area'), function ($q) use ($request){
+            return $q->where('id_area', $request->input('area'));
+        })
+        ->get();
 
         $data = array();
         $id = 1;
@@ -3953,11 +4192,22 @@ class ReportController extends Controller
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
         })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
         ->when($request->has('outlet'), function ($q) use ($request){
             $q->whereHas('outlet', function($q2) use ($request){
                 return $q2->where('id_outlet', $request->input('outlet'));
             });
-        })->get();
+        })
+        ->when($request->has('area'), function ($q) use ($request){
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($request){
+                return $q2->where('id_area', $request->input('area'));
+            });
+        })
+        ->get();
 
         $data = array();
         $id = 1;
@@ -3983,6 +4233,7 @@ class ReportController extends Controller
         }
 
         $dt = Datatables::of(collect($data));
+        // return response()->json($data);
         
         return $dt->rawColumns(['photo','photo2'])->make(true);
     }
@@ -4096,6 +4347,16 @@ class ReportController extends Controller
             $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
             $sales->whereYear('date', substr($request->input('periode'), 3));
         }
+        if ($request->has('area')) {
+            $sales->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+        if($request->has('date')) {
+            $sales->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
         $data = array();
         $product = array();
         $id = 1;
@@ -4146,6 +4407,7 @@ class ReportController extends Controller
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $sales = SalesSpgPasar::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -4164,6 +4426,17 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
+        })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         })
         ->get();
 
@@ -4189,7 +4462,7 @@ class ReportController extends Controller
                     }
                 }
             }
-            $filename = "SalesSPGReport".Carbon::now();
+            $filename = "SalesSPGReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01");
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SalesSPGReport', function($sheet) use ($data)
                 {
@@ -4218,6 +4491,16 @@ class ReportController extends Controller
         if ($request->has('periode')) {
             $rekap->whereMonth('date', substr($request->input('periode'), 0, 2));
             $rekap->whereYear('date', substr($request->input('periode'), 3));
+        }
+        if ($request->has('area')) {
+            $rekap->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            });
+        }
+        if($request->has('date')) {
+            $rekap->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         }
         $id = 1;
         $data = array();
@@ -4251,6 +4534,7 @@ class ReportController extends Controller
     public function exportSPGrekap(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $rekap = SalesRecap::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
@@ -4263,6 +4547,17 @@ class ReportController extends Controller
         {
             return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
             ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
+        })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
         })
         ->get();
 
@@ -4280,7 +4575,12 @@ class ReportController extends Controller
                 }
             }
 
-            $filename = "SPGRekap".Carbon::now().".xlsx";
+        
+            if ($request->has('periode')) {
+                $filename = "SPGRekap ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "SPGRekap ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('SPGRekap', function($sheet) use ($data)
                 {
@@ -4305,8 +4605,23 @@ class ReportController extends Controller
             $q->whereHas('attendance.employee', function($query) use ($request){
                 return $query->where('id_employee', $request->input('employee'));
             });
-        })->whereMonth('checkin', substr($request->input('periode'), 0, 2))
-        ->whereYear('checkin', substr($request->input('periode'), 3))->get();
+        })
+        ->when($request->has('periode'), function($q) use ($request) {
+            return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
+            ->whereYear('checkin', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($request){
+                return $q2->where('id_area', $request->input('area'));
+            });
+        })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
+        })
+        ->get();
         // return response()->json($employee);
         $data = array();
         $absen = array();
@@ -4334,6 +4649,7 @@ class ReportController extends Controller
     public function exportSpgAttandance(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
 
         $employeeAtt = AttendancePasar::when($employee, function($q) use ($employee)
         {
@@ -4345,6 +4661,17 @@ class ReportController extends Controller
         {
             return $q->whereMonth('checkin', substr($request->input('periode'), 0, 2))
             ->whereYear('checkin', substr($request->input('periode'), 3));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
+        })
+        ->when($request->has('date'), function($q) use ($request) {
+            return $q->whereDay('checkin', substr($request->input('date'), 8))
+            ->whereMonth('checkin', substr($request->input('date'), 0, 2))
+            ->whereYear('checkin', substr($request->input('date'), 3, 4));
         })
         ->get();
 
@@ -4364,7 +4691,11 @@ class ReportController extends Controller
                 }
             }
         
-            $filename = "AttandanceSPGReport".Carbon::now().".xlsx";
+            if ($request->has('periode')) {
+                $filename = "AttandanceSPGReport ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "AttandanceSPGReport ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('AttandanceSPGReport', function($sheet) use ($data)
                 {
@@ -4405,6 +4736,12 @@ class ReportController extends Controller
 
         // return $sales->first()->getProductsValue();
         
+        if ($request->has('area')) {
+            $sales->whereHas('pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+
         $dt = Datatables::of($sales);
 
         /* SALES PER PRODUCT(S) */
@@ -4670,6 +5007,12 @@ class ReportController extends Controller
                                  // ->orderBy('outlets.id_pasar', 'ASC');
 
         // return $sales->get();
+
+        if ($request->has('area')) {
+            $sales->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
         
         $dt = Datatables::of($sales);
 
@@ -4711,9 +5054,9 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
-    public function SMDsalesSummaryExportXLS($filterPeriode)
+    public function SMDsalesSummaryExportXLS($filterPeriode, $filterArea)
     {
-        $result = DB::transaction(function() use ($filterPeriode){
+        $result = DB::transaction(function() use ($filterPeriode, $filterArea){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -4723,7 +5066,7 @@ class ReportController extends Controller
                     'title' => "SMD Pasar - Report Sales Summary " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSMDReportSalesSummaryJob($JobTrace, [$filterPeriode, $filecode]));
+                dispatch(new ExportSMDReportSalesSummaryJob($JobTrace, [$filterPeriode, $filterArea, $filecode]));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
@@ -4740,6 +5083,13 @@ class ReportController extends Controller
         $target_kpi = TargetKpiMd::whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
+
+        if($request->area != null && $request->area != 'null'){
+            $target_kpi = $target_kpi->join('employee_pasars','employees.id','employee_pasars.id_employee')
+                                    ->join('pasars','employee_pasars.id_pasar','pasars.id')
+                                    ->join('sub_areas','pasars.id_subarea','sub_areas.id')
+                                    ->where('sub_areas.id_area', $request->area);
+        }
 
         // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
 
@@ -4772,9 +5122,9 @@ class ReportController extends Controller
 
     }
 
-    public function SMDTargetKpiExportXLS($filterPeriode)
+    public function SMDTargetKpiExportXLS($filterPeriode, $filterArea)
     {
-        $result = DB::transaction(function() use ($filterPeriode){
+        $result = DB::transaction(function() use ($filterPeriode, $filterArea){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -4784,7 +5134,7 @@ class ReportController extends Controller
                     'title' => "SMD Pasar - Report Target KPI " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSMDReportTargetKPIJob($JobTrace, $filterPeriode, $filecode));
+                dispatch(new ExportSMDReportTargetKPIJob($JobTrace, $filterPeriode, $filterArea, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
@@ -4802,6 +5152,13 @@ class ReportController extends Controller
             return $query->where('level', 'mdgtc');
         });
 
+        if($request->area != null && $request->area != 'null'){
+            $target_kpi = $target_kpi->join('employee_pasars','employees.id','employee_pasars.id_employee')
+                                    ->join('pasars','employee_pasars.id_pasar','pasars.id')
+                                    ->join('sub_areas','pasars.id_subarea','sub_areas.id')
+                                    ->where('sub_areas.id_area', $request->area);
+        }
+        // return response()->json($target_kpi);
         // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
 
         // return array_key_exists('hk', $target_kpi->first()->getTarget($request->periode)) ? $target_kpi->first()->getTarget($request->periode)['hk'] : 0;
@@ -4884,9 +5241,10 @@ class ReportController extends Controller
 
     }
 
-    public function SMDKpiExportXLS($filterPeriode)
+    public function SMDKpiExportXLS($filterPeriode, $filterArea)
     {
-        $result = DB::transaction(function() use ($filterPeriode){
+
+        $result = DB::transaction(function() use ($filterPeriode, $filterArea){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -4896,7 +5254,7 @@ class ReportController extends Controller
                     'title' => "SMD Pasar - Report KPI " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportSMDReportKPIJob($JobTrace, $filterPeriode, $filecode));
+                dispatch(new ExportSMDReportKPIJob($JobTrace, $filterPeriode, $filterArea, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)

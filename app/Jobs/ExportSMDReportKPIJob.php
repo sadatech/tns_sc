@@ -17,7 +17,7 @@ class ExportSMDReportKPIJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportSMDReportKPITrait;
 
-    protected $trace, $filterPeriode, $filecode;
+    protected $trace, $filterPeriode, $filterArea, $filecode;
 
     /**
      * The number of times the job may be attempted.
@@ -31,10 +31,11 @@ class ExportSMDReportKPIJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(JobTrace $trace, $filterPeriode, $filecode)
+    public function __construct(JobTrace $trace, $filterPeriode, $filterArea, $filecode)
     {
         $this->trace = $trace;
         $this->filterPeriode = $filterPeriode;
+        $this->filterArea = $filterArea;
         $this->filecode = $filecode;
     }
 
@@ -47,7 +48,7 @@ class ExportSMDReportKPIJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->SMDReportKPIExportTrait($this->filterPeriode, $this->filecode), // return excel file location
+            'results' => $this->SMDReportKPIExportTrait($this->filterPeriode, $this->filterArea, $this->filecode), // return excel file location
         ]);
     }
 
