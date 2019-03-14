@@ -706,14 +706,22 @@ class ReportController extends Controller
         $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
         $filters['new']         = $new;
-        $result = DB::transaction(function() use ($filters){
+        $titleDate = '';
+
+        if($filters['day'] != 'null'){
+            $titleDate = $filters['year'].'-'.$filters['month'].'-'.$filters['day'];
+        }else{
+            $titleDate = $filters['year'].'-'.$filters['month'];
+        }
+
+        $result = DB::transaction(function() use ($filters, $titleDate){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("F Y") ." (" . $filecode . ")",
+                    'title' => "GTC - CBD " . Carbon::parse($titleDate) ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportGTCCbdJob($JobTrace, $filters, $filecode));
@@ -4208,6 +4216,8 @@ class ReportController extends Controller
             });
         })
         ->get();
+
+        // return $cbd;
 
         $data = array();
         $id = 1;
