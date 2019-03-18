@@ -2,7 +2,7 @@
 @section('title', "Report CBD SMD Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">CBD SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">CBD SMD Pasar<small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -66,6 +66,7 @@
               <th class="text-center" style="width: 70px;"></th>
               <th>Employee</th>
               <th>Outlet</th>
+              <th>Area</th>
               <th>Date</th>
               <th>Photo Before</th>
               <th>Photo After</th>
@@ -235,6 +236,7 @@ table.table thead tr th {
       { data: 'id' },
       { data: 'employee' },
       { data: 'outlet' },
+      { data: 'area' },
       { data: 'date' },
       { data: 'photo' },
       { data: 'photo2' },
