@@ -648,7 +648,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('stockist')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\StockMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd.stockist', $data);
 				})->name('report.stockist')->middleware('auth');
@@ -658,7 +658,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('cbd')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\StockMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd.cbd', $data);
 				})->name('report.cbd')->middleware('auth');
@@ -676,7 +676,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\SalesMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd.sales',$data);
 				})->name('report.sales.pasar')->middleware('auth');
@@ -692,7 +692,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('distributorPf')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\DistributionDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd.distpf',$data);
 				})->name('report.dist.pf')->middleware('auth');
@@ -702,7 +702,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('summary')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\StockMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.smd', $data);
 				})->name('report.summary')->middleware('auth');
@@ -756,7 +756,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\SalesSpgPasarDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.spg.sales', $data);
 				})->name('report.sales.spg')->middleware('auth');
@@ -793,7 +793,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sampling')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\SamplingDcDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\SamplingDcDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.democooking.sampling', $data);
 				})->name('report.demo.sampling')->middleware('auth');
@@ -803,7 +803,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('salesDC')->group(function(){
 				Route::get('/', function(){
-					$getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\SalesDcDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.democooking.salesDC', $data);
 				})->name('report.demo.salesDC')->middleware('auth');
@@ -853,7 +853,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('distPF')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\DistributionMotoricDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.motorik.distPF', $data);
 				})->name('report.motorik.distPF')->middleware('auth');
@@ -863,7 +863,7 @@ Route::prefix('report')->group(function () {
 
 			Route::prefix('sales')->group(function () {
 				Route::get('/', function(){
-					$getId = array_column(\App\SalesMotoricDetail::get(['id_product'])->toArray(),'id_product');
+					$getId = array_column(\App\SalesMotoricDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
 					$data['product'] = \App\Product::whereIn('id', $getId)->get();
 					return view('report.motorik.sales', $data);
 				})->name('report.motorik.sales')->middleware('auth');
