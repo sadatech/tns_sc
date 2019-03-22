@@ -23,7 +23,7 @@
           </h3>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="regiontable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="regiontable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Region</th>

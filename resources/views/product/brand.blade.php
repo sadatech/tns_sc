@@ -23,7 +23,7 @@
                     </h3>
                 </div>
 
-                <table class="table table-striped table-vcenter js-dataTable-full" id="brantable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="brantable">
                   <thead>
                     <th class="text-center" style="width: 70px;"></th>
                     <th class="text-center">Brand</th>

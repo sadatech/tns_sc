@@ -50,7 +50,7 @@
           </div>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTable">
         <thead>
           <tr>
             <th style="vertical-align: middle; text-align: center;">CATEGORY</th>

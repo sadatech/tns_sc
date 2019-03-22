@@ -22,7 +22,7 @@
                     <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
                 </h3>
             </div>
-            <table class="table table-striped table-vcenter js-dataTable-full" id="channeltable">
+            <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="channeltable">
             <thead>
                 <th class="text-center" style="width: 70px;"></th>
                 <th class="text-center">Name</th>

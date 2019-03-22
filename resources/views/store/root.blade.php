@@ -25,7 +25,7 @@
             <a href="{{ route('subarea.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="subtable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="subtable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Route</th>

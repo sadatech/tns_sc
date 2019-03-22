@@ -55,7 +55,7 @@
               <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="summaryTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="summaryTable">
           <thead>
             <tr>
               <th colspan="4" style="text-align: center;">INFORMATION</th>

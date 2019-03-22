@@ -56,7 +56,7 @@
                         <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
                     </div>
                 </div>
-                <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="cashDcTable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="cashDcTable">
                     <thead>
                         <tr>
                             <th rowspan="2" style="vertical-align: middle; width: 20px !important;">Tgl.</th>

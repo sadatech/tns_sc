@@ -26,7 +26,7 @@
             <a href="{{ route('sku-unit.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="sku-unit">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="sku-unit">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Sku Unit</th>

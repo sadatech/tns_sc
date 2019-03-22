@@ -52,7 +52,7 @@
                     <a target-url="{{ route('dc.inventori.data.exportXLS') }}" id="btnDownloadXLS" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                 </div>
             </div>
-            <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
+            <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTable">
                 <thead>
                     <th class="text-center" style="width: 6px;">#</th>
                     <th>Employee</th>

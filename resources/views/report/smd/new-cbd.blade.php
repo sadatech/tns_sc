@@ -60,7 +60,7 @@
 
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="category">
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>

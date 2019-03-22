@@ -3019,7 +3019,7 @@ class ReportController extends Controller
                     'Block'         => (isset($value->block->name) ? $value->block->name : "-"),
                     'Tanggal'       => Carbon::parse($value->date)->day
                     );
-                    $getId = array_column(\App\DistributionMotoricDetail::get(['id_product'])->toArray(),'id_product');
+                    $getId = array_column(\App\DistributionMotoricDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";
@@ -3064,7 +3064,7 @@ class ReportController extends Controller
                 );
             }
         }
-        $getId = array_column(\App\SalesMotoricDetail::get(['id_product'])->toArray(),'id_product');
+        $getId = array_column(\App\SalesMotoricDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
         $dt = Datatables::of(collect($data));
         $columns = array();
@@ -3096,7 +3096,7 @@ class ReportController extends Controller
                         'Block'         => (isset($value->block->name) ? $value->block->name : ""),
                         'Date'          => (isset($value->date) ? $value->date : ""),
                     );
-                    $getId = array_column(\App\SalesMotoricDetail::get(['id_product'])->toArray(),'id_product');
+                    $getId = array_column(\App\SalesMotoricDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";
@@ -3280,7 +3280,7 @@ class ReportController extends Controller
                 );
             }
         }
-        $getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
+        $getId = array_column(\App\SalesDcDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
         $dt = Datatables::of(collect($data));
         $columns = array();
@@ -3340,7 +3340,7 @@ class ReportController extends Controller
                         'Icip-icip'         => (isset($value->icip_icip) ? $value->icip_icip : ""),
                         'Effective Contact' => (isset($value->effective_contact) ? $value->effective_contact : ""),
                     );
-                    $getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
+                    $getId = array_column(\App\SalesDcDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";
@@ -3469,7 +3469,7 @@ class ReportController extends Controller
                         'Place'             => (isset($value->place) ? $value->place : ""),
                         'Date'              => (isset($value->date) ? $value->date : ""),
                     );
-                    $getId = array_column(\App\SalesDcDetail::get(['id_product'])->toArray(),'id_product');
+                    $getId = array_column(\App\SalesDcDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";
@@ -3813,7 +3813,7 @@ class ReportController extends Controller
                         'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
                     );
 
-                $getId = array_column(\App\DistributionDetail::get(['id_product'])->toArray(),'id_product');
+                $getId = array_column(\App\DistributionDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";
@@ -3888,7 +3888,7 @@ class ReportController extends Controller
                 );
             }
         }
-        $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+        $getId = array_column(\App\SalesMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
         $dt = Datatables::of(collect($data));
         $columns = array();
@@ -3973,7 +3973,7 @@ class ReportController extends Controller
                         'Tanggal'   => (isset($val->date) ? $val->date : ""),
                         'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
                     );
-                    $getId = array_column(\App\SalesMdDetail::get(['id_product'])->toArray(),'id_product');
+                    $getId = array_column(\App\SalesMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";
@@ -4049,7 +4049,7 @@ class ReportController extends Controller
             }
         }
 
-        $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+        $getId = array_column(\App\StockMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
 
         $dt = Datatables::of(collect($data));
@@ -4113,7 +4113,7 @@ class ReportController extends Controller
                         'Week'      => (isset($val->week) ? $val->week : ""),
                         'Stockist'  => (isset($val->stockist) ? $val->stockist : "-")
                     );
-                    $getId = array_column(\App\StockMdDetail::get(['id_product'])->toArray(),'id_product');
+                    $getId = array_column(\App\StockMdDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";
@@ -4375,7 +4375,7 @@ class ReportController extends Controller
                 );
             }
         }
-        $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+        $getId = array_column(\App\SalesSpgPasarDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
         $product = \App\Product::whereIn('id', $getId)->get();
         $dt = Datatables::of(collect($data));
         $columns = array();
@@ -4452,7 +4452,7 @@ class ReportController extends Controller
                         'Nama Pemilik Pasar'    => (isset($value->name) ? $value->name : ""),
                         'Phone Pemilik Pasar'   => (isset($value->phone) ? $value->phone : "")
                     );
-                    $getId = array_column(\App\SalesSpgPasarDetail::get(['id_product'])->toArray(),'id_product');
+                    $getId = array_column(\App\SalesSpgPasarDetail::groupBy('id_product')->get(['id_product'])->toArray(),'id_product');
                     $productList = \App\Product::whereIn('id', $getId)->get();
                     foreach ($productList as $pro) {
                         $data[$key][$pro->name] = "-";

@@ -18,7 +18,7 @@
                         <a href="{{ route('employeedc.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
-                <table class="table table-striped table-vcenter js-dataTable-full table-hover" id="employeetable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="employeetable">
                     <thead>
                         <th class="text-center" width="350px">Action</th>
                         <th width="200px">NIK</th>

@@ -54,7 +54,7 @@
         </div>
       </div>
       <hr>
-      <table class="table table-striped table-vcenter js-dataTable-full" id="reportTable">
+      <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Region</th>
