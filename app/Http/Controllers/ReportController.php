@@ -706,7 +706,6 @@ class ReportController extends Controller
         $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
         $filters['new']         = $new;
-
         $result = DB::transaction(function() use ($filters){
             try
             {
@@ -4328,6 +4327,8 @@ class ReportController extends Controller
         })
         ->get();
 
+        // return $cbd;
+
         $data = array();
         $id = 1;
         foreach ($cbd as $val) {
@@ -5274,13 +5275,20 @@ class ReportController extends Controller
             return $query->where('level', 'mdgtc');
         });
 
+        // if($request->area != null && $request->area != 'null'){
+        //     $target_kpi = $target_kpi->join('employee_pasars','employees.id','employee_pasars.id_employee')
+        //                             ->join('pasars','employee_pasars.id_pasar','pasars.id')
+        //                             ->join('sub_areas','pasars.id_subarea','sub_areas.id')
+        //                             ->where('sub_areas.id_area', $request->area);
+        // }
+
         if($request->area != null && $request->area != 'null'){
-            $target_kpi = $target_kpi->join('employee_pasars','employees.id','employee_pasars.id_employee')
-                                    ->join('pasars','employee_pasars.id_pasar','pasars.id')
-                                    ->join('sub_areas','pasars.id_subarea','sub_areas.id')
-                                    ->where('sub_areas.id_area', $request->area);
+            $target_kpi = $target_kpi->whereHas('employeePasar.pasar.subarea', function($q) use ($request){
+                return $q->where('id_area', $request->area);
+            });
         }
-        // return response()->json($target_kpi);
+
+        // return response()->json($target_kpi->first());
         // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
 
         // return array_key_exists('hk', $target_kpi->first()->getTarget($request->periode)) ? $target_kpi->first()->getTarget($request->periode)['hk'] : 0;
@@ -5291,7 +5299,7 @@ class ReportController extends Controller
             return is_null($item->getTarget($request->periode)) ? 0 : $item->getTarget($request->periode)['hk'];
         })
         ->addColumn('hk_actual', function ($item) use ($request){
-            return @$item->getHkActual($request->periode);
+            return @count($item->getHkActual($request->periode));
         })
         ->addColumn('sum_of_cbd', function ($item) use ($request){
             return @$item->getCbd($request->periode);

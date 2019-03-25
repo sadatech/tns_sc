@@ -2,7 +2,7 @@
 @section('title', "Report CBD SMD Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">CBD SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">CBD SMD Pasar<small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>

@@ -84,6 +84,7 @@ trait ExportGTCCbdTrait
 				$this->valueList[$a] = [
 					$d->employee->name,
 					$d->outlet->name,
+					$d->outlet->employeePasar->pasar->subarea->area->name,
 					$d->date,
 				];
 
@@ -156,11 +157,11 @@ trait ExportGTCCbdTrait
 	            		if (file_exists(public_path("/uploads/cbd/".($this->photoList[$valueTLKey]))))
 	            		{
 		            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
-		            		$imgDrawing->setCoordinates("D".($startTLRow));
+		            		$imgDrawing->setCoordinates("E".($startTLRow));
 		            		$imgDrawing->setWorksheet($sheet);
 		            		$imgDrawing->setWidth(40);
 	            		}else{
-		            		$sheet->setCellValue('D'.$startTLRow, "not found")->setAutoSize(true);
+		            		$sheet->setCellValue('E'.$startTLRow, "not found")->setAutoSize(true);
 	            		}
 	            	}
 

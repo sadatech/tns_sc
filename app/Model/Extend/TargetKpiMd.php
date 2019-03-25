@@ -28,7 +28,8 @@ class TargetKpiMd extends Employee
     	return Attendance::whereMonth('date', Carbon::parse($periode)->month)
 				        ->whereYear('date', Carbon::parse($periode)->year)
 				        ->where('id_employee', $this->id)
-        				->count();
+                        ->groupBy(DB::raw('DATE(date)'))
+        				->pluck('id');
     }
 
     public function getTotalValue($periode){
