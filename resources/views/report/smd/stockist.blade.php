@@ -65,6 +65,9 @@
               <th class="text-center" style="width: 70px;"></th>
               <th>Nama</th>
               <th>Pasar</th>
+              <th>Region</th>
+              <th>Area</th>
+              <th>Sub Area</th>
               <th>Tanggal</th>
               <th>Week</th>
               <th>Stockist</th>
@@ -206,6 +209,9 @@ table.table thead tr th {
       { data: 'id' },
       { data: 'name' },
       { data: 'pasar' },
+      { data: 'region' },
+      { data: 'area' },
+      { data: 'subarea' },
       { data: 'tanggal' },
       { data: 'week' },
       { data: 'stockist' },

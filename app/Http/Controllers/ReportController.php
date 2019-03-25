@@ -706,14 +706,20 @@ class ReportController extends Controller
         $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
         $filters['new']         = $new;
+
         $result = DB::transaction(function() use ($filters){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                if ($filters['day'] == null) {
+                    $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("F Y") ." (" . $filecode . ")";
+                }else{
+                    $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
+                }
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
+                    'title' => $title,
                     'date' => Carbon::now(),
-                    'title' => "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("F Y") ." (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportGTCCbdJob($JobTrace, $filters, $filecode));
@@ -2527,6 +2533,7 @@ class ReportController extends Controller
                         'stockist' => $this->getStockist($data, $periode, $i),
                         'bulan' => $date->month,
                         'tanggal' => $i,
+                        'tahun' => $date->year,
                         'call' => $this->getCall($data, $periode, $i),
                         'ro' => $this->getRo($data, $periode, $i),
                         'cbd' => $this->getCbd($data, $periode, $i),
@@ -2537,11 +2544,11 @@ class ReportController extends Controller
         $dt = Datatables::of(collect($report));
         foreach (\App\SubCategory::get() as $cat) {
             $dt->addColumn('cat-'.$cat->id, function($report) use ($cat){
-                $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+                $dateOn = $report['tahun']."-".$report['bulan']."-".$report['tanggal'];
                 $getVal = DB::table('distribution_details')
                 ->join('products', 'distribution_details.id_product', '=', 'products.id')
                 ->join('distributions', 'distribution_details.id_distribution', '=', 'distributions.id')
-                ->whereDate('distribution_details.created_at', '=', Carbon::parse($date))
+                ->whereDate('distribution_details.created_at', '=', Carbon::parse($dateOn))
                 ->where([
                     'products.id_subcategory' => $cat->id,
                     'distributions.id_employee' => $report['id_emp']
@@ -2551,36 +2558,36 @@ class ReportController extends Controller
         }
         foreach (\App\Product::get() as $product) {
             $dt->addColumn('product-'.$product->id, function($report) use ($product){
-                // $date = Carbon::now()->format('Y')."-".$report['bulan']."-16";
-                $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+                // $dateOn = $report['tahun']."-".$report['bulan']."-16";
+                $dateOn = $report['tahun']."-".$report['bulan']."-".$report['tanggal'];
                 $getOos = DB::table('stock_md_headers')
                 ->join('stock_md_details', 'stock_md_headers.id', '=', 'stock_md_details.id_stock')
                 ->where([
                     'stock_md_headers.id_employee' => $report['id_emp'],
                     'stock_md_headers.id_pasar' => $report['id_pasar'],
-                    'stock_md_headers.date' => $date,
+                    'stock_md_headers.date' => $dateOn,
                     'stock_md_details.id_product' => $product->id
                 ])->first();
                 return (isset($getOos->oos) ? $getOos->oos : "-");
             });
         }
         $dt->addColumn('ec', function($report){
-            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
-            return SalesMD::whereDate('date', $date)->count();
+            $dateOn = $report['tahun']."-".$report['bulan']."-".$report['tanggal'];
+            return SalesMD::whereDate('date', $dateOn)->count();
         });
         $dt->addColumn('vpf', function($report) {
-            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            $dateOn = $report['tahun']."-".$report['bulan']."-".$report['tanggal'];
             $sale = DB::table('sales_mds')
             ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
             ->join('products', 'sales_md_details.id_product', '=', 'products.id')
             ->join('prices', 'products.id', '=', 'prices.id_product')
-            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->whereDate('sales_mds.date', '=', Carbon::parse($dateOn))
             ->where([
                 'sales_md_details.is_pf' => 1,
                 // 'sales_mds.id_employee' => 101
                 'sales_mds.id_employee' => $report['id_emp']
             ])
-            ->where('prices.rilis', '<=', $date)
+            ->where('prices.rilis', '<=', $dateOn)
             ->get([
                 'sales_mds.id_outlet',
                 'sales_md_details.qty_actual',
@@ -2596,19 +2603,19 @@ class ReportController extends Controller
             return "Rp.".(array_sum($getVal) == 0 ? "-" : array_sum($getVal));
         });
         $dt->addColumn('vnpf', function($report) {
-            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
-            // $date = Carbon::now()->format('Y')."-".$report['bulan']."-15";
+            $dateOn = $report['tahun']."-".$report['bulan']."-".$report['tanggal'];
+            // $dateOn = $report['tahun']."-".$report['bulan']."-15";
             $sale = DB::table('sales_mds')
             ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
             ->join('products', 'sales_md_details.id_product', '=', 'products.id')
             ->join('prices', 'products.id', '=', 'prices.id_product')
-            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->whereDate('sales_mds.date', '=', Carbon::parse($dateOn))
             ->where([
                 'sales_md_details.is_pf' => 0,
                 // 'sales_mds.id_employee' => 101
                 'sales_mds.id_employee' => $report['id_emp']
             ])
-            ->where('prices.rilis', '<=', $date)
+            ->where('prices.rilis', '<=', $dateOn)
             ->get([
                 'sales_mds.id_outlet',
                 'sales_md_details.qty_actual',
@@ -2624,18 +2631,18 @@ class ReportController extends Controller
             return "Rp.".(array_sum($getVal) == 0 ? "-" : array_sum($getVal));
         });
         $dt->addColumn('vt', function($report) {
-            $date = Carbon::now()->format('Y')."-".$report['bulan']."-".$report['tanggal'];
+            $dateOn = $report['tahun']."-".$report['bulan']."-".$report['tanggal'];
             $vpf = DB::table('sales_mds')
             ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
             ->join('products', 'sales_md_details.id_product', '=', 'products.id')
             ->join('prices', 'products.id', '=', 'prices.id_product')
-            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->whereDate('sales_mds.date', '=', Carbon::parse($dateOn))
             ->where([
                 'sales_md_details.is_pf' => 1,
                 // 'sales_mds.id_employee' => 101
                 'sales_mds.id_employee' => $report['id_emp']
             ])
-            ->where('prices.rilis', '<=', $date)
+            ->where('prices.rilis', '<=', $dateOn)
             ->get([
                 'sales_mds.id_outlet',
                 'sales_md_details.qty_actual',
@@ -2646,13 +2653,13 @@ class ReportController extends Controller
             ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
             ->join('products', 'sales_md_details.id_product', '=', 'products.id')
             ->join('prices', 'products.id', '=', 'prices.id_product')
-            ->whereDate('sales_mds.date', '=', Carbon::parse($date))
+            ->whereDate('sales_mds.date', '=', Carbon::parse($dateOn))
             ->where([
                 'sales_md_details.is_pf' => 0,
                 // 'sales_mds.id_employee' => 101
                 'sales_mds.id_employee' => $report['id_emp']
             ])
-            ->where('prices.rilis', '<=', $date)
+            ->where('prices.rilis', '<=', $dateOn)
             ->get([
                 'sales_mds.id_outlet',
                 'sales_md_details.qty_actual',
@@ -2694,7 +2701,7 @@ class ReportController extends Controller
         if ($request->has('date')) {
             $periode = $request->input('date');
             $date = Carbon::parse(substr($periode, 3, 4)."-".substr($periode, 0, 2)."-".substr($periode, 8));
-            $periode = substr($periode, 0, 6);
+            $periode = substr($periode, 0, 7);
             $i = $date->day;
             $day = $date->day;
         }
@@ -2704,14 +2711,15 @@ class ReportController extends Controller
             }); 
         }
         if ($employeePasar->count() > 0) {
+            $indexArray = 1 ;
             for ($i; $i <= $day; $i++) {
                 foreach ($employeePasar->get() as $data) {
                     if ($data->employee->position->level == 'mdgtc') {
-                        $report[] = array(
+                        $report[$indexArray] = array(
                             'id' => $id++,
-                            // 'id_ep' => $data->id,
-                            // 'id_emp' => $data->employee->id,
-                            // 'id_pasar' => $data->pasar->id,
+                            'id_ep' => $data->id,
+                            'id_emp' => $data->employee->id,
+                            'id_pasar' => $data->pasar->id,
                             'area' => $data->pasar->subarea->area->name,
                             'nama' => $data->employee->name,
                             'jabatan' => $data->employee->position->name,
@@ -2719,11 +2727,113 @@ class ReportController extends Controller
                             'stockist' => ($this->getStockist($data, $periode, $i) ?: "-"),
                             'bulan' => $date->month,
                             'tanggal' => $i,
+                            'tahun' => $date->year,
                             'call' => ($this->getCall($data, $periode, $i) ?: "-"),
                             'ro' => ($this->getRo($data, $periode, $i) ?: "-"),
                             'cbd' => ($this->getCbd($data, $periode, $i) ?: "-")
                         );
+
+                        foreach (\App\SubCategory::get() as $cat) {
+                                $dateNow = $report[$indexArray]['tahun']."-".$report[$indexArray]['bulan']."-".$report[$indexArray]['tanggal'];
+                                $getVal = DB::table('distribution_details')
+                                ->join('products', 'distribution_details.id_product', '=', 'products.id')
+                                ->join('distributions', 'distribution_details.id_distribution', '=', 'distributions.id')
+                                ->whereDate('distribution_details.created_at', '=', Carbon::parse($dateNow))
+                                ->where([
+                                    'products.id_subcategory' => $cat->id,
+                                    'distributions.id_employee' => $report[$indexArray]['id_emp']
+                                ])->count();
+                                $report[$indexArray] = array_merge($report[$indexArray], [$cat->name => $getVal]);
+                        }
+                        foreach (\App\Product::get() as $product) {
+                                // $dateOn = $report['tahun']."-".$report['bulan']."-16";
+                                $dateOn = $report[$indexArray]['tahun']."-".$report[$indexArray]['bulan']."-".$report[$indexArray]['tanggal'];
+                                $getOos = DB::table('stock_md_headers')
+                                ->join('stock_md_details', 'stock_md_headers.id', '=', 'stock_md_details.id_stock')
+                                ->where([
+                                    'stock_md_headers.id_employee' => $report[$indexArray]['id_emp'],
+                                    'stock_md_headers.id_pasar' => $report[$indexArray]['id_pasar'],
+                                    'stock_md_headers.date' => $dateOn,
+                                    'stock_md_details.id_product' => $product->id
+                                ])->first();
+                                $report[$indexArray] = array_merge($report[$indexArray], ["'".$product->name => (isset($getOos->oos) ? $getOos->oos : "-")]);
+                        }
+
+                            $dateOn = $report[$indexArray]['tahun']."-".$report[$indexArray]['bulan']."-".$report[$indexArray]['tanggal'];
+                            $ec = SalesMD::whereDate('date', $dateOn)->count();
+                                $report[$indexArray] = array_merge($report[$indexArray], ['EC' => $ec]);
+
+                            $dateOn = $report[$indexArray]['tahun']."-".$report[$indexArray]['bulan']."-".$report[$indexArray]['tanggal'];
+                            $salevpf = DB::table('sales_mds')
+                            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+                            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+                            ->join('prices', 'products.id', '=', 'prices.id_product')
+                            ->whereDate('sales_mds.date', '=', Carbon::parse($dateOn))
+                            ->where([
+                                'sales_md_details.is_pf' => 1,
+                                // 'sales_mds.id_employee' => 101
+                                'sales_mds.id_employee' => $report[$indexArray]['id_emp']
+                            ])
+                            ->where('prices.rilis', '<=', $dateOn)
+                            ->get([
+                                'sales_mds.id_outlet',
+                                'sales_md_details.qty_actual',
+                                'sales_md_details.id_product',
+                                'prices.price',
+                            ]);
+                            // dd($report);
+                            // dd($salevpf);
+                            $getVpf = array();
+                            foreach ($salevpf as $data) {
+                                $getVpf[] = $data->price*$data->qty_actual;
+                            }
+                            $vpf = "Rp.".(array_sum($getVpf) == 0 ? "-" : array_sum($getVpf));
+                                $report[$indexArray] = array_merge($report[$indexArray], ['VPF' => $vpf]);
+
+
+                            $dateOn = $report[$indexArray]['tahun']."-".$report[$indexArray]['bulan']."-".$report[$indexArray]['tanggal'];
+                            // $dateOn = $report[$indexArray]['tahun']."-".$report[$indexArray]['bulan']."-15";
+                            $salevnpf = DB::table('sales_mds')
+                            ->join('sales_md_details', 'sales_mds.id', '=', 'sales_md_details.id_sales')
+                            ->join('products', 'sales_md_details.id_product', '=', 'products.id')
+                            ->join('prices', 'products.id', '=', 'prices.id_product')
+                            ->whereDate('sales_mds.date', '=', Carbon::parse($dateOn))
+                            ->where([
+                                'sales_md_details.is_pf' => 0,
+                                // 'sales_mds.id_employee' => 101
+                                'sales_mds.id_employee' => $report[$indexArray]['id_emp']
+                            ])
+                            ->where('prices.rilis', '<=', $dateOn)
+                            ->get([
+                                'sales_mds.id_outlet',
+                                'sales_md_details.qty_actual',
+                                'sales_md_details.id_product',
+                                'prices.price',
+                            ]);
+                            // dd($report);
+                            // dd($salevnpf);
+                            $getVnpf = array();
+                            foreach ($salevnpf as $data) {
+                                $getVnpf[] = $data->price*$data->qty_actual;
+                            }
+                            $vnpf = "Rp.".(array_sum($getVnpf) == 0 ? "-" : array_sum($getVnpf));
+                                $report[$indexArray] = array_merge($report[$indexArray], ['VNPF' => $vnpf]);
+
+
+                            $getVpf = array();
+                            $getVnpf = array();
+                            foreach ($salevpf as $data) {
+                                $getVpf[] = $data->price*$data->qty_actual;
+                            }
+                            foreach ($salevnpf as $data) {
+                                $getVnpf[] = $data->price*$data->qty_actual;
+                            }
+                            $total = array_sum($getVpf)+array_sum($getVnpf);
+                            $vt = "Rp.".($total == 0 ? "-" : $total);
+                                $report[$indexArray] = array_merge($report[$indexArray], ['VT' => $vt]);
+
                     }
+                    $indexArray++;
                 }
             }
             $filename = "SummarySMDReport".Carbon::parse(substr($periode, 3)."-".substr($periode, 0, 2)."-01").".xlsx";
@@ -2780,7 +2890,7 @@ class ReportController extends Controller
                 $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
                 $data[] = array(
                     'id' => $id++,
-                    'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                    'region' => (isset($val->outlet->employeePasar->pasar->subarea->area->region->name) ? $val->outlet->employeePasar->pasar->subarea->area->region->name : ""),
                     'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
                     'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
                     'nama' => (isset($val->attendance->employee->name) ? $val->attendance->employee->name : ""),
@@ -4042,6 +4152,9 @@ class ReportController extends Controller
                     'id_stock'  => $val->id,
                     'name'      => (isset($val->employee->name) ? $val->employee->name : ""),
                     'pasar'     => (isset($val->pasar->name) ? $val->pasar->name : ""),
+                    'region'    => (isset($val->pasar->subarea->area->region->name) ? $val->pasar->subarea->area->region->name : ""),
+                    'area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
+                    'subarea'   => (isset($val->pasar->subarea->name) ? $val->pasar->subarea->name : ""),
                     'tanggal'   => (isset($val->date) ? $val->date : ""),
                     'week'      => (isset($val->week) ? $val->week : ""),
                     'stockist'  => (isset($val->stockist) ? $val->stockist : "")
@@ -4109,6 +4222,9 @@ class ReportController extends Controller
                     $data[] = array(
                         'Name'      => (isset($val->employee->name) ? $val->employee->name : "-"),
                         'Pasar'     => (isset($val->pasar->name) ? $val->pasar->name : "-"),
+                        'Region'    => (isset($val->pasar->subarea->area->region->name) ? $val->pasar->subarea->area->region->name : ""),
+                        'Area'      => (isset($val->pasar->subarea->area->name) ? $val->pasar->subarea->area->name : ""),
+                        'Subarea'   => (isset($val->pasar->subarea->name) ? $val->pasar->subarea->name : ""),
                         'Date'      => (isset($val->date) ? $val->date : ""),
                         'Week'      => (isset($val->week) ? $val->week : ""),
                         'Stockist'  => (isset($val->stockist) ? $val->stockist : "-")
@@ -4170,6 +4286,9 @@ class ReportController extends Controller
                 $data[] = array(
                     'id'            => $id++,
                     'outlet'        => $val->outlet->name,
+                    'region'        => (isset($val->outlet->employeePasar->pasar->subarea->area->region->name) ? $val->outlet->employeePasar->pasar->subarea->area->region->name : ""),
+                    'area'          => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                    'subarea'       => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),
@@ -4216,6 +4335,9 @@ class ReportController extends Controller
                 $data[] = array(
                     'id'            => $id++,
                     'outlet'        => $val->outlet->name,
+                    'region'        => (isset($val->outlet->employeePasar->pasar->subarea->area->region->name) ? $val->outlet->employeePasar->pasar->subarea->area->region->name : ""),
+                    'area'          => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                    'subarea'       => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),

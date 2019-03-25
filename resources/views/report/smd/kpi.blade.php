@@ -58,7 +58,7 @@
         <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="summaryTable">
           <thead>
             <tr>
-              <th colspan="11" style="text-align: center;">INFORMATION</th>
+              <th colspan="12" style="text-align: center;">INFORMATION</th>
               <th colspan="7" style="text-align: center;">RATA-RATA PERFORMANCE KPI</th>
               <th colspan="7" style="text-align: center;">BEST KPI</th>
               <th style="text-align: center;">TOTAL</th>
