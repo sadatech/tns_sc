@@ -71,7 +71,7 @@
           </div>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="onTargetTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="onTargetTable">
           <thead>          
             <th>Periode</th>
             <th>Region</th>

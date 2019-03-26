@@ -26,7 +26,7 @@
             <button class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</button>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="promoTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="promoTable">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Product</th>

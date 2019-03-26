@@ -55,7 +55,7 @@
                     </div>
                 </div>
 
-                <table class="table table-striped table-vcenter js-dataTable-full" id="agencytable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="agencytable">
                   <thead>
                     <th class="text-center" style="width: 70px;"></th>
                     <th class="text-center">Name</th>

@@ -24,7 +24,7 @@
           </h3>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="account">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="account">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th>Accoount</th>

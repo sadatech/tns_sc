@@ -14,7 +14,7 @@
                         <a href="{{ route('tambah.faq') }}" class="btn btn-primary btn-square" title="Add Data Store"><i class="fa fa-plus mr-2"></i>Add Data</a>
                     </h3>
                 </div>
-                <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="faqtable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered dataTable" id="faqtable">
                     <thead>
                         <th class="text-center" style="width: 150px;">Action</th>
                         <th width="200px">Question</th>

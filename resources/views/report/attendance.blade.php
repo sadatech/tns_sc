@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="attendanceTable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered dataTable" id="attendanceTable">
                     <thead>
                         <th width="70px">NIK</th>
                         <th width="100px">Name</th>

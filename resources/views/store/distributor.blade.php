@@ -23,7 +23,7 @@
                     <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal" title="Import Data"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
                 </h3>
             </div>
-            <table class="table table-striped table-vcenter js-dataTable-full" id="classtable">
+            <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="classtable">
             <thead>
                 <th class="text-center" style="width: 70px;"></th>
                 <th>Code</th>

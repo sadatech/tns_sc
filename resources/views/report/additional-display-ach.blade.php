@@ -25,7 +25,7 @@
         </div>
         <center><h3>Area/TL</h3></center>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableArea">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTableArea">
         <thead>
           <tr>
             <th rowspan="2" style="vertical-align: middle; text-align: center;">PERFORMANCE AREA/TL</th>
@@ -44,7 +44,7 @@
 
         <center><h3>SPG</h3></center>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableSpg">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTableSpg">
         <thead>
           <tr>
                 <th rowspan="2" style="vertical-align: middle; text-align: center;">PERFORMANCE SPG</th>
@@ -62,7 +62,7 @@
 
         <center><h3>MD</h3></center>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableMd">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTableMd">
         <thead>
           <tr>
                 <th rowspan="2" style="vertical-align: middle; text-align: center;">PERFORMANCE MD</th>

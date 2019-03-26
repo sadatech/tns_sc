@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <table class="table table-striped table-vcenter js-dataTable-full" id="Rejointable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="Rejointable">
                   <thead>
                     <th class="text-center" style="width: 15%;"> Action</th>
                     <th class="text-center">NIK</th>

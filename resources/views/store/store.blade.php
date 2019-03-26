@@ -18,7 +18,7 @@
                         <a href="{{route('store.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </div>
                 </div>
-                <table class="table table-striped table-vcenter js-dataTable-full dataTable" id="storetable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered dataTable" id="storetable">
                     <thead>
                         <th class="text-center" style="width: 60px;">Action</th>
                         <th width="200px">Name</th>

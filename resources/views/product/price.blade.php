@@ -26,7 +26,7 @@
             <a href="{{ route('price.export') }}" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full" id="price">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="price">
         <thead>
           <th class="text-center" style="width: 70px;"></th>
           <th class="text-center">Product</th>

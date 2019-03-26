@@ -57,7 +57,7 @@
           </div>
 
           <center><h3>AREA</h3></center>
-          <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableArea">
+          <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTableArea">
             <thead>
               <th class="text-center" style="width: 70px;">no</th>
               <th>AREA</th>
@@ -70,7 +70,7 @@
           <div class="block-header p-0 mb-20">
           </div>
           <center><h3>ACCOUNT</h3></center>
-          <table class="table table-striped table-vcenter js-dataTable-full" id="reportTableAccount">
+          <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTableAccount">
             <thead>
               <th class="text-center" style="width: 70px;">no</th>
               <th>ACCOUNT</th>

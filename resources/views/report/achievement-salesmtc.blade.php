@@ -53,7 +53,7 @@
           </div>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="tlTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="tlTable">
           <thead>          
             <th></th>            
             <th>Performance TL</th>
@@ -99,7 +99,7 @@
           </div>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="spgTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="spgTable">
           <thead>          
             <th></th>            
             <th>Performance SPG</th>
@@ -144,7 +144,7 @@
           </div>
         </div>
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="mdTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="mdTable">
           <thead>          
             <th></th>            
             <th>Performance MD</th>

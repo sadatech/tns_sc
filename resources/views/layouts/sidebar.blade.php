@@ -278,7 +278,7 @@
                                     </li> 
                                     {{-- SUMMARY REPORT--}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Summary</span></a>
+                                        <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Detail VDO</span></a>
                                     </li>
                                     {{-- SALES SUMMARY --}}
                                     <li>

@@ -59,12 +59,15 @@
               <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="category">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="category">
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
               <th>Nama</th>
               <th>Pasar</th>
+              <th>Region</th>
+              <th>Area</th>
+              <th>Sub Area</th>
               <th>Tanggal</th>
               <th>Week</th>
               <th>Stockist</th>
@@ -206,6 +209,9 @@ table.table thead tr th {
       { data: 'id' },
       { data: 'name' },
       { data: 'pasar' },
+      { data: 'region' },
+      { data: 'area' },
+      { data: 'subarea' },
       { data: 'tanggal' },
       { data: 'week' },
       { data: 'stockist' },

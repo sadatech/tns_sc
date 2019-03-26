@@ -28,7 +28,7 @@
                     </div>
                 </div>
 
-                <table class="table table-striped table-vcenter js-dataTable-full table-responsive" id="placetable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="placetable">
                     <thead>
                         <th style="width: 70px;">Action</th>
                         <th width="120px">Code</th>

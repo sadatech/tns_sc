@@ -23,7 +23,7 @@
                         <a href="{{ route('plan.export') }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                     </h3>
                 </div>
-                <table class="table table-responsive table-striped table-vcenter js-dataTable-full" id="planTable">
+                <table class="table table-responsive table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="planTable">
                 <thead>
                     <th style="width: 20%;"> Action</th>
                     <th style="width: 300px;">Employee</th>

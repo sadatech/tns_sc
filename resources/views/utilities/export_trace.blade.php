@@ -58,7 +58,7 @@
       <div class="block-content block-content-full">
 
 
-        <table class="table table-striped table-vcenter js-dataTable-full" id="traceTable">
+        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="traceTable">
           <thead> 
             <th class="text-center" style="width: 70px;"></th>    
             <th>Date</th>

@@ -18,7 +18,7 @@
         <div class="block-content block-content-full">
             <div class="block-header p-0 mb-20">
             </div>
-            <table class="table table-striped table-vcenter js-dataTable-full" id="resigntable">
+            <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="resigntable">
                 <thead class="text-center">
                     <th></th>
                     <th width="200px">NIK</th>

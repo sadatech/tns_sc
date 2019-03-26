@@ -9,7 +9,7 @@
         </div>
         <div class="block">        
             <div class="block-content block-content-full">
-                <table class="table table-striped table-vcenter js-dataTable-full" id="positiontable">
+                <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="positiontable">
                     <thead>
                         <th class="text-center">Name</th>
                         <th class="text-center" style="width: 15%;"> Action</th>
