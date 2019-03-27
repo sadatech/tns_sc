@@ -29,20 +29,33 @@ $action = $action ?? '';
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            {{ Form::textInput('code', old('code'), ['labelText' => 'Code SKU Product', 'id' => $type.'Code',  'required' => '']) }}
+                        <div class="form-group col-md-6">
+                          <label>Code SKU Product</label>
+                            <input type="text" class="form-control" name="code" id="{{$type}}Code">
                         </div>
-                        <div class="col-md-6">
-                            {{ Form::textInput('name', old('name'), ['labelText' => 'SKU Product', 'required' => '', 'id' => $type.'Name']) }}
+                        <div class="form-group col-md-6">
+                          <label>SKU Product</label>
+                            <input type="text" class="form-control" name="name" id="{{$type}}Name">
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            {{ Form::select2Input('panel', old('panel'), App\Product::getPanelOptions(), ['labelText' => 'Panel', 'required' => '', 'id' => $type.'Panel']) }}
+                        <div class="form-group col-md-6">
+                            <label>Panel</label>
+                            <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}Panel" name="panel" required>
+                              <option value="" disabled selected>Choose your Panel</option>
+                              <option value="yes">Yes </option>
+                              <option value="no">No </option>
+                            </select>
                         </div>
-                        <div class="col-md-6">
-                            {{ Form::select2Input('stock_type_id', old('stock_type_id'), App\ProductStockType::toDropDownData(), ['labelText' => 'Stock Type', 'required' => '', 'id' => $type.'StockType']) }}
+                        <div class="form-group col-md-6">
+                            <label>Stock Type</label>
+                            <select class="{{$type}}-js-select2 form-control" style="width: 100%" id="{{$type}}StockType" name="stock_type_id" required>
+                              <option value="" disabled selected>Choose your Stock Type</option>
+                              @foreach(App\ProductStockType::get() as $data)
+                              <option value="{{ $data->id }}">{{ $data->name }} </option>
+                              @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -99,6 +112,10 @@ $action = $action ?? '';
         }
     ));
 
+  $(".{{$type}}-js-select2").select2({ 
+    dropdownParent: $("#{{$id}}")
+  });
+
 $("#example-inline-checkbox1").change(function() {
     if ($(this).removeAttr("checked")) {
         $("#Input1").hide();
@@ -137,7 +154,7 @@ $("#example-inline-checkbox2").change(function() {
             $('.input2').val(json.pack);
             $('#{{$type}}Pcs').val(json.pcs);
             // $('#{{$type}}MeasurementUnit').val(json.measure).trigger('change');
-            console.log(json)
+            // console.log(json.carton)
         }
     @endif
 </script>
