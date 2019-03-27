@@ -19,7 +19,7 @@ class SmdController extends Controller
 {
     public function baca()
     {
-        $data['employee']      = Employee::where(['isResign' => false])
+        $data['employee']      = Employee::where(['isResign' => 0])
         ->where('id_position', 4)
         ->get();
         return view('target.smd', $data);

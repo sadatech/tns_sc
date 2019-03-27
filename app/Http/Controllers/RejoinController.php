@@ -23,7 +23,7 @@ class RejoinController extends Controller
     public function data()
     {
         $rejoin = Employee::where([
-            ['isResign', true]
+            ['isResign' => 1]
         ])->with(['position', 'agency']);
 
         return Datatables::of($rejoin)
@@ -63,7 +63,7 @@ class RejoinController extends Controller
             ]);
             if ($insert->id) {
                 $update = Employee::find($request->input('employee'));
-                $update->isResign = false;
+                $update->isResign = 0;
                 if ($update->save()) {
                     return redirect()->back()
                     ->with([
@@ -93,7 +93,7 @@ class RejoinController extends Controller
 
     public function export()
     {
-        $rejoin = Employee::where('isResign', true)->orderBy('created_at', 'DESC')->get();
+        $rejoin = Employee::where('isResign', 1)->orderBy('created_at', 'DESC')->get();
         $data = array();
         foreach ($rejoin as $val) {
             $data[] = array(

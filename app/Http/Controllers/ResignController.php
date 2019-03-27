@@ -22,7 +22,7 @@ class ResignController extends Controller
     public function data()
     {
         $resign = Employee::where([
-            ['isResign', false]
+            ['isResign' => 0]
         ])->with(['position', 'agency']);
         
         return Datatables::of($resign)
@@ -73,7 +73,7 @@ class ResignController extends Controller
                 $save = DB::table('resign_stores')->insert($storeAll);
                 if ($save) {
                     $update = Employee::find($request->input('employee'));
-                    $update->isResign = true;
+                    $update->isResign = 1;
                     if ($update->save()) {
                         return redirect()->back()
                         ->with([

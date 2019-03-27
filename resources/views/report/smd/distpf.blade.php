@@ -63,7 +63,10 @@
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Nama SMD</th>
+              <th>Nama VDO</th>
+              <th>Region</th>
+              <th>Area</th>
+              <th>Sub Area</th>
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Outlet</th>
@@ -204,6 +207,9 @@ table.table thead tr th {
       columns: [
       { data: 'id', name:'' },
       { data: 'nama', name:'Nama' },
+      { data: 'region' },
+      { data: 'area' },
+      { data: 'subarea' },
       { data: 'pasar', name:'Pasar' },
       { data: 'tanggal', name:'Tanggal' },
       { data: 'outlet', name:'Outlet' },

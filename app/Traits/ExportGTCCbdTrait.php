@@ -13,12 +13,13 @@ trait ExportGTCCbdTrait
 {
 
 	private $headerList = [
-		["EMPLOYEE", "OUTLET", "DATE", "PHOTO"], // old
-		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM"], // new
+		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO"], // old
+		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO", "PHOTO", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM"], // new
 	];
 
 	private $valueList 	= [];
 	private $photoList 	= [];
+	private $photoList2 = [];
 	private $tempVar 	= [];
 
 	public function GTCCbdExportTrait($filters, $filecode)
@@ -71,6 +72,7 @@ trait ExportGTCCbdTrait
                     $d->outlet->employeePasar->pasar->subarea->name,
 					$d->date,
 					"",
+					"",
 					$d->total_hanger, 
 					$d->outlet_type, 
 					$d->cbd_position,
@@ -79,16 +81,20 @@ trait ExportGTCCbdTrait
 				];
 
 				$this->photoList[$a] = $d->photo;
+				$this->photoList2[$a] = $d->photo2;
 
 			}else{
 				$this->valueList[$a] = [
 					$d->employee->name,
 					$d->outlet->name,
-					$d->outlet->employeePasar->pasar->subarea->area->name,
+                    $d->outlet->employeePasar->pasar->subarea->area->region->name,
+                    $d->outlet->employeePasar->pasar->subarea->area->name,
+                    $d->outlet->employeePasar->pasar->subarea->name,
 					$d->date,
 				];
 
 				$this->photoList[$a] = $d->photo;
+				$this->photoList2[$a] = $d->photo2;
 			}
 		}
 	}
@@ -104,12 +110,18 @@ trait ExportGTCCbdTrait
 		}
 
 		$data = [];
-		$filename = "GTC ".$label."CBD ".Carbon::parse("1/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (".$this->tempVar["filecode"].")";
-
+		if ($this->tempVar['filters']['day'] != 'null') {
+			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day']."/".$this->tempVar['filters']['year'])->format("d F Y")." (".$this->tempVar["filecode"].")";
+		}else{
+			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (".$this->tempVar["filecode"].")";
+		}
 
 		$store = Excel::create($filename, function($excel) use (&$data, $index, $label){
-			$excel->setTitle("GTC ".$label."CBD ".Carbon::parse("1/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y"));
-
+		if ($this->tempVar['filters']['day'] != 'null') {
+			$excel->setTitle("GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day'].'/'.$this->tempVar['filters']['year'])->format("d F Y"));
+		}else{
+			$excel->setTitle("GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y"));
+		}
 			$excel->setCreator("SADA Technologies");
 			$excel->setCompany("SADA Technologies");
 			$excel->setLastModifiedBy("SADA Technologies");
@@ -157,6 +169,30 @@ trait ExportGTCCbdTrait
 	            		if (file_exists(public_path("/uploads/cbd/".($this->photoList[$valueTLKey]))))
 	            		{
 		            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
+		            		$imgDrawing->setCoordinates("E".($startTLRow));
+		            		$imgDrawing->setWorksheet($sheet);
+		            		$imgDrawing->setWidth(40);
+	            		}else{
+		            		$sheet->setCellValue('E'.$startTLRow, "not found")->setAutoSize(true);
+	            		}
+	            	}
+
+					$startTLRow++;
+				}
+
+				$startTLRow = 2;
+				foreach ($this->valueList as $valueTLKey => $valueTLData) {
+					$sheet->row($startTLRow, $valueTLData);
+					$sheet->row($startTLRow, function($row){
+						$row->setFontSize(12);
+					});
+
+	            	$imgDrawing = new PHPExcel_Worksheet_Drawing;
+	            	if (isset($this->photoList2[$valueTLKey]))
+	            	{
+	            		if (file_exists(public_path("/uploads/cbd/".($this->photoList2[$valueTLKey]))))
+	            		{
+		            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList2[$valueTLKey])));
 		            		$imgDrawing->setCoordinates("E".($startTLRow));
 		            		$imgDrawing->setWorksheet($sheet);
 		            		$imgDrawing->setWidth(40);

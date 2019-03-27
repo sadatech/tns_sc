@@ -701,7 +701,7 @@ class ReportController extends Controller
     {
         $filters['month']       = $filterMonth;
         $filters['year']        = $filterYear;
-        $filters['day']        = $filterDay;
+        $filters['day']         = $filterDay;
         $filters['employee']    = $filterEmployee;
         $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
@@ -710,10 +710,10 @@ class ReportController extends Controller
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
-                if ($filters['day'] == null) {
-                    $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("F Y") ." (" . $filecode . ")";
-                }else{
+                if ($filters['day'] == 'null') {
                     $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
+                }else{
+                    $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (" . $filecode . ")";
                 }
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
@@ -2831,6 +2831,7 @@ class ReportController extends Controller
                             $vt = "Rp.".($total == 0 ? "-" : $total);
                                 $report[$indexArray] = array_merge($report[$indexArray], ['VT' => $vt]);
 
+                            $report[$indexArray] = array_except($report[$indexArray],['id_ep','id_emp','id_pasar']);
                     }
                     $indexArray++;
                 }
@@ -3842,6 +3843,9 @@ class ReportController extends Controller
                 'id_employee'   => $value->id_employee,
                 'date'          => $value->date,
                 'nama'          => $value->employee->name,
+                'region'        => (isset($value->outlet->employeePasar->pasar->subarea->area->region->name) ? $value->outlet->employeePasar->pasar->subarea->area->region->name : ""),
+                'area'          => (isset($value->outlet->employeePasar->pasar->subarea->area->name) ? $value->outlet->employeePasar->pasar->subarea->area->name : ""),
+                'subarea'       => (isset($value->outlet->employeePasar->pasar->subarea->name) ? $value->outlet->employeePasar->pasar->subarea->name : ""),
                 'pasar'         => (isset($value->outlet->employeePasar->pasar->name) ? $value->outlet->employeePasar->pasar->name : ""),
                 'tanggal'       => Carbon::parse($value->date)->day,
                 'outlet'        => (isset($value->outlet->name) ? $value->outlet->name : "") 
@@ -5203,15 +5207,14 @@ class ReportController extends Controller
 
     public function SMDTargetKpi(Request $request)
     {
-        $target_kpi = TargetKpiMd::whereHas('position', function($query){
+        $target_kpi = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
 
         if($request->area != null && $request->area != 'null'){
-            $target_kpi = $target_kpi->join('employee_pasars','employees.id','employee_pasars.id_employee')
-                                    ->join('pasars','employee_pasars.id_pasar','pasars.id')
-                                    ->join('sub_areas','pasars.id_subarea','sub_areas.id')
-                                    ->where('sub_areas.id_area', $request->area);
+            $target_kpi = $target_kpi->whereHas('employeePasar.pasar.subarea', function($q) use ($request){
+                return $q->where('id_area', $request->area);
+            });
         }
 
         // return is_null($target_kpi->first()->getTarget($request->periode)) ? 0 : $target_kpi->first()->getTarget($request->periode)['hk'];
@@ -5271,7 +5274,7 @@ class ReportController extends Controller
 
     public function SMDKpi(Request $request)
     {
-        $target_kpi = TargetKpiMd::whereHas('position', function($query){
+        $target_kpi = TargetKpiMd::where('isResign', 0)->where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
 
@@ -5373,7 +5376,6 @@ class ReportController extends Controller
 
     public function SMDKpiExportXLS($filterPeriode, $filterArea)
     {
-
         $result = DB::transaction(function() use ($filterPeriode, $filterArea){
             try
             {

@@ -67,7 +67,7 @@ trait ExportSMDReportKPITrait
 
 	private function createValue()
 	{
-		$TargetKPI = TargetKpiMd::whereHas('position', function($query){
+		$TargetKPI = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
 
@@ -93,20 +93,20 @@ trait ExportSMDReportKPITrait
 				number_format($KPIData->getTotalValue($this->tempVar['periode'])),
 				number_format($KPIData->getSalesValue($this->tempVar['periode'])),
 				round($KPIData->getAvgCbd($this->tempVar['periode'])),
-				round($KPIData->getAvgCall($this->tempVar['periode'])),
-				round($KPIData->getAvgEc($this->tempVar['periode'])),
+				'',//round($KPIData->getAvgCall($this->tempVar['periode'])),
+				'',//round($KPIData->getAvgEc($this->tempVar['periode'])),
 				@$KPIData->getAvgCat1($this->tempVar['periode']),
 				@$KPIData->getAvgCat2($this->tempVar['periode']),
-				number_format($KPIData->getAvgTotalValue($this->tempVar['periode'])),
-				number_format($KPIData->getAvgSalesValue($this->tempVar['periode'])),
-				$KPIData->getBestCbd($this->tempVar['periode']),
-				$KPIData->getBestCall($this->tempVar['periode']),
-				$KPIData->getBestEc($this->tempVar['periode']),
-				@$KPIData->getBestCat1($this->tempVar['periode']),
-				@$KPIData->getBestCat2($this->tempVar['periode']),
-				$KPIData->getBestTotalValue($this->tempVar['periode']),
-				$KPIData->getBestSalesValue($this->tempVar['periode']),
-				$KPIData->getTotalPoint($this->tempVar['periode']),
+				'',//number_format($KPIData->getAvgTotalValue($this->tempVar['periode'])),
+				'',//number_format($KPIData->getAvgSalesValue($this->tempVar['periode'])),
+				'',//$KPIData->getBestCbd($this->tempVar['periode']),
+				'',//$KPIData->getBestCall($this->tempVar['periode']),
+				'',//$KPIData->getBestEc($this->tempVar['periode']),
+				'',//@$KPIData->getBestCat1($this->tempVar['periode']),
+				'',//@$KPIData->getBestCat2($this->tempVar['periode']),
+				'',//$KPIData->getBestTotalValue($this->tempVar['periode']),
+				'',//$KPIData->getBestSalesValue($this->tempVar['periode']),
+				'',//$KPIData->getTotalPoint($this->tempVar['periode']),
         	];
         }
 	}

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', "Report Summary SMD")
+@section('title', "Report Summary VDO")
 @section('content')
 <div class="content">
     <h2 class="content-heading pt-10">Summary<small>Report</small></h2>

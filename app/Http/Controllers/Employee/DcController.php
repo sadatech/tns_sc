@@ -38,13 +38,13 @@ class DcController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false, 'id_position' => 5])
+		$employee = Employee::where(['isResign' => 0, 'id_position' => 5])
 		->with(['agency', 'position', 'employeeSubArea', 'timezone'])
 		->select('employees.*');
 		// dd($employee->get()[0]);
 		return Datatables::of($employee)
 		->addColumn('action', function ($employee) {
-			// if ($employee->isResign == false) {
+			// if ($employee->isResign == 0) {
 				return "<a href=".route('ubah.employee', $employee->id)."/dc"." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
 				<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
 				<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
@@ -78,7 +78,7 @@ class DcController extends Controller
 	public function export()
     {
         $emp = Employee::where([
-		'isResign' => false, 
+		'isResign' => 0,
 		'id_position' => 5
         ])->orderBy('created_at', 'DESC');
         if (!empty($emp->count() > 1)) {

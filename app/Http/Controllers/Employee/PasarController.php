@@ -41,7 +41,7 @@ class PasarController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false])
+		$employee = Employee::where(['isResign' => 0])
 		->whereIn('id_position', [3,4,7,8])
 		->with(['agency', 'position', 'employeePasar', 'timezone'])
 		->select('employees.*');
@@ -95,7 +95,7 @@ class PasarController extends Controller
 
 	public function export()
 	{
-		$emp = Employee::where(['isResign' => false])
+		$emp = Employee::where(['isResign' => 0])
 		->whereIn('id_position', [3,4,7, 8])
 		->orderBy('created_at', 'DESC')
 		->get();
