@@ -35,7 +35,7 @@ trait ExportSMDReportTargetKPITrait
 
 	public function createValue()
 	{
-		$TargetKPI = TargetKpiMd::whereHas('position', function($query){
+		$TargetKPI = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
 

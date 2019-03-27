@@ -278,7 +278,7 @@ class EmployeeController extends Controller
 
 	public function data()
 	{
-		$employee = Employee::where(['isResign' => false])
+		$employee = Employee::where(['isResign' => 0])
 		->whereIn('id_position', [1,2,6])
 		->with(['agency', 'position', 'employeeStore', 'timezone'])
 		->select('employees.*');
@@ -519,7 +519,7 @@ class EmployeeController extends Controller
 
 	public function export()
 	{
-		$emp = Employee::where(['isResign' => false])
+		$emp = Employee::where(['isResign' => 0])
 		->whereIn('id_position', [1,2,6])
 		->orderBy('created_at', 'DESC');
 		if ($emp->count() > 0) {
@@ -606,7 +606,7 @@ class EmployeeController extends Controller
                             ->withInput();
                         } else {
 							// $check = Employee::whereRaw("TRIM(UPPER(name)) = '". trim(strtoupper($row->name))."'")
-							// ->where(['nik' => $row->nik, 'isResign' => false])
+							// ->where(['nik' => $row->nik, 'isResign' => 0])
 							// ->whereIn('id_position', [1,2,6])
 							// ->count();
 

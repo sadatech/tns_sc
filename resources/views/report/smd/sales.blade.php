@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sales SMD Pasar")
+@section('title', "Report Sales VDO Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">Sales SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales VDO Pasar <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -70,6 +70,7 @@
               @foreach ($product as $pro)
               <th>{{ $pro->name }}</th>
               @endforeach
+              <th>Total</th>
             </tr>
           </thead>
         </table>
@@ -210,6 +211,7 @@ table.table thead tr th {
       @foreach ($product as $pro)
       { data: 'product-{{ $pro->id }}' },
       @endforeach
+      { data: 'total' },
       ],
       bDestroy: true
     });

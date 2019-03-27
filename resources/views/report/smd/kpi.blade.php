@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report Sales SPG")
+@section('title', "Report Sales VDO")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">KPI <small>SMD</small></h2>
+  <h2 class="content-heading pt-10">KPI <small>VDO</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -66,7 +66,7 @@
             <tr>
               <th class="text-center" style="width: 70px;"></th>              
               <th>Area</th>
-              <th>Nama SMD</th>
+              <th>Nama VDO</th>
               <th>HK Target</th>
               <th>HK Actual</th>
               <th>Sum of CBD</th>
@@ -277,10 +277,13 @@ table.table thead tr th {
       $('#panelData').attr("style", "display:none;");
     })
 
+
     $("#filterSearch").click(function() {
 
-      
+      var serial = $("#filterForm").serialize()
+      console.log(serial)
 
+      $("#btnDownloadXLS").attr("target-url", "{{ route('smd.pasar.kpi.exportXLS') }}" + "/" + $('#filterMonth').val()+"/"+$("#filterArea").val());
       $('#panelData').removeAttr('style');
       
     })

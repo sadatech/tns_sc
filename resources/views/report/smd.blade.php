@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report SMD Pasar")
+@section('title', "Report VDO Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">SMD Pasar <small>Report</small></h2>
+  <h2 class="content-heading pt-10">VDO Pasar <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -56,7 +56,7 @@
             <tr>
               <th class="text-center" style="width: 70px;"></th>
               <th>Area</th>
-              <th>Nama SMD</th>
+              <th>Nama VDO</th>
               <th>Jabatan</th>
               <th>Pasar</th>
               <th>Nama Stockist</th>
