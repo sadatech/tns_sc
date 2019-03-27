@@ -28,6 +28,7 @@ use App\Oos;
 use App\OosDetail;
 use App\EmployeeSubArea;
 use App\Brand;
+use App\Price;
 use Auth;
 use DB;
 use App\Block;
@@ -3921,6 +3922,9 @@ class ReportController extends Controller
                     $detail = DistributionDetail::where('id_distribution',$val->id)->get();
                     $data[] = array(
                         'Employee'  => $val->employee->name,
+                        'Region'    => (isset($val->outlet->employeePasar->pasar->subarea->area->region->name) ? $val->outlet->employeePasar->pasar->subarea->area->region->name : ""),
+                        'Area'      => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
+                        'Subarea'   => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
                         'Pasar'     => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
                         'Tanggal'   => (isset($val->date) ? $val->date : ""),
                         'Outlet'    => (isset($val->outlet->name) ? $val->outlet->name : "-")
@@ -3938,9 +3942,9 @@ class ReportController extends Controller
             }
         
             if ($request->has('periode')) {
-                $filename = "ReportDistPf ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+                $filename = "ReportDistPf ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01")->format("F Y").".xlsx";
             }else{
-                $filename = "ReportDistPf ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+                $filename = "ReportDistPf ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8))->format("d F Y").".xlsx";
             }
             return Excel::create($filename, function($excel) use ($data) {
                 $excel->sheet('ReportDistPf', function($sheet) use ($data)
@@ -4034,6 +4038,26 @@ class ReportController extends Controller
                 return implode(", ", $satuan);
             });
         }
+        $dt->addColumn('total', function($sales) use ($product) {
+            $satuan = 0;
+            foreach ($product as $pdct) {
+                $sale = \App\SalesMd::where([
+                    'id_employee' => $sales['id_employee'],
+                    'id_outlet' => $sales['id_outlet'],
+                    'date' => $sales['date'],
+                ])->get(['id'])->toArray();
+                $getIdSale = array_column($sale,'id');
+                $detail = \App\SalesMdDetail::whereIn('id_sales', $getIdSale)
+                ->where('id_product', $pdct['id'])
+                ->get();
+                $price = Price::where('id_product', $pdct['id'])->first();
+                foreach ($detail as $value) {
+                     $satuan += $value->qty_actual*$price->price;
+                } 
+            }
+                return "Rp.".($satuan == 0 ? "-" : $satuan);
+        });
+
         $dt->rawColumns($columns);
         return $dt->make(true);
     }
