@@ -2982,7 +2982,7 @@ class ReportController extends Controller
                 $checkin = Carbon::parse($val->checkin)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s');
                 $checkout = ($val->checkout ? Carbon::parse($val->checkout)->setTimezone($val->attendance->employee->timezone->timezone)->format('H:i:s') : "Belum Check-out");
                 $data[] = array(
-                    'id' => $id++,
+                    'no.' => $id++,
                     'region' => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
                     'area' => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
                     'subarea' => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
@@ -4367,6 +4367,7 @@ class ReportController extends Controller
                     'region'        => (isset($val->outlet->employeePasar->pasar->subarea->area->region->name) ? $val->outlet->employeePasar->pasar->subarea->area->region->name : ""),
                     'area'          => (isset($val->outlet->employeePasar->pasar->subarea->area->name) ? $val->outlet->employeePasar->pasar->subarea->area->name : ""),
                     'subarea'       => (isset($val->outlet->employeePasar->pasar->subarea->name) ? $val->outlet->employeePasar->pasar->subarea->name : ""),
+                    'pasar'         => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
                     'employee'      => $val->employee->name,
                     'date'          => $val->date,
                     'photo'         => (isset($val->photo) ? "<a href=".asset('/uploads/cbd/'.$val->photo)." class='btn btn-sm btn-success btn-square popup-image' title=''><i class='si si-picture mr-2'></i> View Photo</a>" : "-"),

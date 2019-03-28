@@ -69,6 +69,7 @@
               <th>Region</th>
               <th>Area</th>
               <th>Sub Area</th>
+              <th>Pasar</th>
               <th>Date</th>
               <th>Photo Before</th>
               <th>Photo After</th>
@@ -293,6 +294,7 @@ table.table thead tr th {
       { data: 'region' },
       { data: 'area' },
       { data: 'subarea' },
+      { data: 'pasar' },
       { data: 'date' },
       { data: 'photo' },
       { data: 'photo2' },

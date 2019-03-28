@@ -14,7 +14,7 @@ trait ExportGTCCbdTrait
 
 	private $headerList = [
 		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO"], // old
-		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO Before", "PHOTO After", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Approval"], // new
+		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "PASAR", "DATE", "PHOTO Before", "PHOTO After", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Approval"], // new
 	];
 
 	private $valueList 	= [];
@@ -67,9 +67,10 @@ trait ExportGTCCbdTrait
 				$this->valueList[$a] = [
 					$d->employee->name,
 					$d->outlet->name,
-                    $d->outlet->employeePasar->pasar->subarea->area->region->name,
-                    $d->outlet->employeePasar->pasar->subarea->area->name,
-                    $d->outlet->employeePasar->pasar->subarea->name,
+                    $d->outlet->employeePasar->pasar->subarea->area->region->name?? '-',
+                    $d->outlet->employeePasar->pasar->subarea->area->name?? '-',
+                    $d->outlet->employeePasar->pasar->subarea->name?? '-',
+                    $d->outlet->employeePasar->pasar->name?? '-',
 					$d->date,
 					"",
 					"",
