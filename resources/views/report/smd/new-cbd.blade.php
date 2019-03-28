@@ -69,6 +69,7 @@
               <th>Region</th>
               <th>Area</th>
               <th>Sub Area</th>
+              <th>Pasar</th>
               <th>Date</th>
               <th>Photo Before</th>
               <th>Photo After</th>
@@ -80,6 +81,7 @@
               <th>POSM Hangering Mobile</th>
               <th>POSM Poster</th>
               <th>POSM Other</th>
+              <th>Approval</th>
             </tr>
           </thead>
         </table>
@@ -233,6 +235,57 @@ table.table thead tr th {
         }else{
           $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
         };
+        $('.js-swal-reject').on('click', function(){
+          var url = $(this).data("url");
+          swal({
+            title: "Are you sure to make change?",
+            text: "CBD will be reject!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#d26a5c',
+            confirmButtonText: 'Yes, delete it!',
+            html: false,
+            preConfirm: function() {
+                return new Promise(function (resolve) {
+                    setTimeout(function () {
+                        resolve();
+                    }, 50);
+                });
+            }
+          }).then(function(result){
+            if (result.value) {
+                window.location = url;
+            } else if (result.dismiss === 'cancel') {
+                swal('Cancelled', 'Your data is safe :)', 'error');
+            }
+          });
+        });
+        $('.js-swal-approve').on('click', function(){
+          var url = $(this).data("url");
+          swal({
+            title: "Are you sure to make change?",
+            text: "CBD will be approve!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#d26a5c',
+            confirmButtonText: 'Yes, delete it!',
+            html: false,
+            preConfirm: function() {
+                return new Promise(function (resolve) {
+                    setTimeout(function () {
+                        resolve();
+                    }, 50);
+                });
+            }
+          }).then(function(result){
+            if (result.value) {
+                window.location = url;
+            } else if (result.dismiss === 'cancel') {
+                swal('Cancelled', 'Your data is safe :)', 'error');
+            }
+          });
+        });
+
       },
       columns: [
       { data: 'id' },
@@ -241,6 +294,7 @@ table.table thead tr th {
       { data: 'region' },
       { data: 'area' },
       { data: 'subarea' },
+      { data: 'pasar' },
       { data: 'date' },
       { data: 'photo' },
       { data: 'photo2' },
@@ -252,9 +306,30 @@ table.table thead tr th {
       { data: 'posm_hangering_mobile' },
       { data: 'posm_poster' },
       { data: 'posm_others' },
+      { data: 'status' },
       ],
       bDestroy: true
     });
   });
+
+  @if(session('type'))
+  $(document).ready(function() {
+      $.notify({
+        title: '<strong>{!! session('title') !!}</strong>',
+        message: '{!! session('message') !!}'
+      }, {
+        type: '{!! session('type') !!}',
+        animate: {
+          enter: 'animated zoomInDown',
+          exit: 'animated zoomOutUp'
+        },
+        placement: {
+          from: 'top',
+          align: 'center'
+        }
+      });
+  });
+  @endif
+
 </script>
 @endsection

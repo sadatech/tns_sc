@@ -23,7 +23,7 @@ class RejoinController extends Controller
     public function data()
     {
         $rejoin = Employee::where([
-            ['isResign' => 1]
+            'isResign' => 1
         ])->with(['position', 'agency']);
 
         return Datatables::of($rejoin)
