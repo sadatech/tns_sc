@@ -22,7 +22,7 @@ class ResignController extends Controller
     public function data()
     {
         $resign = Employee::where([
-            ['isResign' => 0]
+            'isResign' => 0
         ])->with(['position', 'agency']);
         
         return Datatables::of($resign)
