@@ -4379,14 +4379,52 @@ class ReportController extends Controller
                     'cbd_position'  => $val->cbd_position,
                     'outlet_type'   => $val->outlet_type,
                     'total_hanger'  => $val->total_hanger,
+                    'status'        => $val->status,
+                    'id_cbd'        => $val->id,
                 );
             }
         }
 
         $dt = Datatables::of(collect($data));
         // return response()->json($data);
+        $dt->editColumn('status', function($item){
+            if ($item['status'] == 1) {
+                return '<button data-url='.route("cbd.reject", $item['id_cbd']).' class="btn btn-sm btn-success btn-square js-swal-reject"><i class="si si-check"></i> Approve</button>';
+            }else{
+                return '<button data-url='.route("cbd.approve", $item['id_cbd']).' class="btn btn-sm btn-danger btn-square js-swal-approve"><i class="si si-minus"></i> Reject</button>';
+            }
+        });
         
-        return $dt->rawColumns(['photo','photo2'])->make(true);
+        return $dt->rawColumns(['photo','photo2', 'status'])->make(true);
+    }
+
+    public function reject($id)
+    {
+        $newCbd = NewCbd::find($id);
+        // return response()->json($newCbd);
+
+        $newCbd->update(['status' => 0]);
+
+        return redirect()->back()
+        ->with([
+            'type'    => 'success',
+            'title'   => 'Sukses!<br/>',
+            'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil diubah!'
+        ]);
+    }
+
+    public function approve($id)
+    {
+        $newCbd = NewCbd::find($id);
+
+        $newCbd->update(['status' => 1]);
+
+        return redirect()->back()
+        ->with([
+            'type'    => 'success',
+            'title'   => 'Sukses!<br/>',
+            'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil diubah!'
+        ]);
     }
 
     public function getCbd($data, $periode, $day)

@@ -14,7 +14,7 @@ trait ExportGTCCbdTrait
 
 	private $headerList = [
 		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO"], // old
-		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO", "PHOTO", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM"], // new
+		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO Before", "PHOTO After", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Approval"], // new
 	];
 
 	private $valueList 	= [];
@@ -77,7 +77,11 @@ trait ExportGTCCbdTrait
 					$d->outlet_type, 
 					$d->cbd_position,
 					$d->cbd_competitor,
-					$d->posm,
+                    ($d->posm_shop_sign == 1) ? 'Yes' : 'No',
+                    ($d->posm_hangering_mobile == 1) ? 'Yes' : 'No',
+                    ($d->posm_poster == 1) ? 'Yes' : 'No',
+                    $d->posm_others?? '-',
+                    ($d->status == 1) ? 'approve' : 'reject',
 				];
 
 				$this->photoList[$a] = $d->photo;
