@@ -70,7 +70,7 @@
               @foreach ($product as $pro)
               <th>{{ $pro->name }}</th>
               @endforeach
-              <th>Total</th>
+              <!-- <th>Total</th> -->
             </tr>
           </thead>
         </table>
@@ -211,7 +211,7 @@ table.table thead tr th {
       @foreach ($product as $pro)
       { data: 'product-{{ $pro->id }}' },
       @endforeach
-      { data: 'total' },
+      // { data: 'total' },
       ],
       bDestroy: true
     });

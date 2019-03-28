@@ -174,7 +174,7 @@ trait ExportGTCCbdTrait
 	            		if (file_exists(public_path("/uploads/cbd/".($this->photoList[$valueTLKey]))))
 	            		{
 		            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList[$valueTLKey])));
-		            		$imgDrawing->setCoordinates("E".($startTLRow));
+		            		$imgDrawing->setCoordinates("H".($startTLRow));
 		            		$imgDrawing->setWorksheet($sheet);
 		            		$imgDrawing->setWidth(40);
 	            		}else{
@@ -198,7 +198,7 @@ trait ExportGTCCbdTrait
 	            		if (file_exists(public_path("/uploads/cbd/".($this->photoList2[$valueTLKey]))))
 	            		{
 		            		$imgDrawing->setPath(public_path("/uploads/cbd/".($this->photoList2[$valueTLKey])));
-		            		$imgDrawing->setCoordinates("E".($startTLRow));
+		            		$imgDrawing->setCoordinates("I".($startTLRow));
 		            		$imgDrawing->setWorksheet($sheet);
 		            		$imgDrawing->setWidth(40);
 	            		}else{

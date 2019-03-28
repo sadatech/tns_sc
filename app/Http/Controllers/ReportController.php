@@ -4038,25 +4038,25 @@ class ReportController extends Controller
                 return implode(", ", $satuan);
             });
         }
-        $dt->addColumn('total', function($sales) use ($product) {
-            $satuan = 0;
-            foreach ($product as $pdct) {
-                $sale = \App\SalesMd::where([
-                    'id_employee' => $sales['id_employee'],
-                    'id_outlet' => $sales['id_outlet'],
-                    'date' => $sales['date'],
-                ])->get(['id'])->toArray();
-                $getIdSale = array_column($sale,'id');
-                $detail = \App\SalesMdDetail::whereIn('id_sales', $getIdSale)
-                ->where('id_product', $pdct['id'])
-                ->get();
-                $price = Price::where('id_product', $pdct['id'])->first();
-                foreach ($detail as $value) {
-                     $satuan += $value->qty_actual*$price->price;
-                } 
-            }
-                return "Rp.".($satuan == 0 ? "-" : $satuan);
-        });
+        // $dt->addColumn('total', function($sales) use ($product) {
+        //     $satuan = 0;
+        //     foreach ($product as $pdct) {
+        //         $sale = \App\SalesMd::where([
+        //             'id_employee' => $sales['id_employee'],
+        //             'id_outlet' => $sales['id_outlet'],
+        //             'date' => $sales['date'],
+        //         ])->get(['id'])->toArray();
+        //         $getIdSale = array_column($sale,'id');
+        //         $detail = \App\SalesMdDetail::whereIn('id_sales', $getIdSale)
+        //         ->where('id_product', $pdct['id'])
+        //         ->get();
+        //         $price = Price::where('id_product', $pdct['id'])->first();
+        //         foreach ($detail as $value) {
+        //              $satuan += $value->qty_actual*$price->price;
+        //         } 
+        //     }
+        //         return "Rp.".($satuan == 0 ? "-" : $satuan);
+        // });
 
         $dt->rawColumns($columns);
         return $dt->make(true);
