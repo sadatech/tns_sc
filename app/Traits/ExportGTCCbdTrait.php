@@ -13,8 +13,8 @@ trait ExportGTCCbdTrait
 {
 
 	private $headerList = [
-		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO"], // old
-		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "PASAR", "DATE", "PHOTO Before", "PHOTO After", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Approval"], // new
+		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO BEFORE", "PHOTO AFTER"], // old
+		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "PASAR", "DATE", "PHOTO BEFORE", "PHOTO AFTER", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Approval"], // new
 	];
 
 	private $valueList 	= [];
@@ -178,7 +178,7 @@ trait ExportGTCCbdTrait
 		            		$imgDrawing->setWorksheet($sheet);
 		            		$imgDrawing->setWidth(40);
 	            		}else{
-		            		$sheet->setCellValue('E'.$startTLRow, "not found")->setAutoSize(true);
+		            		$sheet->setCellValue('H'.$startTLRow, "not found")->setAutoSize(true);
 	            		}
 	            	}
 
@@ -202,7 +202,7 @@ trait ExportGTCCbdTrait
 		            		$imgDrawing->setWorksheet($sheet);
 		            		$imgDrawing->setWidth(40);
 	            		}else{
-		            		$sheet->setCellValue('E'.$startTLRow, "not found")->setAutoSize(true);
+		            		$sheet->setCellValue('I'.$startTLRow, "not found")->setAutoSize(true);
 	            		}
 	            	}
 
