@@ -631,6 +631,40 @@ Route::prefix('company')->group(function () {
 });
 
 
+// ***************** EDITING SALES (START) ***********************
+
+Route::prefix('edit')->group(function () {
+	//GTC REPORT
+	Route::prefix('gtc')->group(function () {
+		// SMD REPORT
+		Route::prefix('smd')->group(function () {
+
+			Route::prefix('sales')->group(function () {
+				Route::get('/', function(){
+					return view('editreport.smd.sales');
+				})->name('edit.gtc.smd.sales')->middleware('auth');
+				Route::any('/data', 'ReportEditSmdController@SMDsales')->name('dataedit.gtc.smd.sales')->middleware('auth');
+				Route::put('/update/{id}','ReportEditSmdController@updateSales')->name('update.gtc.smd.sales')->middleware('auth');
+				Route::get('/delete/{id}', 'ReportEditSmdController@deleteSales')->name('edit.gtc.smd.sales.delete')->middleware('auth');
+
+			});
+
+			Route::prefix('new-cbd')->group(function () {
+				Route::get('/', function(){
+					return view('editreport.smd.new-cbd');
+				})->name('edit.gtc.smd.new-cbd')->middleware('auth');
+				Route::any('/data', 'ReportEditSmdController@SMDNewCbd')->name('dataedit.gtc.smd.new-cbd')->middleware('auth');
+				Route::put('/update/{id}','ReportEditSmdController@updateNewCbd')->name('update.gtc.smd.new-cbd')->middleware('auth');
+				Route::get('/delete/{id}', 'ReportEditSmdController@deleteNewCbd')->name('edit.gtc.smd.new-cbd.delete')->middleware('auth');
+
+			});
+
+		});
+	});
+});
+
+
+
 // ***************** REPORTING (START) ***********************
 
 Route::prefix('report')->group(function () {

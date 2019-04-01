@@ -56,7 +56,6 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
 
           </div>
         </div>
@@ -71,8 +70,6 @@
               <th>Sub Area</th>
               <th>Pasar</th>
               <th>Date</th>
-              <th>Photo Before</th>
-              <th>Photo After</th>
               <th>Approval</th>
               <th>Total Hanger</th>
               <th>Outlet Type</th>
@@ -82,10 +79,103 @@
               <th>POSM Hangering Mobile</th>
               <th>POSM Poster</th>
               <th>POSM Other</th>
+              <th>Action</th>
             </tr>
           </thead>
         </table>
       </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary p-10">
+          <h3 class="block-title"><i class="fa fa-edit"></i> Update Sales VDO</h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form id="editForm" method="post">
+        {!! method_field('PUT') !!}
+        {!! csrf_field() !!}
+        <div class="block-content">
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label>VDO Name</label>
+              <input type="text" class="form-control" name="name" id="nameInput" readonly required>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Outlet</label>
+                <select class="form-control" style="width: 100%" name="outlate" id="outletInput" required>
+                </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Total Hanger</label>
+              <input type="text" class="form-control" name="total_hanger" id="total_hangerInput" required>
+            </div>
+            <div class="form-group col-md-12">
+              <label>CBD Position</label>
+              <select class="js-select2 form-control" style="width: 100%" id="cbd_positionInput" name="cbd_position" required>
+                <option value="" disabled selected>Choose</option>
+                <option value="&quot;ETC&quot;">ETC </option>
+                <option value="&quot;Depan&quot;">Depan </option>
+                <option value="&quot;Belakang&quot;">Belakang </option>
+              </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Outlet Type</label>
+              <select class="js-select2 form-control" style="width: 100%" id="outlet_typeInput" name="outlet_type" required>
+                <option value="" disabled selected>Choose</option>
+                <option value="&quot;Permanen&quot;">Permanen </option>
+                <option value="&quot;Tidak&quot;">Tidak </option>
+              </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Competitor</label>
+              <input type="text" class="form-control" name="cbd_competitor" id="cbd_competitorInput">
+            </div>
+            <div class="form-group col-md-12">
+              <label>POSM Shop Sign</label>
+              <select class="js-select2 form-control" style="width: 100%" id="posm_shop_signInput" name="posm_shop_sign" required>
+                <option value="" disabled selected>Choose</option>
+                <option value="1">Yes </option>
+                <option value="0">No </option>
+              </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>POSM Hangering Mobile</label>
+              <select class="js-select2 form-control" style="width: 100%" id="posm_hangering_mobileInput" name="posm_hangering_mobile" required>
+                <option value="" disabled selected>Choose</option>
+                <option value="1">Yes </option>
+                <option value="0">No </option>
+              </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>POSM Poster</label>
+              <select class="js-select2 form-control" style="width: 100%" id="posm_posterInput" name="posm_poster" required>
+                <option value="" disabled selected>Choose</option>
+                <option value="1">Yes </option>
+                <option value="0">No </option>
+              </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>POSM Other</label>
+              <input type="text" class="form-control" name="posm_others" id="posm_othersInput" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-alt-success">
+              <i class="fa fa-save"></i> Save
+            </button>
+            <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -115,6 +205,32 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+  function editModal(json) {
+    $('#editModal').modal('show');
+    $('#editForm').attr('action', "{{ url('/edit/gtc/smd/new-cbd/update') }}/"+json.id_cbd);
+    $('#nameInput').val(json.employee);
+    setSelect2IfPatch2($("#productInput"), json.id_product, json.product);
+    setSelect2IfPatch2($("#outletInput"), json.id_outlet, json.outlet);
+    $('#posm_shop_signInput').val(json.posm_shop_sign).trigger('change');
+    $('#posm_hangering_mobileInput').val(json.posm_hangering_mobile).trigger('change');
+    $('#posm_posterInput').val(json.posm_poster).trigger('change');
+    $('#posm_othersInput').val(json.posm_others);
+    $('#total_hangerInput').val(json.total_hanger);
+    $('#cbd_positionInput').val(json.cbd_position).trigger('change');
+    $('#outlet_typeInput').val(json.outlet_type).trigger('change');
+  }
+  $('#outletInput').select2(setOptions('{{ route("outlet-select2") }}', 'Choose your Outlet', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+
+  $(".js-select2").select2({ 
+  });
   $(document).ready(function() {
 
       $('.js-datepicker').change(function(){
@@ -180,27 +296,12 @@ table.table thead tr th {
     }
   });
   
-  /**
-   * Download OnClick
-   */
-  $("#btnDownloadXLS").on("click", function(){
-    $.ajax({
-      url: $(this).attr("target-url"),
-      type: "post",
-      success: function(e){
-        swal("Success!", e.result, "success");
-      },
-      error: function(){
-        swal("Error!", e.result, "error");
-      }
-    });
-  });
 
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
     var table = null;
-    var url = '{!! route('data.smd.new-cbd') !!}';
+    var url = '{!! route('dataedit.gtc.smd.new-cbd') !!}';
     table = $('#category').DataTable({
       processing: true,
       serverSide: true,
@@ -230,62 +331,31 @@ table.table thead tr th {
         $('.popup-image').magnificPopup({
           type: 'image',
         });
-        if ($("#filterDate").val()=='') {
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
-        }else{
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
-        };
-        $('.js-swal-reject').on('click', function(){
-          var url = $(this).data("url");
-          swal({
-            title: "Are you sure to make change?",
-            text: "CBD will be reject!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: '#d26a5c',
-            confirmButtonText: 'Yes, delete it!',
-            html: false,
-            preConfirm: function() {
-                return new Promise(function (resolve) {
-                    setTimeout(function () {
-                        resolve();
-                    }, 50);
-                });
-            }
-          }).then(function(result){
-            if (result.value) {
-                window.location = url;
-            } else if (result.dismiss === 'cancel') {
-                swal('Cancelled', 'Your data is safe :)', 'error');
-            }
-          });
+        $('.js-swal-delete').on('click', function(){
+            var url = $(this).data("url");
+            swal({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this data!',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d26a5c',
+                confirmButtonText: 'Yes, delete it!',
+                html: false,
+                preConfirm: function() {
+                    return new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }).then(function(result){
+                if (result.value) {
+                    window.location = url;
+                } else if (result.dismiss === 'cancel') {
+                    swal('Cancelled', 'Your data is safe :)', 'error');
+                }
+            });
         });
-        $('.js-swal-approve').on('click', function(){
-          var url = $(this).data("url");
-          swal({
-            title: "Are you sure to make change?",
-            text: "CBD will be approve!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: '#d26a5c',
-            confirmButtonText: 'Yes, delete it!',
-            html: false,
-            preConfirm: function() {
-                return new Promise(function (resolve) {
-                    setTimeout(function () {
-                        resolve();
-                    }, 50);
-                });
-            }
-          }).then(function(result){
-            if (result.value) {
-                window.location = url;
-            } else if (result.dismiss === 'cancel') {
-                swal('Cancelled', 'Your data is safe :)', 'error');
-            }
-          });
-        });
-
       },
       columns: [
       { data: 'id' },
@@ -296,17 +366,16 @@ table.table thead tr th {
       { data: 'subarea' },
       { data: 'pasar' },
       { data: 'date' },
-      { data: 'photo' },
-      { data: 'photo2' },
       { data: 'status' },
       { data: 'total_hanger' },
       { data: 'outlet_type' },
       { data: 'cbd_position' },
       { data: 'cbd_competitor' },
-      { data: 'posm_shop_sign' },
-      { data: 'posm_hangering_mobile' },
-      { data: 'posm_poster' },
+      { data: 'posm_shop_sign_display' },
+      { data: 'posm_hangering_mobile_display' },
+      { data: 'posm_poster_display' },
       { data: 'posm_others' },
+      { data: 'action' },
       ],
       bDestroy: true
     });

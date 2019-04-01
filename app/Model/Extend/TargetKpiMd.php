@@ -29,7 +29,7 @@ class TargetKpiMd extends Employee
 				        ->whereYear('date', Carbon::parse($periode)->year)
 				        ->where('id_employee', $this->id)
                         ->groupBy(DB::raw('DATE(date)'))
-        				->pluck('id');
+        				->get()->count('id');
     }
 
     public function getTotalValue($periode){
@@ -273,7 +273,7 @@ class TargetKpiMd extends Employee
     }
 
     public function getCbd($periode){
-    	return Cbd::whereMonth('date', Carbon::parse($periode)->month)->whereYear('date', Carbon::parse($periode)->year)->distinct('id_outlet')->count('id_outlet');
+    	return Cbd::whereMonth('date', Carbon::parse($periode)->month)->whereYear('date', Carbon::parse($periode)->year)->distinct('id_outlet')->get()->count('id_outlet');
     }
 
     /**  **/

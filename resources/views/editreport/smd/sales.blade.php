@@ -55,9 +55,6 @@
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
           </h3>
-          <div class="block-option">
-              <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
-          </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="category">
           <thead>
@@ -67,14 +64,73 @@
               <th>Pasar</th>
               <th>Tanggal</th>
               <th>Outlet</th>
-              @foreach ($product as $pro)
-              <th>{{ $pro->name }}</th>
-              @endforeach
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Satuan</th>
+              <th>Action</th>
               <!-- <th>Total</th> -->
             </tr>
           </thead>
         </table>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-popout" role="document">
+    <div class="modal-content">
+      <div class="block block-themed block-transparent mb-0">
+        <div class="block-header bg-primary p-10">
+          <h3 class="block-title"><i class="fa fa-edit"></i> Update Sales VDO</h3>
+          <div class="block-options">
+            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+              <i class="si si-close"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <form id="editForm" method="post">
+        {!! method_field('PUT') !!}
+        {!! csrf_field() !!}
+        <div class="block-content">
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label>VDO Name</label>
+              <input type="text" class="form-control" name="name" id="nameInput" readonly required>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Outlet</label>
+                <select class="form-control" style="width: 100%" name="outlate" id="outletInput" required>
+                </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Product</label>
+                <select class="form-control" style="width: 100%" name="product" id="productInput" required>
+                </select>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Quantity</label>
+              <input type="text" class="form-control" name="qty" id="qtyInput" required>
+            </div>
+            <div class="form-group col-md-12">
+              <label>Satuan</label>
+              <select class="js-select2 form-control" style="width: 100%" id="satuanInput" name="satuan" required>
+                <option value="" disabled selected>Choose</option>
+                <option value="pack">Pack </option>
+                <option value="pcs">Pcs </option>
+                <option value="carton">Carton </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-alt-success">
+              <i class="fa fa-save"></i> Save
+            </button>
+            <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -102,6 +158,37 @@ table.table thead tr th {
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
+  function editModal(json) {
+    $('#editModal').modal('show');
+    $('#editForm').attr('action', "{{ url('/edit/gtc/smd/sales/update') }}/"+json.id_detail);
+    $('#nameInput').val(json.nama);
+    setSelect2IfPatch2($("#productInput"), json.id_product, json.product);
+    setSelect2IfPatch2($("#outletInput"), json.id_outlet, json.outlet);
+    $('#qtyInput').val(json.qty);
+    $('#satuanInput').val(json.satuan).trigger('change');
+  }
+  $('#productInput').select2(setOptions('{{ route("product-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#outletInput').select2(setOptions('{{ route("outlet-select2") }}', 'Choose your Area', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+
+  $(".js-select2").select2({ 
+  });
+
   $(document).ready(function() {
 
       $('.js-datepicker').change(function(){
@@ -167,19 +254,41 @@ table.table thead tr th {
     }
   });
 
-  $("#btnDownloadXLS").on("click", function(){
-      var url= "{{ route('export.sales.smd') }}"+"?periode="+$(".js-datepicker").val()+"&date="+$("#filterDate").val()+"&employee="+$("#filterEmployee").val()+"&pasar="+$("#filterPasar").val()+"&area="+$("#filterArea").val();
-      window.location.href=url;
-  });
-
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
     var table = null;
-    var url = '{!! route('data.sales.smd') !!}';
+    var url = '{!! route('dataedit.gtc.smd.sales') !!}';
     table = $('#category').DataTable({
       processing: true,
       serverSide: true,
+      drawCallback: function(){
+          $('.js-swal-delete').on('click', function(){
+              var url = $(this).data("url");
+              swal({
+                  title: 'Are you sure?',
+                  text: 'You will not be able to recover this data!',
+                  type: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d26a5c',
+                  confirmButtonText: 'Yes, delete it!',
+                  html: false,
+                  preConfirm: function() {
+                      return new Promise(function (resolve) {
+                          setTimeout(function () {
+                              resolve();
+                          }, 50);
+                      });
+                  }
+              }).then(function(result){
+                  if (result.value) {
+                      window.location = url;
+                  } else if (result.dismiss === 'cancel') {
+                      swal('Cancelled', 'Your data is safe :)', 'error');
+                  }
+              });
+          });
+      },
       scrollX: true,
       scrollY: "300px",
       ajax: {
@@ -208,13 +317,33 @@ table.table thead tr th {
       { data: 'pasar' },
       { data: 'tanggal' },
       { data: 'outlet' },
-      @foreach ($product as $pro)
-      { data: 'product-{{ $pro->id }}' },
-      @endforeach
+      { data: 'product' },
+      { data: 'qty' },
+      { data: 'satuan' },
+      { data: 'action' },
       // { data: 'total' },
       ],
       bDestroy: true
     });
   });
+
+  @if(session('type'))
+  $(document).ready(function() {
+      $.notify({
+        title: '<strong>{!! session('title') !!}</strong>',
+        message: '{!! session('message') !!}'
+      }, {
+        type: '{!! session('type') !!}',
+        animate: {
+          enter: 'animated zoomInDown',
+          exit: 'animated zoomOutUp'
+        },
+        placement: {
+          from: 'top',
+          align: 'center'
+        }
+      });
+  });
+  @endif
 </script>
 @endsection
