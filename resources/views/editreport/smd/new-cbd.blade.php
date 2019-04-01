@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report CBD VDO Pasar")
+@section('title', "Edit CBD VDO Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">CBD VDO Pasar<small>Report</small></h2>
+  <h2 class="content-heading pt-10">CBD VDO Pasar<small> Edit</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -122,17 +122,17 @@
               <label>CBD Position</label>
               <select class="js-select2 form-control" style="width: 100%" id="cbd_positionInput" name="cbd_position" required>
                 <option value="" disabled selected>Choose</option>
-                <option value="&quot;ETC&quot;">ETC </option>
-                <option value="&quot;Depan&quot;">Depan </option>
-                <option value="&quot;Belakang&quot;">Belakang </option>
+                <option value="ETC">ETC </option>
+                <option value="Depan">Depan </option>
+                <option value="Belakang">Belakang </option>
               </select>
             </div>
             <div class="form-group col-md-12">
               <label>Outlet Type</label>
               <select class="js-select2 form-control" style="width: 100%" id="outlet_typeInput" name="outlet_type" required>
                 <option value="" disabled selected>Choose</option>
-                <option value="&quot;Permanen&quot;">Permanen </option>
-                <option value="&quot;Tidak&quot;">Tidak </option>
+                <option value="Permanen">Permanen </option>
+                <option value="Tidak">Tidak </option>
               </select>
             </div>
             <div class="form-group col-md-12">
@@ -216,6 +216,7 @@ table.table thead tr th {
     $('#posm_posterInput').val(json.posm_poster).trigger('change');
     $('#posm_othersInput').val(json.posm_others);
     $('#total_hangerInput').val(json.total_hanger);
+    $('#cbd_competitorInput').val(json.cbd_competitor);
     $('#cbd_positionInput').val(json.cbd_position).trigger('change');
     $('#outlet_typeInput').val(json.outlet_type).trigger('change');
   }
