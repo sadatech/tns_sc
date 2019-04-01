@@ -4390,9 +4390,9 @@ class ReportController extends Controller
         // return response()->json($data);
         $dt->editColumn('status', function($item){
             if ($item['status'] == 1) {
-                return '<button data-url='.route("cbd.reject", $item['id_cbd']).' class="btn btn-sm btn-success btn-square js-swal-reject"><i class="si si-check"></i> Approve</button>';
+                return '<button data-url='.route("cbd.reject", $item['id_cbd']).' class="btn btn-sm btn-danger btn-square js-swal-reject"><i class="si si-minus"></i> Reject</button>';
             }else{
-                return '<button data-url='.route("cbd.approve", $item['id_cbd']).' class="btn btn-sm btn-danger btn-square js-swal-approve"><i class="si si-minus"></i> Reject</button>';
+                return '<button data-url='.route("cbd.approve", $item['id_cbd']).' class="btn btn-sm btn-success btn-square js-swal-approve"><i class="si si-check"></i> Approve</button>';
             }
         });
         
@@ -4405,6 +4405,8 @@ class ReportController extends Controller
         // return response()->json($newCbd);
 
         $newCbd->update(['status' => 0]);
+
+        
 
         return redirect()->back()
         ->with([
@@ -5365,7 +5367,7 @@ class ReportController extends Controller
             return is_null($item->getTarget($request->periode)) ? 0 : $item->getTarget($request->periode)['hk'];
         })
         ->addColumn('hk_actual', function ($item) use ($request){
-            return @count($item->getHkActual($request->periode));
+            return @$item->getHkActual($request->periode);
         })
         ->addColumn('sum_of_cbd', function ($item) use ($request){
             return @$item->getCbd($request->periode);

@@ -73,6 +73,7 @@
               <th>Date</th>
               <th>Photo Before</th>
               <th>Photo After</th>
+              <th>Approval</th>
               <th>Total Hanger</th>
               <th>Outlet Type</th>
               <th>CBD Position</th>
@@ -81,7 +82,6 @@
               <th>POSM Hangering Mobile</th>
               <th>POSM Poster</th>
               <th>POSM Other</th>
-              <th>Approval</th>
             </tr>
           </thead>
         </table>
@@ -298,6 +298,7 @@ table.table thead tr th {
       { data: 'date' },
       { data: 'photo' },
       { data: 'photo2' },
+      { data: 'status' },
       { data: 'total_hanger' },
       { data: 'outlet_type' },
       { data: 'cbd_position' },
@@ -306,7 +307,6 @@ table.table thead tr th {
       { data: 'posm_hangering_mobile' },
       { data: 'posm_poster' },
       { data: 'posm_others' },
-      { data: 'status' },
       ],
       bDestroy: true
     });
