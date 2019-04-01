@@ -246,6 +246,23 @@
                         <a class="{{ request()->is('utility/export-download') ? 'active' : '' }}" href="{{ route('export-download') }}"><i class="si si-cloud-download"></i><span class="sidebar-mini-hide">Download Export(s)</span></a>
                     </li> 
                     
+                    {{-- EDIT --}}
+                    <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">EDIT</span></li>
+
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
+                    <li class="{{ request()->is('edit/gtc/smd/*') ? 'open' : '' }}">
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">GTC(s)</span></a>
+                        <ul>
+                             <li>
+                                <a class="{{ request()->is('edit/gtc/smd/sales') ? 'active' : '' }}" href="{{ route('edit.gtc.smd.sales') }}">Sales VDO</a>
+                            </li>
+                             <li>
+                                <a class="{{ request()->is('edit/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('edit.gtc.smd.new-cbd') }}">CBD VDO</a>
+                            </li>
+                        </ul>
+                    </li>
+                    @endif
+
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- REPORT GTC --}}
                     @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
