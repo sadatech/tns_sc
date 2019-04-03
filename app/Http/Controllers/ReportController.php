@@ -5339,7 +5339,7 @@ class ReportController extends Controller
 
     public function SMDKpi(Request $request)
     {
-        $target_kpi = TargetKpiMd::where('isResign', 0)->where('isResign', 0)->whereHas('position', function($query){
+        $target_kpi = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
 
