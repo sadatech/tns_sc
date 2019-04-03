@@ -11,7 +11,7 @@ use App\SalesMd;
 use DB;
 use App\AttendanceOutlet;
 use App\Attendance;
-use App\Cbd;
+use App\NewCbd;
 use App\Pf;
 
 class TargetKpiMd extends Employee
@@ -273,7 +273,8 @@ class TargetKpiMd extends Employee
     }
 
     public function getCbd($periode){
-    	return Cbd::whereMonth('date', Carbon::parse($periode)->month)->whereYear('date', Carbon::parse($periode)->year)->distinct('id_outlet')->get()->count('id_outlet');
+    	return NewCbd::whereMonth('date', Carbon::parse($periode)->month)->whereYear('date', Carbon::parse($periode)->year)
+                                                 ->where('id_employee', $this->id)->distinct('id_outlet')->get()->count('id_outlet');
     }
 
     /**  **/

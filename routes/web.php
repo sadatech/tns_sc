@@ -48,6 +48,9 @@ Route::prefix('dashboard')->group(function () {
 
 Route::prefix('data')->group(function () {
 	Route::get('/dashboard', 'DashboardController@dashboard')->name('data.dashboard')->middleware('auth');
+	Route::get('/dataAchSmd', 'DashboardController@achSmd')->name('data.dashboard.achSmd')->middleware('auth');
+	Route::get('/dataAchSmdArea', 'DashboardController@achSmdArea')->name('data.dashboard.achSmdArea')->middleware('auth');
+	Route::get('/chartAchSmd', 'DashboardController@chartAchSmd')->name('data.dashboard.chartAchSmd')->middleware('auth');
 	Route::get('/gtc-smd', 'DashboardController@gtc_smd')->name('data.gtc_smd')->middleware('auth');
 	Route::get('/gtc-spg', 'DashboardController@gtc_spg')->name('data.gtc_spg')->middleware('auth');
 	Route::get('/gtc-dc', 'DashboardController@gtc_dc')->name('data.gtc_dc')->middleware('auth');

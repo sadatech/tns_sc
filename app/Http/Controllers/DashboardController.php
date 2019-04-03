@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\Datatables\Datatables;
 use App\Product;
 use App\Store;
 use App\Pasar;
 use App\Employee;
+use App\TargetGtc;
+use App\NewCbd;
+use App\Attendance;
 use App\AttendancePasar;
 use App\AttendanceOutlet;
 use App\StockMdHeader;
@@ -21,6 +25,7 @@ use App\SamplingDcDetail;
 use App\AttendanceBlock;
 use App\SalesMotoricDetail;
 use App\DistributionMotoricDetail;
+use App\Model\Extend\TargetKpiMd;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use DB;
@@ -28,6 +33,30 @@ use DB;
 class DashboardController extends Controller
 {
     public function dashboard() {
+        $periode = Carbon::now();
+        $vdoEmployees = Employee::where('isResign', 0)->whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        })->pluck('id');
+        $target = TargetGtc::whereIn('id_employee', $vdoEmployees)
+                        ->whereMonth('rilis', $periode->month)
+                        ->whereYear('rilis', $periode->year)
+                        ->orderBy('rilis', 'DESC')
+                        ->distinct('id_employee')
+                        ->get();
+        $data['table']['hk_target'] = $target->sum('hk');
+        $data['table']['cbd_target'] = $target->sum('cbd');
+        $data['table']['cbd_actual'] = NewCbd::whereMonth('date', $periode->month)
+                        ->whereYear('date', $periode->year)
+                        ->whereIn('id_employee', $vdoEmployees)
+                        ->distinct('id_outlet')
+                        ->get()->count('id_outlet');
+    
+        $data['table']['hk_actual'] = Attendance::whereMonth('date', $periode->month)
+                        ->whereYear('date', $periode->year)
+                        ->whereIn('id_employee', $vdoEmployees)
+                        ->groupBy(DB::raw('DATE(date)'),'id_employee')
+                        ->get()->count('id');
+        $data['table']['ach'] = ($data['table']['cbd_target'] == 0) ? '0 %' : (($data['table']['cbd_actual']/$data['table']['cbd_target']).'%');
         $data['product']  = Product::count();
         $data['store']    = Store::count();
         $data['pasar']    = Pasar::count();
@@ -37,7 +66,71 @@ class DashboardController extends Controller
             'count' => $data
         ]);
     }
-    
+
+    public function achSmd()
+    {
+        $periode = Carbon::now();
+        $target_kpi = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        });
+        return Datatables::of($target_kpi)
+        ->addColumn('hk_target', function ($item) use ($periode){
+            return is_null($item->getTarget($periode)) ? 0 : $item->getTarget($periode)['hk'];
+        })
+        ->addColumn('cbd_target', function ($item) use ($periode){
+            return is_null($item->getTarget($periode)) ? 0 : $item->getTarget($periode)['cbd'];
+        })
+        ->addColumn('hk_actual', function ($item) use ($periode){
+            return @$item->getHkActual($periode);
+        })
+        ->addColumn('sum_of_cbd', function ($item) use ($periode){
+            return @$item->getCbd($periode);
+        })
+        ->addColumn('ach', function ($item) use ($periode){
+            return is_null($item->getTarget($periode)) ? '0 %'  : ((@$item->getCbd($periode)/($item->getTarget($periode)['cbd'])).'%');
+        })
+        ->make(true);
+    }
+
+    public function achSmdArea()
+    {
+        $periode = Carbon::now();
+        $target_kpi = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        });
+        return Datatables::of($target_kpi)
+        ->addColumn('hk_target', function ($item) use ($periode){
+            return is_null($item->getTarget($periode)) ? 0 : $item->getTarget($periode)['hk'];
+        })
+        ->addColumn('cbd_target', function ($item) use ($periode){
+            return is_null($item->getTarget($periode)) ? 0 : $item->getTarget($periode)['cbd'];
+        })
+        ->addColumn('hk_actual', function ($item) use ($periode){
+            return @$item->getHkActual($periode);
+        })
+        ->addColumn('sum_of_cbd', function ($item) use ($periode){
+            return @$item->getCbd($periode);
+        })
+        ->addColumn('ach', function ($item) use ($periode){
+            return is_null($item->getTarget($periode)) ? '0 %'  : ((@$item->getCbd($periode)/($item->getTarget($periode)['cbd'])).'%');
+        })
+        ->make(true);
+    }
+
+    public function chartAchSmd()
+    {
+        $periode = Carbon::parse('January 2019');
+        $SMDs = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        })->get();
+        foreach ($SMDs as $smd) {
+            $smd->sum_of_cbd = @$smd->getCbd($periode);
+        }
+
+
+        return response()->json($SMDs);
+    }
+
     public function welcome() {
         return view('welcome');
     }

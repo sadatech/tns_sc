@@ -45,9 +45,78 @@
             </div>
         </a>
     </div>
+
+    @if(Auth::user()->role->level == 'AdminGtc' || Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator')
+
+    <div class="block block-themed">
+        <div class="block">
+          <div class="block-content block-content-full">
+            <div class="block-header p-0 mb-20">
+            </div>
+            <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="vdo">
+            <thead>
+              <th style="width: 70px;"></th>
+              <th>NAMA AREA</th>
+              <th>NAMA SMD</th>
+              <th>JABATAN</th>
+              <th>TOTAL HK BULAN INI</th>
+              <th>HARI KERJA ACTUAL</th>
+              <th>KONTRAK DISPLAY Target</th>
+              <th>KONTRAK DISPLAY Actual</th>
+              <th>KONTRAK DISPLAY Ach</th>
+             <tfoot>
+             <tr>
+                <th colspan="4" style="text-align:right">total amount:</th>
+                <th>TOTAL HK BULAN INI</th>
+                <th>HARI KERJA ACTUAL</th>
+                <th>KONTRAK DISPLAY</th>
+                <th>KONTRAK DISPLAY</th>
+                <th>KONTRAK DISPLAY</th>
+             </tr>
+             </tfoot>
+            </thead>
+            </table>
+          </div>
+        </div>
+    </div>
+    <div class="block block-themed">
+        <div class="block">
+          <div class="block-content block-content-full">
+            <div class="block-header p-0 mb-20">
+            </div>
+            <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="vdoAch">
+            <thead>
+              <th style="width: 70px;"></th>
+              <th>NAMA SMD</th>
+              <th>NAMA AREA</th>
+              <th>KONTRAK DISPLAY Target</th>
+            </thead>
+            </table>
+          </div>
+        </div>
+    </div>
+    <div class="block block-themed">
+        <div class="block">
+          <div class="block-content block-content-full">
+           <div class="panel panel-default">
+               <div class="panel-heading"><b>Charts</b></div>
+               <div class="panel-body">
+                   <canvas id="canvas" height="280" width="600"></canvas>
+               </div>
+           </div>
+       </div>
+     </div>
+    </div>
+    @endif
 </div>
 @endsection
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
+</style>
+@endsection
 @section('js')
+<script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function(){
         $.ajax({
@@ -62,6 +131,78 @@
                     $('#pasar').html(data.count.pasar);
                 }
             }
+        });
+    })
+    $(function() {
+        $('#vdo').DataTable({
+            processing: true,
+            scrollY: "300px",
+            ajax: '{!! route('data.dashboard.achSmd') !!}',
+            columns: [
+            { data: 'id', name: 'id' },
+            { data: 'area', name: 'area' },
+            { data: 'name', name: 'name' },
+            { data: 'status', name: 'status' },
+            { data: 'hk_target', name: 'hk_target' },
+            { data: 'hk_actual', name: 'hk_actual' },
+            { data: 'cbd_target', name: 'cbd_target' },
+            { data: 'sum_of_cbd', name: 'sum_of_cbd' },
+            { data: 'ach', name: 'ach' },
+            ]
+        });
+    });
+    $(function() {
+        $('#vdoAch').DataTable({
+            processing: true,
+            scrollY: "300px",
+            ajax: '{!! route('data.dashboard.achSmd') !!}',
+            columns: [
+            { data: 'id', name: 'id' },
+            { data: 'name', name: 'name' },
+            { data: 'area', name: 'area' },
+            { data: 'sum_of_cbd', name: 'sum_of_cbd' },
+            ]
+        });
+    });
+</script>
+@endsection
+
+@section('chartjs')
+<script type="text/javascript">
+    $(document).ready(function(){
+        var url = "{{ route('data.dashboard.chartAchSmd') }}";
+        var SMD = new Array();
+        var Labels = new Array();
+        var CBD = new Array();
+        $(document).ready(function(){
+          $.get(url, function(response){
+            response.forEach(function(data){
+                SMD.push(data.name);
+                Labels.push(data.email);
+                CBD.push(data.sum_of_cbd);
+            });
+            var ctx = document.getElementById("canvas").getContext('2d');
+                var myChart = new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                      labels:SMD,
+                      datasets: [{
+                          label: 'Kontrak Display Actual',
+                          data: CBD,
+                          borderWidth: 1
+                      }]
+                  },
+                  options: {
+                      scales: {
+                          yAxes: [{
+                              ticks: {
+                                  beginAtZero:true
+                              }
+                          }]
+                      }
+                  }
+              });
+          });
         });
     })
 </script>
