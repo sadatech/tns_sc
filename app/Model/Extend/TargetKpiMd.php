@@ -274,7 +274,7 @@ class TargetKpiMd extends Employee
 
     public function getCbd($periode){
     	return NewCbd::whereMonth('date', Carbon::parse($periode)->month)->whereYear('date', Carbon::parse($periode)->year)
-                                                 ->where('id_employee', $this->id)->distinct('id_outlet')->get()->count('id_outlet');
+                                                 ->where('id_employee', $this->id)->groupBy('id_outlet')->get()->count('id_outlet');
     }
 
     /**  **/

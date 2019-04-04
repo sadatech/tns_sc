@@ -67,11 +67,11 @@
              <tfoot>
              <tr>
                 <th colspan="4" style="text-align:right">total amount:</th>
-                <th>TOTAL HK BULAN INI</th>
-                <th>HARI KERJA ACTUAL</th>
-                <th>KONTRAK DISPLAY</th>
-                <th>KONTRAK DISPLAY</th>
-                <th>KONTRAK DISPLAY</th>
+                <th>{{ $hk_target }}</th>
+                <th>{{ $hk_actual }}</th>
+                <th>{{ $cbd_target }}</th>
+                <th>{{ $cbd_actual }}</th>
+                <th>{{ $ach }}</th>
              </tr>
              </tfoot>
             </thead>
@@ -101,7 +101,7 @@
            <div class="panel panel-default">
                <div class="panel-heading"><b>Charts</b></div>
                <div class="panel-body">
-                   <canvas id="canvas" height="280" width="600"></canvas>
+                   <canvas id="canvas" height="280" width="1143"></canvas>
                </div>
            </div>
        </div>
@@ -119,6 +119,11 @@
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function(){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         $.ajax({
             url: '{{ route('data.dashboard') }}',
             type: 'GET',
@@ -161,7 +166,8 @@
             { data: 'name', name: 'name' },
             { data: 'area', name: 'area' },
             { data: 'sum_of_cbd', name: 'sum_of_cbd' },
-            ]
+            ],
+            order: [[ 3, "desc" ]]
         });
     });
 </script>
@@ -169,6 +175,13 @@
 
 @section('chartjs')
 <script type="text/javascript">
+    $(document).ready(function(){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    })
     $(document).ready(function(){
         var url = "{{ route('data.dashboard.chartAchSmd') }}";
         var SMD = new Array();

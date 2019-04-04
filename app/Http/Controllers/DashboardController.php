@@ -32,7 +32,7 @@ use DB;
 
 class DashboardController extends Controller
 {
-    public function dashboard() {
+    public function index(){
         $periode = Carbon::now();
         $vdoEmployees = Employee::where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
@@ -41,22 +41,27 @@ class DashboardController extends Controller
                         ->whereMonth('rilis', $periode->month)
                         ->whereYear('rilis', $periode->year)
                         ->orderBy('rilis', 'DESC')
-                        ->distinct('id_employee')
+                        ->groupBy('id_employee')
                         ->get();
-        $data['table']['hk_target'] = $target->sum('hk');
-        $data['table']['cbd_target'] = $target->sum('cbd');
-        $data['table']['cbd_actual'] = NewCbd::whereMonth('date', $periode->month)
+        $data['hk_target'] = $target->sum('hk');
+        $data['cbd_target'] = $target->sum('cbd');
+        $data['cbd_actual'] = NewCbd::whereMonth('date', $periode->month)
                         ->whereYear('date', $periode->year)
                         ->whereIn('id_employee', $vdoEmployees)
-                        ->distinct('id_outlet')
+                        ->groupBy('id_outlet','id_employee')
                         ->get()->count('id_outlet');
     
-        $data['table']['hk_actual'] = Attendance::whereMonth('date', $periode->month)
+        $data['hk_actual'] = Attendance::whereMonth('date', $periode->month)
                         ->whereYear('date', $periode->year)
                         ->whereIn('id_employee', $vdoEmployees)
                         ->groupBy(DB::raw('DATE(date)'),'id_employee')
                         ->get()->count('id');
-        $data['table']['ach'] = ($data['table']['cbd_target'] == 0) ? '0 %' : (($data['table']['cbd_actual']/$data['table']['cbd_target']).'%');
+        $data['ach'] = ($data['cbd_target'] == 0) ? '0 %' : (($data['cbd_actual']/$data['cbd_target']).'%');
+
+        return view('dashboard.home', $data);
+    }
+
+    public function dashboard() {
         $data['product']  = Product::count();
         $data['store']    = Store::count();
         $data['pasar']    = Pasar::count();
@@ -119,14 +124,26 @@ class DashboardController extends Controller
 
     public function chartAchSmd()
     {
-        $periode = Carbon::parse('January 2019');
-        $SMDs = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
-            return $query->where('level', 'mdgtc');
-        })->get();
-        foreach ($SMDs as $smd) {
-            $smd->sum_of_cbd = @$smd->getCbd($periode);
-        }
+        $periode = Carbon::now();
+        $SMDs = Employee::where('employees.isResign', 0)
+        ->join('positions','employees.id_position','positions.id')
+        ->where('positions.level', 'mdgtc')
+            ->leftjoin('new_cbds','employees.id','new_cbds.id_employee')
+            ->where('new_cbds.deleted_at', null)
+            ->whereMonth('date', $periode->month)
+            ->whereYear('date', $periode->year)
+            ->select('employees.id as id', 'employees.name as name', 'employees.email as email', DB::raw("count(new_cbds.id) as cbd"))
+            ->groupBy('employees.id')
+            ->orderBy('cbd','desc')
+            ->limit(10)->get();
 
+        foreach ($SMDs as $smd) {
+            $smd->sum_of_cbd = NewCbd::whereMonth('date', $periode->month)
+                                ->whereYear('date', $periode->year)
+                                ->where('id_employee', $smd->id)
+                                ->groupBy('id_outlet')
+                                ->get()->count('id_outlet');
+        }
 
         return response()->json($SMDs);
     }

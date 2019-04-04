@@ -10,14 +10,10 @@
 |
 */
 
-Route::get('/', function(){
-	return view('dashboard.home');
-})->name('dashboard')->middleware('auth');
+Route::get('/', 'DashboardController@index')->name('dashboard')->middleware('auth');
 
 Route::prefix('dashboard')->group(function () {
-	Route::get('/', function(){
-		return view('dashboard.home');
-	})->name('dashboard')->middleware('auth');
+	Route::get('/', 'DashboardController@index')->name('dashboard')->middleware('auth');
 	
 	Route::prefix('gtc')->group(function () {
 		Route::get('/', function(){
