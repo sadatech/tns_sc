@@ -196,28 +196,31 @@ class SmdController extends Controller
                         if (!empty($results->all())) {
                             foreach($results as $row)
                             {
-                                $rowRules = [
-                                    'employee'  => 'required',
-                                    'hk'		=> 'required|numeric',	
-                                    'value'		=> 'required|numeric',
-                                    'ecpf'		=> 'required|numeric',
-                                    'cbd'	    => 'required|numeric'
-                                ];
-                                $validator = Validator($row->toArray(), $rowRules);
-                                if ($validator->fails()) {
-                                    return redirect()->back()
-                                    ->withErrors($validator)
-                                    ->withInput();
-                                } else {
-                                     TargetGtc::create([
-                                        'id_employee'   => \App\Employee::where('name', $row['employee'])->first()->id,
-                                        'hk'            => $row['hk'],
-                                        'rilis'         => Carbon::now(),
-                                        'value_sales'   => $row['value'],
-                                        'ec'            => $row['ecpf'],
-                                        'cbd'           => $row['cbd']
+                                if ($row['employee'] != null) {
 
-                                    ]);
+                                    $rowRules = [
+                                        'employee'  => 'required',
+                                        'hk'		=> 'required|numeric',
+                                        'value'		=> 'required|numeric',
+                                        'ecpf'      => 'required|numeric',
+                                        'cbd'	    => 'required|numeric'
+                                    ];
+                                    $validator = Validator($row->toArray(), $rowRules);
+                                    if ($validator->fails()) {
+                                        return redirect()->back()
+                                        ->withErrors($validator)
+                                        ->withInput();
+                                    } else {
+                                         TargetGtc::create([
+                                            'id_employee'   => \App\Employee::where('name', $row['employee'])->first()->id,
+                                            'hk'            => $row['hk'],
+                                            'rilis'         => Carbon::parse($row['rilis']),
+                                            'value_sales'   => $row['value'],
+                                            'ec'            => $row['ecpf'],
+                                            'cbd'           => $row['cbd']
+
+                                        ]);
+                                    }
                                 }
                             }
                             DB::commit();

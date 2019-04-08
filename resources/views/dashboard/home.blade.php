@@ -57,7 +57,7 @@
             <thead>
               <th style="width: 70px;"></th>
               <th>NAMA AREA</th>
-              <th>NAMA SMD</th>
+              <th>NAMA VDO</th>
               <th>JABATAN</th>
               <th>TOTAL HK BULAN INI</th>
               <th>HARI KERJA ACTUAL</th>
@@ -87,7 +87,7 @@
             <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="vdoAch">
             <thead>
               <th style="width: 70px;"></th>
-              <th>NAMA SMD</th>
+              <th>NAMA VDO</th>
               <th>NAMA AREA</th>
               <th>KONTRAK DISPLAY Target</th>
             </thead>
@@ -160,7 +160,7 @@
         $('#vdoAch').DataTable({
             processing: true,
             scrollY: "300px",
-            ajax: '{!! route('data.dashboard.achSmd') !!}',
+            ajax: '{!! route('data.dashboard.achSmdArea') !!}',
             columns: [
             { data: 'id', name: 'id' },
             { data: 'name', name: 'name' },
@@ -184,13 +184,13 @@
     })
     $(document).ready(function(){
         var url = "{{ route('data.dashboard.chartAchSmd') }}";
-        var SMD = new Array();
+        var Employee = new Array();
         var Labels = new Array();
         var CBD = new Array();
         $(document).ready(function(){
           $.get(url, function(response){
             response.forEach(function(data){
-                SMD.push(data.name);
+                Employee.push(data.name);
                 Labels.push(data.email);
                 CBD.push(data.sum_of_cbd);
             });
@@ -198,14 +198,27 @@
                 var myChart = new Chart(ctx, {
                   type: 'bar',
                   data: {
-                      labels:SMD,
+                      labels:Employee,
                       datasets: [{
-                          label: 'Kontrak Display Actual',
+                          label: 'CBD Actual',
+                          backgroundColor: "rgba(151,187,205,0.5)",
                           data: CBD,
                           borderWidth: 1
                       }]
                   },
                   options: {
+                      elements: {
+                          rectangle: {
+                              borderWidth: 2,
+                              borderColor: 'rgb(0, 255, 0)',
+                              borderSkipped: 'bottom'
+                          }
+                      },
+                      responsive: true,
+                      title: {
+                          display: true,
+                          text: 'Kontrak Display Employee'
+                      },
                       scales: {
                           yAxes: [{
                               ticks: {

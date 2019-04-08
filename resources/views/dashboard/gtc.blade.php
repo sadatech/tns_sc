@@ -5,7 +5,7 @@
         <div class="block">
             <ul class="nav nav-tabs nav-tabs-alt">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('dashboard/gtc') ? 'active' : '' }} {{ request()->is('dashboard/gtc/smd') ? 'active' : '' }}" href="{{ route('dashboard.gtc.smd') }}">SMD</a>
+                    <a class="nav-link {{ request()->is('dashboard/gtc') ? 'active' : '' }} {{ request()->is('dashboard/gtc/smd') ? 'active' : '' }}" href="{{ route('dashboard.gtc.smd') }}">VDO</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('dashboard/gtc/spg') ? 'active' : '' }}" href="{{ route('dashboard.gtc.spg') }}">SPG</a>

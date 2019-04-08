@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "SMD Target")
+@section('title', "VDO Target")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10"> Target<small class="ml-2">SMD Pasar</small></h2>
+  <h2 class="content-heading pt-10"> Target<small class="ml-2">VDO Pasar</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -48,7 +48,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Target SMD Pasar</h3>
+          <h3 class="block-title"><i class="fa fa-plus"></i> Import Data Target VDO Pasar</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -93,7 +93,7 @@
         </div>
         <div class="block-content">
           <div class="form-group">
-          <label>Upload Your Data Target SMD Pasar:</label>
+          <label>Upload Your Data Target VDO Pasar:</label>
             <div class="custom-file">
                 <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
                 <label class="custom-file-label">Choose file Excel</label>
@@ -117,7 +117,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="fa fa-edit"></i> Update Target SMD</h3>
+          <h3 class="block-title"><i class="fa fa-edit"></i> Update Target VDO</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
@@ -184,7 +184,7 @@
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
         <div class="block-header bg-gd-sun p-10">
-          <h3 class="block-title"><i class="fa fa-plus"></i> Add Target SMD</h3>
+          <h3 class="block-title"><i class="fa fa-plus"></i> Add Target VDO</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
               <i class="si si-close"></i>
