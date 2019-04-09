@@ -139,7 +139,7 @@
                         </table>
                     </div>
                     <div class="form-group col-md-12">
-                        <label>Upload Your Data Employee SMD:</label>
+                        <label>Upload Your Data Employee VDO:</label>
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" name="file" data-toggle="custom-file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
                             <label class="custom-file-label">Choose file Excel</label>

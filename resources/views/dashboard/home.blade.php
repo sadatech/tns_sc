@@ -45,19 +45,18 @@
             </div>
         </a>
     </div>
+</div>
 
     @if(Auth::user()->role->level == 'AdminGtc' || Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator')
 
     <div class="block block-themed">
         <div class="block">
           <div class="block-content block-content-full">
-            <div class="block-header p-0 mb-20">
-            </div>
             <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="vdo">
             <thead>
               <th style="width: 70px;"></th>
               <th>NAMA AREA</th>
-              <th>NAMA SMD</th>
+              <th>NAMA VDO</th>
               <th>JABATAN</th>
               <th>TOTAL HK BULAN INI</th>
               <th>HARI KERJA ACTUAL</th>
@@ -87,7 +86,7 @@
             <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="vdoAch">
             <thead>
               <th style="width: 70px;"></th>
-              <th>NAMA SMD</th>
+              <th>NAMA VDO</th>
               <th>NAMA AREA</th>
               <th>KONTRAK DISPLAY Target</th>
             </thead>
@@ -95,20 +94,19 @@
           </div>
         </div>
     </div>
-    <div class="block block-themed">
-        <div class="block">
-          <div class="block-content block-content-full">
-           <div class="panel panel-default">
-               <div class="panel-heading"><b>Charts</b></div>
-               <div class="panel-body">
-                   <canvas id="canvas" height="280" width="1143"></canvas>
-               </div>
-           </div>
-       </div>
-     </div>
+    <div class="row" id="content">
+      <div class="col-md-12">
+        <div class="block block-bordered block-themed">
+          <div class="block-header p-5 pl-10">
+            <h3 class="block-title">CBD This Month</h3>
+          </div>
+          <div class="block-content">
+            <canvas id="canvas" height="90px"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
     @endif
-</div>
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
@@ -160,7 +158,7 @@
         $('#vdoAch').DataTable({
             processing: true,
             scrollY: "300px",
-            ajax: '{!! route('data.dashboard.achSmd') !!}',
+            ajax: '{!! route('data.dashboard.achSmdArea') !!}',
             columns: [
             { data: 'id', name: 'id' },
             { data: 'name', name: 'name' },
@@ -181,16 +179,14 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-    })
-    $(document).ready(function(){
         var url = "{{ route('data.dashboard.chartAchSmd') }}";
-        var SMD = new Array();
+        var Employee = new Array();
         var Labels = new Array();
         var CBD = new Array();
         $(document).ready(function(){
           $.get(url, function(response){
             response.forEach(function(data){
-                SMD.push(data.name);
+                Employee.push(data.name);
                 Labels.push(data.email);
                 CBD.push(data.sum_of_cbd);
             });
@@ -198,14 +194,27 @@
                 var myChart = new Chart(ctx, {
                   type: 'bar',
                   data: {
-                      labels:SMD,
+                      labels:Employee,
                       datasets: [{
-                          label: 'Kontrak Display Actual',
+                          label: 'CBD Actual',
+                          backgroundColor: "rgba(151,187,205,0.5)",
                           data: CBD,
                           borderWidth: 1
                       }]
                   },
                   options: {
+                      elements: {
+                          rectangle: {
+                              borderWidth: 2,
+                              borderColor: 'rgb(0, 255, 0)',
+                              borderSkipped: 'bottom'
+                          }
+                      },
+                      responsive: true,
+                      title: {
+                          display: true,
+                          text: 'Kontrak Display Employee'
+                      },
                       scales: {
                           yAxes: [{
                               ticks: {
@@ -217,6 +226,6 @@
               });
           });
         });
-    })
+    });
 </script>
 @endsection

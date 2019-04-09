@@ -100,9 +100,19 @@ class DashboardController extends Controller
     public function achSmdArea()
     {
         $periode = Carbon::now();
-        $target_kpi = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
-            return $query->where('level', 'mdgtc');
-        });
+        // $periode = Carbon::parse('January 2019');
+        $target_kpi = TargetKpiMd::where('employees.isResign', 0)
+        ->join('positions','employees.id_position','positions.id')
+        ->where('positions.level', 'mdgtc')
+            ->leftjoin('new_cbds','employees.id','new_cbds.id_employee')
+            ->where('new_cbds.deleted_at', null)
+            ->whereMonth('date', $periode->month)
+            ->whereYear('date', $periode->year)
+            ->select('employees.id as id', 'employees.name as name', 'employees.email as email', DB::raw("count(distinct(new_cbds.id_outlet)) as cbd"))
+            ->groupBy('employees.id')
+            ->orderBy('cbd','desc')
+            ->limit(10);
+
         return Datatables::of($target_kpi)
         ->addColumn('hk_target', function ($item) use ($periode){
             return is_null($item->getTarget($periode)) ? 0 : $item->getTarget($periode)['hk'];
@@ -124,7 +134,8 @@ class DashboardController extends Controller
 
     public function chartAchSmd()
     {
-        $periode = Carbon::now();
+        $periode = Carbon::parse('January 2019');
+        // $periode = Carbon::now();
         $SMDs = Employee::where('employees.isResign', 0)
         ->join('positions','employees.id_position','positions.id')
         ->where('positions.level', 'mdgtc')
@@ -132,18 +143,10 @@ class DashboardController extends Controller
             ->where('new_cbds.deleted_at', null)
             ->whereMonth('date', $periode->month)
             ->whereYear('date', $periode->year)
-            ->select('employees.id as id', 'employees.name as name', 'employees.email as email', DB::raw("count(new_cbds.id) as cbd"))
+            ->select('employees.id as id', 'employees.name as name', 'employees.email as email', DB::raw("count(distinct(new_cbds.id_outlet)) as sum_of_cbd"))
             ->groupBy('employees.id')
-            ->orderBy('cbd','desc')
+            ->orderBy('sum_of_cbd','desc')
             ->limit(10)->get();
-
-        foreach ($SMDs as $smd) {
-            $smd->sum_of_cbd = NewCbd::whereMonth('date', $periode->month)
-                                ->whereYear('date', $periode->year)
-                                ->where('id_employee', $smd->id)
-                                ->groupBy('id_outlet')
-                                ->get()->count('id_outlet');
-        }
 
         return response()->json($SMDs);
     }

@@ -122,7 +122,7 @@ table.table thead tr th {
 <script type="text/javascript">
 
         var thead_before = '<th colspan="9" style="text-align: center;">INFORMATION</th>';
-        var thead = '<th class="text-center" style="width: 70px;">No.</th><th>Area</th><th>Nama SMD</th><th style="text-align: center;">Jabatan</th><th>Nama Pasar</th><th>Nama Stokist</th><th style="text-align: center;">Tanggal</th><th style="text-align: center;">Call</th><th style="text-align: center;">RO</th>';
+        var thead = '<th class="text-center" style="width: 70px;">No.</th><th>Area</th><th>Nama VDO</th><th style="text-align: center;">Jabatan</th><th>Nama Pasar</th><th>Nama Stokist</th><th style="text-align: center;">Tanggal</th><th style="text-align: center;">Call</th><th style="text-align: center;">RO</th>';
         var table = 'summaryTable';
         var filterId = ['#filterSubCategory'];
         var url = "{!! route('smd.pasar.sales.summary.data') !!}";
