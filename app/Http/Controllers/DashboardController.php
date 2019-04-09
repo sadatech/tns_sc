@@ -34,6 +34,7 @@ class DashboardController extends Controller
 {
     public function index(){
         $periode = Carbon::now();
+        // $periode = Carbon::parse('January 2019');
         $vdoEmployees = Employee::where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         })->pluck('id');
@@ -56,7 +57,7 @@ class DashboardController extends Controller
                         ->whereIn('id_employee', $vdoEmployees)
                         ->groupBy(DB::raw('DATE(date)'),'id_employee')
                         ->get()->count('id');
-        $data['ach'] = ($data['cbd_target'] == 0) ? '0 %' : (($data['cbd_actual']/$data['cbd_target']).'%');
+        $data['ach'] = ($data['cbd_target'] == 0) ? '0 %' : (round(($data['cbd_actual']/$data['cbd_target']*100),2).'%');
 
         return view('dashboard.home', $data);
     }
@@ -75,6 +76,7 @@ class DashboardController extends Controller
     public function achSmd()
     {
         $periode = Carbon::now();
+        // $periode = Carbon::parse('January 2019');
         $target_kpi = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
             return $query->where('level', 'mdgtc');
         });
@@ -92,7 +94,7 @@ class DashboardController extends Controller
             return @$item->getCbd($periode);
         })
         ->addColumn('ach', function ($item) use ($periode){
-            return is_null($item->getTarget($periode)) ? '0 %'  : (round(@$item->getCbd($periode)/($item->getTarget($periode)['cbd']),2).'%');
+            return is_null($item->getTarget($periode)) ? '0 %'  : (round((@$item->getCbd($periode)/($item->getTarget($periode)['cbd'])*100),2).'%');
         })
         ->make(true);
     }
@@ -127,15 +129,15 @@ class DashboardController extends Controller
             return @$item->getCbd($periode);
         })
         ->addColumn('ach', function ($item) use ($periode){
-            return is_null($item->getTarget($periode)) ? '0 %'  : (round(@$item->getCbd($periode)/($item->getTarget($periode)['cbd']),2).'%');
+            return is_null($item->getTarget($periode)) ? '0 %'  : (round((@$item->getCbd($periode)/($item->getTarget($periode)['cbd'])*100),2).'%');
         })
         ->make(true);
     }
 
     public function chartAchSmd()
     {
-        // $periode = Carbon::parse('January 2019');
         $periode = Carbon::now();
+        $periode = Carbon::parse('January 2019');
         $SMDs = Employee::where('employees.isResign', 0)
         ->join('positions','employees.id_position','positions.id')
         ->where('positions.level', 'mdgtc')
@@ -148,6 +150,9 @@ class DashboardController extends Controller
             ->orderBy('sum_of_cbd','desc')
             ->limit(10)->get();
 
+        foreach ($SMDs as $key => $smd) {
+            $smd['nama_potong'] = substr($smd->name, 0, 18);
+        }
         return response()->json($SMDs);
     }
 
