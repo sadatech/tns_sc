@@ -186,7 +186,7 @@
         $(document).ready(function(){
           $.get(url, function(response){
             response.forEach(function(data){
-                Employee.push(data.name);
+                Employee.push(data.nama_potong);
                 Labels.push(data.email);
                 CBD.push(data.sum_of_cbd);
             });
@@ -197,7 +197,7 @@
                       labels:Employee,
                       datasets: [{
                           label: 'CBD Actual',
-                          backgroundColor: "rgba(151,187,205,0.5)",
+                          backgroundColor: "rgba(255, 99, 132, 0.9)",
                           data: CBD,
                           borderWidth: 1
                       }]
@@ -206,7 +206,7 @@
                       elements: {
                           rectangle: {
                               borderWidth: 2,
-                              borderColor: 'rgb(0, 255, 0)',
+                              borderColor: 'rgba(255, 99, 132, 1)',
                               borderSkipped: 'bottom'
                           }
                       },
