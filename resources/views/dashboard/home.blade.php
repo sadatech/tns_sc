@@ -45,14 +45,13 @@
             </div>
         </a>
     </div>
+</div>
 
     @if(Auth::user()->role->level == 'AdminGtc' || Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator')
 
     <div class="block block-themed">
         <div class="block">
           <div class="block-content block-content-full">
-            <div class="block-header p-0 mb-20">
-            </div>
             <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="vdo">
             <thead>
               <th style="width: 70px;"></th>
@@ -95,20 +94,19 @@
           </div>
         </div>
     </div>
-    <div class="block block-themed">
-        <div class="block">
-          <div class="block-content block-content-full">
-           <div class="panel panel-default">
-               <div class="panel-heading"><b>Charts</b></div>
-               <div class="panel-body">
-                   <canvas id="canvas" height="280" width="1143"></canvas>
-               </div>
-           </div>
-       </div>
-     </div>
+    <div class="row" id="content">
+      <div class="col-md-12">
+        <div class="block block-bordered block-themed">
+          <div class="block-header p-5 pl-10">
+            <h3 class="block-title">CBD This Month</h3>
+          </div>
+          <div class="block-content">
+            <canvas id="canvas" height="90px"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
     @endif
-</div>
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
@@ -181,8 +179,6 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-    })
-    $(document).ready(function(){
         var url = "{{ route('data.dashboard.chartAchSmd') }}";
         var Employee = new Array();
         var Labels = new Array();
@@ -230,6 +226,6 @@
               });
           });
         });
-    })
+    });
 </script>
 @endsection
