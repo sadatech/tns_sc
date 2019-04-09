@@ -137,7 +137,7 @@ class DashboardController extends Controller
     public function chartAchSmd()
     {
         $periode = Carbon::now();
-        $periode = Carbon::parse('January 2019');
+        // $periode = Carbon::parse('January 2019');
         $SMDs = Employee::where('employees.isResign', 0)
         ->join('positions','employees.id_position','positions.id')
         ->where('positions.level', 'mdgtc')
