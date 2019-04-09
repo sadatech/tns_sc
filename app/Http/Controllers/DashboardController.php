@@ -92,7 +92,7 @@ class DashboardController extends Controller
             return @$item->getCbd($periode);
         })
         ->addColumn('ach', function ($item) use ($periode){
-            return is_null($item->getTarget($periode)) ? '0 %'  : ((@$item->getCbd($periode)/($item->getTarget($periode)['cbd'])).'%');
+            return is_null($item->getTarget($periode)) ? '0 %'  : (round(@$item->getCbd($periode)/($item->getTarget($periode)['cbd']),2).'%');
         })
         ->make(true);
     }
@@ -127,15 +127,15 @@ class DashboardController extends Controller
             return @$item->getCbd($periode);
         })
         ->addColumn('ach', function ($item) use ($periode){
-            return is_null($item->getTarget($periode)) ? '0 %'  : ((@$item->getCbd($periode)/($item->getTarget($periode)['cbd'])).'%');
+            return is_null($item->getTarget($periode)) ? '0 %'  : (round(@$item->getCbd($periode)/($item->getTarget($periode)['cbd']),2).'%');
         })
         ->make(true);
     }
 
     public function chartAchSmd()
     {
-        $periode = Carbon::parse('January 2019');
-        // $periode = Carbon::now();
+        // $periode = Carbon::parse('January 2019');
+        $periode = Carbon::now();
         $SMDs = Employee::where('employees.isResign', 0)
         ->join('positions','employees.id_position','positions.id')
         ->where('positions.level', 'mdgtc')

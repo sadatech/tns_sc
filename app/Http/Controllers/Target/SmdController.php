@@ -30,6 +30,10 @@ class SmdController extends Controller
         $target = TargetGtc::with('employee')
         ->select('target_gtcs.*');
         return Datatables::of($target)
+        ->editColumn('rilis', function($target){
+            $rilis = Carbon::parse($target->rilis)->format('F Y');
+            return $rilis;
+        })
         ->addColumn('values', function($target){
             return number_format($target->value_sales,2,',','.');
         })
