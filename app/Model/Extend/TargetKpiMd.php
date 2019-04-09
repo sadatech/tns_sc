@@ -236,40 +236,46 @@ class TargetKpiMd extends Employee
     public function getEc($periode){
     	// return Carbon::parse($periode);
 
-    	$data = SalesMd::join('sales_md_details', 'sales_mds.id', 'sales_md_details.id_sales')
-        					->join('products', 'products.id', 'sales_md_details.id_product')
-        					->join('employees', 'employees.id', 'sales_mds.id_employee')
-        					->join('outlets', 'outlets.id', 'sales_mds.id_outlet')
-        					->join('employee_pasars', 'employee_pasars.id', 'outlets.id_employee_pasar')
-        					->join('pasars', 'pasars.id', 'employee_pasars.id_pasar')
-        					->join('sub_areas', 'sub_areas.id', 'pasars.id_subarea')
-        					->join('areas', 'areas.id', 'sub_areas.id_area')
-        					->join('product_fokus_gtcs', function ($join){
-        						return $join->on('product_fokus_gtcs.id_product', 'products.id')
-        									->on('product_fokus_gtcs.id_area', 'areas.id');
-        					})
-        					->whereMonth('sales_mds.date', Carbon::parse($periode)->month)
-        					->whereYear('sales_mds.date', Carbon::parse($periode)->year)
-        					->whereDate('product_fokus_gtcs.from', '<=', Carbon::parse($periode))
-        					->whereDate('product_fokus_gtcs.to', '>=', Carbon::parse($periode))
-        					->where('employees.id', $this->id)
-        					->whereNull('product_fokus_gtcs.deleted_at')
-        					->count();
+    	// $data = SalesMd::join('sales_md_details', 'sales_mds.id', 'sales_md_details.id_sales')
+     //    					->join('products', 'products.id', 'sales_md_details.id_product')
+     //    					->join('employees', 'employees.id', 'sales_mds.id_employee')
+     //    					->join('outlets', 'outlets.id', 'sales_mds.id_outlet')
+     //    					->join('employee_pasars', 'employee_pasars.id', 'outlets.id_employee_pasar')
+     //    					->join('pasars', 'pasars.id', 'employee_pasars.id_pasar')
+     //    					->join('sub_areas', 'sub_areas.id', 'pasars.id_subarea')
+     //    					->join('areas', 'areas.id', 'sub_areas.id_area')
+     //    					->join('product_fokus_gtcs', function ($join){
+     //    						return $join->on('product_fokus_gtcs.id_product', 'products.id')
+     //    									->on('product_fokus_gtcs.id_area', 'areas.id');
+     //    					})
+     //    					->whereMonth('sales_mds.date', Carbon::parse($periode)->month)
+     //    					->whereYear('sales_mds.date', Carbon::parse($periode)->year)
+     //    					->whereDate('product_fokus_gtcs.from', '<=', Carbon::parse($periode))
+     //    					->whereDate('product_fokus_gtcs.to', '>=', Carbon::parse($periode))
+     //    					->where('employees.id', $this->id)
+     //    					->whereNull('product_fokus_gtcs.deleted_at')
+     //    					->count();
 
-        $data2 = SalesMd::join('sales_md_details', 'sales_mds.id', 'sales_md_details.id_sales')
-        					->join('products', 'products.id', 'sales_md_details.id_product')
-        					->join('employees', 'employees.id', 'sales_mds.id_employee')
-        					->join('product_fokus_gtcs', 'products.id', 'product_fokus_gtcs.id_product')
-        					->whereMonth('sales_mds.date', Carbon::parse($periode)->month)
-        					->whereYear('sales_mds.date', Carbon::parse($periode)->year)
-        					->whereDate('product_fokus_gtcs.from', '<=', Carbon::parse($periode))
-        					->whereDate('product_fokus_gtcs.to', '>=', Carbon::parse($periode))
-        					->where('employees.id', $this->id)
-        					->where('product_fokus_gtcs.id_area', null)
-        					->whereNull('product_fokus_gtcs.deleted_at')
-        					->count();
+     //    $data2 = SalesMd::join('sales_md_details', 'sales_mds.id', 'sales_md_details.id_sales')
+     //    					->join('products', 'products.id', 'sales_md_details.id_product')
+     //    					->join('employees', 'employees.id', 'sales_mds.id_employee')
+     //    					->join('product_fokus_gtcs', 'products.id', 'product_fokus_gtcs.id_product')
+     //    					->whereMonth('sales_mds.date', Carbon::parse($periode)->month)
+     //    					->whereYear('sales_mds.date', Carbon::parse($periode)->year)
+     //    					->whereDate('product_fokus_gtcs.from', '<=', Carbon::parse($periode))
+     //    					->whereDate('product_fokus_gtcs.to', '>=', Carbon::parse($periode))
+     //    					->where('employees.id', $this->id)
+     //    					->where('product_fokus_gtcs.id_area', null)
+     //    					->whereNull('product_fokus_gtcs.deleted_at')
+     //    					->count();
 
-        return $data + $data2;
+     //    return $data + $data2;
+        $data3 = SalesMd::whereMonth('sales_mds.date', Carbon::parse($periode)->month)
+                         ->whereYear('sales_mds.date', Carbon::parse($periode)->year)
+                         ->where('id_employee', $this->id)
+                         ->groupBy('id_outlet')
+                         ->get()->count();
+        return $data3;
     }
 
     public function getCbd($periode){

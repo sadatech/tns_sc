@@ -333,7 +333,8 @@
             { data: 'ec', name: 'ec' },
             { data: 'cbd', name: 'cbd' },
             { data: 'action', name: 'action' }
-            ]
+            ],
+            order: [[ 0, "desc" ]]
           });
         });
         $(".JustAngka").keydown(function (e) {
