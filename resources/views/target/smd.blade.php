@@ -71,6 +71,7 @@
                   <td><b>Value</b></td>
                   <td><b>ECPF</b></td>
                   <td><b>CBD</b></td>
+                  <td><b>Rilis</b></td>
               </tr>
             </thead>
             <tbody>
@@ -80,6 +81,7 @@
                   <td>Value 1</td>
                   <td>ECPF 1</td>
                   <td>CBD 1</td>
+                  <td>2018/12/20</td>
               </tr>
               <tr>
                   <td>Employee 2</td>
@@ -87,6 +89,7 @@
                   <td>Value 2</td>
                   <td>ECPF 2</td>
                   <td>CBD 2</td>
+                  <td>2018/12/21</td>
               </tr>
             </tbody>
           </table>

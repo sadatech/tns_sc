@@ -70,20 +70,22 @@
                             <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Pembelian Bahan Baku</th>
                             <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Pembelian Property</th>
                             <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Perijinan</th>
-                            <th colspan="5" style="vertical-align: middle; text-align: center; width: 200px !important;">Angkutan</th>
+                            <th rowspan="2" style="vertical-align: middle; text-align: center; width: 200px !important;">Angkutan</th>
                             <th colspan="2" style="vertical-align: middle; text-align: center; width: 200px !important;">Biaya lain-lain</th>
                             <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Total Biaya</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Profit</th>
+                            <th rowspan="2" style="vertical-align: middle; width: 200px !important;">Subsidi Sasa</th>
                         </tr>
                         <tr>
                             <th style="vertical-align: middle; width: 120px !important;">KM Awal</th>
                             <th style="vertical-align: middle; width: 120px !important;">KM Akhir</th>
                             <th style="vertical-align: middle; width: 120px !important;">Jarak Tempuh</th>
-                            <!--  -->
+                            <!--  --><!-- 
                             <th style="vertical-align: middle; width: 120px !important;">Bus</th>
                             <th style="vertical-align: middle; width: 120px !important;">SIPA</th>
                             <th style="vertical-align: middle; width: 120px !important;">Ojek</th>
                             <th style="vertical-align: middle; width: 120px !important;">Becak</th>
-                            <th style="vertical-align: middle; width: 120px !important;">Taksi</th>
+                            <th style="vertical-align: middle; width: 120px !important;">Taksi</th> -->
                             <!--  -->
                             <th style="vertical-align: middle; width: 120px !important;">Rp.</th>
                             <th style="vertical-align: middle; width: 120px !important;">Keterangan</th>
@@ -341,14 +343,17 @@ table.table thead tr th {
                   { data: 'raw_material', name: 'raw_material'},
                   { data: 'property', name: 'property'},
                   { data: 'permission', name: 'permission'},
-                  { data: 'bus', name: 'bus'},
-                  { data: 'sipa', name: 'sipa'},
-                  { data: 'taxibike', name: 'taxibike'},
-                  { data: 'rickshaw', name: 'rickshaw'},
-                  { data: 'taxi', name: 'taxi'},
+                  // { data: 'bus', name: 'bus'},
+                  // { data: 'sipa', name: 'sipa'},
+                  // { data: 'taxibike', name: 'taxibike'},
+                  // { data: 'rickshaw', name: 'rickshaw'},
+                  // { data: 'taxi', name: 'taxi'},
+                  { data: 'trasnport', name: 'trasnport'},
                   { data: 'other_cost', name: 'other_cost'},
                   { data: 'other_description', name: 'other_description'},
                   { data: 'total_cost', name: 'total_cost'},
+                  { data: 'price_profit', name: 'price_profit'},
+                  { data: 'subsidi_sasa', name: 'subsidi_sasa'},
                 ],
                 // "columnDefs": columnDefs,
                 "order": [[0, 'desc']],

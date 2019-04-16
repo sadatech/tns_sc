@@ -14,7 +14,9 @@ class AddStatusInCbdTable extends Migration
     public function up()
     {
         Schema::table('new_cbds', function (Blueprint $table) {
-            $table->tinyInteger('status')->after('total_hanger')->default(1);
+            $table->tinyInteger('propose')->after('total_hanger')->default(1);
+            $table->tinyInteger('approve')->after('total_hanger')->default(0);
+            $table->tinyInteger('reject')->after('total_hanger')->default(0);
         });
     }
 
@@ -26,7 +28,9 @@ class AddStatusInCbdTable extends Migration
     public function down()
     {
         Schema::table('new_cbds', function($table) {
-            $table->dropColumn(['status']);
+            $table->dropColumn(['reject']);
+            $table->dropColumn(['approve']);
+            $table->dropColumn(['propose']);
         });
     }
 }

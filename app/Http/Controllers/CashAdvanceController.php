@@ -77,6 +77,7 @@ class CashAdvanceController extends Controller
                                 'other_currency'    => $row->r ?? null,
                                 'other_description' => $row->s ?? null,
                                 'total_cost'        => $row->t ?? null,
+                                'price_profit'      => $row->u ?? null,
                             ]);
                         }
                     }
@@ -115,6 +116,10 @@ class CashAdvanceController extends Controller
         })
         ->addColumn("employee", function($item){
             return $item->employee->name;
+        })
+        ->addColumn("trasnport", function($item){
+            $tranport = $item->bus+$item->sipa+$item->taxibike+$item->rickshaw+$item->taxi;
+            return $tranport;
         })
         ->make(true);
     }

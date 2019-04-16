@@ -71,6 +71,8 @@ class CashAdvanceController extends Controller
 						'other_cost'    	=> $request->other_cost ?? 0,
 						'other_description' => $request->other_description ?? null,
 						'total_cost'        => $total,
+						'price_profit'    	=> $request->price_profit ?? 0,
+						'subsidi_sasa'		=> $total - $request->price_profit ?? 0,
 					]);
 					if ($insert->id) {
 						$res['success'] = true;
@@ -128,6 +130,8 @@ class CashAdvanceController extends Controller
 						'other_cost'    	=> $data->other_cost ?? null,
 						'other_description' => $data->other_description ?? null,
 						'total_cost'        => $data->total_cost ?? null,
+						'price_profit'      => $data->price_profit ?? null,
+						'subsidi_sasa'      => $data->subsidi_sasa ?? null,
 						'area_name'			=> $data->area->name ?? null,
 					);
 				}

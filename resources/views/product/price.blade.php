@@ -31,7 +31,8 @@
           <th class="text-center" style="width: 70px;"></th>
           <th class="text-center">Product</th>
           <th class="text-center">Category</th>
-          <th class="text-center">Price</th>
+          <th class="text-center">Retailer Price</th>
+          <th class="text-center">Consumer Price</th>
           <th class="text-center">Date Rilis</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
@@ -66,7 +67,8 @@
                             <thead>
                                 <tr>
                                     <td><b>Product</b></td>
-                                    <td><b>Price</b></td>
+                                    <td><b>Retailer Price</b></td>
+                                    <td><b>Consumer Price</b></td>
                                     <td><b>Rilis</b></td>
                                 </tr>
                             </thead>
@@ -74,11 +76,13 @@
                                 <tr>
                                     <td>Product 1 (sesuai dengan data product)</td>
                                     <td>10000</td>
+                                    <td>10500</td>
                                     <td>2018/12/5</td>
                                 </tr>
                                 <tr>
                                     <td>Product 3 (sesuai dengan data product)</td>
                                     <td>20000</td>
+                                    <td>21000</td>
                                     <td>2018/12/20</td>
                                 </tr>
                             </tbody>
@@ -188,6 +192,7 @@ $('#currency').on('change', function() {
       { data: 'product', name: 'product' },
       { data: 'category', name: 'category' },
       { data: 'price', name: 'price' },
+      { data: 'price_cs', name: 'price_cs' },
       { data: 'rilis', name: 'rilis' },
       { data: 'action', name: 'action' },
       ]
