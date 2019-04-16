@@ -47,8 +47,8 @@
     </div>
 </div>
 
-    @if(Auth::user()->role->level == 'AdminGtc' || Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator')
-
+    @if(Auth::user()->role->level == 'AdminGtc' || Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'ViewAll')
+<!-- 
     <div class="block block-themed">
         <div class="block">
           <div class="block-content block-content-full">
@@ -93,15 +93,25 @@
             </table>
           </div>
         </div>
-    </div>
+    </div> -->
     <div class="row" id="content">
-      <div class="col-md-12">
+      <div class="col-md-5">
         <div class="block block-bordered block-themed">
           <div class="block-header p-5 pl-10">
-            <h3 class="block-title">CBD This Month</h3>
+            <h3 class="block-title" id="pie"></h3>
           </div>
           <div class="block-content">
-            <canvas id="canvas" height="90px"></canvas>
+            <canvas id="myChartPie"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="block block-bordered block-themed">
+          <div class="block-header p-5 pl-10">
+            <h3 class="block-title" id="bar"></h3>
+          </div>
+          <div class="block-content">
+            <canvas id="AreaChart"></canvas>
           </div>
         </div>
       </div>
@@ -132,6 +142,8 @@
                     $('#store').html(data.count.store);
                     $('#product').html(data.count.product);
                     $('#pasar').html(data.count.pasar);
+                    $('#pie').html(data.pie);
+                    $('#bar').html(data.bar);
                 }
             }
         });
@@ -179,51 +191,75 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        var url = "{{ route('data.dashboard.chartAchSmd') }}";
-        var Employee = new Array();
-        var Labels = new Array();
-        var CBD = new Array();
+        var urlPie = "{{ route('data.dashboard.chartPieNational') }}";
+        var cbdStatus = new Array();
+        var cbdPersen = new Array();
+        $(document).ready(function(){
+          $.get(urlPie, function(response){
+            response.forEach(function(data){
+                cbdStatus.push(data.name);
+                cbdPersen.push(data.poin);
+            });
+            var pie = document.getElementById('myChartPie').getContext('2d');
+            var myChartPie = new Chart(pie, {
+                type: 'doughnut',
+                data: {
+                    labels: cbdStatus,
+                    datasets: [{
+                        label: 'CBD',
+                        data: cbdPersen,
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.9)',
+                            'rgba(255, 69, 132, 0.9)',
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 69, 132, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                }
+            });
+          });
+        });
+        var url = "{{ route('data.dashboard.chartArea') }}";
+        var Area = new Array();
+        var cbdArea = new Array();
+        var Color = new Array();
         $(document).ready(function(){
           $.get(url, function(response){
             response.forEach(function(data){
-                Employee.push(data.nama_potong);
-                Labels.push(data.email);
-                CBD.push(data.sum_of_cbd);
+                Area.push(data.name);
+                cbdArea.push(data.persen);
+                Color.push(data.color);
             });
-            var ctx = document.getElementById("canvas").getContext('2d');
-                var myChart = new Chart(ctx, {
-                  type: 'bar',
-                  data: {
-                      labels:Employee,
-                      datasets: [{
-                          label: 'CBD Actual',
-                          backgroundColor: "rgba(255, 99, 132, 0.9)",
-                          data: CBD,
-                          borderWidth: 1
-                      }]
+            var arx = document.getElementById("AreaChart").getContext('2d');
+            var AreaChart = new Chart(arx, {
+              type: 'horizontalBar',
+              data: {
+                  labels:Area,
+                  datasets: [{
+                      label: 'CBD Actual',
+                      backgroundColor: Color,
+                      data: cbdArea,
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  title: {
+                      display: true,
+                      text: 'Kontrak Display Area'
                   },
-                  options: {
-                      elements: {
-                          rectangle: {
-                              borderWidth: 2,
-                              borderColor: 'rgba(255, 99, 132, 1)',
-                              borderSkipped: 'bottom'
+                  scales: {
+                      xAxes: [{
+                          ticks: {
+                              beginAtZero:true
                           }
-                      },
-                      responsive: true,
-                      title: {
-                          display: true,
-                          text: 'Kontrak Display Employee'
-                      },
-                      scales: {
-                          yAxes: [{
-                              ticks: {
-                                  beginAtZero:true
-                              }
-                          }]
-                      }
+                      }]
                   }
-              });
+              }
+            });
           });
         });
     });

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\Datatables\Datatables;
+use App\Area;
 use App\Product;
-use App\Store;
+use App\Outlet;
 use App\Pasar;
 use App\Employee;
+use App\Region;
 use App\TargetGtc;
 use App\NewCbd;
 use App\Attendance;
@@ -63,13 +65,19 @@ class DashboardController extends Controller
     }
 
     public function dashboard() {
+        $periode = Carbon::now();
+        $gtcEmployee = ['mdgtc','spggtc','dc','motoric','tlgtc'];
         $data['product']  = Product::count();
-        $data['store']    = Store::count();
+        $data['store']    = Outlet::count();
         $data['pasar']    = Pasar::count();
-        $data['employee'] = Employee::count();
+        $data['employee'] = Employee::whereHas('position', function($query) use ($gtcEmployee){
+                                return $query->whereIn('level', $gtcEmployee);
+                            })->where('isResign', 0)->count();
         return response()->json([
             'success' => true,
-            'count' => $data
+            'count' => $data,
+            'pie' => 'Achievement CBD '.$periode->format('M Y'),
+            'bar' => 'Achievement CBD Region '.$periode->format('M Y')
         ]);
     }
 
@@ -154,6 +162,82 @@ class DashboardController extends Controller
             $smd['nama_potong'] = substr($smd->name, 0, 18);
         }
         return response()->json($SMDs);
+    }
+
+    public function chartPieNational()
+    {
+        $periode = Carbon::now();
+        // $periode = Carbon::parse('January 2019');
+        $vdoEmployees = Employee::where('isResign', 0)->whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        })->pluck('id');
+        $target = TargetGtc::whereIn('id_employee', $vdoEmployees)
+                        ->whereMonth('rilis', $periode->month)
+                        ->whereYear('rilis', $periode->year)
+                        ->orderBy('rilis', 'DESC')
+                        ->groupBy('id_employee')
+                        ->get();
+        $data['cbd_target'] = $target->sum('cbd');
+        $data['cbd_actual'] = NewCbd::whereMonth('date', $periode->month)
+                        ->whereYear('date', $periode->year)
+                        ->whereIn('id_employee', $vdoEmployees)
+                        ->groupBy('id_outlet','id_employee')
+                        ->get()->count('id_outlet');
+        $data['cbd_less'] = $data['cbd_target']-$data['cbd_actual'];
+        if ($data['cbd_less'] <= 0) {
+            $data['cbd_less'] = 0;
+        }
+
+        $cbd = array();
+        $id = 1;
+        $cbd[] = array(
+            'id'        => $id++,
+            'name'      => 'CBD Aktual',
+            'poin'      => $data['cbd_actual'],
+        );
+        $cbd[] = array(
+            'id'        => $id++,
+            'name'      => 'GAP',
+            'poin'      => $data['cbd_less'],
+        );
+
+        return response()->json($cbd);
+    }
+
+    public function chartArea() {
+        $periode = Carbon::now();
+        // $periode = Carbon::parse('January 2019');
+
+        $regions = Region::get();
+        foreach ($regions as $key => $region) {
+            $region['cbd'] = NewCbd::orderBy('created_at', 'DESC')->with(['employee','outlet'])
+            ->whereYear('date', $periode->year)
+            ->whereMonth('date', $periode->month)
+            ->groupBy('id_outlet','id_employee')
+            ->whereHas('outlet.employeePasar.pasar.subarea.area.region', function($q2) use ($region){
+                    return $q2->where('id_region', $region->id);
+            })
+            ->get()->count();
+
+            $region['target'] = TargetGtc::whereMonth('rilis', $periode->month)
+                        ->whereHas('employee.employeePasar.pasar.subarea.area.region', function($q2) use ($region){
+                                return $q2->where('id_region', $region->id);
+                        })
+                        ->whereYear('rilis', $periode->year)
+                        ->orderBy('rilis', 'DESC')
+                        ->groupBy('id_employee')
+                        ->get()->sum('cbd');
+            $region['persen'] = ($region['target'] == 0) ? '0' : (round(($region['cbd']/$region['target']*100),2));
+            if ($region['persen'] > 100) {
+                $region['color'] = 'rgba(75, 192, 192, 0.9)';
+            }elseif ($region['persen'] > 70) {
+                $region['color'] = 'rgba(255, 206, 86, 0.9)';
+            }else{
+                $region['color'] = 'rgba(255, 69, 132, 0.9)';
+            }
+        }
+
+        return response()->json($regions);
     }
 
     public function welcome() {

@@ -31,6 +31,10 @@ class PriceController extends Controller
         ->editColumn('price', function($price) {
             return ($price->price? $this->numberToPrice('Rp', $price->price) : '');
         })
+
+        ->editColumn('price_cs', function($price) {
+            return ($price->price_cs? $this->numberToPrice('Rp', $price->price_cs) : '');
+        })
         ->addColumn('product', function($price) {
             return ($price->product->name??'DELETED PRODUCT');
         })
@@ -43,6 +47,7 @@ class PriceController extends Controller
                 'product'           => $price->product,
                 'rilis'             => $price->rilis,
                 'price'             => $price->price,
+                'price_cs'          => $price->price_cs,
             );
             return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('price.delete', $price->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
@@ -115,6 +120,7 @@ class PriceController extends Controller
                     'Product'       => $val->product->name??'DELETED PRODUCT',
                     'SubCategory'   => (isset($val->product->subCategory->name) ? $val->product->subCategory->name : "-"),
                     'Price'         => (isset($val->price) ? $val->price : "-"),
+                    'Price Cs'         => (isset($val->price_cs) ? $val->price : "-"),
                     'Rilis'         => (isset($val->rilis) ? $val->rilis : "-")
                 );
             }
@@ -167,6 +173,7 @@ class PriceController extends Controller
                                      Price::create([
                                         'id_product'    => \App\Product::whereRaw("TRIM(UPPER(name)) = '".trim(strtoupper($row['product']))."'")->withTrashed()->first()->id,
                                         'price'         => $row['price'],
+                                        'price_cs'         => $row['price_cs'],
                                         'rilis'         => \PHPExcel_Style_NumberFormat::toFormattedString($row['rilis'], 'YYYY-MM-DD'),
 
                                     ]);

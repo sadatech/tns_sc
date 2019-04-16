@@ -15,7 +15,7 @@ class Price extends BaseModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'id_product', 'rilis', 'price'
+        'id_product', 'rilis', 'price', 'price_cs'
     ];
 
     public function product()
@@ -28,7 +28,8 @@ class Price extends BaseModel
         return [
             'rilis'                 => 'required',
             'id_product'            => 'required',
-            'price'                 => 'required'
+            'price'                 => 'required',
+            'price_cs'              => 'required'
         ];
     }
     public static function hasActivePF($data, $self_id = null)

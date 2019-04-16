@@ -20,26 +20,6 @@
                     </div>
                 </div>
         </div>
-        <div class="content-side content-side-full content-side-user px-10 align-parent">
-                <div class="sidebar-mini-visible-b align-v animated fadeIn">
-                    <img class="img-avatar img-avatar32" src="{{ asset('assets/media/avatars/avatar15.jpg') }}" alt="">
-                </div>
-                <div class="sidebar-mini-hidden-b text-center">
-                    <a class="img-link" href="">
-                        <img class="img-avatar" src="{{ asset('assets/media/avatars/avatar15.jpg') }}" alt="">
-                    </a>
-                    <ul class="list-inline mt-10">
-                        <li class="list-inline-item">
-                            <a class="link-effect text-dual-primary-dark font-size-xs font-w600 text-uppercase" href="#">J. Smith</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a class="link-effect text-dual-primary-dark" data-toggle="layout" data-action="sidebar_style_inverse_toggle" href="javascript:void(0)">
-                                <i class="si si-drop"></i>
-                            </a>
-                        </li>           
-                    </ul>
-                </div>
-        </div>
         <div class="content-side content-side-full">
                 <ul class="nav-main">
                     <li>
@@ -50,6 +30,7 @@
                         <a class="{{ request()->is('company') ? 'active' : '' }}" href="{{ route('company') }}"><i class="si si-briefcase"></i><span class="sidebar-mini-hide">Company Profile</span></a>
                     </li> --}}
                     @endif
+                @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc' || !Auth::user()->role->level == 'ViewAll') 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Master Data</span></li>
                     {{-- Store --}}
                     <li class="{{ request()->is('store/*') ? 'open' : '' }}">
@@ -228,9 +209,12 @@
                     @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator')
                     <li>
                         <a class="{{ request()->is('user/index') ? 'active' : '' }}" href="{{ route('user') }}"><i class="si si-user-follow"></i><span class="sidebar-mini-hide">User</span></a>
-                    </li>  
-
+                    </li>                      
                     @endif
+
+                @endif
+
+                @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc' || !Auth::user()->role->level == 'ViewAll') 
                     {{-- Utilities --}}
                       <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Utilities</span></li>
                     <li>
@@ -251,24 +235,23 @@
 
                     @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                     <li class="{{ request()->is('edit/gtc/smd/*') ? 'open' : '' }}">
-                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">GTC(s)</span></a>
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-edit"></i><span class="sidebar-mini-hide">VDO</span></a>
                         <ul>
                              <li>
-                                <a class="{{ request()->is('edit/gtc/smd/sales') ? 'active' : '' }}" href="{{ route('edit.gtc.smd.sales') }}">Sales VDO</a>
+                                <a class="{{ request()->is('edit/gtc/smd/sales') ? 'active' : '' }}" href="{{ route('edit.gtc.smd.sales') }}">Sales</a>
                             </li>
                              <li>
-                                <a class="{{ request()->is('edit/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('edit.gtc.smd.new-cbd') }}">CBD VDO</a>
+                                <a class="{{ request()->is('edit/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('edit.gtc.smd.new-cbd') }}">CBD</a>
                             </li>
                         </ul>
                     </li>
                     @endif
+                @endif
 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">RT</span><span class="sidebar-mini-hidden">REPORT</span></li>
                     {{-- REPORT GTC --}}
-                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
-                    <li class="{{ request()->is('report/gtc*') ? 'open' : '' }}">
-                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">GTC</span></a>
-                        <ul>
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc' || Auth::user()->role->level == 'ViewAll')
+                    
                             {{-- SMD PASAR --}}
                             <li class="{{ request()->is('report/gtc/smd/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">VDO</span></a>
@@ -311,8 +294,6 @@
                                     </li>                                    
                                 </ul>
                             </li>
-                        </ul>
-                        <ul>
                             {{-- SPG PASAR --}}
                             <li class="{{ request()->is('report/gtc/spg/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SPG Pasar</span></a>
@@ -342,8 +323,6 @@
                                     </li>
                                 </ul>
                             </li>
-                        </ul>
-                        <ul>
                             {{-- Demo Cooking --}}
                             <li class="{{ request()->is('report/gtc/demo/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Demo Cooking</span></a>
@@ -374,8 +353,6 @@
                                     </li>
                                 </ul>
                             </li>
-                        </ul>
-                        <ul>
                             {{-- MOTORIK --}}
                             <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motoris</span></a>
@@ -394,13 +371,10 @@
                                 </li>
                             </ul>
                             </li>
-                        </ul>
-                    </li>
                     @endif
-                    </li>
                     @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                     {{-- REPORT MTC --}}
-                    <li class="{{ request()->is('report/mtc*') ? 'open' : '' }}">
+                    <!-- <li class="{{ request()->is('report/mtc*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-bar-chart"></i><span class="sidebar-mini-hide">MTC</span></a>
                         <ul>
                             {{-- ATTENDANCE MTC --}}
@@ -463,7 +437,7 @@
                                 </ul>
                             </li>
                         </ul>
-                    </li>
+                    </li> -->
                     @endif
                 </ul>
 

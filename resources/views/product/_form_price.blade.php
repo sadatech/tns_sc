@@ -29,11 +29,23 @@ $action = $action ?? '';
                     </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label >Price</label>
+              <label >Retailer Price</label>
               <div class="input-group-append">
                 <span class="input-group-text">Rp</span>
                 <div class="input-group">
                   <input type="text" class="currency form-control" id="{{$type}}Price" name="price" placeholder="" required>
+                  <div class="input-group-append">
+                    <span class="input-group-text">.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label >Consumer Price</label>
+              <div class="input-group-append">
+                <span class="input-group-text">Rp</span>
+                <div class="input-group">
+                  <input type="text" class="currency form-control" id="{{$type}}PriceCs" name="price_cs" placeholder="" required>
                   <div class="input-group-append">
                     <span class="input-group-text">.00</span>
                   </div>
@@ -97,6 +109,7 @@ $action = $action ?? '';
             setSelect2IfPatchModal($("#{{$type}}Product"), json.product.id, json.product.name);
     };
     $('#{{$type}}Price').val(json.price);
+    $('#{{$type}}PriceCs').val(json.price_cs);
     $('#{{$type}}Rilis').val(json.rilis);
       console.log(json);
   }
