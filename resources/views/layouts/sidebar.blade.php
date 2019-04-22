@@ -57,6 +57,9 @@
                                 <a class="{{ request()->is('store/channel') ? 'active' : '' }}" href="{{ route('channel') }}">Channel</a>
                             </li>
                             <li>
+                                <a class="{{ request()->is('store/dc_channel') ? 'active' : '' }}" href="{{ route('dc_channel') }}">DC Channel</a>
+                            </li>
+                            <li>
                                 <a class="{{ request()->is('store/account') ? 'active' : '' }}" href="{{ route('account') }}">Account</a>
                             </li>
                             <!--<li>
@@ -242,6 +245,14 @@
                             </li>
                              <li>
                                 <a class="{{ request()->is('edit/gtc/smd/new-cbd') ? 'active' : '' }}" href="{{ route('edit.gtc.smd.new-cbd') }}">CBD</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="{{ request()->is('edit/gtc/dc/*') ? 'open' : '' }}">
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-edit"></i><span class="sidebar-mini-hide">Dc</span></a>
+                        <ul>
+                             <li>
+                                <a class="{{ request()->is('edit/gtc/dc/sales') ? 'active' : '' }}" href="{{ route('edit.gtc.dc.sales') }}">Sales</a>
                             </li>
                         </ul>
                     </li>

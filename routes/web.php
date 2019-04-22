@@ -133,6 +133,15 @@ Route::prefix('store')->group(function () {
 		Route::get('/delete/{id}', 'ChannelController@delete')->name('channel.delete')->middleware('auth');
 	});
 
+	//Channel Pages
+	Route::prefix('dc_channel')->group(function(){
+		Route::get('/', 'DcChannelController@baca')->name('dc_channel')->middleware('auth');
+		Route::get('/data', 'DcChannelController@data')->name('dc_channel.data')->middleware('auth');
+		Route::post('/create', 'DcChannelController@store')->name('dc_channel.add')->middleware('auth');
+		Route::put('/update/{id}', 'DcChannelController@update')->name('dc_channel.update')->middleware('auth');
+		Route::get('/delete/{id}', 'DcChannelController@delete')->name('dc_channel.delete')->middleware('auth');
+	});
+
 	//Account Pages
 	Route::prefix('account')->group(function(){
 		Route::post('/import', 'AccountController@import')->name('account.import')->middleware('auth');
@@ -657,6 +666,21 @@ Route::prefix('edit')->group(function () {
 				Route::any('/data', 'ReportEditSmdController@SMDNewCbd')->name('dataedit.gtc.smd.new-cbd')->middleware('auth');
 				Route::put('/update/{id}','ReportEditSmdController@updateNewCbd')->name('update.gtc.smd.new-cbd')->middleware('auth');
 				Route::get('/delete/{id}', 'ReportEditSmdController@deleteNewCbd')->name('edit.gtc.smd.new-cbd.delete')->middleware('auth');
+
+			});
+
+		});
+
+		// SMD REPORT
+		Route::prefix('dc')->group(function () {
+
+			Route::prefix('sales')->group(function () {
+				Route::get('/', function(){
+					return view('editreport.dc.sales');
+				})->name('edit.gtc.dc.sales')->middleware('auth');
+				Route::any('/data', 'ReportEditDcController@dcSales')->name('dataedit.gtc.dc.sales')->middleware('auth');
+				Route::put('/update/{id}','ReportEditDcController@updateDcSales')->name('update.gtc.dc.sales')->middleware('auth');
+				Route::get('/delete/{id}', 'ReportEditDcController@deleteDcSales')->name('edit.gtc.dc.sales.delete')->middleware('auth');
 
 			});
 
