@@ -209,8 +209,8 @@
                         label: 'CBD',
                         data: cbdPersen,
                         backgroundColor: [
-                            'rgba(75, 192, 192, 0.9)',
-                            'rgba(255, 69, 132, 0.9)',
+                            'rgba(65, 200, 68, 0.9)',
+                            'rgba(244, 66, 66, 0.9)',
                         ],
                         borderColor: [
                             'rgba(75, 192, 192, 1)',

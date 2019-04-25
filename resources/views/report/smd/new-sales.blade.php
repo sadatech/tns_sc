@@ -1,8 +1,8 @@
 @extends('layouts.app')
-@section('title', "Report CBD VDO Pasar")
+@section('title', "Report Sales VDO Pasar")
 @section('content')
 <div class="content">
-  <h2 class="content-heading pt-10">CBD VDO Pasar<small>Report</small></h2>
+  <h2 class="content-heading pt-10">Sales VDO Pasar <small>Report</small></h2>
   @if($errors->any())
   <div class="alert alert-danger">
     <div><b>Waiitt! You got an error massages <i class="em em-confounded"></i></b></div>
@@ -36,8 +36,8 @@
               <select class="form-control" id="filterArea" name="area"></select>
             </div>
             <div class="col-md-4">
-              <label>Outlet:</label>
-              <select class="form-control" id="filterOutlet" name="outlet"></select>
+              <label>Pasar:</label>
+              <select class="form-control" id="filterPasar" name="pasar"></select>
             </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
@@ -56,33 +56,21 @@
           <h3 class="block-title">
           </h3>
           <div class="block-option">
-            <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
-
+              <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
           </div>
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="category">
           <thead>
             <tr>
               <th class="text-center" style="width: 70px;"></th>
-              <th>Employee</th>
-              <th>Outlet</th>
-              <th>Region</th>
-              <th>Area</th>
-              <th>Sub Area</th>
+              <th>Nama</th>
               <th>Pasar</th>
-              <th>Date</th>
-              <th>Photo Before</th>
-              <th>Photo After</th>
-              <th>Status</th>
-              <th>Action</th>
-              <th>Total Hanger</th>
-              <th>Outlet Type</th>
-              <th>CBD Position</th>
-              <th>CBD Competitor</th>
-              <th>POSM Shop Sign</th>
-              <th>POSM Hangering Mobile</th>
-              <th>POSM Poster</th>
-              <th>POSM Other</th>
+              <th>Tanggal</th>
+              <th>Outlet</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Satuan</th>
+              <th>Total</th>
             </tr>
           </thead>
         </table>
@@ -93,7 +81,6 @@
 @endsection
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('assets/js/plugins/magnific-popup/magnific-popup.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
@@ -110,7 +97,6 @@ table.table thead tr th {
 @endsection
 
 @section('script')
-<script src="{{ asset('assets/js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
 <script src="{{ asset('js/select2-handler.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
@@ -131,9 +117,9 @@ table.table thead tr th {
   });
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet,#filterArea,#filterDate').val(null).trigger('change');
+    $('#filterEmployee,#filterPasar,#filterArea,#filterDate').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee,#filterOutlet,#filterArea,#filterDate').val(null).trigger('change');
+      $('#filterEmployee,#filterPasar,#filterArea,#filterDate').val(null).trigger('change');
     }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
@@ -145,7 +131,7 @@ table.table thead tr th {
       })
     }
   }));
-  $('#filterOutlet').select2(setOptions('{{ route("outlet-select2") }}', 'Choose your Outlet', function (params) {
+  $('#filterPasar').select2(setOptions('{{ route("pasar-select2") }}', 'Choose your Pasar', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {
@@ -163,45 +149,34 @@ table.table thead tr th {
       })
     }
   }));
-  $('#filterDate').datepicker({
-      format: "mm/yyyy/dd",
-      startView: "0",
-      minView: "0",
-      autoclose: true,
-  });
   $(".js-datepicker").datepicker( {
     format: "mm/yyyy",
     viewMode: "months",
     autoclose: true,
     minViewMode: "months"
   });
+  $('#filterDate').datepicker({
+      format: "mm/yyyy/dd",
+      startView: "0",
+      minView: "0",
+      autoclose: true,
+  });
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
   });
-  
-  /**
-   * Download OnClick
-   */
+
   $("#btnDownloadXLS").on("click", function(){
-    $.ajax({
-      url: $(this).attr("target-url"),
-      type: "post",
-      success: function(e){
-        swal("Success!", e.result, "success");
-      },
-      error: function(){
-        swal("Error!", e.result, "error");
-      }
-    });
+      var url= "{{ route('export.new-sales.smd') }}"+"?periode="+$(".js-datepicker").val()+"&date="+$("#filterDate").val()+"&employee="+$("#filterEmployee").val()+"&pasar="+$("#filterPasar").val()+"&area="+$("#filterArea").val();
+      window.location.href=url;
   });
 
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
     e.preventDefault();
     var table = null;
-    var url = '{!! route('data.smd.new-cbd') !!}';
+    var url = '{!! route('data.new-sales.smd') !!}';
     table = $('#category').DataTable({
       processing: true,
       serverSide: true,
@@ -227,111 +202,19 @@ table.table thead tr th {
           swal("Error!", "Failed to load Data!", "error");
         },
       },
-      drawCallback: function(){
-        $('.popup-image').magnificPopup({
-          type: 'image',
-        });
-        if ($("#filterDate").val()=='') {
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
-        }else{
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
-        };
-        $('.js-swal-reject').on('click', function(){
-          var url = $(this).data("url");
-          swal({
-            title: "Are you sure to make change?",
-            text: "CBD will be reject!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: '#d26a5c',
-            confirmButtonText: 'Yes, reject it!',
-            html: false,
-            preConfirm: function() {
-                return new Promise(function (resolve) {
-                    setTimeout(function () {
-                        resolve();
-                    }, 50);
-                });
-            }
-          }).then(function(result){
-            if (result.value) {
-                window.location = url;
-            } else if (result.dismiss === 'cancel') {
-                swal('Cancelled', 'Your data is safe :)', 'error');
-            }
-          });
-        });
-        $('.js-swal-approve').on('click', function(){
-          var url = $(this).data("url");
-          swal({
-            title: "Are you sure to make change?",
-            text: "CBD will be approve!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: '#d26a5c',
-            confirmButtonText: 'Yes, approve it!',
-            html: false,
-            preConfirm: function() {
-                return new Promise(function (resolve) {
-                    setTimeout(function () {
-                        resolve();
-                    }, 50);
-                });
-            }
-          }).then(function(result){
-            if (result.value) {
-                window.location = url;
-            } else if (result.dismiss === 'cancel') {
-                swal('Cancelled', 'Your data is safe :)', 'error');
-            }
-          });
-        });
-
-      },
       columns: [
       { data: 'id' },
-      { data: 'employee' },
-      { data: 'outlet' },
-      { data: 'region' },
-      { data: 'area' },
-      { data: 'subarea' },
+      { data: 'nama' },
       { data: 'pasar' },
-      { data: 'date' },
-      { data: 'photo' },
-      { data: 'photo2' },
-      { data: 'status' },
-      { data: 'action' },
-      { data: 'total_hanger' },
-      { data: 'outlet_type' },
-      { data: 'cbd_position' },
-      { data: 'cbd_competitor' },
-      { data: 'posm_shop_sign' },
-      { data: 'posm_hangering_mobile' },
-      { data: 'posm_poster' },
-      { data: 'posm_others' },
+      { data: 'tanggal' },
+      { data: 'outlet' },
+      { data: 'product' },
+      { data: 'qty_actual' },
+      { data: 'satuan' },
+      { data: 'sales_price' },
       ],
       bDestroy: true
     });
   });
-
-  @if(session('type'))
-  $(document).ready(function() {
-      $.notify({
-        title: '<strong>{!! session('title') !!}</strong>',
-        message: '{!! session('message') !!}'
-      }, {
-        type: '{!! session('type') !!}',
-        animate: {
-          enter: 'animated zoomInDown',
-          exit: 'animated zoomOutUp'
-        },
-        placement: {
-          from: 'top',
-          align: 'center'
-        }
-      });
-  });
-  @endif
-
 </script>
 @endsection

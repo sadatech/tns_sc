@@ -14,7 +14,8 @@ trait ExportGTCCbdTrait
 
 	private $headerList = [
 		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "DATE", "PHOTO BEFORE", "PHOTO AFTER"], // old
-		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "PASAR", "DATE", "PHOTO BEFORE", "PHOTO AFTER", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Approval"], // new
+		// ["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "PASAR", "DATE", "PHOTO BEFORE", "PHOTO AFTER", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Approval"], // new
+		["EMPLOYEE", "OUTLET", "REGION", "AREA", "SUBAREA", "PASAR", "DATE", "PHOTO BEFORE", "PHOTO AFTER", "TOTAL HANGER", "OUTLET TYPE", "CBD POSITION", "CBD COMPETITOR", "POSM Shop Sign", "POSM Hangering Mobile", "POSM Poster", "POSM Other", "Propose", "Approval", "Reject"], // new
 	];
 
 	private $valueList 	= [];
@@ -82,7 +83,10 @@ trait ExportGTCCbdTrait
                     ($d->posm_hangering_mobile == 1) ? 'Yes' : 'No',
                     ($d->posm_poster == 1) ? 'Yes' : 'No',
                     $d->posm_others?? '-',
-                    ($d->status == 1) ? 'approve' : 'reject',
+                    // ($d->status == 1) ? 'approve' : 'reject',
+                    $d->propose,
+                    $d->approve,
+                    $d->reject,
 				];
 
 				$this->photoList[$a] = $d->photo;
