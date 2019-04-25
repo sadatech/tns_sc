@@ -87,8 +87,19 @@ class ReportEditSmdController extends Controller
     {
         $salesDetail = SalesMdDetail::find($id);
 
+        $product = Product::find($request->product);
+        // return response()->json($product);
+        if ($request->satuan == 'carton') {
+            $quantity = (isset($product->carton) ? $product->carton*$request->qty : $request->qty);
+        }elseif ($request->satuan == 'pack') {
+            $quantity = (isset($product->pack) ? $product->pack*$request->qty : $request->qty);
+        }else {
+            $quantity = $request->qty;
+        }
+
         $salesDetail->update([
             'id_product'    => $request->product,
+            'qty'           => $quantity,
             'qty_actual'    => $request->qty,
             'satuan'        => $request->satuan,
             ]);

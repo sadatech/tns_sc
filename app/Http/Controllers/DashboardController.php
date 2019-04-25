@@ -181,6 +181,7 @@ class DashboardController extends Controller
         $data['cbd_actual'] = NewCbd::whereMonth('date', $periode->month)
                         ->whereYear('date', $periode->year)
                         ->whereIn('id_employee', $vdoEmployees)
+                        ->where('reject','!=',1)
                         ->groupBy('id_outlet','id_employee')
                         ->get()->count('id_outlet');
         $data['cbd_less'] = $data['cbd_target']-$data['cbd_actual'];
@@ -213,6 +214,7 @@ class DashboardController extends Controller
             $region['cbd'] = NewCbd::orderBy('created_at', 'DESC')->with(['employee','outlet'])
             ->whereYear('date', $periode->year)
             ->whereMonth('date', $periode->month)
+            ->where('reject','!=',1)
             ->groupBy('id_outlet','id_employee')
             ->whereHas('outlet.employeePasar.pasar.subarea.area.region', function($q2) use ($region){
                     return $q2->where('id_region', $region->id);
@@ -229,11 +231,11 @@ class DashboardController extends Controller
                         ->get()->sum('cbd');
             $region['persen'] = ($region['target'] == 0) ? '0' : (round(($region['cbd']/$region['target']*100),2));
             if ($region['persen'] > 100) {
-                $region['color'] = 'rgba(75, 192, 192, 0.9)';
-            }elseif ($region['persen'] > 70) {
+                $region['color'] = 'rgba(65, 200, 68, 0.9)';
+            }elseif ($region['persen'] > 80) {
                 $region['color'] = 'rgba(255, 206, 86, 0.9)';
             }else{
-                $region['color'] = 'rgba(255, 69, 132, 0.9)';
+                $region['color'] = 'rgba(244, 66, 66, 0.9)';
             }
         }
 

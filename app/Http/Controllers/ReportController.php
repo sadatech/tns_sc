@@ -65,6 +65,7 @@ use App\Jobs\ExportSPGPasarSalesSummaryJob;
 use App\Jobs\ExportDCReportInventoriJob;
 use App\Jobs\ExportSMDReportSalesSummaryJob;
 use App\Jobs\ExportSMDReportKPIJob;
+use App\Jobs\ExportSMDReportNewKPIJob;
 use App\Jobs\ExportSMDReportTargetKPIJob;
 use App\Jobs\ExportMTCAchievementJob;
 use App\Jobs\ExportGTCCbdJob;
@@ -3409,6 +3410,73 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
+    public function DcSalesNew(Request $request)
+    {
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        $sales = SalesDc::orderBy('sales_dcs.created_at', 'DESC')->join('sales_dc_details','sales_dcs.id','sales_dc_details.id_sales')->where('sales_dc_details.deleted_at' ,null)
+        ->when($request->has('employee'), function($q) use ($request)
+        {
+            return $q->whereHas('employee', function($q2) use ($request){
+                return $q2->where('id_employee', $request->input('employee'));
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sales_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'));
+        })
+        ->get();
+
+        $data = array();
+        $id = 1;
+        // return response()->json($sales->get());
+        foreach ($sales as $value) {
+            if($value->employee->position->level == 'dc'){
+                $data[$id] = array(
+                    'id'            => $id++,
+                    // 'id_sales'      => $value->id,
+                    'id_detail'     => $value->id,
+                    'nama'          => (isset($value->employee->name) ? $value->employee->name : ""),
+                    'place'         => (isset($value->place) ? $value->place : ""),
+                    'icip_icip'     => $value->icip_icip ?? "",
+                    'channel'       => $value->channel ?? "",
+                    'effective_contact' => $value->effective_contact ?? "",
+                    'tanggal'       => (isset($value->date) ? $value->date : ""),
+                    'id_product'    => $value->id_product,
+                    // 'qty'           => $value->qty,
+                    'qty_actual'    => $value->qty_actual,
+                    'satuan'        => $value->satuan,
+
+                );
+            }
+            $product = Product::where('id',$data[$id]['id_product'])->first();
+            $data[$id] = array_merge($data[$id], ['product' => $product->name]);
+
+            $price = Price::where('id_product', $product->id)->orderBy('prices.rilis', 'DESC')->first();
+        // return response()->json($price);
+            if ($price) {
+                $salesPrice = 'Rp.  '. $data[$id]['qty_actual']*$price->price;
+                $data[$id] = array_merge($data[$id], ['sales_price' => $salesPrice]);
+            }else{
+                $data[$id] = array_merge($data[$id], ['sales_price' => "haven't added prices"]);
+            }
+        }
+        $dt = Datatables::of(collect($data));
+        return $dt->make(true);
+    }
+
     public function exportDcSales(Request $request)
     {
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
@@ -3459,6 +3527,82 @@ class ReportController extends Controller
                     foreach ($detail as $det) {
                         $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
                     }
+                }
+            }
+            $filename = "DemoCookingSales ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('DemoCooking', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                'type'   => 'danger',
+                'title'  => 'Gagal Unduh!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportDcSalesNew(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $request['area'] = ($request->area == "null" || empty($request->area) ? null : $request->area);
+
+        // return response()->json($request);
+        $sales = SalesDc::orderBy('sales_dcs.created_at', 'DESC')->join('sales_dc_details','sales_dcs.id','sales_dc_details.id_sales')->where('sales_dc_details.deleted_at' ,null)
+        ->when($employee, function($q) use ($employee)
+        {
+            return $q->where('id_employee', $employee);
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($request->has('area'), function($q) use ($request)
+        {
+            return $q->join('employees','sales_dcs.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $request->input('area'));
+        })
+        ->get();
+
+        if ($sales->count() > 0) {
+            $product = array();
+            foreach ($sales as $key => $value) {
+                if ($value->employee->position->level == 'dc') {
+                    $detail = SalesDcDetail::where('id_sales',$value->id)->get();
+                    $data[] = array(
+                        'Nama Demo Cooking' => (isset($value->employee->name) ? $value->employee->name : ""),
+                        'Place'             => (isset($value->place) ? $value->place : ""),
+                        'Date'              => (isset($value->date) ? $value->date : ""),
+                        'Icip-icip'         => (isset($value->icip_icip) ? $value->icip_icip : ""),
+                        'Effective Contact' => (isset($value->effective_contact) ? $value->effective_contact : ""),
+                        'id_product'        => $value->id_product,
+                        'qty'               => $value->qty,
+                        'satuan'            => $value->satuan,
+                    );
+                    $product = Product::where('id',$data[$key]['id_product'])->first();
+                    $data[$key] = array_merge($data[$key], ['product' => $product->name]);
+
+                    $price = Price::where('id_product', $product->id)->orderBy('prices.rilis', 'DESC')->first();
+                // return response()->json($price);
+                    if ($price) {
+                        $salesPrice = 'Rp.  '. $data[$key]['qty']*$price->price;
+                        $data[$key] = array_merge($data[$key], ['Total' => $salesPrice]);
+                    }else{
+                        $data[$key] = array_merge($data[$key], ['Total' => "haven't added prices"]);
+                    }
+                        $data[$key] = array_except($data[$key],['id_product']);
                 }
             }
             $filename = "DemoCookingSales ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
@@ -4062,6 +4206,70 @@ class ReportController extends Controller
         return $dt->make(true);
     }
 
+    public function SMDsalesNew(Request $request)
+    {
+        $sales = SalesMd::orderBy('sales_mds.created_at', 'DESC')->join('sales_md_details','sales_mds.id','sales_md_details.id_sales')->where('sales_md_details.deleted_at' ,null);
+        if ($request->has('employee')) {
+            $sales->whereHas('employee', function($q) use ($request){
+                return $q->where('id_employee', $request->input('employee'));
+            });
+        } 
+         if ($request->has('periode')) {
+            $sales->whereMonth('date', substr($request->input('periode'), 0, 2));
+            $sales->whereYear('date', substr($request->input('periode'), 3));
+        }  
+        if ($request->has('pasar')) {
+            $sales->whereHas('outlet.employeePasar.pasar', function($q) use ($request){
+                return $q->where('id_pasar', $request->input('pasar'));
+            });
+        }
+        if ($request->has('area')) {
+            $sales->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($request){
+                return $q->where('id_area', $request->input('area'));
+            }); 
+        }
+        if($request->has('date')) {
+            $sales->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        }
+        $data = array();
+        $id = 1;
+        // return response()->json($sales->get());
+        foreach ($sales->get() as $value) {
+            if($value->employee->position->level == 'mdgtc'){
+                $data[$id] = array(
+                    'id'            => $id++,
+                    'id_detail'     => $value->id,
+                    'id_outlet'     => $value->id_outlet,
+                    'id_employee'   => $value->id_employee,
+                    'id_product'    => $value->id_product,
+                    'date'          => (isset($value->date) ? $value->date : ""),
+                    'nama'          => (isset($value->employee->name) ? $value->employee->name : ""),
+                    'pasar'         => (isset($value->outlet->employeePasar->pasar->name) ? $value->outlet->employeePasar->pasar->name : ""),
+                    'tanggal'       => $value->date,
+                    'outlet'        => (isset($value->outlet->name) ? $value->outlet->name : ""),
+                    'qty'           => $value->qty,
+                    'qty_actual'    => $value->qty_actual,
+                    'satuan'        => $value->satuan,
+                );
+            }
+            $product = Product::where('id',$data[$id]['id_product'])->first();
+            $data[$id] = array_merge($data[$id], ['product' => $product->name]);
+
+            $price = Price::where('id_product', $product->id)->orderBy('prices.rilis', 'DESC')->first();
+        // return response()->json($price);
+            if ($price) {
+                $salesPrice = 'Rp.  '. $data[$id]['qty']*$price->price;
+                $data[$id] = array_merge($data[$id], ['sales_price' => $salesPrice]);
+            }else{
+                $data[$id] = array_merge($data[$id], ['sales_price' => "haven't added prices"]);
+            }
+        }
+        $dt = Datatables::of(collect($data));
+
+        return $dt->make(true);
+    }
 
     public function exportMdPasar(Request $request)
     {
@@ -4118,6 +4326,93 @@ class ReportController extends Controller
                     foreach ($detail as $det) {
                         $data[$key][$det->product->name] = $det->qty_actual." ".$det->satuan;
                     }
+                }
+            }
+        
+            if ($request->has('periode')) {
+                $filename = "ReportSalesMD ".Carbon::parse(substr($request->periode, 3)."-".substr($request->periode, 0, 2)."-01").".xlsx";
+            }else{
+                $filename = "ReportSalesMD ".Carbon::parse(substr($request->date, 3, 4)."-".substr($request->date, 0, 2)."-".substr($request->date, 8)).".xlsx";
+            }
+            return Excel::create($filename, function($excel) use ($data) {
+                $excel->sheet('SalesMdPasar', function($sheet) use ($data)
+                {
+                    $sheet->fromArray($data);
+                });
+            })->download();
+        } else {
+            return redirect()->back()
+            ->with([
+                    'type'   => 'danger',
+                    'title'  => 'Gagal Unduh!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Data Kosong!'
+            ]);
+        }
+    }
+
+    public function exportMdPasarNew(Request $request)
+    {
+        $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
+        $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
+        $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
+
+        $sales = SalesMd::orderBy('sales_mds.created_at', 'DESC')->join('sales_md_details','sales_mds.id','sales_md_details.id_sales')->where('sales_md_details.deleted_at' ,null)
+        ->when($employee, function($q) use ($employee)
+        {
+            $q->whereHas('employee', function($q2) use ($employee){
+                return $q2->where('id_employee', $employee);
+            });
+        })
+        ->when($pasar, function($q) use ($pasar)
+        {
+            $q->whereHas('outlet.employeePasar.pasar', function($q2) use ($pasar){
+                return $q2->where('id_pasar', $pasar);
+            });
+        })
+        ->when($request->has('periode'), function($q) use ($request)
+        {
+            return $q->whereMonth('date', substr($request->input('periode'), 0, 2))
+            ->whereYear('date', substr($request->input('periode'), 3));
+        })
+        ->when($request->has('date'), function ($q) use ($request){
+            return $q->whereDay('date', substr($request->input('date'), 8))
+            ->whereMonth('date', substr($request->input('date'), 0, 2))
+            ->whereYear('date', substr($request->input('date'), 3, 4));
+        })
+        ->when($area, function($q) use ($area)
+        {
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($area){
+                return $q2->where('id_area', $area);
+            });
+        })
+        ->get();
+
+        if ($sales->count() > 0) {
+            foreach ($sales as $key => $val) {
+                if ($val->employee->position->level == 'mdgtc'){
+                    $detail = SalesMdDetail::where('id_sales',$val->id)->get();
+                    $data[] = array(
+                        'Employee'      => (isset($val->employee->name) ? $val->employee->name : ""),
+                        'Pasar'         => (isset($val->outlet->employeePasar->pasar->name) ? $val->outlet->employeePasar->pasar->name : ""),
+                        'Tanggal'       => (isset($val->date) ? $val->date : ""),
+                        'Outlet'        => (isset($val->outlet->name) ? $val->outlet->name : "-"),
+                        'qty'           => $val->qty,
+                        'qty_actual'    => $val->qty_actual,
+                        'satuan'        => $val->satuan,
+                        'id_product'    => $val->id_product,
+                    );
+                    $product = Product::where('id',$data[$key]['id_product'])->first();
+                    $data[$key] = array_merge($data[$key], ['product' => $product->name]);
+
+                    $price = Price::where('id_product', $product->id)->orderBy('prices.rilis', 'DESC')->first();
+                // return response()->json($price);
+                    if ($price) {
+                        $salesPrice = 'Rp.  '. $data[$key]['qty']*$price->price;
+                        $data[$key] = array_merge($data[$key], ['Total' => $salesPrice]);
+                    }else{
+                        $data[$key] = array_merge($data[$key], ['Total' => "haven't added prices"]);
+                    }
+                        $data[$key] = array_except($data[$key],['id_product','qty']);
                 }
             }
         
@@ -4379,6 +4674,9 @@ class ReportController extends Controller
                     'cbd_competitor'=> $val->cbd_competitor,
                     'cbd_position'  => $val->cbd_position,
                     'outlet_type'   => $val->outlet_type,
+                    'propose'       => $val->propose,
+                    'approve'       => $val->approve,
+                    'reject'        => $val->reject,
                     'total_hanger'  => $val->total_hanger,
                     'status'        => $val->status,
                     'id_cbd'        => $val->id,
@@ -4388,15 +4686,34 @@ class ReportController extends Controller
 
         $dt = Datatables::of(collect($data));
         // return response()->json($data);
-        $dt->editColumn('status', function($item){
-            if ($item['status'] == 1) {
+        // $dt->editColumn('status', function($item){
+        //     if ($item['status'] == 1) {
+        //         return '<button data-url='.route("cbd.reject", $item['id_cbd']).' class="btn btn-sm btn-danger btn-square js-swal-reject"><i class="si si-minus"></i> Reject</button>';
+        //     }else{
+        //         return '<button data-url='.route("cbd.approve", $item['id_cbd']).' class="btn btn-sm btn-success btn-square js-swal-approve"><i class="si si-check"></i> Approve</button>';
+        //     }
+        // });
+        // return $dt->rawColumns(['photo','photo2', 'status'])->make(true);
+        $dt->addColumn('status', function($item){
+            if ($item['propose'] == 1) {
+                return "<a class='btn btn-sm btn-info'>Propose</a>";
+            }elseif ($item['approve'] == 1) {
+                return "<a class='btn btn-sm btn-success'>Approve</a>";
+            }else{
+                return "<a class='btn btn-sm btn-danger'>Reject</a>";
+            }
+        })
+        ->addColumn('action', function($item){
+            if ($item['propose'] == 1) {
+                return '<button data-url='.route("cbd.approve", $item['id_cbd']).' class="btn btn-sm btn-success btn-square js-swal-approve"><i class="si si-check"></i> Approve</button> <button data-url='.route("cbd.reject", $item['id_cbd']).' class="btn btn-sm btn-danger btn-square js-swal-reject"><i class="si si-minus"></i> Reject</button>';
+            }elseif ($item['approve'] == 1) {
                 return '<button data-url='.route("cbd.reject", $item['id_cbd']).' class="btn btn-sm btn-danger btn-square js-swal-reject"><i class="si si-minus"></i> Reject</button>';
             }else{
                 return '<button data-url='.route("cbd.approve", $item['id_cbd']).' class="btn btn-sm btn-success btn-square js-swal-approve"><i class="si si-check"></i> Approve</button>';
             }
         });
         
-        return $dt->rawColumns(['photo','photo2', 'status'])->make(true);
+        return $dt->rawColumns(['photo','photo2', 'status', 'action'])->make(true);
     }
 
     public function reject($id)
@@ -4404,7 +4721,12 @@ class ReportController extends Controller
         $newCbd = NewCbd::find($id);
         // return response()->json($newCbd);
 
-        $newCbd->update(['status' => 0]);
+        // $newCbd->update(['status' => 0]);
+        $newCbd->update([
+            'propose' => 0,
+            'approve' => 0,
+            'reject' => 1
+            ]);
 
         
 
@@ -4420,7 +4742,12 @@ class ReportController extends Controller
     {
         $newCbd = NewCbd::find($id);
 
-        $newCbd->update(['status' => 1]);
+        // $newCbd->update(['status' => 1]);
+        $newCbd->update([
+            'propose' => 0,
+            'approve' => 1,
+            'reject' => 0
+            ]);
 
         return redirect()->back()
         ->with([
@@ -5326,6 +5653,52 @@ class ReportController extends Controller
                     'status' => 'PROCESSING',
                 ]);
                 dispatch(new ExportSMDReportTargetKPIJob($JobTrace, $filterPeriode, $filterArea, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
+    public function SMDNewKpi(Request $request)
+    {
+        $target_kpi = TargetKpiMd::where('isResign', 0)->whereHas('position', function($query){
+            return $query->where('level', 'mdgtc');
+        });
+
+        if($request->area != null && $request->area != 'null'){
+            $target_kpi = $target_kpi->whereHas('employeePasar.pasar.subarea', function($q) use ($request){
+                return $q->where('id_area', $request->area);
+            });
+        }
+
+        return Datatables::of($target_kpi)
+        ->addColumn('sum_of_cbd', function ($item) use ($request){
+            return @$item->getCbd($request->periode);
+        })
+        ->addColumn('ach', function ($item) use ($request){
+            return is_null($item->getTarget($request->periode)) ? '0 %'  : (round((@$item->getCbd($request->periode)/($item->getTarget($request->periode)['cbd'])*100),2).'%');
+        })
+        ->make(true);
+    }
+
+    public function SMDNewKpiExportXLS($filterPeriode, $filterArea)
+    {
+        $result = DB::transaction(function() use ($filterPeriode, $filterArea){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "SMD Pasar - Report KPI " . Carbon::parse($filterPeriode)->format("F Y") ." (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportSMDReportNewKPIJob($JobTrace, $filterPeriode, $filterArea, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)

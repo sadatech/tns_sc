@@ -92,6 +92,7 @@ class ReportEditDcController  extends Controller
 
         $salesDetail->update([
             'id_product'    => $request->product,
+            'qty'           => $request->qty_actual,
             'qty_actual'    => $request->qty_actual,
             'satuan'        => $request->satuan,
             ]);

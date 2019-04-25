@@ -67,21 +67,64 @@ class NewCbdController extends Controller
 					$image_compress->save($path.'/'.$photo2, 50);
 				}
 
-				$insert = NewCbd::create([
-					'id_employee'			=> $user->id,
-					'id_outlet'				=> $request->outlet,
-					'date'					=> Carbon::today()->toDateString(),
-					'photo'					=> $photo?? null,
-					'photo2'				=> $photo2?? null,
-					'posm_shop_sign'		=> $request->posm_shop_sign?? null,
-					'posm_others'			=> $request->posm_others?? null,
-					'posm_hangering_mobile'	=> $request->posm_hangering_mobile?? null,
-					'posm_poster'			=> $request->posm_poster?? null,
-					'cbd_competitor'		=> $request->cbd_competitor,
-					'cbd_position'			=> $request->cbd_position,
-					'outlet_type'			=> $request->outlet_type,
-					'total_hanger'			=> $request->total_hanger,
-				]);
+				// $insert = NewCbd::create([
+				// 	'id_employee'			=> $user->id,
+				// 	'id_outlet'				=> $request->outlet,
+				// 	'date'					=> Carbon::today()->toDateString(),
+				// 	'photo'					=> $photo?? null,
+				// 	'photo2'				=> $photo2?? null,
+				// 	'posm_shop_sign'		=> $request->posm_shop_sign?? null,
+				// 	'posm_others'			=> $request->posm_others?? null,
+				// 	'posm_hangering_mobile'	=> $request->posm_hangering_mobile?? null,
+				// 	'posm_poster'			=> $request->posm_poster?? null,
+				// 	'cbd_competitor'		=> $request->cbd_competitor,
+				// 	'cbd_position'			=> $request->cbd_position,
+				// 	'outlet_type'			=> $request->outlet_type,
+				// 	'total_hanger'			=> $request->total_hanger,
+				// ]);
+
+		        $cbd = NewCbd::where('id_employee', $user->id)
+		            ->where('id_outlet', $request->outlet)
+					->whereMonth('date', Carbon::now()->month)
+		            ->whereYear('date', Carbon::now()->year)
+		            ->where('approve', 1)->first();
+
+		        if ($cbd) {
+					$insert = NewCbd::create([
+						'id_employee'			=> $user->id,
+						'id_outlet'				=> $request->outlet,
+						'date'					=> Carbon::today()->toDateString(),
+						'photo'					=> $photo?? null,
+						'photo2'				=> $photo2?? null,
+						'posm_shop_sign'		=> $request->posm_shop_sign?? null,
+						'posm_others'			=> $request->posm_others?? null,
+						'posm_hangering_mobile'	=> $request->posm_hangering_mobile?? null,
+						'posm_poster'			=> $request->posm_poster?? null,
+						'cbd_competitor'		=> $request->cbd_competitor,
+						'cbd_position'			=> $request->cbd_position,
+						'outlet_type'			=> $request->outlet_type,
+						'total_hanger'			=> $request->total_hanger,
+						'propose'				=> 0,
+						'approve'				=> 1,
+						'reject'				=> 0,
+					]);
+		        }else{
+					$insert = NewCbd::create([
+						'id_employee'			=> $user->id,
+						'id_outlet'				=> $request->outlet,
+						'date'					=> Carbon::today()->toDateString(),
+						'photo'					=> $photo?? null,
+						'photo2'				=> $photo2?? null,
+						'posm_shop_sign'		=> $request->posm_shop_sign?? null,
+						'posm_others'			=> $request->posm_others?? null,
+						'posm_hangering_mobile'	=> $request->posm_hangering_mobile?? null,
+						'posm_poster'			=> $request->posm_poster?? null,
+						'cbd_competitor'		=> $request->cbd_competitor,
+						'cbd_position'			=> $request->cbd_position,
+						'outlet_type'			=> $request->outlet_type,
+						'total_hanger'			=> $request->total_hanger,
+					]);
+		        }
 				if ($insert->id) {
 					$res['success'] = true;
 					$res['msg'] 	= "Success add CBD.";

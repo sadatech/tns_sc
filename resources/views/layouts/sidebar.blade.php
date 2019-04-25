@@ -287,6 +287,10 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/sales') ? 'active' : '' }}" href="{{ route('report.sales.pasar') }}"><span class="sidebar-mini-hide">Sales</span></a>
                                     </li> 
+                                    {{-- New SALES--}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/smd/new-sales') ? 'active' : '' }}" href="{{ route('report.new-sales.pasar') }}"><span class="sidebar-mini-hide">New Sales</span></a>
+                                    </li> 
                                     {{-- SUMMARY REPORT--}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Detail VDO</span></a>
@@ -299,10 +303,13 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/kpi') ? 'active' : '' }}" href="{{ route('report.kpi.smd') }}"><span class="sidebar-mini-hide">KPI</span></a>
                                     </li>
+                                    <!-- <li>
+                                        <a class="{{ request()->is('report/gtc/smd/new-kpi') ? 'active' : '' }}" href="{{ route('report.new-kpi.smd') }}"><span class="sidebar-mini-hide">New KPI</span></a>
+                                    </li> -->
                                     {{-- TARGET KPI --}}
-                                    <li>
+                                    <!-- <li>
                                         <a class="{{ request()->is('report/gtc/smd/target-kpi') ? 'active' : '' }}" href="{{ route('report.target.kpi.smd') }}"><span class="sidebar-mini-hide">Target KPI</span></a>
-                                    </li>                                    
+                                    </li>  -->                                   
                                 </ul>
                             </li>
                             {{-- SPG PASAR --}}
@@ -349,6 +356,10 @@
                                     {{-- Sales DC --}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/demo/salesDC') ? 'active' : '' }}" href="{{ route('report.demo.salesDC') }}"><span class="sidebar-mini-hide">Sales DC</span></a>
+                                    </li>
+                                    {{-- Sales DC --}}
+                                    <li>
+                                        <a class="{{ request()->is('report/gtc/demo/new-salesDC') ? 'active' : '' }}" href="{{ route('report.demo.new-salesDC') }}"><span class="sidebar-mini-hide">New Sales DC</span></a>
                                     </li>
                                     {{-- Activity --}}
                                     <li>

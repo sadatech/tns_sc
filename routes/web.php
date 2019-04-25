@@ -745,6 +745,14 @@ Route::prefix('report')->group(function () {
 				Route::get('/export', 'ReportController@exportMdPasar')->name('export.sales.smd')->middleware('auth');
 			});
 
+			Route::prefix('new-sales')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.new-sales');
+				})->name('report.new-sales.pasar')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDsalesNew')->name('data.new-sales.smd')->middleware('auth');
+				Route::get('/export', 'ReportController@exportMdPasarNew')->name('export.new-sales.smd')->middleware('auth');
+			});
+
 			Route::prefix('achievement')->group(function () {
 				Route::get('/', function(){
 					return view('report.smd.achievement');
@@ -794,6 +802,14 @@ Route::prefix('report')->group(function () {
 				})->name('report.kpi.smd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDKpi')->name('smd.pasar.kpi.data')->middleware('auth');
 				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDKpiExportXLS')->name('smd.pasar.kpi.exportXLS')->middleware('auth');
+			});
+
+			Route::prefix('new-kpi')->group(function () {
+				Route::get('/', function(){
+					return view('report.smd.new-kpi');
+				})->name('report.new-kpi.smd')->middleware('auth');
+				Route::post('/data', 'ReportController@SMDNewKpi')->name('smd.pasar.new-kpi.data')->middleware('auth');
+				Route::any('/exportXLS/{filterdate?}/{filterarea?}', 'ReportController@SMDNewKpiExportXLS')->name('smd.pasar.new-kpi.exportXLS')->middleware('auth');
 			});
 
 		});
@@ -870,6 +886,14 @@ Route::prefix('report')->group(function () {
 				})->name('report.demo.salesDC')->middleware('auth');
 				Route::post('/data', 'ReportController@DcSales')->name('dc.sales.data')->middleware('auth');
 				Route::any('/export', 'ReportController@exportDcSales')->name('dc.sales.export')->middleware('auth');
+			});
+
+			Route::prefix('new-salesDC')->group(function(){
+				Route::get('/', function(){
+					return view('report.democooking.new-salesDC');
+				})->name('report.demo.new-salesDC')->middleware('auth');
+				Route::post('/data', 'ReportController@DcSalesNew')->name('dc.new-sales.data')->middleware('auth');
+				Route::any('/export', 'ReportController@exportDcSalesNew')->name('dc.new-sales.export')->middleware('auth');
 			});
 
 			Route::prefix('activity')->group(function () {
