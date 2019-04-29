@@ -63,7 +63,8 @@
               <th>Product</th>
               <th>Quantity</th>
               <th>Satuan</th>
-              <th>Total</th>
+              <th>Total Consumer Price</th>
+              <th>Total Retailer Price</th>
             </tr>
           </thead>
         </table>
@@ -177,7 +178,8 @@ table.table thead tr th {
       { data: 'product' },
       { data: 'qty_actual' },
       { data: 'satuan' },
-      { data: 'sales_price' },
+      { data: 'sales_price_consumer' },
+      { data: 'sales_price_retailer' },
       ],
       bDestroy: true
     });

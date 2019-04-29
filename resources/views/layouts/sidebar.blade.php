@@ -284,12 +284,12 @@
                                         <a class="{{ request()->is('report/gtc/smd/distributorPf') ? 'active' : '' }}" href="{{ route('report.dist.pf') }}"><span class="sidebar-mini-hide">Distribusi PF</span></a>
                                     </li> 
                                     {{-- SALES--}}
-                                    <li>
+                                    <!-- <li>
                                         <a class="{{ request()->is('report/gtc/smd/sales') ? 'active' : '' }}" href="{{ route('report.sales.pasar') }}"><span class="sidebar-mini-hide">Sales</span></a>
                                     </li> 
-                                    {{-- New SALES--}}
+ -->                                    {{-- New SALES--}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/smd/new-sales') ? 'active' : '' }}" href="{{ route('report.new-sales.pasar') }}"><span class="sidebar-mini-hide">New Sales</span></a>
+                                        <a class="{{ request()->is('report/gtc/smd/new-sales') ? 'active' : '' }}" href="{{ route('report.new-sales.pasar') }}"><span class="sidebar-mini-hide">Sales</span></a>
                                     </li> 
                                     {{-- SUMMARY REPORT--}}
                                     <li>
@@ -354,12 +354,12 @@
                                         <a class="{{ request()->is('report/gtc/demo/sampling') ? 'active' : '' }}" href="{{ route('report.demo.sampling') }}"><span class="sidebar-mini-hide">Sampling</span></a>
                                     </li>
                                     {{-- Sales DC --}}
-                                    <li>
+                                    <!-- <li>
                                         <a class="{{ request()->is('report/gtc/demo/salesDC') ? 'active' : '' }}" href="{{ route('report.demo.salesDC') }}"><span class="sidebar-mini-hide">Sales DC</span></a>
-                                    </li>
+                                    </li> -->
                                     {{-- Sales DC --}}
                                     <li>
-                                        <a class="{{ request()->is('report/gtc/demo/new-salesDC') ? 'active' : '' }}" href="{{ route('report.demo.new-salesDC') }}"><span class="sidebar-mini-hide">New Sales DC</span></a>
+                                        <a class="{{ request()->is('report/gtc/demo/new-salesDC') ? 'active' : '' }}" href="{{ route('report.demo.new-salesDC') }}"><span class="sidebar-mini-hide">Sales DC</span></a>
                                     </li>
                                     {{-- Activity --}}
                                     <li>

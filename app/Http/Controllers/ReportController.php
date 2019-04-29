@@ -3467,10 +3467,20 @@ class ReportController extends Controller
             $price = Price::where('id_product', $product->id)->orderBy('prices.rilis', 'DESC')->first();
         // return response()->json($price);
             if ($price) {
-                $salesPrice = 'Rp.  '. $data[$id]['qty_actual']*$price->price;
-                $data[$id] = array_merge($data[$id], ['sales_price' => $salesPrice]);
+                if ($price->price_cs) {
+                    $salesPriceConsumer = 'Rp.  '. $data[$id]['qty_actual']*$price->price_cs;
+                    $data[$id] = array_merge($data[$id], ['sales_price_consumer' => $salesPriceConsumer]);
+                }else{
+                    $data[$id] = array_merge($data[$id], ['sales_price_consumer' => "haven't added prices"]);
+                }if ($price->price) {
+                    $salesPriceRetailer = 'Rp.  '. $data[$id]['qty_actual']*$price->price;
+                    $data[$id] = array_merge($data[$id], ['sales_price_retailer' => $salesPriceRetailer]);
+                }else{
+                    $data[$id] = array_merge($data[$id], ['sales_price_retailer' => "haven't added prices"]);
+                }
             }else{
-                $data[$id] = array_merge($data[$id], ['sales_price' => "haven't added prices"]);
+                $data[$id] = array_merge($data[$id], ['sales_price_consumer' => "haven't added prices"]);
+                $data[$id] = array_merge($data[$id], ['sales_price_retailer' => "haven't added prices"]);
             }
         }
         $dt = Datatables::of(collect($data));
