@@ -146,6 +146,14 @@ Route::prefix('pk')->group(function () {
 	Route::get('/list', 'API\PkController@list')->name('api.pk.list');
 });
 
+//Dashboard
+Route::prefix('dashbord')->group(function () {
+	Route::get('/cbd-employee', 'API\DashboardController@CbdByEmployee')->name('api.dashbord.cbd-employee');
+	Route::get('/cbd-detail', 'API\DashboardController@CbdDetail')->name('api.dashbord.cbd-detail');
+	Route::get('/cbd-reject', 'API\DashboardController@CbdReject')->name('api.dashbord.cbd-reject');
+});
+
+
 // Pasar
 Route::prefix('pasar')->group(function () {
 	Route::get('/list', 'API\PasarController@list')->name('api.pasar.list');	

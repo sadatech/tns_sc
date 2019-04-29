@@ -35,33 +35,35 @@ use DB;
 class DashboardController extends Controller
 {
     public function index(){
-        $periode = Carbon::now();
-        // $periode = Carbon::parse('January 2019');
-        $vdoEmployees = Employee::where('isResign', 0)->whereHas('position', function($query){
-            return $query->where('level', 'mdgtc');
-        })->pluck('id');
-        $target = TargetGtc::whereIn('id_employee', $vdoEmployees)
-                        ->whereMonth('rilis', $periode->month)
-                        ->whereYear('rilis', $periode->year)
-                        ->orderBy('rilis', 'DESC')
-                        ->groupBy('id_employee')
-                        ->get();
-        $data['hk_target'] = $target->sum('hk');
-        $data['cbd_target'] = $target->sum('cbd');
-        $data['cbd_actual'] = NewCbd::whereMonth('date', $periode->month)
-                        ->whereYear('date', $periode->year)
-                        ->whereIn('id_employee', $vdoEmployees)
-                        ->groupBy('id_outlet','id_employee')
-                        ->get()->count('id_outlet');
+        // $periode = Carbon::now();
+        // // $periode = Carbon::parse('January 2019');
+        // $vdoEmployees = Employee::where('isResign', 0)->whereHas('position', function($query){
+        //     return $query->where('level', 'mdgtc');
+        // })->pluck('id');
+        // $target = TargetGtc::whereIn('id_employee', $vdoEmployees)
+        //                 ->whereMonth('rilis', $periode->month)
+        //                 ->whereYear('rilis', $periode->year)
+        //                 ->orderBy('rilis', 'DESC')
+        //                 ->groupBy('id_employee')
+        //                 ->get();
+        // $data['hk_target'] = $target->sum('hk');
+        // $data['cbd_target'] = $target->sum('cbd');
+        // $data['cbd_actual'] = NewCbd::whereMonth('date', $periode->month)
+        //                 ->whereYear('date', $periode->year)
+        //                 ->whereIn('id_employee', $vdoEmployees)
+        //                 ->groupBy('id_outlet','id_employee')
+        //                 ->get()->count('id_outlet');
     
-        $data['hk_actual'] = Attendance::whereMonth('date', $periode->month)
-                        ->whereYear('date', $periode->year)
-                        ->whereIn('id_employee', $vdoEmployees)
-                        ->groupBy(DB::raw('DATE(date)'),'id_employee')
-                        ->get()->count('id');
-        $data['ach'] = ($data['cbd_target'] == 0) ? '0 %' : (round(($data['cbd_actual']/$data['cbd_target']*100),2).'%');
+        // $data['hk_actual'] = Attendance::whereMonth('date', $periode->month)
+        //                 ->whereYear('date', $periode->year)
+        //                 ->whereIn('id_employee', $vdoEmployees)
+        //                 ->groupBy(DB::raw('DATE(date)'),'id_employee')
+        //                 ->get()->count('id');
+        // $data['ach'] = ($data['cbd_target'] == 0) ? '0 %' : (round(($data['cbd_actual']/$data['cbd_target']*100),2).'%');
 
-        return view('dashboard.home', $data);
+        // return view('dashboard.home', $data);
+        
+        return view('dashboard.home');
     }
 
     public function dashboard() {
@@ -188,17 +190,19 @@ class DashboardController extends Controller
         if ($data['cbd_less'] <= 0) {
             $data['cbd_less'] = 0;
         }
+        $persenAkual = ($data['cbd_target'] == 0) ? '0 %' : (round(($data['cbd_actual']/$data['cbd_target']*100),2).'%');
+        $persenGap = ($data['cbd_target'] == 0) ? '0 %' : (round(($data['cbd_less']/$data['cbd_target']*100),2).'%');
 
         $cbd = array();
         $id = 1;
         $cbd[] = array(
             'id'        => $id++,
-            'name'      => 'CBD Aktual',
+            'name'      => 'CBD Aktual '.$persenAkual,
             'poin'      => $data['cbd_actual'],
         );
         $cbd[] = array(
             'id'        => $id++,
-            'name'      => 'GAP',
+            'name'      => 'GAP '.$persenGap,
             'poin'      => $data['cbd_less'],
         );
 

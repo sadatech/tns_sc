@@ -63,16 +63,6 @@
               <th>KONTRAK DISPLAY Target</th>
               <th>KONTRAK DISPLAY Actual</th>
               <th>KONTRAK DISPLAY Ach</th>
-             <tfoot>
-             <tr>
-                <th colspan="4" style="text-align:right">total amount:</th>
-                <th>{{ $hk_target }}</th>
-                <th>{{ $hk_actual }}</th>
-                <th>{{ $cbd_target }}</th>
-                <th>{{ $cbd_actual }}</th>
-                <th>{{ $ach }}</th>
-             </tr>
-             </tfoot>
             </thead>
             </table>
           </div>
