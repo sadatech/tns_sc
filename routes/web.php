@@ -730,8 +730,8 @@ Route::prefix('report')->group(function () {
 					return view('report.smd.new-cbd');
 				})->name('report.new-cbd')->middleware('auth');
 				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
-				Route::get('/reject/{id}', 'ReportController@reject')->name('cbd.reject')->middleware('auth');
-				Route::get('/approve/{id}', 'ReportController@approve')->name('cbd.approve')->middleware('auth');
+				Route::post('/reject/{id}', 'ReportController@reject')->name('cbd.reject')->middleware('auth');
+				Route::post('/approve/{id}', 'ReportController@approve')->name('cbd.approve')->middleware('auth');
 				Route::post('/export/{month?}/{year?}/{date?}/{employee?}/{outlet?}/{area?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
 			});
 
