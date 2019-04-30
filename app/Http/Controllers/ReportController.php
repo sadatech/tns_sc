@@ -4728,43 +4728,53 @@ class ReportController extends Controller
 
     public function reject($id)
     {
-        $newCbd = NewCbd::find($id);
-        // return response()->json($newCbd);
 
-        // $newCbd->update(['status' => 0]);
-        $newCbd->update([
-            'propose' => 0,
-            'approve' => 0,
-            'reject' => 1
-            ]);
+        $result = DB::transaction(function() use ($id){
+            try
+            {
+                $newCbd = NewCbd::find($id);
+                // return response()->json($newCbd);
 
-        
+                // $newCbd->update(['status' => 0]);
+                $newCbd->update([
+                    'propose' => 0,
+                    'approve' => 0,
+                    'reject' => 1
+                    ]);
+                return 'Changed succeed, status Reject';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Change request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
 
-        return redirect()->back()
-        ->with([
-            'type'    => 'success',
-            'title'   => 'Sukses!<br/>',
-            'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil diubah!'
-        ]);
     }
 
     public function approve($id)
     {
-        $newCbd = NewCbd::find($id);
+        $result = DB::transaction(function() use ($id){
+            try
+            {
+                $newCbd = NewCbd::find($id);
 
-        // $newCbd->update(['status' => 1]);
-        $newCbd->update([
-            'propose' => 0,
-            'approve' => 1,
-            'reject' => 0
-            ]);
-
-        return redirect()->back()
-        ->with([
-            'type'    => 'success',
-            'title'   => 'Sukses!<br/>',
-            'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil diubah!'
-        ]);
+                // $newCbd->update(['status' => 1]);
+                $newCbd->update([
+                    'propose' => 0,
+                    'approve' => 1,
+                    'reject' => 0
+                    ]);
+                return 'Changed succeed, status Approve';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Change request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
     public function getCbd($data, $periode, $day)

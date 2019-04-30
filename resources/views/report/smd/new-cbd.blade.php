@@ -255,7 +255,17 @@ table.table thead tr th {
             }
           }).then(function(result){
             if (result.value) {
-                window.location = url;
+              $.ajax({
+                url: url,
+                type: "post",
+                success: function(e){
+                  table.ajax.reload( null, false )
+                  swal("Success!", e.result, "success");
+                },
+                error: function(){
+                  swal("Error!", e.result, "error");
+                }
+              });
             } else if (result.dismiss === 'cancel') {
                 swal('Cancelled', 'Your data is safe :)', 'error');
             }
@@ -280,7 +290,17 @@ table.table thead tr th {
             }
           }).then(function(result){
             if (result.value) {
-                window.location = url;
+              $.ajax({
+                url: url,
+                type: "post",
+                success: function(e){
+                  table.ajax.reload( null, false )
+                  swal("Success!", e.result, "success");
+                },
+                error: function(){
+                  swal("Error!", e.result, "error");
+                }
+              });
             } else if (result.dismiss === 'cancel') {
                 swal('Cancelled', 'Your data is safe :)', 'error');
             }
