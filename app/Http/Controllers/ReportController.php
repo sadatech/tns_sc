@@ -4760,6 +4760,21 @@ class ReportController extends Controller
             {
                 $newCbd = NewCbd::find($id);
 
+
+                // $cbds = NewCbd::where('id_employee', $newCbd->id_employee)
+                //     ->where('id_outlet', $newCbd->id_outlet)
+                //     ->whereMonth('date', $newCbd->month)
+                //     ->whereYear('date', $newCbd->year)
+                //     ->where('approve', 1)->first();
+
+                // foreach ($cbds as $key => $cbd) {
+                //     $cbd->update([
+                //         'propose' => 0,
+                //         'approve' => 1,
+                //         'reject' => 0
+                //         ]);
+                // }
+
                 // $newCbd->update(['status' => 1]);
                 $newCbd->update([
                     'propose' => 0,

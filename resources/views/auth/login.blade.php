@@ -1,12 +1,12 @@
 @extends('layouts.auth')
 @section('title', 'Login')
 @section('content')
-<div class="bg-image" style="background-image: url('assets/media/photos/sasa-inti20161024100922.jpg');">
+<div class="bg-image" style="background-image: url('assets/media/photos/Sasa_Melezatkan_Desktop-01.jpg');">
     <div class="row mx-0 bg-black-op">
         <div class="hero-static col-md-6 col-xl-8 d-none d-md-flex align-items-md-end">
             <div class="p-30 invisible" data-toggle="appear">
                 <p class="font-size-h3 font-w600 text-white">
-                    Get Inspired and Create.
+                    SASA Melezatkan.
                 </p>
                 <p class="font-italic text-white-op">
                     Copyright &copy; <span class="js-year-copy">2018</span>
