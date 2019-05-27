@@ -217,6 +217,14 @@
 
                 @endif
 
+                @if(Auth::user()->role->level == 'ViewAll') 
+                    {{-- Utilities --}}
+                      <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Utilities</span></li>
+                    <li>
+                        <a class="{{ request()->is('utility/export-download') ? 'active' : '' }}" href="{{ route('export-download') }}"><i class="si si-cloud-download"></i><span class="sidebar-mini-hide">Download Export(s)</span></a>
+                    </li> 
+                    
+                @endif
                 @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc' || !Auth::user()->role->level == 'ViewAll') 
                     {{-- Utilities --}}
                       <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Utilities</span></li>
