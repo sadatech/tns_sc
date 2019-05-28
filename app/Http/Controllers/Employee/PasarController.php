@@ -63,7 +63,7 @@ class PasarController extends Controller
 				{
 					$getOutlet = Outlet::where(['id_employee_pasar' => $data->id]);
 					foreach ($getOutlet->get() as $val) {
-						$outlist[$data->id][] = $val->name. " (".$val->phone.")";
+						$outlist[$data->id][] = str_replace("'", "`", $val->name). " (".$val->phone.")";
 					}
 					if ($getOutlet->count() < 1) {
 						$pasar[] = (isset($data->pasar->name) ? "<tr><td>".$data->pasar->name."</td><td>Kosong</td></tr>" : "");
