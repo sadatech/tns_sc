@@ -295,14 +295,14 @@ class EmployeeController extends Controller
 				{
 					$getOutlet = Store::where(['id' => $data->id_store]);
 					foreach ($getOutlet->get() as $val) {
-						$acc[$data->id][] 		= $val->account->name;
-						$address[$data->id][] 	= $val->address;
+						$acc[$data->id][] 		= str_replace("'", "`", $val->account->name);
+						$address[$data->id][] 	= str_replace("'", "`", $val->address);
 						$coverage[$data->id][] 	= $val->coverage;
 					}
 					if ($getOutlet->count() < 1) {
-						$store[] = (isset($data->store->name1) ? "<tr><td>".$data->store->name1."</td><td>Kosong</td></tr>" : "");
+						$store[] = (isset($data->store->name1) ? "<tr><td>".str_replace("'", "`", $data->store->name1)."</td><td>Kosong</td></tr>" : "");
 					} else {
-						$store[] = (isset($data->store->name1) ? "<tr><td>".$data->store->name1."</td><td>".rtrim(implode(', ', $acc[$data->id]), ',')."</td><td>".rtrim(implode(', ', $address[$data->id]), ',')."</td><td>".rtrim(implode(', ', $coverage[$data->id]), ',')."</td></tr>" : "");
+						$store[] = (isset($data->store->name1) ? "<tr><td>".str_replace("'", "`", $data->store->name1)."</td><td>".rtrim(implode(', ', $acc[$data->id]), ',')."</td><td>".rtrim(implode(', ', $address[$data->id]), ',')."</td><td>".rtrim(implode(', ', $coverage[$data->id]), ',')."</td></tr>" : "");
 					}
 				}
 
