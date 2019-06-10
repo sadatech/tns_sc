@@ -14,7 +14,7 @@
                     </button>
 
                     <div class="content-header-item">
-                        <a class="link-effect font-w700" href="index.html">
+                        <a class="link-effect font-w700" href="{{ route('dashboard') }}">
                             <span class="font-size-xl text-dual-primary-dark">SASA</span>
                         </a>
                     </div>
