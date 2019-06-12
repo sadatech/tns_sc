@@ -259,7 +259,12 @@ table.table thead tr th {
                 url: url,
                 type: "post",
                 success: function(e){
-                  table.ajax.reload( null, false )
+                  var scrollingContainer = $(table.table().node()).parent('div.dataTables_scrollBody');
+                  var scrollTop = scrollingContainer.scrollTop();
+
+                  table.ajax.reload(function() {
+                      scrollingContainer.scrollTop(scrollTop);
+                  }, false);
                   swal("Success!", e.result, "success");
                 },
                 error: function(){
@@ -294,7 +299,12 @@ table.table thead tr th {
                 url: url,
                 type: "post",
                 success: function(e){
-                  table.ajax.reload( null, false )
+                  var scrollingContainer = $(table.table().node()).parent('div.dataTables_scrollBody');
+                  var scrollTop = scrollingContainer.scrollTop();
+
+                  table.ajax.reload(function() {
+                      scrollingContainer.scrollTop(scrollTop);
+                  }, false);
                   swal("Success!", e.result, "success");
                 },
                 error: function(){
