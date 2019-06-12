@@ -158,7 +158,7 @@
       processing: true,
       serverSide: true,
       scrollX: true,
-      scrollY: "300px",
+      scrollY: "400px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
         type: 'GET',
@@ -199,7 +199,7 @@
       processing: true,
       serverSide: true,
       scrollX: true,
-      scrollY: "300px",
+      scrollY: "400px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
         type: 'GET',

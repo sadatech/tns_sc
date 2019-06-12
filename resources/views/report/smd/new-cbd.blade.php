@@ -63,7 +63,7 @@
         <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="category">
           <thead>
             <tr>
-              <th class="text-center" style="width: 70px;"></th>
+              <th class="text-center"></th>
               <th>Employee</th>
               <th>Outlet</th>
               <th>Region</th>
@@ -104,7 +104,7 @@ table.table thead tr th:first-child {
   min-width: 5px;
 }
 table.table thead tr th {
-  min-width: 200px;
+  min-width: 150px;
 }
 </style>
 @endsection
@@ -206,7 +206,7 @@ table.table thead tr th {
       processing: true,
       serverSide: true,
       scrollX: true,
-      scrollY: "300px",
+      scrollY: "400px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
         type: 'POST',

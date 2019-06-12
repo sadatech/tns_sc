@@ -82,8 +82,9 @@
 /*table.table thead tr th:first-child {
   min-width: 5px;
 }*/
+
 table.table thead tr th {
-  min-width: 200px;
+  min-width: 150px;
 }
 </style>
 @endsection
@@ -104,7 +105,7 @@ table.table thead tr th {
       processing: true,
       serverSide: true,
       scrollX: true,
-      scrollY: "300px",
+      scrollY: "400px",
       ajax: '{!! route('spg.pasar.sales.summary.data') !!}',
       columns: [
       { data: 'id', name:'id', visible: false },
