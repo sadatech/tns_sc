@@ -171,7 +171,7 @@ th, td {
       processing: true,
       serverSide: true,
       scrollX: true,
-      scrollY: "300px",
+      scrollY: "400px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
         type: 'POST',

@@ -85,8 +85,9 @@
 table.table thead tr th:first-child {
   min-width: 5px;
 }
+
 table.table thead tr th {
-  min-width: 200px;
+  min-width: 150px;
 }
 </style>
 @endsection
@@ -167,7 +168,7 @@ table.table thead tr th {
       processing: true,
       serverSide: true,
       scrollX: true,
-      scrollY: "300px",
+      scrollY: "400px",
       ajax: {
         url: url + "?" + $("#filter").serialize(),
         type: 'POST',
