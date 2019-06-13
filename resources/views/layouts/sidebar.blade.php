@@ -299,6 +299,9 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/new-sales') ? 'active' : '' }}" href="{{ route('report.new-sales.pasar') }}"><span class="sidebar-mini-hide">Sales</span></a>
                                     </li> 
+
+                             @if(Auth::user()->role->level != 'ViewAll')
+                    
                                     {{-- SUMMARY REPORT--}}
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/summary') ? 'active' : '' }}" href="{{ route('report.summary') }}"><span class="sidebar-mini-hide">Detail VDO</span></a>
@@ -311,6 +314,7 @@
                                     <li>
                                         <a class="{{ request()->is('report/gtc/smd/kpi') ? 'active' : '' }}" href="{{ route('report.kpi.smd') }}"><span class="sidebar-mini-hide">KPI</span></a>
                                     </li>
+                            @endif
                                     <!-- <li>
                                         <a class="{{ request()->is('report/gtc/smd/new-kpi') ? 'active' : '' }}" href="{{ route('report.new-kpi.smd') }}"><span class="sidebar-mini-hide">New KPI</span></a>
                                     </li> -->
