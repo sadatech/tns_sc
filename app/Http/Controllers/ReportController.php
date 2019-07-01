@@ -4733,14 +4733,24 @@ class ReportController extends Controller
             try
             {
                 $newCbd = NewCbd::find($id);
-                // return response()->json($newCbd);
+                $dateCbd = Carbon::createFromFormat('Y-m-d', $newCbd->date);
 
-                // $newCbd->update(['status' => 0]);
-                $newCbd->update([
-                    'propose' => 0,
-                    'approve' => 0,
-                    'reject' => 1
-                    ]);
+                // return response()->json($dateCbd);
+                $cbds = NewCbd::where('id_employee', $newCbd->id_employee)
+                    ->where('id_outlet', $newCbd->id_outlet)
+                    ->whereMonth('date', $dateCbd->format('m'))
+                    ->whereYear('date', $dateCbd->format('Y'))
+                    ->get();
+
+                // return response()->json($cbds);
+
+                foreach ($cbds as $key => $cbd) {
+                    $cbd->update([
+                        'propose' => 0,
+                        'approve' => 0,
+                        'reject' => 1
+                        ]);
+                }
                 return 'Changed succeed, status Reject';
             }
             catch(\Exception $e)
@@ -4759,28 +4769,30 @@ class ReportController extends Controller
             try
             {
                 $newCbd = NewCbd::find($id);
+                $dateCbd = Carbon::createFromFormat('Y-m-d', $newCbd->date);
 
+                // return response()->json($dateCbd);
+                $cbds = NewCbd::where('id_employee', $newCbd->id_employee)
+                    ->where('id_outlet', $newCbd->id_outlet)
+                    ->whereMonth('date', $dateCbd->format('m'))
+                    ->whereYear('date', $dateCbd->format('Y'))
+                    ->get();
 
-                // $cbds = NewCbd::where('id_employee', $newCbd->id_employee)
-                //     ->where('id_outlet', $newCbd->id_outlet)
-                //     ->whereMonth('date', $newCbd->month)
-                //     ->whereYear('date', $newCbd->year)
-                //     ->where('approve', 1)->first();
+                // return response()->json($cbds);
 
-                // foreach ($cbds as $key => $cbd) {
-                //     $cbd->update([
-                //         'propose' => 0,
-                //         'approve' => 1,
-                //         'reject' => 0
-                //         ]);
-                // }
+                foreach ($cbds as $key => $cbd) {
+                    $cbd->update([
+                        'propose' => 0,
+                        'approve' => 1,
+                        'reject' => 0
+                        ]);
+                }
 
-                // $newCbd->update(['status' => 1]);
-                $newCbd->update([
-                    'propose' => 0,
-                    'approve' => 1,
-                    'reject' => 0
-                    ]);
+                // $newCbd->update([
+                //     'propose' => 0,
+                //     'approve' => 1,
+                //     'reject' => 0
+                //     ]);
                 return 'Changed succeed, status Approve';
             }
             catch(\Exception $e)
