@@ -4733,24 +4733,13 @@ class ReportController extends Controller
             try
             {
                 $newCbd = NewCbd::find($id);
-                $dateCbd = Carbon::createFromFormat('Y-m-d', $newCbd->date);
+                // return response()->json($newCbd);
 
-                // return response()->json($dateCbd);
-                $cbds = NewCbd::where('id_employee', $newCbd->id_employee)
-                    ->where('id_outlet', $newCbd->id_outlet)
-                    ->whereMonth('date', $dateCbd->format('m'))
-                    ->whereYear('date', $dateCbd->format('Y'))
-                    ->get();
-
-                // return response()->json($cbds);
-
-                foreach ($cbds as $key => $cbd) {
-                    $cbd->update([
-                        'propose' => 0,
-                        'approve' => 0,
-                        'reject' => 1
-                        ]);
-                }
+                $newCbd->update([
+                    'propose' => 0,
+                    'approve' => 0,
+                    'reject' => 1
+                    ]);
                 return 'Changed succeed, status Reject';
             }
             catch(\Exception $e)
@@ -4769,6 +4758,13 @@ class ReportController extends Controller
             try
             {
                 $newCbd = NewCbd::find($id);
+
+                $newCbd->update([
+                    'propose' => 0,
+                    'approve' => 1,
+                    'reject' => 0
+                    ]);
+                
                 $dateCbd = Carbon::createFromFormat('Y-m-d', $newCbd->date);
 
                 // return response()->json($dateCbd);
@@ -4776,6 +4772,7 @@ class ReportController extends Controller
                     ->where('id_outlet', $newCbd->id_outlet)
                     ->whereMonth('date', $dateCbd->format('m'))
                     ->whereYear('date', $dateCbd->format('Y'))
+                    ->where('propose', 1)
                     ->get();
 
                 // return response()->json($cbds);
