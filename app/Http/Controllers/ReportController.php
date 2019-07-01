@@ -4758,6 +4758,13 @@ class ReportController extends Controller
             try
             {
                 $newCbd = NewCbd::find($id);
+
+                $newCbd->update([
+                    'propose' => 0,
+                    'approve' => 1,
+                    'reject' => 0
+                    ]);
+                
                 $dateCbd = Carbon::createFromFormat('Y-m-d', $newCbd->date);
 
                 // return response()->json($dateCbd);
@@ -4765,6 +4772,7 @@ class ReportController extends Controller
                     ->where('id_outlet', $newCbd->id_outlet)
                     ->whereMonth('date', $dateCbd->format('m'))
                     ->whereYear('date', $dateCbd->format('Y'))
+                    ->where('propose', 1)
                     ->get();
 
                 // return response()->json($cbds);
