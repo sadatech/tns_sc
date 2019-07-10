@@ -74,10 +74,11 @@ class CashAdvanceController extends Controller
                                 'taxibike'          => $row->o ?? null,
                                 'rickshaw'          => $row->p ?? null,
                                 'taxi'              => $row->q ?? null,
-                                'other_currency'    => $row->r ?? null,
+                                'other_cost'        => $row->r ?? null,
                                 'other_description' => $row->s ?? null,
                                 'total_cost'        => $row->t ?? null,
                                 'price_profit'      => $row->u ?? null,
+                                'subsidi_sasa'      => $row->v ?? null,
                             ]);
                         }
                     }

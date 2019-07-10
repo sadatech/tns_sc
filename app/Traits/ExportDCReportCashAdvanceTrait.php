@@ -33,7 +33,7 @@ trait ExportDCReportCashAdvanceTrait
 		        	"TPD", "HOTEL / KOSAN",
 			        "BBM", "PARKIR/TOL", "PEMBELIAN BAHAN BAKU", "PEMBELIAN PROPERTY", "PERIJINAN",
 			        "BUS", "SIPA", "OJEK", "BECAK", "TAKSI",
-			        "RP.", "KETERANGAN", "TOTAL BIAYA"
+			        "RP.", "KETERANGAN", "TOTAL BIAYA", "PROFIT", "SUBSIDI SASA"
 		    	];
 
                 // all width
@@ -68,8 +68,10 @@ trait ExportDCReportCashAdvanceTrait
                 		$dbData->rickshaw,
                 		$dbData->taxi,
                 		$dbData->other_cost,
-                		$dbData->other_description,
-                		$dbData->total_cost,
+                        $dbData->other_description,
+                        $dbData->total_cost,
+                		$dbData->price_profit,
+                		$dbData->subsidi_sasa,
                 	];
                     $startVal++;
                     $dtObj["allHeightObj"][] = $startVal;
@@ -103,7 +105,9 @@ trait ExportDCReportCashAdvanceTrait
 							(clone $CashAdvanceDataQuery)->sum("taxi"),
 							(clone $CashAdvanceDataQuery)->sum("other_cost"),
 							null,
-							(clone $CashAdvanceDataQuery)->sum("total_cost"),
+                            (clone $CashAdvanceDataQuery)->sum("total_cost"),
+                            (clone $CashAdvanceDataQuery)->sum("price_profit"),
+							(clone $CashAdvanceDataQuery)->sum("subsidi_sasa"),
 						];
 	                } else $dtObj["dataValue"][] = [];
 				}
