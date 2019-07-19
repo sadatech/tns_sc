@@ -110,11 +110,32 @@ table.table thead tr th {
       $('.js-datepicker').change(function(){
           console.log(filters);
           $('#filterDate').val('');
+
+          $('#filterArea').select2(setOptions('{{ route("area-select2") }}', '{{App\Area::first()->name}}', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));  
       });
 
       $('#filterDate').change(function(){
           console.log(filters);
           $('.js-datepicker').val('');
+          $('#filterArea').val('');
+
+          $('#filterArea').select2(setOptions('{{ route("area-select2") }}', 'Choose your Area', function (params) {
+            return filterData('name', params.term);
+          }, function (data, params) {
+            return {
+              results: $.map(data, function (obj) {                                
+                return {id: obj.id, text: obj.name}
+              })
+            }
+          }));
       });
 
   });
