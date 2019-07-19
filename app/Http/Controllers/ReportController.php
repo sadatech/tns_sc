@@ -3957,11 +3957,16 @@ class ReportController extends Controller
 
     public function SMDdistpf(Request $request)
     {
-
-        if (!empty($request->input('area'))) {
-            $area   = $request->input('area');
+        if ($request->has('periode')) {
+            if (!empty($request->input('area'))) {
+                $area   = $request->input('area');
+            }else{
+                $area   = Area::first()->id;
+            }
         }else{
-            $area   = Area::first()->id;
+            if (!empty($request->input('area'))) {
+                $area   = $request->input('area');
+            }
         }
 
         $dist = Distribution::orderBy('created_at', 'DESC');
@@ -3984,9 +3989,11 @@ class ReportController extends Controller
             ->whereMonth('date', substr($request->input('date'), 0, 2))
             ->whereYear('date', substr($request->input('date'), 3, 4));
         }
+        if (!empty($area)){
             $dist->whereHas('outlet.employeePasar.pasar.subarea.area', function($q) use ($area){
                 return $q->where('id_area', $area);
             });
+        }
         $data = array();
         $product = array();
         $id = 1;
@@ -4035,9 +4042,21 @@ class ReportController extends Controller
 
     public function exportSmdDist(Request $request)
     {
+
         $employee = ($request->employee == "null" || empty($request->employee) ? null : $request->employee);
         $pasar = ($request->pasar == "null" || empty($request->pasar) ? null : $request->pasar);
         $area = ($request->area == "null" || empty($request->area) ? null : $request->area);
+        if ($request->has('periode')) {
+            if ((!empty($request->area)) or ($request->area != "null")) {
+                $area   = $area;
+            }else{
+                $area   = Area::first()->id;
+            }
+        }else{
+            if (!empty($request->area)) {
+                $area   = $area;
+            }
+        }
 
         $dist = Distribution::orderBy('created_at', 'DESC')
         ->when($employee, function($q) use ($employee)
