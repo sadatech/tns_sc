@@ -10,12 +10,12 @@ use App\CashAdvance;
 trait ExportDCReportCashAdvanceTrait
 {
 
-	public function DCReportCashAdvanceExportTrait($id_area, $filtermonth, $filecode)
+	public function DCReportCashAdvanceExportTrait($id_area, $filterFrom, $filterTo, $filecode)
 	{
 		$data = [];
 		$CashAdvanceDataQuery = CashAdvance::where("id_area", $id_area)
-        ->whereMonth("date", Carbon::parse($filtermonth)->format("m"))
-        ->whereYear("date", Carbon::parse($filtermonth)->format("Y"));
+        ->where("date",'>=', Carbon::parse($filterFrom)->format("Y-m-d"))
+        ->where("date",'<=', Carbon::parse($filterTo)->format("Y-m-d"));
 		$CashAdvanceData = (clone $CashAdvanceDataQuery)->get();
 
 		$filename = "DC - Report Cash Advance (".$filecode.")";

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SalesDc extends Model
 {
     protected $fillable = [
-        'id_employee', 'place', 'date', 'week', 'type', 'name', 'phone', 'icip_icip', 'effective_contact'
+        'id_employee', 'place', 'date', 'week', 'type', 'name', 'phone', 'icip_icip', 'effective_contact', 'value'
     ];
 
     public function detailSales()

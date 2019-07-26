@@ -27,7 +27,6 @@ class SalesDcController extends Controller
 
 	public function store(Request $request, $type = 'SALES')
 	{
-
 		$check = $this->authCheck();
 
 		if ($check['success'] == true) {
@@ -73,6 +72,7 @@ class SalesDcController extends Controller
 			[
 				'icip_icip'			=> $data->icip_icip,
 				'effective_contact'	=> $data->effective_contact,
+				'value'			=> $data->value,
 			]
 		);
 
@@ -102,4 +102,3 @@ class SalesDcController extends Controller
 		return $res;
 	}
 }
-

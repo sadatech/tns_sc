@@ -256,6 +256,9 @@ Route::prefix('employee')->group(function () {
 		Route::get('/data/pasar', 'Employee\PasarController@data')->name('employee.data.pasar')->middleware('auth');
 		Route::get('/data/dc', 'Employee\DcController@data')->name('employee.data.dc')->middleware('auth');
 
+	// aditional
+		// Route::get('/pasarEdit/{id}', 'Employee\PasarController@pasar')->name('employeepasar.edit')->middleware('auth');
+
 		//Export Import
 		Route::get('/export', 'EmployeeController@export')->name('employee.export')->middleware('auth');
 		Route::get('/dc/export', 'Employee\DcController@export')->name('employeedc.export')->middleware('auth');
@@ -732,7 +735,7 @@ Route::prefix('report')->group(function () {
 				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
 				Route::post('/reject/{id}', 'ReportController@reject')->name('cbd.reject')->middleware('auth');
 				Route::post('/approve/{id}', 'ReportController@approve')->name('cbd.approve')->middleware('auth');
-				Route::post('/export/{month?}/{year?}/{date?}/{employee?}/{outlet?}/{area?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
+				Route::post('/export/{month?}/{year?}/{date?}/{employee?}/{outlet?}/{area?}/{staus?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {
@@ -908,7 +911,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', 'CashAdvanceController@index')->name('report.demo.cashAdvance')->middleware('auth');
 				Route::post('/data', 'CashAdvanceController@data')->name('report.demo.cashAdvance.data')->middleware('auth');
 				Route::post('/import', 'CashAdvanceController@import')->name('report.demo.import')->middleware('auth');
-				Route::any('/exportXLS/{subCategory?}/{date?}', 'CashAdvanceController@exportXLS')->name('report.demo.cashAdvance.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{subCategory?}/{datefrom?}/{dateto?}', 'CashAdvanceController@exportXLS')->name('report.demo.cashAdvance.exportXLS')->middleware('auth');
 				Route::get('/download-template', function()
 				{
 					return response()->download(public_path('assets/CashAdvanceImport.xlsx'));
