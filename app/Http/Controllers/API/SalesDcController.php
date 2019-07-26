@@ -50,6 +50,7 @@ class SalesDcController extends Controller
 	public function sales($user, $data, $type = 'SALES')
 	{
 		
+		$data->value = (!empty($data->value) ? $data->value : null);
 		$date 	= Carbon::parse($data->date);
 		
 		$res['code'] = 200;
