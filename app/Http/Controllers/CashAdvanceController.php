@@ -107,8 +107,8 @@ class CashAdvanceController extends Controller
     public function data(Request $req)
     {
         $CashAdvance = CashAdvance::where("id_area", $req->id_area)
-        ->whereMonth("date", Carbon::parse($req->periode)->format("m"))
-        ->whereYear("date", Carbon::parse($req->periode)->format("Y"))
+        ->where("date",'>=', Carbon::parse($req->periodeFrom)->format("Y-m-d"))
+        ->where("date",'<=', Carbon::parse($req->periodeTo)->format("Y-m-d"))
         ->get();
 
         return Datatables::of($CashAdvance)
@@ -125,19 +125,19 @@ class CashAdvanceController extends Controller
         ->make(true);
     }
 
-    public function exportXLS($id_area, $filterPeriode)
+    public function exportXLS($id_area, $filterPeriodeFrom, $filterPeriodeTo)
     {
-        $result = DB::transaction(function() use ($id_area, $filterPeriode){
+        $result = DB::transaction(function() use ($id_area, $filterPeriodeFrom, $filterPeriodeTo){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
                     'date' => Carbon::now(),
-                    'title' => "Demo Cooking - Report Cash Advance - " . Area::where("id", $id_area)->first()->name. " - " . Carbon::parse($filterPeriode)->format("M Y") . " (" . $filecode . ")",
+                    'title' => "Demo Cooking - Report Cash Advance - " . Area::where("id", $id_area)->first()->name. " - " . Carbon::parse($filterPeriodeFrom)->format("d M Y") ." to : " . Carbon::parse($filterPeriodeTo)->format("d M Y") . " (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportDCReportCashAdvanceJob($JobTrace, $id_area, $filterPeriode, $filecode));
+                dispatch(new ExportDCReportCashAdvanceJob($JobTrace, $id_area, $filterPeriodeFrom, $filterPeriodeTo, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
