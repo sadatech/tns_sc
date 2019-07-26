@@ -27,7 +27,6 @@ class SalesDcController extends Controller
 
 	public function store(Request $request, $type = 'SALES')
 	{
-
 		$check = $this->authCheck();
 
 		if ($check['success'] == true) {
@@ -51,6 +50,7 @@ class SalesDcController extends Controller
 	public function sales($user, $data, $type = 'SALES')
 	{
 		
+		$data->value = (!empty($data->value) ? $data->value : null);
 		$date 	= Carbon::parse($data->date);
 		
 		$res['code'] = 200;
@@ -73,6 +73,7 @@ class SalesDcController extends Controller
 			[
 				'icip_icip'			=> $data->icip_icip,
 				'effective_contact'	=> $data->effective_contact,
+				'value'			=> $data->value,
 			]
 		);
 
@@ -102,4 +103,3 @@ class SalesDcController extends Controller
 		return $res;
 	}
 }
-
