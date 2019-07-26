@@ -60,6 +60,16 @@ trait ExportGTCCbdTrait
                 return $q2->where('id_area', $this->tempVar['filters']['area']);
             });
         })
+        ->when($this->tempVar['filters']['status'] != 'null', function ($q){
+            if ($this->tempVar['filters']['status'] == 'propose') {
+                return $q->where('propose', '1');
+            }elseif ($this->tempVar['filters']['status'] == 'approve') {
+                return $q->where('approve', '1');
+            }elseif ($this->tempVar['filters']['status'] == 'reject') {
+                return $q->where('reject', '1');
+            }
+        })
+
         ;
 
 		foreach ($data->get() as $a => $d)

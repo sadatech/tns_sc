@@ -699,7 +699,7 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
-    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $new = '')
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $filterStatus, $new = '')
     {
         $filters['month']       = $filterMonth;
         $filters['year']        = $filterYear;
@@ -707,6 +707,7 @@ class ReportController extends Controller
         $filters['employee']    = $filterEmployee;
         $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
+        $filters['status']      = $filterStatus;
         $filters['new']         = $new;
         $result = DB::transaction(function() use ($filters){
             try
@@ -4088,7 +4089,6 @@ class ReportController extends Controller
             });
         })
         ->get();
-
         if ($dist->count() > 0) {
             foreach ($dist as $key => $val) {
                 if($val->employee->position->level == 'mdgtc') {
@@ -4676,6 +4676,15 @@ class ReportController extends Controller
             $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2) use ($request){
                 return $q2->where('id_area', $request->input('area'));
             });
+        })
+        ->when($request->has('status'), function ($q) use ($request){
+            if ($request['status'] == 'propose') {
+                return $q->where('propose', '1');
+            }elseif ($request['status'] == 'approve') {
+                return $q->where('approve', '1');
+            }elseif ($request['status'] == 'reject') {
+                return $q->where('reject', '1');
+            }
         })
         ->get();
 
