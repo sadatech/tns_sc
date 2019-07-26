@@ -27,11 +27,20 @@
                   <div class="font-size-sm font-w600 text-uppercase text-muted">Area</div>
                   <select id="filterArea" class="inputFilter" name="id_area"></select>
               </div>
-              <div class="col-4 col-sm-4 text-center text-sm-left">
+              <div class="col-2 col-sm-2 text-center text-sm-left">
                   <span>
-                    <i class="fa fa-calendar"></i> Periode
+                    <i class="fa fa-calendar"></i> From :
                   </span>
-                  <input type="text" id="filterMonth" class="form-control" placeholder="Periode" name="periode">
+                  <input type="text" id="filterMonthFrom" class="form-control" placeholder="Periode" name="periodeFrom">
+              </div>
+              <p>
+                <br> -
+              </p>
+              <div class="col-2 col-sm-2 text-center text-sm-left">
+                  <span>
+                     <i class="fa fa-calendar"></i> To :
+                  </span>
+                  <input type="text" id="filterMonthTo" class="form-control" placeholder="Periode" name="periodeTo">
               </div>
           </div>
           <div class="row col-sm-12 col-md-12">
@@ -227,13 +236,20 @@ table.table thead tr th {
         /**
          * Filter Month
          */
-        $('#filterMonth').datetimepicker({
-            format: "MM yyyy",
-            startView: "3",
-            minView: "3",
+        $('#filterMonthFrom').datetimepicker({
+            format: "d MM yyyy",
+            startView: "2",
+            minView: "2",
             autoclose: true,
         });
-        $('#filterMonth').val(moment().format("MMMM Y"));
+        $('#filterMonthTo').datetimepicker({
+            format: "d MM yyyy",
+            startView: "2",
+            minView: "2",
+            autoclose: true,
+        });
+        $('#filterMonthFrom').val(moment().format("D MMMM Y"));
+        $('#filterMonthTo').val(moment().format("D MMMM Y"));
         $('#monthModal').datetimepicker({
             format: "MM yyyy",
             startView: "3",
@@ -285,7 +301,8 @@ table.table thead tr th {
           $.each($('#filterForm select'), function(key, value) {
             $('#'+this.id).val(null).trigger('change');
           });
-          $('#filterMonth').val(moment().format("MMMM Y"));
+          $('#filterMonthFrom').val(moment().format("D MMMM Y"));
+          $('#filterMonthTo').val(moment().format("D MMMM Y"));
           $('#panelData').attr("style", "display:none;");
         })
 
@@ -296,6 +313,14 @@ table.table thead tr th {
 
             if($('#filterArea').val() == null){
                 swal("Warning!", "Please select Area First!", "warning");
+                return;
+            }
+            if($('#filterMonthFrom').val() == null){
+                swal("Warning!", "Please select Periode From First!", "warning");
+                return;
+            }
+            if($('#filterMonthTo').val() == null){
+                swal("Warning!", "Please select Periode To First!", "warning");
                 return;
             }
 
@@ -309,7 +334,7 @@ table.table thead tr th {
                 $('#cashDcTable').DataTable().destroy();
             }
 
-            $("#btnDownloadXLS").attr("target-url", "{{ route('report.demo.cashAdvance.exportXLS') }}" + "/" + $('#filterArea').val() + "/" + $('#filterMonth').val());
+            $("#btnDownloadXLS").attr("target-url", "{{ route('report.demo.cashAdvance.exportXLS') }}" + "/" + $('#filterArea').val() + "/" + $('#filterMonthFrom').val() + "/" + $('#filterMonthTo').val());
 
             $('#cashDcTable').dataTable({
                 "fnCreatedRow": function (nRow, data) {

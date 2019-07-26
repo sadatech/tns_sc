@@ -39,6 +39,15 @@
               <label>Outlet:</label>
               <select class="form-control" id="filterOutlet" name="outlet"></select>
             </div>
+            <div class="col-md-4">
+              <label>Status:</label>
+              <select class="js-select form-control" id="filterStatus" name="status">
+                  <option value="null">(none)</option>
+                  <option value="propose">Propose</option>
+                  <option value="approve">Approve</option>
+                  <option value="reject">Reject</option>
+              </select>
+            </div>
           </div>
           <button type="submit" class="btn btn-outline-danger btn-square mt-10">Filter Data</button>
           <input type="reset" id="reset" class="btn btn-outline-secondary btn-square mt-10" value="Reset Filter"/>
@@ -131,9 +140,9 @@ table.table thead tr th {
   });
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet,#filterArea,#filterDate').val(null).trigger('change');
+    $('#filterEmployee,#filterOutlet,#filterArea,#filterDate,#filterStatus').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee,#filterOutlet,#filterArea,#filterDate').val(null).trigger('change');
+      $('#filterEmployee,#filterOutlet,#filterArea,#filterDate','#filterStatus').val(null).trigger('change');
     }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
@@ -175,6 +184,9 @@ table.table thead tr th {
     autoclose: true,
     minViewMode: "months"
   });
+
+  $(".js-select").select2();
+
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -232,9 +244,9 @@ table.table thead tr th {
           type: 'image',
         });
         if ($("#filterDate").val()=='') {
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new");
         }else{
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/new");
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new");
         };
         $('.js-swal-reject').on('click', function(){
           var url = $(this).data("url");
