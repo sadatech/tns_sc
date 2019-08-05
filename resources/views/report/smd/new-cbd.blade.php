@@ -66,6 +66,7 @@
           </h3>
           <div class="block-option">
             <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+            <a id="btnDownloadXLSNoImage" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data Tanpa Gambar</a>
 
           </div>
         </div>
@@ -208,6 +209,18 @@ table.table thead tr th {
       }
     });
   });
+  $("#btnDownloadXLSNoImage").on("click", function(){
+    $.ajax({
+      url: $(this).attr("target-url"),
+      type: "post",
+      success: function(e){
+        swal("Success!", e.result, "success");
+      },
+      error: function(){
+        swal("Error!", e.result, "error");
+      }
+    });
+  });
 
   $('#filter').submit(function(e) {
     Codebase.layout('header_loader_on');
@@ -244,10 +257,13 @@ table.table thead tr th {
           type: 'image',
         });
         if ($("#filterDate").val()=='') {
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new");
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/yes");
+          $("#btnDownloadXLSNoImage").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/no");
         }else{
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new");
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/yes");
+          $("#btnDownloadXLSNoImage").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/no");
         };
+
         $('.js-swal-reject').on('click', function(){
           var url = $(this).data("url");
           swal({

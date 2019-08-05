@@ -735,7 +735,7 @@ Route::prefix('report')->group(function () {
 				Route::post('/data', 'ReportController@SMDnewCbd')->name('data.smd.new-cbd')->middleware('auth');
 				Route::post('/reject/{id}', 'ReportController@reject')->name('cbd.reject')->middleware('auth');
 				Route::post('/approve/{id}', 'ReportController@approve')->name('cbd.approve')->middleware('auth');
-				Route::post('/export/{month?}/{year?}/{date?}/{employee?}/{outlet?}/{area?}/{staus?}/{new?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
+				Route::post('/export/{month?}/{year?}/{date?}/{employee?}/{outlet?}/{area?}/{staus?}/{new?}/{image?}', 'ReportController@cbdGtcExportXLS')->name('export.smd.new-cbd')->middleware('auth');
 			});
 
 			Route::prefix('sales')->group(function () {

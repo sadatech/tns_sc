@@ -699,7 +699,7 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
-    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $filterStatus, $new = '')
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $filterStatus, $new = '', $image)
     {
         $filters['month']       = $filterMonth;
         $filters['year']        = $filterYear;
@@ -709,14 +709,23 @@ class ReportController extends Controller
         $filters['area']        = $filterArea;
         $filters['status']      = $filterStatus;
         $filters['new']         = $new;
+        $filters['image']       = $image;
         $result = DB::transaction(function() use ($filters){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
-                if ($filters['day'] == 'null') {
-                    $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
+                if ($filters['image'] == 'yes') {
+                    if ($filters['day'] == 'null') {
+                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
+                    }else{
+                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (" . $filecode . ")";
+                    }
                 }else{
-                    $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (" . $filecode . ")";
+                    if ($filters['day'] == 'null') {
+                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (No Image) (" . $filecode . ")";
+                    }else{
+                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (No Image) (" . $filecode . ")";
+                    }
                 }
                 $JobTrace = JobTrace::create([
                     'id_user' => Auth::user()->id,
