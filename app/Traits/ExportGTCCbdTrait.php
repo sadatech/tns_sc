@@ -129,11 +129,21 @@ trait ExportGTCCbdTrait
 		}
 
 		$data = [];
+	if ($this->tempVar['filters']['image'] == 'yes') {
+
 		if ($this->tempVar['filters']['day'] != 'null') {
 			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day']."/".$this->tempVar['filters']['year'])->format("d F Y")." (".$this->tempVar["filecode"].")";
 		}else{
 			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (".$this->tempVar["filecode"].")";
 		}
+	}else{
+
+		if ($this->tempVar['filters']['day'] != 'null') {
+			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day']."/".$this->tempVar['filters']['year'])->format("d F Y")." (No Image) (".$this->tempVar["filecode"].")";
+		}else{
+			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (No Image) (".$this->tempVar["filecode"].")";
+		}
+	}
 
 		$store = Excel::create($filename, function($excel) use (&$data, $index, $label){
 		if ($this->tempVar['filters']['day'] != 'null') {
