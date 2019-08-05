@@ -181,6 +181,7 @@ trait ExportGTCCbdTrait
 					$sheet->row($startTLRow, function($row){
 						$row->setFontSize(12);
 					});
+		if ($this->tempVar['filters']['image'] == 'yes') {
 
 	            	$imgDrawing = new PHPExcel_Worksheet_Drawing;
 	            	if (isset($this->photoList[$valueTLKey]))
@@ -195,6 +196,7 @@ trait ExportGTCCbdTrait
 		            		$sheet->setCellValue('H'.$startTLRow, "not found")->setAutoSize(true);
 	            		}
 	            	}
+		}
 
 					$startTLRow++;
 				}
@@ -205,6 +207,7 @@ trait ExportGTCCbdTrait
 					$sheet->row($startTLRow, function($row){
 						$row->setFontSize(12);
 					});
+		if ($this->tempVar['filters']['image'] == 'yes') {
 
 	            	$imgDrawing = new PHPExcel_Worksheet_Drawing;
 	            	if (isset($this->photoList2[$valueTLKey]))
@@ -219,6 +222,7 @@ trait ExportGTCCbdTrait
 		            		$sheet->setCellValue('I'.$startTLRow, "not found")->setAutoSize(true);
 	            		}
 	            	}
+		}
 
 					$startTLRow++;
 				}
