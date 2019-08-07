@@ -34,11 +34,11 @@
             <div class="col-md-4">
               <label>Area:</label>
               <select class="form-control" id="filterArea" name="area"></select>
-            </div>
+            </div><!-- 
             <div class="col-md-4">
               <label>Outlet:</label>
               <select class="form-control" id="filterOutlet" name="outlet"></select>
-            </div>
+            </div> -->
             <div class="col-md-4">
               <label>Status:</label>
               <select class="js-select form-control" id="filterStatus" name="status">

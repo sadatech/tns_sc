@@ -62,7 +62,9 @@
                     </h3>
                     <div class="block-option">
                         <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                    @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
                         <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
+                    @endif
                     </div>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered table-responsive" id="cashDcTable">
