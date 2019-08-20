@@ -705,7 +705,7 @@ class ReportController extends Controller
         $filters['year']        = $filterYear;
         $filters['day']         = $filterDay;
         $filters['employee']    = $filterEmployee;
-        $filters['outlet']      = 'null';
+        $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
         $filters['status']      = $filterStatus;
         $filters['new']         = $new;
