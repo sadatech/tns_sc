@@ -23,7 +23,7 @@
       <div class="block-content bg-white">
         <form id="filterForm" method="post" action="#">
           <div class="row items-push">
-              <div class="col-4 col-sm-4 text-center text-sm-left">
+              <div class="col-3 col-sm-3 text-center text-sm-left">
                   <div class="font-size-sm font-w600 text-uppercase text-muted">Area</div>
                   <select id="filterArea" class="inputFilter" name="id_area"></select>
               </div>
@@ -41,6 +41,11 @@
                      <i class="fa fa-calendar"></i> To :
                   </span>
                   <input type="text" id="filterMonthTo" class="form-control" placeholder="Periode" name="periodeTo">
+              </div>
+
+              <div class="col-3 col-sm-3 text-center text-sm-left">
+                  <div class="font-size-sm font-w600 text-uppercase text-muted">Employee</div>
+                  <select id="filterEmployee" class="inputFilter" name="id_tl"></select>
               </div>
           </div>
           <div class="row col-sm-12 col-md-12">
@@ -260,6 +265,16 @@ table.table thead tr th {
         }).on('changeDate', function(ev){
           $('#period').val(moment(ev.date).format('Y-MM-DD'));
         });
+
+        $('#filterEmployee').select2(setOptions('{{ route("employee-is-tl-select2") }}', 'Select Employee', function (params) {
+            return filterData('name', params.term);
+        }, function (data, params) {
+            return {
+              results: $.map(data, function (obj){
+                return {id: obj.id, text: obj.name}
+            })
+          }
+        }));
         
 
         /**
@@ -313,10 +328,6 @@ table.table thead tr th {
          */
         $("#filterSearch").click(function() {
 
-            if($('#filterArea').val() == null){
-                swal("Warning!", "Please select Area First!", "warning");
-                return;
-            }
             if($('#filterMonthFrom').val() == null){
                 swal("Warning!", "Please select Periode From First!", "warning");
                 return;
@@ -336,7 +347,7 @@ table.table thead tr th {
                 $('#cashDcTable').DataTable().destroy();
             }
 
-            $("#btnDownloadXLS").attr("target-url", "{{ route('report.demo.cashAdvance.exportXLS') }}" + "/" + $('#filterArea').val() + "/" + $('#filterMonthFrom').val() + "/" + $('#filterMonthTo').val());
+            $("#btnDownloadXLS").attr("target-url", "{{ route('report.demo.cashAdvance.exportXLS') }}" + "/" + $('#filterArea').val() + "/" + $('#filterMonthFrom').val() + "/" + $('#filterMonthTo').val() + "/" + $('#filterEmployee').val());
 
             $('#cashDcTable').dataTable({
                 "fnCreatedRow": function (nRow, data) {

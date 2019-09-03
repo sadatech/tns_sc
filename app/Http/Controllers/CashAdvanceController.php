@@ -11,6 +11,7 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\CashAdvance;
+use App\Employee;
 use App\Area;
 use DB;
 
@@ -106,10 +107,15 @@ class CashAdvanceController extends Controller
 
     public function data(Request $req)
     {
-        $CashAdvance = CashAdvance::where("id_area", $req->id_area)
-        ->where("date",'>=', Carbon::parse($req->periodeFrom)->format("Y-m-d"))
-        ->where("date",'<=', Carbon::parse($req->periodeTo)->format("Y-m-d"))
-        ->get();
+        $CashAdvance = CashAdvance::where("date",'>=', Carbon::parse($req->periodeFrom)->format("Y-m-d"))
+        ->where("date",'<=', Carbon::parse($req->periodeTo)->format("Y-m-d"));
+        if ($req->id_tl) {
+            $CashAdvance->where("id_employee", $req->id_tl);
+        }
+        if ($req->id_area) {
+            $CashAdvance->where("id_area", $req->id_area);
+        }
+        $CashAdvance->get();
 
         return Datatables::of($CashAdvance)
         ->addColumn("tgl", function($item){
@@ -125,19 +131,45 @@ class CashAdvanceController extends Controller
         ->make(true);
     }
 
-    public function exportXLS($id_area, $filterPeriodeFrom, $filterPeriodeTo)
+    public function exportXLS($id_area, $filterPeriodeFrom, $filterPeriodeTo, $filterTl)
     {
-        $result = DB::transaction(function() use ($id_area, $filterPeriodeFrom, $filterPeriodeTo){
+        $result = DB::transaction(function() use ($id_area, $filterPeriodeFrom, $filterPeriodeTo, $filterTl){
             try
             {
-                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
-                $JobTrace = JobTrace::create([
-                    'id_user' => Auth::user()->id,
-                    'date' => Carbon::now(),
-                    'title' => "Demo Cooking - Report Cash Advance - " . Area::where("id", $id_area)->first()->name. " - " . Carbon::parse($filterPeriodeFrom)->format("d M Y") ." to : " . Carbon::parse($filterPeriodeTo)->format("d M Y") . " (" . $filecode . ")",
-                    'status' => 'PROCESSING',
-                ]);
-                dispatch(new ExportDCReportCashAdvanceJob($JobTrace, $id_area, $filterPeriodeFrom, $filterPeriodeTo, $filecode));
+                if ($id_area != null && $id_area != 'null' && $filterTl != null && $filterTl != 'null') {
+                    $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                    $JobTrace = JobTrace::create([
+                        'id_user' => Auth::user()->id,
+                        'date' => Carbon::now(),
+                        'title' => "Demo Cooking - Report Cash Advance - " . Area::where("id", $id_area)->first()->name. " - "  . Employee::where("id", $filterTl)->first()->name. " - " . Carbon::parse($filterPeriodeFrom)->format("d M Y") ." to : " . Carbon::parse($filterPeriodeTo)->format("d M Y") . " (" . $filecode . ")",
+                        'status' => 'PROCESSING',
+                    ]);
+                }elseif ($id_area != null && $id_area != 'null') {
+                    $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                    $JobTrace = JobTrace::create([
+                        'id_user' => Auth::user()->id,
+                        'date' => Carbon::now(),
+                        'title' => "Demo Cooking - Report Cash Advance - " . Area::where("id", $id_area)->first()->name. " - " . Carbon::parse($filterPeriodeFrom)->format("d M Y") ." to : " . Carbon::parse($filterPeriodeTo)->format("d M Y") . " (" . $filecode . ")",
+                        'status' => 'PROCESSING',
+                    ]);
+                }elseif ($filterTl != null && $filterTl != 'null') {
+                    $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                    $JobTrace = JobTrace::create([
+                        'id_user' => Auth::user()->id,
+                        'date' => Carbon::now(),
+                        'title' => "Demo Cooking - Report Cash Advance - " . Employee::where("id", $filterTl)->first()->name. " - " . Carbon::parse($filterPeriodeFrom)->format("d M Y") ." to : " . Carbon::parse($filterPeriodeTo)->format("d M Y") . " (" . $filecode . ")",
+                        'status' => 'PROCESSING',
+                    ]);
+                }else{
+                    $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                    $JobTrace = JobTrace::create([
+                        'id_user' => Auth::user()->id,
+                        'date' => Carbon::now(),
+                        'title' => "Demo Cooking - Report Cash Advance - " . Carbon::parse($filterPeriodeFrom)->format("d M Y") ." to : " . Carbon::parse($filterPeriodeTo)->format("d M Y") . " (" . $filecode . ")",
+                        'status' => 'PROCESSING',
+                    ]);
+                }
+                dispatch(new ExportDCReportCashAdvanceJob($JobTrace, $id_area, $filterPeriodeFrom, $filterPeriodeTo, $filterTl, $filecode));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)

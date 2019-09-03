@@ -16,7 +16,7 @@ class ExportDCReportCashAdvanceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ExportDCReportCashAdvanceTrait;
 
-    protected $trace, $id_area, $filterFrom, $filterTo, $filecode;
+    protected $trace, $id_area, $filterFrom, $filterTo, $filterTl, $filecode;
 
     /**
      * The number of times the job may be attempted.
@@ -30,12 +30,13 @@ class ExportDCReportCashAdvanceJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(JobTrace $trace, $id_area, $filterFrom,  $filterTo, $filecode)
+    public function __construct(JobTrace $trace, $id_area, $filterFrom,  $filterTo, $filterTl, $filecode)
     {
         $this->trace = $trace;
         $this->id_area = $id_area;
         $this->filterFrom = $filterFrom;
         $this->filterTo = $filterTo;
+        $this->filterTl = $filterTl;
         $this->filecode = $filecode;
     }
 
@@ -48,7 +49,7 @@ class ExportDCReportCashAdvanceJob implements ShouldQueue
     {
         $this->trace->update([
             'status' => 'DONE',
-            'results' => $this->DCReportCashAdvanceExportTrait($this->id_area, $this->filterFrom, $this->filterTo, $this->filecode), // return excel file location
+            'results' => $this->DCReportCashAdvanceExportTrait($this->id_area, $this->filterFrom, $this->filterTo, $this->filterTl, $this->filecode), // return excel file location
         ]);
     }
 
