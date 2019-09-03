@@ -911,7 +911,7 @@ Route::prefix('report')->group(function () {
 				Route::get('/', 'CashAdvanceController@index')->name('report.demo.cashAdvance')->middleware('auth');
 				Route::post('/data', 'CashAdvanceController@data')->name('report.demo.cashAdvance.data')->middleware('auth');
 				Route::post('/import', 'CashAdvanceController@import')->name('report.demo.import')->middleware('auth');
-				Route::any('/exportXLS/{subCategory?}/{datefrom?}/{dateto?}', 'CashAdvanceController@exportXLS')->name('report.demo.cashAdvance.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{subCategory?}/{datefrom?}/{dateto?}/{tl?}', 'CashAdvanceController@exportXLS')->name('report.demo.cashAdvance.exportXLS')->middleware('auth');
 				Route::get('/download-template', function()
 				{
 					return response()->download(public_path('assets/CashAdvanceImport.xlsx'));
