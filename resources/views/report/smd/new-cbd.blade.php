@@ -32,6 +32,10 @@
               <select class="form-control" id="filterEmployee" name="employee"></select>
             </div>
             <div class="col-md-4">
+              <label>Region:</label>
+              <select class="form-control" id="filterRegion" name="region"></select>
+            </div>
+            <div class="col-md-4">
               <label>Area:</label>
               <select class="form-control" id="filterArea" name="area"></select>
             </div>
@@ -141,9 +145,9 @@ table.table thead tr th {
   });
   $('#reset').click(function(){
     $('.js-datepicker').val(null);
-    $('#filterEmployee,#filterOutlet,#filterArea,#filterDate,#filterStatus').val(null).trigger('change');
+    $('#filterEmployee,#filterOutlet,#filterArea,#filterRegion,#filterDate,#filterStatus').val(null).trigger('change');
     setTimeout(function() {
-      $('#filterEmployee,#filterOutlet,#filterArea,#filterDate','#filterStatus').val(null).trigger('change');
+      $('#filterEmployee,#filterOutlet,#filterArea,#filterRegion,#filterDate,#filterStatus').val(null).trigger('change');
     }, 10);
   });
   $('#filterEmployee').select2(setOptions('{{ route("employee-select2") }}', 'Choose your Employee', function (params) {
@@ -156,6 +160,15 @@ table.table thead tr th {
     }
   }));
   $('#filterOutlet').select2(setOptions('{{ route("outlet-select2") }}', 'Choose your Outlet', function (params) {
+    return filterData('name', params.term);
+  }, function (data, params) {
+    return {
+      results: $.map(data, function (obj) {                                
+        return {id: obj.id, text: obj.name}
+      })
+    }
+  }));
+  $('#filterRegion').select2(setOptions('{{ route("region-select2") }}', 'Choose your Region', function (params) {
     return filterData('name', params.term);
   }, function (data, params) {
     return {
@@ -257,11 +270,11 @@ table.table thead tr th {
           type: 'image',
         });
         if ($("#filterDate").val()=='') {
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/yes");
-          $("#btnDownloadXLSNoImage").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/no");
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterRegion").val()+"/"+$("#filterStatus").val()+"/new/yes");
+          $("#btnDownloadXLSNoImage").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$(".js-datepicker").val()+"/null/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterRegion").val()+"/"+$("#filterStatus").val()+"/new/no");
         }else{
-          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/yes");
-          $("#btnDownloadXLSNoImage").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterStatus").val()+"/new/no");
+          $("#btnDownloadXLS").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterRegion").val()+"/"+$("#filterStatus").val()+"/new/yes");
+          $("#btnDownloadXLSNoImage").attr("target-url","{{ route('export.smd.new-cbd') }}"+"/"+$("#filterDate").val()+"/"+$("#filterEmployee").val()+"/"+$("#filterOutlet").val()+"/"+$("#filterArea").val()+"/"+$("#filterRegion").val()+"/"+$("#filterStatus").val()+"/new/no");
         };
 
         $('.js-swal-reject').on('click', function(){

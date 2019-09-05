@@ -12,6 +12,7 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Collection;
 use App\Components\traits\WeekHelper;
 use App\Category;
+use App\Region;
 use App\Area;
 use App\SubArea;
 use App\Account;
@@ -699,7 +700,7 @@ class ReportController extends Controller
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
     }
 
-    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $filterStatus, $new = '', $image)
+    public function cbdGtcExportXLS($filterMonth, $filterYear, $filterDay, $filterEmployee, $filterOutlet, $filterArea, $filterRegion, $filterStatus, $new = '', $image)
     {
         $filters['month']       = $filterMonth;
         $filters['year']        = $filterYear;
@@ -707,6 +708,7 @@ class ReportController extends Controller
         $filters['employee']    = $filterEmployee;
         $filters['outlet']      = $filterOutlet;
         $filters['area']        = $filterArea;
+        $filters['region']      = $filterRegion;
         $filters['status']      = $filterStatus;
         $filters['new']         = $new;
         $filters['image']       = $image;
@@ -716,15 +718,15 @@ class ReportController extends Controller
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 if ($filters['image'] == 'yes') {
                     if ($filters['day'] == 'null') {
-                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
                     }else{
-                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (" . $filecode . ")";
                     }
                 }else{
                     if ($filters['day'] == 'null') {
-                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (No Image) (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (No Image) (" . $filecode . ")";
                     }else{
-                        $title = "GTC - CBD " . Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (No Image) (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (No Image) (" . $filecode . ")";
                     }
                 }
                 $JobTrace = JobTrace::create([
@@ -3613,7 +3615,12 @@ class ReportController extends Controller
                     );
                     $product = Product::where('id',$data[$key]['id_product'])->first();
                     $data[$key] = array_merge($data[$key], ['product' => $product->name]);
-
+                    if ($key > 1) {
+                        if ( ($data[$key]['Nama Demo Cooking'] === $data[$key-1]['Nama Demo Cooking']) && ($data[$key]['Place'] === $data[$key-1]['Place']) && ($data[$key]['Date'] === $data[$key-1]['Date']) ) {
+                        $data[$key]['Icip-icip'] = "";
+                        $data[$key]['Effective Contact'] = "";
+                        }    
+                    } 
                     $price = Price::where('id_product', $product->id)->orderBy('prices.rilis', 'DESC')->first();
                 // return response()->json($price);
                     if ($price) {
@@ -4679,6 +4686,11 @@ class ReportController extends Controller
         ->when($request->has('outlet'), function ($q) use ($request){
             $q->whereHas('outlet', function($q2) use ($request){
                 return $q2->where('id_outlet', $request->input('outlet'));
+            });
+        })
+        ->when($request->has('region'), function ($q) use ($request){
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area.region', function($q2) use ($request){
+                return $q2->where('id_region', $request->input('region'));
             });
         })
         ->when($request->has('area'), function ($q) use ($request){

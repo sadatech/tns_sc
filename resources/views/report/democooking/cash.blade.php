@@ -243,24 +243,24 @@ table.table thead tr th {
         /**
          * Filter Month
          */
-        $('#filterMonthFrom').datetimepicker({
+        $('#filterMonthFrom').datepicker({
             format: "d MM yyyy",
-            startView: "2",
-            minView: "2",
+            startView: "0",
+            minView: "0",
             autoclose: true,
         });
-        $('#filterMonthTo').datetimepicker({
+        $('#filterMonthTo').datepicker({
             format: "d MM yyyy",
-            startView: "2",
-            minView: "2",
+            startView: "0",
+            minView: "0",
             autoclose: true,
         });
         $('#filterMonthFrom').val(moment().format("D MMMM Y"));
         $('#filterMonthTo').val(moment().format("D MMMM Y"));
-        $('#monthModal').datetimepicker({
+        $('#monthModal').datepicker({
             format: "MM yyyy",
-            startView: "3",
-            minView: "3",
+            startView: "1",
+            minView: "1",
             autoclose: true,
         }).on('changeDate', function(ev){
           $('#period').val(moment(ev.date).format('Y-MM-DD'));
