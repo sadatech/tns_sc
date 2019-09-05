@@ -6,6 +6,8 @@ use DB;
 use Excel;
 use PHPExcel_Worksheet_Drawing;
 
+use App\Region;
+use App\Area;
 use App\Cbd;
 use App\NewCbd;
 
@@ -58,6 +60,11 @@ trait ExportGTCCbdTrait
         ->when($this->tempVar['filters']['area'] != 'null', function($q){
             $q->whereHas('outlet.employeePasar.pasar.subarea.area', function($q2){
                 return $q2->where('id_area', $this->tempVar['filters']['area']);
+            });
+        })
+        ->when($this->tempVar['filters']['region'] != 'null', function($q){
+            $q->whereHas('outlet.employeePasar.pasar.subarea.area.region', function($q2){
+                return $q2->where('id_region', $this->tempVar['filters']['region']);
             });
         })
         ->when($this->tempVar['filters']['status'] != 'null', function ($q){
@@ -132,16 +139,16 @@ trait ExportGTCCbdTrait
 	if ($this->tempVar['filters']['image'] == 'yes') {
 
 		if ($this->tempVar['filters']['day'] != 'null') {
-			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day']."/".$this->tempVar['filters']['year'])->format("d F Y")." (".$this->tempVar["filecode"].")";
+			$filename = "GTC ".$label."CBD - " .($this->tempVar['filters']['region'] != "null" ? Region::where('id',$this->tempVar['filters']['region'])->first()->name : "Goodbye")." - ". ($this->tempVar['filters']['area'] != "null" ? Area::where('id',$this->tempVar['filters']['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day']."/".$this->tempVar['filters']['year'])->format("d F Y")." (".$this->tempVar["filecode"].")";
 		}else{
-			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (".$this->tempVar["filecode"].")";
+			$filename = "GTC ".$label."CBD - " .($this->tempVar['filters']['region'] != "null" ? Region::where('id',$this->tempVar['filters']['region'])->first()->name : "Goodbye")." - ". ($this->tempVar['filters']['area'] != "null" ? Area::where('id',$this->tempVar['filters']['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (".$this->tempVar["filecode"].")";
 		}
 	}else{
 
 		if ($this->tempVar['filters']['day'] != 'null') {
-			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day']."/".$this->tempVar['filters']['year'])->format("d F Y")." (No Image) (".$this->tempVar["filecode"].")";
+			$filename = "GTC ".$label."CBD - " .($this->tempVar['filters']['region'] != "null" ? Region::where('id',$this->tempVar['filters']['region'])->first()->name : "Goodbye")." - ". ($this->tempVar['filters']['area'] != "null" ? Area::where('id',$this->tempVar['filters']['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['day']."/".$this->tempVar['filters']['year'])->format("d F Y")." (No Image) (".$this->tempVar["filecode"].")";
 		}else{
-			$filename = "GTC ".$label."CBD ".Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (No Image) (".$this->tempVar["filecode"].")";
+			$filename = "GTC ".$label."CBD - " .($this->tempVar['filters']['region'] != "null" ? Region::where('id',$this->tempVar['filters']['region'])->first()->name : "Goodbye")." - ". ($this->tempVar['filters']['area'] != "null" ? Area::where('id',$this->tempVar['filters']['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($this->tempVar['filters']['month']."/".$this->tempVar['filters']['month'].'/'.$this->tempVar['filters']['year'])->format("F Y")." (No Image) (".$this->tempVar["filecode"].")";
 		}
 	}
 
