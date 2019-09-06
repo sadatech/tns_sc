@@ -3615,7 +3615,7 @@ class ReportController extends Controller
                     );
                     $product = Product::where('id',$data[$key]['id_product'])->first();
                     $data[$key] = array_merge($data[$key], ['product' => $product->name]);
-                    if ($key > 1) {
+                    if ($key > 0) {
                         if ( ($data[$key]['Nama Demo Cooking'] === $data[$key-1]['Nama Demo Cooking']) && ($data[$key]['Place'] === $data[$key-1]['Place']) && ($data[$key]['Date'] === $data[$key-1]['Date']) ) {
                         $data[$key]['Icip-icip'] = "";
                         $data[$key]['Effective Contact'] = "";
