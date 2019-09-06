@@ -718,15 +718,15 @@ class ReportController extends Controller
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
                 if ($filters['image'] == 'yes') {
                     if ($filters['day'] == 'null') {
-                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (" . $filecode . ")";
                     }else{
-                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (" . $filecode . ")";
                     }
                 }else{
                     if ($filters['day'] == 'null') {
-                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (No Image) (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'])->format("F Y") ." (No Image) (" . $filecode . ")";
                     }else{
-                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "Goodbye")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "Goodbye")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (No Image) (" . $filecode . ")";
+                        $title = "GTC - CBD - " .($filters['region'] != "null" ? Region::where('id',$filters['region'])->first()->name : "")." - ". ($filters['area'] != "null" ? Area::where('id',$filters['area'])->first()->name : "")." - ".  Carbon::parse($filters['year'].'-'.$filters['month'].'-'.$filters['day'])->format("d F Y") ." (No Image) (" . $filecode . ")";
                     }
                 }
                 $JobTrace = JobTrace::create([
