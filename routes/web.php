@@ -565,6 +565,22 @@ Route::prefix('propertiDc')->group(function () {
 	})->name('properti.download-template')->middleware('auth');
 });
 
+/**
+*	InventoriDC Pages
+*/
+Route::prefix('inventoriDc')->group(function () {
+	Route::get('/', 'PlandcController@readinventori')->name('inventoriDc')->middleware('auth');
+	Route::get('/data', 'PlandcController@datainventori')->name('inventoriDc.data')->middleware('auth');
+	Route::post('/add','PlandcController@storeinventori')->name('inventori.add')->middleware('auth');
+	Route::post('/import','PlandcController@importinventori')->name('inventori.import')->middleware('auth');
+	Route::put('/update/{id}', 'PlandcController@updateinventori')->name('inventori.update')->middleware('auth');
+	Route::get('/delete/{id}', 'PlandcController@deleteinventori')->name('inventori.delete')->middleware('auth');
+	Route::get('/export', 'PlandcController@exportinventori')->name('inventori.export')->middleware('auth');
+				Route::post('/data/{employee?}', 'PlandcController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
+				Route::post('/add', 'PlandcController@inventoriDCAdd')->name('inventoriDC.inventori.data.add')->middleware('auth');
+				Route::any('/exportXLS', 'PlandcController@inventoriDCExportXLS')->name('dc.inventori.data.exportXLS')->middleware('auth');
+	});
+
 /*
 	Setting PF
 */
@@ -922,9 +938,9 @@ Route::prefix('report')->group(function () {
 				Route::get('/', function(){
 					return view('report.democooking.inventori');
 				})->name('report.demo.inventori')->middleware('auth');
-				Route::post('/data/{employee?}', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
+				Route::post('/data/{employee?}/{area?}', 'ReportController@inventoriDC')->name('dc.inventori.data')->middleware('auth');
 				Route::post('/add', 'ReportController@inventoriDCAdd')->name('dc.inventori.data.add')->middleware('auth');
-				Route::any('/exportXLS', 'ReportController@inventoriDCExportXLS')->name('dc.inventori.data.exportXLS')->middleware('auth');
+				Route::any('/exportXLS/{employee?}/{area?}', 'ReportController@inventoriDCExportXLS')->name('dc.inventori.data.exportXLS')->middleware('auth');
 			});
 
 		});

@@ -60,6 +60,7 @@
               <th>Tanggal</th>
               <th>Icip Icip</th>
               <th>Effective Contact</th>
+              <th>Value Profit</th>
               <th>Product</th>
               <th>Quantity</th>
               <th>Satuan</th>
@@ -176,6 +177,7 @@ table.table thead tr th {
       { data: 'tanggal' },
       { data: 'icip_icip' },
       { data: 'effective_contact' },
+      { data: 'value_profit' },
       { data: 'product' },
       { data: 'qty_actual' },
       { data: 'satuan' },

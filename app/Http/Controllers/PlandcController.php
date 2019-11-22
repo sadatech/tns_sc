@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\PlanDc;
 use App\PlanEmployee;
+use App\ReportInventori;
 use DB;
 use Auth;
 use File;
@@ -409,5 +410,84 @@ class PlandcController extends Controller
                 'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
             ]);
     }
+
+
+    public function readInventori()
+    {
+        return view('plandc.inventori');
+    }
+
+
+    public function inventoriDC($id_employee)
+    {
+        $data = ReportInventori::where("id_employee", $id_employee)->get();
+        return Datatables::of(collect($data))
+        ->addColumn("employee", function($item){
+            return Employee::where("id", $item->id_employee)->first()->name;
+        })
+        ->addColumn("item", function($item){
+            return PropertiDc::where("id", $item->id_properti_dc)->first()->item;
+        })
+        ->addColumn("dokumentasi", function($item){
+            return (isset($item->photo) ? "<img src='".asset($item->photo)."' style='min-width: 149px;max-width: 150px;'>" : "-");
+        })
+        ->rawColumns(["dokumentasi"])
+        ->make(true);
+    }
+
+    public function inventoriDCAdd(Request $req)
+    {
+        $PropertiDcs = PropertiDc::get();
+        $result = DB::transaction(function() use ($PropertiDcs, $req){
+            foreach ($PropertiDcs as $PropertiDc)
+            {
+                $countReportInventori = ReportInventori::where("id_employee", $req->id_employee)->where("id_properti_dc", $PropertiDc->id)->count();
+                if ($countReportInventori == 0)
+                {
+                    ReportInventori::create([
+                        "no_polisi"       => strtoupper($req->no_polisi),
+                        "id_employee"     => $req->id_employee,
+                        "id_properti_dc"  => $PropertiDc->id,
+                        "quantity"        => 0,
+                        "actual"          => 0
+                    ]);
+                }
+            }
+        });
+
+        return redirect(route('inventoriDc'))->with([
+                'type'   => 'success',
+                'title'  => 'Berhasil<br/>',
+                'message'=> '<i class="em em-confetti_ball mr-2"></i>Data berhasil diperbarui!'
+        ]);
+    }
+
+    // use \App\Traits\ExportDCReportInventoriTrait;
+
+    public function inventoriDCExportXLS()
+    {
+        // return $this->DCReportInventoriExportTrait("cc");
+        $result = DB::transaction(function(){
+            try
+            {
+                $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
+                $JobTrace = JobTrace::create([
+                    'id_user' => Auth::user()->id,
+                    'date' => Carbon::now(),
+                    'title' => "Demo Cooking - Report Inventori (" . $filecode . ")",
+                    'status' => 'PROCESSING',
+                ]);
+                dispatch(new ExportDCReportInventoriJob($JobTrace, $filecode));
+                return 'Export succeed, please go to download page';
+            }
+            catch(\Exception $e)
+            {
+                DB::rollback();
+                return 'Export request failed '.$e->getMessage();
+            }
+        });
+        return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);
+    }
+
     
 }

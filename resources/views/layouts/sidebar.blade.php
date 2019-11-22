@@ -123,6 +123,10 @@
                      <li>
                         <a class="{{ request()->is('propertiDc') ? 'active' : '' }}" href="{{ route('propertiDc') }}"><i class="fa fa-suitcase"></i><span class="sidebar-mini-hide">Properti Dc</span></a>
                     </li>
+                    {{-- Inventory Dc  --}}
+                     <li>
+                        <a class="{{ request()->is('inventoriDc') ? 'active' : '' }}" href="{{ route('inventoriDc') }}"><i class="fa fa-briefcase"></i><span class="sidebar-mini-hide">Inventori Dc</span></a>
+                    </li>
                     @endif
                     {{-- Product --}}
                     <li class="{{ request()->is('product/*') ? 'open' : '' }}">
@@ -324,6 +328,7 @@
                                     </li>  -->                                   
                                 </ul>
                             </li>
+                        @if(Auth::user()->role->level != 'ViewAll')
                             {{-- SPG PASAR --}}
                             <li class="{{ request()->is('report/gtc/spg/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">SPG Pasar</span></a>
@@ -353,6 +358,7 @@
                                     </li>
                                 </ul>
                             </li>
+                        @endif
                             {{-- Demo Cooking --}}
                             <li class="{{ request()->is('report/gtc/demo/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Demo Cooking</span></a>
@@ -387,6 +393,7 @@
                                     </li>
                                 </ul>
                             </li>
+                        @if(Auth::user()->role->level != 'ViewAll')
                             {{-- MOTORIK --}}
                             <li class="{{ request()->is('report/gtc/motorik/*') ? 'open' : '' }}">
                             <a class="nav-submenu" data-toggle="nav-submenu"><span class="sidebar-mini-hide">Motoris</span></a>
@@ -405,6 +412,7 @@
                                 </li>
                             </ul>
                             </li>
+                        @endif
                     @endif
                     @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
                     {{-- REPORT MTC --}}
