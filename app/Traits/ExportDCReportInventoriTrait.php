@@ -12,14 +12,32 @@ use App\EmployeeSubArea;
 trait ExportDCReportInventoriTrait
 {
 
-	public function DCReportInventoriExportTrait($filecode)
+	public function DCReportInventoriExportTrait($filecode, $employee, $area)
 	{
 		$data = [];
 
 		// 
         $filename = "DC - Report Inventori (".$filecode.")";
-        $store = Excel::create($filename, function($excel) use (&$data){
-	        foreach (ReportInventori::groupBy("id_employee")->get() as $ReportInventori)
+        $store = Excel::create($filename, function($excel) use (&$data, $employee, $area){
+        // $reportData
+        $datas = ReportInventori::orderBy('report_inventories.created_at', 'DESC')
+
+        ->when($employee, function($q) use ($employee)
+        {
+            return $q->where("report_inventories.id_employee", $employee);
+        })
+        ->when($area, function($q) use ($area)
+        {
+            return $q->join('employees','report_inventories.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $area)
+                        ->select('report_inventories.*');
+        })
+        ->get();
+
+	        // foreach (ReportInventori::groupBy("id_employee")->get() as $ReportInventori)
+	        foreach ($datas as $ReportInventori)
 	        {
 		        // get area
 		        $EmployeeSubAreaName = EmployeeSubArea::where("id_employee", $ReportInventori->id_employee)->first()->subarea->area->name;

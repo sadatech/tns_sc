@@ -110,6 +110,7 @@ use App\FokusProduct;
 use App\Model\Extend\SalesMdSummary;
 use App\ProductFokusGtc;
 use App\Pf;
+use PHPExcel_Worksheet_Drawing;
 
 class ReportController extends Controller
 {
@@ -3465,6 +3466,7 @@ class ReportController extends Controller
                     'icip_icip'     => $value->icip_icip ?? "",
                     'channel'       => $value->channel ?? "",
                     'effective_contact' => $value->effective_contact ?? "",
+                    'value_profit'  => $value->value ?? 0,
                     'tanggal'       => (isset($value->date) ? $value->date : ""),
                     'id_product'    => $value->id_product,
                     // 'qty'           => $value->qty,
@@ -3609,6 +3611,7 @@ class ReportController extends Controller
                         'Date'              => (isset($value->date) ? $value->date : ""),
                         'Icip-icip'         => (isset($value->icip_icip) ? $value->icip_icip : ""),
                         'Effective Contact' => (isset($value->effective_contact) ? $value->effective_contact : ""),
+                        'Value Profit'      => (isset($value->value) ? $value->value : "0"),
                         'id_product'        => $value->id_product,
                         'qty'               => $value->qty,
                         'satuan'            => $value->satuan,
@@ -3619,6 +3622,7 @@ class ReportController extends Controller
                         if ( ($data[$key]['Nama Demo Cooking'] === $data[$key-1]['Nama Demo Cooking']) && ($data[$key]['Place'] === $data[$key-1]['Place']) && ($data[$key]['Date'] === $data[$key-1]['Date']) ) {
                         $data[$key]['Icip-icip'] = "";
                         $data[$key]['Effective Contact'] = "";
+                        $data[$key]['Value Profit'] = "";
                         }    
                     } 
                     $price = Price::where('id_product', $product->id)->orderBy('prices.rilis', 'DESC')->first();
@@ -3880,7 +3884,10 @@ class ReportController extends Controller
                         'Date'      => (isset($val->date) ? $val->date : ""),
                         'Palce'     => (isset($val->place) ? $val->place : ""),
                         'Type'      => (isset($val->type) ? $val->type : ""),
-                        'Note'      => (isset($val->note) ? $val->note : "")
+                        'Note'      => (isset($val->note) ? $val->note : ""),
+                        'Photo 1'   => $val->photo1,
+                        'Photo 2'   => $val->photo2,
+                        'Photo 3'   => $val->photo3
                     );
                 }
             }
@@ -3889,6 +3896,67 @@ class ReportController extends Controller
                 $excel->sheet('DemoCookingDocumentation', function($sheet) use ($data)
                 {
                     $sheet->fromArray($data);
+
+                $startTLRow = 2;
+                foreach ($data as $valueData) {
+
+                    $imgDrawing = new PHPExcel_Worksheet_Drawing;
+                    if (isset($valueData['Photo 1']))
+                    {
+                        if (file_exists(public_path("/uploads/documentation/".($valueData['Photo 1']))))
+                        {
+                            $imgDrawing->setPath(public_path("/uploads/documentation/".($valueData['Photo 1'])));
+                            $imgDrawing->setCoordinates("F".($startTLRow));
+                            $imgDrawing->setWorksheet($sheet);
+                            $imgDrawing->setWidth(40);
+                        }else{
+                            $sheet->setCellValue('F'.$startTLRow, "not found")->setAutoSize(true);
+                        }
+                    }
+
+                    $startTLRow++;
+                }
+
+                $startTLRow = 2;
+                foreach ($data as $valueData) {
+
+                    $imgDrawing = new PHPExcel_Worksheet_Drawing;
+                    if (isset($valueData['Photo 2']))
+                    {
+                        if (file_exists(public_path("/uploads/documentation/".($valueData['Photo 2']))))
+                        {
+                            $imgDrawing->setPath(public_path("/uploads/documentation/".($valueData['Photo 2'])));
+                            $imgDrawing->setCoordinates("G".($startTLRow));
+                            $imgDrawing->setWorksheet($sheet);
+                            $imgDrawing->setWidth(40);
+                        }else{
+                            $sheet->setCellValue('G'.$startTLRow, "not found")->setAutoSize(true);
+                        }
+                    }
+
+                    $startTLRow++;
+                }
+
+                $startTLRow = 2;
+                foreach ($data as $valueData) {
+
+                    $imgDrawing = new PHPExcel_Worksheet_Drawing;
+                    if (isset($valueData['Photo 3']))
+                    {
+                        if (file_exists(public_path("/uploads/documentation/".($valueData['Photo 3']))))
+                        {
+                            $imgDrawing->setPath(public_path("/uploads/documentation/".($valueData['Photo 3'])));
+                            $imgDrawing->setCoordinates("H".($startTLRow));
+                            $imgDrawing->setWorksheet($sheet);
+                            $imgDrawing->setWidth(40);
+                        }else{
+                            $sheet->setCellValue('H'.$startTLRow, "not found")->setAutoSize(true);
+                        }
+                    }
+
+                    $startTLRow++;
+                }
+
                 });
             })->download();
         } else {
@@ -3901,9 +3969,28 @@ class ReportController extends Controller
         }
     }
 
-    public function inventoriDC($id_employee)
+    public function inventoriDC($employee, $area)
     {
-        $data = ReportInventori::where("id_employee", $id_employee)->get();
+
+        $employee = ($employee == "null" || empty($employee) ? null : $employee);
+        $area = ($area == "null" || empty($area) ? null : $area);
+
+        // return response()->json($area);
+        $data = ReportInventori::orderBy('report_inventories.created_at', 'DESC')
+        
+        ->when($employee, function($q) use ($employee)
+        {
+            return $q->where("report_inventories.id_employee", $employee);
+        })
+        ->when($area, function($q) use ($area)
+        {
+            return $q->join('employees','report_inventories.id_employee','employees.id')
+                        ->join('employee_sub_areas','employees.id','employee_sub_areas.id_employee')
+                        ->join('sub_areas','employee_sub_areas.id_subarea','sub_areas.id')
+                        ->where('sub_areas.id_area', $area)
+                        ->select('report_inventories.*');
+        })
+        ->get();
         return Datatables::of(collect($data))
         ->addColumn("employee", function($item){
             return Employee::where("id", $item->id_employee)->first()->name;
@@ -3947,10 +4034,14 @@ class ReportController extends Controller
 
     // use \App\Traits\ExportDCReportInventoriTrait;
 
-    public function inventoriDCExportXLS()
+    public function inventoriDCExportXLS($employee, $area)
     {
+        $employee = ($employee == "null" || empty($employee) ? null : $employee);
+        $area = ($area == "null" || empty($area) ? null : $area);
+
+        // return response()->json($filter);
         // return $this->DCReportInventoriExportTrait("cc");
-        $result = DB::transaction(function(){
+        $result = DB::transaction(function() use ($employee, $area){
             try
             {
                 $filecode = "@".substr(str_replace("-", null, crc32(md5(time()))), 0, 9);
@@ -3960,13 +4051,13 @@ class ReportController extends Controller
                     'title' => "Demo Cooking - Report Inventori (" . $filecode . ")",
                     'status' => 'PROCESSING',
                 ]);
-                dispatch(new ExportDCReportInventoriJob($JobTrace, $filecode));
+                dispatch(new ExportDCReportInventoriJob($JobTrace, $filecode, $employee, $area));
                 return 'Export succeed, please go to download page';
             }
             catch(\Exception $e)
             {
                 DB::rollback();
-                return 'Export request failed '.$e->getMessage();
+                return 'Export failed '.$e->getMessage();
             }
         });
         return response()->json(["result"=>$result], 200, [], JSON_PRETTY_PRINT);

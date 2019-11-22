@@ -35,7 +35,7 @@
           </div>
           <div class="row col-sm-12 col-md-12">
             <p class="btn btn-sm btn-primary" id="filterSearch"><i class="fa fa-search"></i> Search</p>
-            <!-- <p class="btn btn-sm btn-success" id="filterSearch" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus"></i> Add Data</p> -->
+            <p class="btn btn-sm btn-success" id="filterSearch" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus"></i> Add Data</p>
             <p class="btn btn-sm btn-danger" id="filterReset"><i class="fa fa-refresh"></i> Clear</p>
         </div>
     </form>
@@ -53,9 +53,7 @@
                 </h3>
                 <div class="block-option">
                     <!-- <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button> -->
-                    <!-- <a target-url="{{ route('dc.inventori.data.exportXLS') }}" id="btnDownloadXLS" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a> -->
-                    <a id="btnDownloadXLS" target="_blank" href="javascript:" title="Unduh Data" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
-
+                    <a target-url="{{ route('dc.inventori.data.exportXLS') }}" id="btnDownloadXLS" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
                 </div>
             </div>
             <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="reportTable">
@@ -88,7 +86,7 @@
                     </div>
                 </div>
             </div>
-            <form action="{{ route('dc.inventori.data.add') }}" method="post">
+            <form action="{{ route('inventoriDC.inventori.data.add') }}" method="post">
                 {!! csrf_field() !!}
                 <div class="block-content">
                     <div class="form-group">
@@ -163,20 +161,16 @@
         }
     });
     $("#btnDownloadXLS").on("click", function(){
-      if (($("#filterEmployee").val()=='') || ($("#filterEmployee").val()==null)) {
-            swal("Error!", "Employee Filter Cant Empty", "error");
-      }else{
-        $.ajax({
-          url: $(this).attr("target-url"),
-          type: "post",
-          success: function(e){
-            swal("Success!", e.result, "success");
-          },
-          error: function(){
-            swal("Error!", e.result, "error");
-          }
-        });
-      };
+      $.ajax({
+        url: $(this).attr("target-url"),
+        type: "post",
+        success: function(e){
+          swal("Success!", e.result, "success");
+        },
+        error: function(){
+          swal("Error!", e.result, "error");
+        }
+      });
     });
 
     $('#filterEmployee').select2(setOptions('{{ route("employee-is-tl-select2") }}', 'Select Employee', function (params) {
@@ -224,10 +218,6 @@
         //     swal("Warning!", "Please select Employee First!", "warning");
         //     return;
         // }
-
-
-        $("#btnDownloadXLS").attr("target-url", "{{ route('dc.inventori.data.exportXLS') }}" + "/" + $('#filterEmployee').val() + "/" + $('#filterArea').val());
-
 
         $("#filterEmployeeAdd").val($("#filterEmployee").val());
 

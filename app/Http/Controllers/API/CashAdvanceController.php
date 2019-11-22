@@ -48,9 +48,7 @@ class CashAdvanceController extends Controller
 					
 					$total = array_sum($total_cost_list);
 
-					if (!empty($request->price_profit)) {
-						$subsidi_sasa = $total - $request->price_profit;
-					}
+					$subsidi_sasa = $total - $request->price_profit;
 
 					$insert = CashAdvance::create([
 						'id_employee'		=> $user->id,
