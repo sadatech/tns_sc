@@ -11,6 +11,6 @@ class ProductFilters extends QueryFilters
      * Ordering data by name
      */
     public function product($value) {
-        return (!$this->requestAllData($value)) ? $this->builder->where('name', 'like', '%'.$value.'%')->orWhere('deskripsi', 'like', '%'.$value.'%') : null;
+        return (!$this->requestAllData($value)) ? $this->builder->where('name', 'like', '%'.$value.'%')->orWhere('code', 'like', '%'.$value.'%') : null;
     }
 }

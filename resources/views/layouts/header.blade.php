@@ -16,7 +16,7 @@
 		<div class="content-header-section">
 			<!-- Toggle Side Overlay -->
 			<!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
-			<button type="button" class="btn btn-dual-secondary bg-gd-pulse text-white border-0" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+			<button type="button" class="btn btn-dual-secondary bg-pulse-light text-white border-0" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
 			<i class="si si-power"></i> 
 			<span class="d-none d-sm-inline-block">Logout</span> &nbsp;
 			</button>

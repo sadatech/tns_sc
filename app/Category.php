@@ -10,8 +10,13 @@ class Category extends Model
 {
     use DropDownHelper;
     protected $fillable = [
-        'name', 'description'
+        'name', 'description', 'id_brand'
     ];
+
+    public function brand()
+    {
+        return $this->belongsTo('App\Brand', 'id_brand');
+    }
 
     public function subCategory()
     {

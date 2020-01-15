@@ -12,14 +12,14 @@
     </div>
   @endif
   <div class="block block-themed"> 
-    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+    <div class="block-header bg-primary pl-20 pr-20 pt-15 pb-15">
       <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
-            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
+            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#formModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
             <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
@@ -33,7 +33,7 @@
           <th class="text-center">Category</th>
           <th class="text-center">Retailer Price</th>
           <th class="text-center">Consumer Price</th>
-          <th class="text-center">Date Rilis</th>
+          <th class="text-center">Release Date</th>
           <th class="text-center" style="width: 15%;"> Action</th>
         </thead>
         </table>
@@ -46,7 +46,7 @@
     <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-gd-sun p-10">
+                <div class="block-header bg-primary p-10">
                     <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import Data Price Product</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -66,10 +66,10 @@
                         <table class="table table-bordered table-vcenter">
                             <thead>
                                 <tr>
-                                    <td><b>Product</b></td>
+                                    <td><b>Product Code</b></td>
                                     <td><b>Retailer Price</b></td>
                                     <td><b>Consumer Price</b></td>
-                                    <td><b>Rilis</b></td>
+                                    <td><b>Release</b></td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -77,13 +77,13 @@
                                     <td>Product 1 (sesuai dengan data product)</td>
                                     <td>10000</td>
                                     <td>10500</td>
-                                    <td>2018/12/5</td>
+                                    <td>13/01/2020</td>
                                 </tr>
                                 <tr>
                                     <td>Product 3 (sesuai dengan data product)</td>
                                     <td>20000</td>
                                     <td>21000</td>
-                                    <td>2018/12/20</td>
+                                    <td>20/02/2020</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -108,11 +108,7 @@
     </div>
 </div>
 
-{{-- MODAL ADD PRICE --}}
-@include('product._form_price', ['id' => 'tambahModal', 'action' => route('price.add')])
-
-{{-- MODAL UPDATE PRICE --}}
-@include('product._form_price', ['id' => 'editModal', 'type' => 'edit'])
+@include('product._form_price', ['id' => 'formModal', 'action' => route('price.add')])
 
 @endsection
 
@@ -132,10 +128,11 @@
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('js/select2-handler.js') }}"></script>
+<script src="{{ asset('js/jquery.mask.min.js') }}"></script>
 <script type="text/javascript">
-$('#currency').on('change', function() {
-    window.location.href = $(this).val();
-});
+  $('#currency').on('change', function() {
+      window.location.href = $(this).val();
+  });
   @if(session('type'))
   $(document).ready(function() {
     $.notify({
@@ -187,14 +184,21 @@ $('#currency').on('change', function() {
       },
       // scrollY: "300px",
       ajax: '{!! route('price.data') !!}',
+      order:[],
+      columnDefs:[
+        {"className": "text-center", "targets": 0},
+        {"className": "text-right", "targets": 3},
+        {"className": "text-right", "targets": 4},
+        {"className": "text-center", "targets": 5}
+      ],
       columns: [
-      { data: 'id', name: 'id' },
-      { data: 'product', name: 'product' },
-      { data: 'category', name: 'category' },
-      { data: 'price', name: 'price' },
-      { data: 'price_cs', name: 'price_cs' },
-      { data: 'rilis', name: 'rilis' },
-      { data: 'action', name: 'action' },
+        { data: 'id', name: 'id' },
+        { data: 'product', name: 'product' },
+        { data: 'category', name: 'category' },
+        { data: 'retailer_price', name: 'retailer_price' },
+        { data: 'consumer_price', name: 'consumer_price' },
+        { data: 'release', name: 'release' },
+        { data: 'action', name: 'action' },
       ]
     });
   });

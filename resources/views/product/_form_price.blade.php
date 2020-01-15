@@ -3,11 +3,11 @@ $type = $type ?? '';
 $action = $action ?? '';
 @endphp
 
-<div class="modal fade" id="{{ $id }}" role="dialog" aria-labelledby="{{ $id }}" aria-hidden="true">
+<div class="modal fade" id="{{ $id }}" role="dialog" aria-label="{{ $id }}" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-gd-sun p-10">
+        <div class="block-header bg-primary p-10">
           <h3 class="block-title"><i class="fa fa-plus"></i> {{ $type == '' ? 'Add' : ucfirst($type) }} Price Product</h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -21,19 +21,25 @@ $action = $action ?? '';
         {!! method_field('PUT') !!}
         @endif
         <div class="block-content">
-                    <div class="row">
-                        <div class="form-group col-md-12">
-                          <label>Product</label>
-                          <select class="form-control" id="{{$type}}Product" name="id_product"></select>
-                        </div>
-                    </div>
+          <div class="row">
+              <div class="form-group col-md-6">
+                <label>Product</label>
+                <input type="hidden" name="id" id="id">
+                <input type="hidden" name="update" id="update">
+                <select class="form-control" id="{{$type}}Product" name="id_product"></select>
+              </div>
+              <div class="col-md-6">
+                <label>Start Date</label>
+                <input class="form-control date-picker" type="text" placeholder="Release Date" data-date-format="dd/mm/yyyy" id="{{$type}}Release" name="release" data-month-highlight="true" required>
+              </div>
+          </div>
           <div class="row">
             <div class="form-group col-md-6">
               <label >Retailer Price</label>
               <div class="input-group-append">
                 <span class="input-group-text">Rp</span>
                 <div class="input-group">
-                  <input type="text" class="currency form-control" id="{{$type}}Price" name="price" placeholder="" required>
+                  <input type="text" class="currency form-control" id="{{$type}}Price" name="retailer_price" placeholder="" required>
                   <div class="input-group-append">
                     <span class="input-group-text">.00</span>
                   </div>
@@ -45,15 +51,12 @@ $action = $action ?? '';
               <div class="input-group-append">
                 <span class="input-group-text">Rp</span>
                 <div class="input-group">
-                  <input type="text" class="currency form-control" id="{{$type}}PriceCs" name="price_cs" placeholder="" required>
+                  <input type="text" class="currency form-control" id="{{$type}}PriceCs" name="consumer_price" placeholder="" required>
                   <div class="input-group-append">
                     <span class="input-group-text">.00</span>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="col-md-6">
-              {{ Form::textInput('rilis', old('rilis'), ['labelText' => 'Rilis Date', 'id' => $type.'Rilis', 'class' => 'js-datepicker form-control', 'data-week-start' => '1', 'data-autoclose' => 'true', 'data-today-highlight' => 'true', 'data-date-format' => 'yyyy-mm-dd', 'placeholder' => 'yyyy-mm-dd', 'required' => '']) }}
             </div>
           </div>
         </div>
@@ -70,22 +73,28 @@ $action = $action ?? '';
 
 @push('additional-js')
 <script type="text/javascript">
-  $.ajaxSetup({
-    headers: {
-      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
+  $(document).ready(function(){
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+      // Format mata uang.
+      $('.currency').mask('000.000.000', {reverse: true});
+
   });
 
-    $('#{{$type}}Product').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
-        return filterData('product', params.term);
-        }, function (data, params) {
-            return {
-              results: $.map(data, function (obj) {                                
-                return {id: obj.id, text: obj.name}
-              })
-            }
-        }
-    ));
+  $('#{{$type}}Product').select2(setOptions('{{ route("product-select2") }}', 'Select Product', function (params) {
+      return filterData('product', params.term);
+      }, function (data, params) {
+          return {
+            results: $.map(data, function (obj) {                                
+              return {id: obj.id, text: obj.code + " | " + obj.name}
+            })
+          }
+      }
+  ));
 
   $(".currency").keydown(function (e) {
     if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
@@ -98,21 +107,22 @@ $action = $action ?? '';
         e.preventDefault();
     }
   });
-  $(".{{$type}}-js-select2").select2({ 
-    dropdownParent: $("#{{$id}}")
-  });
-  @if ($type == 'edit')
+  
   function editModal(json) {
-    $('#editModal').modal('show');
-    $('#{{$type}}Form').attr('action', "{{ url('/product/price/update') }}/"+json.id);
+    $('#id').val(json.id);
+    $('#update').val(1);
     if (json.product) {
-            setSelect2IfPatchModal($("#{{$type}}Product"), json.product.id, json.product.name);
+      setSelect2IfPatchModal($("#{{$type}}Product"), json.product.id, json.product.name);
     };
-    $('#{{$type}}Price').val(json.price);
-    $('#{{$type}}PriceCs').val(json.price_cs);
-    $('#{{$type}}Rilis').val(json.rilis);
-      console.log(json);
+    $('#{{$type}}Price').val(json.retailer_price);
+    $('#{{$type}}PriceCs').val(json.consumer_price);
+    $('#{{$type}}Release').val(json.release);
   }
-  @endif
+  $(".date-picker").datepicker( {
+    format: "dd/mm/yyyy",
+    viewMode: 0,
+    minViewMode: 0,
+    autoclose: true
+  });
 </script>
 @endpush

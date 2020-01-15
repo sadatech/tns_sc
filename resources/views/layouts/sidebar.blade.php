@@ -33,54 +33,25 @@
                 @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc' || !Auth::user()->role->level == 'ViewAll') 
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">UI</span><span class="sidebar-mini-hidden">Master Data</span></li>
                     {{-- Store --}}
-                    <li class="{{ request()->is('store/*') ? 'open' : '' }}">
-                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-shopping-cart"></i><span class="sidebar-mini-hide">Store(s)</span></a>
+                        <li>
+                            <a class="{{ request()->is('route') ? 'active' : '' }}" href="{{ route('route',['market'=>1]) }}"><i class="fa fa-connectdevelop"></i><span class="sidebar-mini-hide">Route</span></a>
+                        </li>
+                        <li>
+                            <a class="{{ request()->is('market') ? 'active' : '' }}" href="{{ route('route',['market'=>2]) }}"><i class="fa fa-fort-awesome"></i><span class="sidebar-mini-hide">Market</span></a>
+                        </li>
+                    {{-- Product --}}
+                    <li class="{{ request()->is('product/*') ? 'open' : '' }}">
+                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-shopping-bag"></i><span class="sidebar-mini-hide">Product(s)</span></a>
                         <ul>
-                        
-                       
                             <li>
-                                <a class="{{ request()->is('store/region') ? 'active' : '' }}" href="{{ route('region') }}">Region</a>
+                                <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
                             </li>
                             <li>
-                                <a class="{{ request()->is('store/area') ? 'active' : '' }}" href="{{ route('area') }}">Area</a>
+                                <a class="{{ request()->is('product/price') ? 'active' : '' }}" href="{{ route('price') }}">Price</a>
                             </li>
-                            <li>
-                                <a class="{{ request()->is('store/subarea') ? 'active' : '' }}" href="{{ route('subarea') }}">Sub Area</a>
+                             <li>
+                                <a class="{{ request()->is('product/focus') ? 'active' : '' }}" href="{{ route('focus') }}">Focus</a>
                             </li>
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
-                            <li>
-                                <a class="{{ request()->is('store/root') ? 'active' : '' }}" href="{{ route('root') }}">Route</a>
-                            </li>
-                            @endif
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
-                            <li>
-                                <a class="{{ request()->is('store/channel') ? 'active' : '' }}" href="{{ route('channel') }}">Channel</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('store/dc_channel') ? 'active' : '' }}" href="{{ route('dc_channel') }}">DC Channel</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('store/account') ? 'active' : '' }}" href="{{ route('account') }}">Account</a>
-                            </li>
-                            <!--<li>
-                                <a class="{{ request()->is('store/distributor') ? 'active' : '' }}" href="{{ route('distributor') }}">Distributor</a>
-                            </li>-->
-                            <li>
-                                <a class="{{ request()->is('store/sales_tiers') ? 'active' : '' }}" href="{{ route('sales_tiers') }}">Sales Tiers</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('store/summary') ? 'active' : '' }}" href="{{ route('store') }}">Store</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('store/place') ? 'active' : '' }}" href="{{ route('place') }}">Place</a>
-                            </li>
-                            @endif
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
-                            <li>
-                                <a class="{{ request()->is('store/pasar') ? 'active' : '' }}" href="{{ route('pasar') }}">Pasar</a>
-                            </li>
-                            @endif
-                         
                         </ul>
                     </li>
                     {{-- Employee --}}
@@ -128,61 +99,6 @@
                         <a class="{{ request()->is('inventoriDc') ? 'active' : '' }}" href="{{ route('inventoriDc') }}"><i class="fa fa-briefcase"></i><span class="sidebar-mini-hide">Inventori Dc</span></a>
                     </li>
                     @endif
-                    {{-- Product --}}
-                    <li class="{{ request()->is('product/*') ? 'open' : '' }}">
-                        <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-list-alt"></i><span class="sidebar-mini-hide">Product(s)</span></a>
-                        <ul>
-                            <li>
-                                <a class="{{ request()->is('product/brand') ? 'active' : '' }}" href="{{ route('brand') }}">Brand</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('product/category') ? 'active' : '' }}" href="{{ route('category') }}">Category</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('product/sub-category') ? 'active' : '' }}" href="{{ route('sub-category') }}">Sub Category</a>
-                            </li>
-                            <!-- <li>
-                                <a class="{{ request()->is('product/sku-unit') ? 'active' : '' }}" href="{{ route('sku-unit') }}">SKU Unit</a>
-                            </li> -->
-                            <li>
-                                <a class="{{ request()->is('product/stock-type') ? 'active' : '' }}" href="{{ route('stock-type') }}">Stock Type</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('product/summary') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
-                            </li>
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
-                            <li>
-                                <a class="{{ request()->is('product/product-competitor') ? 'active' : '' }}" href="{{ route('product-competitor') }}">Product Competitor</a>
-                            </li>
-                            @endif
-                            <li>
-                                <a class="{{ request()->is('product/price') ? 'active' : '' }}" href="{{ route('price') }}">Price</a>
-                            </li>
-                            <!--<li>
-                                <a class="{{ request()->is('product/fokus') ? 'active' : '' }}" href="{{ route('fokus') }}">Fokus</a>
-                            </li> -->
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
-                             <li>
-                                <a class="{{ request()->is('product/fokus-mtc') ? 'active' : '' }}" href="{{ route('fokusMtc') }}">Fokus MTC</a>
-                            </li>
-                            @endif
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
-                             <li>
-                                <a class="{{ request()->is('product/fokusGTC') ? 'active' : '' }}" href="{{ route('fokusGTC') }}">Fokus GTC</a>
-                            </li>
-                            {{-- <li>
-                                <a class="{{ request()->is('product/fokusMD') ? 'active' : '' }}" href="{{ route('fokusMD') }}">Fokus MD</a>
-                            </li> --}}
-
-                            <li>
-                                <a class="{{ request()->is('product/fokusSpg') ? 'active' : '' }}" href="{{ route('fokusSpg') }}">Fokus SPG Pasar</a>
-                            </li>
-                            @endif
-                            <!-- <li>
-                                <a class="{{ request()->is('product/promo') ? 'active' : '' }}" href="{{ route('promo') }}">Promo</a>
-                            </li> -->
-                        </ul>
-                    </li>
                     {{-- Target --}}
                     <li class="{{ request()->is('target/*') ? 'open' : '' }}">
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="si si-target"></i><span class="sidebar-mini-hide">Target(s)</span></a>

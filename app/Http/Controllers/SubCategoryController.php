@@ -47,8 +47,11 @@ class SubCategoryController extends Controller
                 'category'     => $subcategory->category->name,
                 'name'      => $subcategory->name
             );
-            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('sub-category.delete', $subcategory->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            $action = "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>";
+            if($subcategory->product->isEmpty()){
+                $action .= "<button data-url=".route('sub-category.delete', $subcategory->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
+            }
+            return $action;
         })->make(true);
     }
 

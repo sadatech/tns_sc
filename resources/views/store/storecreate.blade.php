@@ -69,9 +69,53 @@
                 </div>
             </div>
             <div class="block-content">
-                <h5><b>Account, Area, and Type</b></h5>
+
+                <h5><b>Account & Area</b></h5>
                 <div class="row">
-                      <div class="col-md-6">
+                    <div class="row col-md-6">
+                        <div class="col-md-8 col-sm-12">
+                            {{ 
+                                Form::select2Input('account', null, route('account-select2'), [
+                                    'useLabel'  => false,
+                                    'elOptions' => [
+                                        'placeholder' => 'Choose your Account',
+                                    ]
+                                ]) 
+                            }}
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <label class="css-control css-control-primary css-switch">
+                                <input type="checkbox" class="css-control-input" id="newAccountCheckbox" name="newAccountCheckbox">
+                                <span class="css-control-indicator"></span> New
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row col-md-6">
+                        <div class="col-md-8 col-sm-12">
+                            {{ 
+                                Form::select2Input('subarea', null, route('subarea-select2'), [
+                                    'useLabel'  => false,
+                                    'labelText' => 'Sub Area',
+                                    'text' => 'obj.area_name + " - " + obj.name',
+                                    'elOptions' => [
+                                        'required' => 'required',
+                                        'placeholder' => 'Choose your Subarea',
+                                    ]
+                                ]) 
+                            }}
+                        </div>
+                        <div class="col-md-4 col-sm-12">
+                            <label class="css-control css-control-primary css-switch">
+                                <input type="checkbox" class="css-control-input" id="newSubAreaCheckbox" name="newSubAreaCheckbox">
+                                <span class="css-control-indicator"></span> New
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <h5><b>Type</b></h5>
+                <div class="row">
+                    <div class="col-md-6">
                         {{
                             Form::select2Input('is_jawa', null, ["Jawa"=>"JAWA","Non Jawa"=>"NON JAWA"], [
                                 'elOptions' => [
@@ -87,7 +131,7 @@
                             <option value="Non Jawa">NON JAWA</option>
                         </select> --}}
                     </div>
-                     <div class="col-md-6">
+                    <div class="col-md-6">
                         {{-- isset($data->sales->id) ? [$data->sales->id, $data->sales->name] :  --}}
                         {{ 
                             Form::select2Input('sales', null, route('sales-tier-select2'), [
@@ -102,44 +146,6 @@
                         <option value="" disabled selected>Choose your Sales</option>
                             @foreach($sales as $time)
                                 <option value="{{$time->id}}">{{$time->name}}</option>
-                            @endforeach
-                        </select> --}}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        {{ 
-                            Form::select2Input('account', null, route('account-select2'), [
-                                'elOptions' => [
-                                    'required' => 'required',
-                                    'placeholder' => 'Choose your Account',
-                                ]
-                            ]) 
-                        }}
-                        {{-- <label>Account</label>
-                        <select class="js-select2 custom-select" name="account" required>
-                            <option value="" disabled selected>Choose your Account</option>
-                            @foreach ($account as $acc)
-                            <option value="{{ $acc->id }}">{{ $acc->channel->name }} - {{ $acc->name }}</option>
-                            @endforeach
-                        </select> --}}
-                    </div>
-                    <div class="col-md-6">
-                        {{ 
-                            Form::select2Input('subarea', null, route('subarea-select2'), [
-                                'labelText' => 'Sub Area',
-                                'text' => 'obj.area_name + " - " + obj.name',
-                                'elOptions' => [
-                                    'required' => 'required',
-                                    'placeholder' => 'Choose your Subarea',
-                                ]
-                            ]) 
-                        }}
-                        {{-- <label>Sub Area/ Area</label>
-                        <select class="js-select2 form-control" name="subarea" required>
-                            <option value="" disabled selected>Choose your Subarea</option>
-                            @foreach($subarea as $data)
-                                <option value="{{ $data->id }}">{{ $data->area->name }} - {{ $data->name }}</option>
                             @endforeach
                         </select> --}}
                     </div>

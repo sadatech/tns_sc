@@ -12,14 +12,14 @@
     </div>
   @endif
   <div class="block block-themed"> 
-    <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+    <div class="block-header bg-primary pl-20 pr-20 pt-15 pb-15">
         <h3 class="block-title">Datatables</h3>
     </div>
     <div class="block">        
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
-            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal"><i class="fa fa-plus mr-2"></i>Add Data</button>
+            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal" onclick="addModal()"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
             <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
@@ -28,12 +28,12 @@
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="product">
         <thead>
-          <th style="width: 70px;"></th>
+          <th></th>
           <th>Brand</th>
-          <th width="400px">Sub Category</th>
+          <th>Category</th>
+          <th>Sub Category</th>
           <th>Code</th>
-          <th>SKU</th>
-          <th width="400px">Stock Type</th>
+          <th>Name</th>
           <th>Panel</th>
           <th>Carton</th>
           <th>Pack</th>
@@ -47,64 +47,13 @@
 </div>
 
 {{-- ADD PRODUCT MODAL --}}
-@include('product._form_product', ['action' => route('product.add'), 'id' => 'tambahModal'])
-
-@include('product._form_product', ['id' => 'editModal', 'type' => 'edit'])
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-popout" role="document">
-        <div class="modal-content">
-            <div class="block block-themed block-transparent mb-0">
-                <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="fa fa-edit"></i> Update Product</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="si si-close"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <form id="editForm" method="post">
-                {!! method_field('PUT') !!}
-                {!! csrf_field() !!}
-                <div class="block-content">
-                    <div class="row">
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-md-12">
-                            <label>SKU Name</label>
-                            <input type="text" class="form-control" name="name" id="nameInput" required>
-                        </div>
-                    </div>
-                    <!-- <div class="form-group">
-                        <label>Deskripsi</label>
-                        <textarea class="form-control" name="deskripsi" id="deskripsiInput"></textarea>
-                    </div> -->
-                    <div class="row">
-                        <div class="form-group col-md-12">
-                            <label>Panel</label>
-                            <select class="js-edit form-control" id="panelinput" style="width: 100%" name="panel" >
-                                <option value="yes"> Yes </option>
-                                <option value="no"> No </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-alt-success">
-                        <i class="fa fa-save"></i> Save
-                    </button>
-                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@include('product._form_product', ['action' => route('product.add'), 'id' => 'tambahModal', 'type' => 'product'])
 
 <div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
     <div class="modal-content">
       <div class="block block-themed block-transparent mb-0">
-        <div class="block-header bg-gd-sun p-10">
+        <div class="block-header bg-primary p-10">
           <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Import <i>Data Product</i></h3>
           <div class="block-options">
             <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -128,7 +77,6 @@
                         <td><b>Category</b></td>
                         <td><b>Code</b></td>
                         <td><b>SKU</b></td>
-                        <td><b>Type</b></td>
                         <td><b>Panel</b></td>
                         <td><b>Carton</b></td>
                         <td><b>Pack</b></td>
@@ -140,7 +88,6 @@
                         <td>Category 1</td>
                         <td>Code 1</td>
                         <td>SKU 1</td>
-                        <td>Type 1</td>
                         <td>Panel 1</td>
                         <td>Carton 1</td>
                         <td>Pack 1</td>
@@ -150,7 +97,6 @@
                         <td>Category 2</td>
                         <td>Code 2</td>
                         <td>SKU 2</td>
-                        <td>Type 2</td>
                         <td>Panel 2</td>
                         <td></td>
                         <td></td>
@@ -242,15 +188,21 @@
                     });
                 });
             },
-            scrollY: "300px",
+            order: [],
             ajax: '{!! route('product.data') !!}',
+            columnDefs:[
+              {"className": "text-center", "targets": 0},
+              {"className": "text-center", "targets": 7},
+              {"className": "text-center", "targets": 8},
+              {"className": "text-center", "targets": 9}
+            ],
             columns: [
             { data: 'id', name: 'id' },
             { data: 'brand', name: 'brand' },
+            { data: 'category', name: 'category' },
             { data: 'subcategory.name', name: 'subcategory.name' },
             { data: 'code', name: 'code' },
             { data: 'name', name: 'name' },
-            { data: 'stockType', name: 'stockType' },
             { data: 'panel', name: 'panel' },
             { data: 'carton', name: 'carton' },
             { data: 'pack', name: 'pack' },

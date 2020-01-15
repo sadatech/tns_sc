@@ -9,9 +9,20 @@ trait StringTrait
     	return str_replace("'", "", $string);
     }
 
-    public function numberToPrice($currency, $string)
+    public function numberToPrice($currency = '', $string, $separator = '')
     {
-    	return $currency.'. '.number_format($string);
+    	$price = ($currency != '' ? $currency.'. ' : '').number_format($string);
+        return $separator != '' ? str_replace(',', $separator, $price) : $price;
+    }
+
+    public function trimAndUpper($string)
+    {
+    	return strtoupper(trim($string));
+    }
+
+    public function getFirstExplode($string, $splitter)
+    {
+    	return explode($splitter, $string)[0];
     }
 
 }

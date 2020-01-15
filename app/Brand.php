@@ -19,9 +19,9 @@ class Brand extends Model
     	return self::get()->first();
     }
 
-    public function product()
+    public function category()
     {
-    	return $this->hasMany('App\Product', 'id_brand');
+    	return $this->hasMany('App\Category', 'id_brand');
     }
 
     public function scopeFilter($query, QueryFilters $filters)

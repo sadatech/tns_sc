@@ -18,32 +18,31 @@ class Product extends Model
     
     protected $guarded = ['sku_units'];
 
-    protected $dates =['deleted_at'];
+    protected $dates = ['deleted_at'];
 
     public static function boot(){
-        parent::boot();
-        self::creating(function($model){
-            $model->id_brand = Brand::defaultBrand()->id;
-        });
+        // parent::boot();
+        // self::creating(function($model){
+        //     $model->id_brand = Brand::defaultBrand()->id;
+        // });
     }
 
     public static function rule()
     {
         return [
-            'id_subcategory' => 'required|integer',
-            'name' => 'required|string',
-            'code' => 'required|string',
-            'panel' => 'required|string',
-            'stock_type_id' => 'required|integer',
-            'pcs' => 'integer',
+            'id_sub_category'   => 'required|integer',
+            'name'              => 'required|string',
+            'code'              => 'required|string',
+            'panel'             => 'required|string',
+            'pcs'               => 'integer',
         ];
     }
 
     public static function getPanelOptions()
     {
         return [
-            'yes' => 'Yes',
-            'no' => 'No'
+            'yes'   => 'Yes',
+            'no'    => 'No'
         ];
     }
 
@@ -59,7 +58,7 @@ class Product extends Model
 
     public function subcategory()
     {
-        return $this->belongsTo('App\SubCategory', 'id_subcategory');
+        return $this->belongsTo('App\SubCategory', 'id_sub_category');
     }
 
     public function productcategory()
@@ -69,7 +68,7 @@ class Product extends Model
 
     public function brand()
     {
-        return $this->belongsTo('App\Brand', 'id_brand');
+        return $this->subcategory->category->brand();
     }
     public function product()
     {
@@ -127,9 +126,9 @@ class Product extends Model
     }
 
     public function getPrice($date, $type_price){
-        $data = $this->prices->where('rilis', '<=', $date)
+        $data = $this->prices->where('release', '<=', $date)
                             ->where('type_price', $type_price)
-                            ->sortByDesc('rilis')
+                            ->sortByDesc('release')
                             ->first();
 
         return ($data) ? $data->price : 0;

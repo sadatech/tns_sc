@@ -27,9 +27,11 @@
 
     <!-- Fonts and Codebase framework -->
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.css') }}">
+    <!-- <link rel="stylesheet" href="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.css') }}"> -->
+    <link href="{{ asset('assets/swal/sweetalert.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/emoji.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/codebase.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/themes/corporate.min.css') }}" id="css-theme" >
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/summernote/summernote-bs4.css') }}">
 
     @yield('select2-plugins-resource')
@@ -37,11 +39,17 @@
     @yield('css')
 
     @stack('additional-css')
+    <style type="text/css">
+        .select2-search__field{
+            width: 100% !important;
+        }
+    </style>
 </head>
 <body>
 
     <!-- Page Container -->
-    <div id="page-container" class="sidebar-o enable-page-overlay side-scroll page-header-fixed main-content-boxed">
+    <div id="page-container" class="sidebar-o enable-page-overlay side-scroll page-header-inverse main-content-boxed sidebar-inverse enable-cookies">
+
         <!-- Side Overlay-->
         <aside id="side-overlay">
             <!-- Side Overlay Scroll Container -->
@@ -143,7 +151,8 @@
     <script src="{{ asset('assets/js/codebase.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/select2/js/select2.full.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/swal/sweetalert.min.js') }}"></script>
+    <!-- <script src="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script> -->
     <script src="{{ asset('assets/js/plugins/summernote/summernote-bs4.min.js') }}"></script>
     @yield('script')
     @stack('additional-js')

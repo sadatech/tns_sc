@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Route extends Model
 {
     protected $fillable = [
-		'id_subarea', 'name'
+		'id_subarea', 'name', 'address', 'latitude', 'longitude', 'type'
     ];
 
     public function subarea()

@@ -5,31 +5,50 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\SubArea;
+use App\Area;
+use App\Region;
 use App\Route;
+use App\Traits\StringTrait;
+use Carbon\Carbon;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class RouteController extends Controller
 {
-    public function baca()
+    use StringTrait;
+
+    public function baca($market = '')
     {
-        $data['subarea'] = SubArea::get();
-        return view('store.root', $data);
+        $data['subarea']    = SubArea::get();
+        $data['market']     = $market;
+        return view('store.route', $data);
     }
 
-    public function data()
+    public function data($market = '')
     {
-        $subarea = Route::with('subarea.area.region')
-        ->select('routes.*');
-        return Datatables::of($subarea)
-        ->addColumn('action', function ($subarea) {
-            $data = array(
-                'id'            => $subarea->id,
-                'subarea'       => $subarea->subarea->id,
-                'subarea_name'  => $subarea->subarea->name,
-                'name'          => $subarea->name
-            );
-            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square'><i class='si si-pencil'></i></button>
-            <button data-url=".route('root.delete', $subarea->id)." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
-        })->make(true);
+        $route = Route::with('subarea.area.region')
+            ->when($market == '1', function($q){
+                return $q->whereType(1);
+            })
+            ->when($market == '2', function($q){
+                return $q->whereType(2);
+            })
+            ->orderBy('routes.id', 'desc')
+            ->select('routes.*');
+
+            return Datatables::of($route)
+            ->addColumn('action', function ($routes) use ($market){
+                $data = array(
+                    'id'            => $routes->id,
+                    'subarea'       => $routes->subarea->id,
+                    'subarea_name'  => $routes->subarea->name,
+                    'name'          => $routes->name,
+                    'latitude'      => $routes->latitude,
+                    'longitude'     => $routes->longitude,
+                    'address'       => $routes->address,
+                );
+                return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' data-target='#formModal' data-toggle='modal'><i class='si si-pencil'></i></button>
+                <button data-url=".route('route.delete',['market'=>$market, 'id'=>$routes->id])." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
+            })->make(true);
     }
 
     public function store(Request $request)
@@ -37,44 +56,18 @@ class RouteController extends Controller
         $data=$request->all();
         $limit=[
             'name'          => 'required',
-            'subarea'      => 'required|numeric',
-        ];
-        $validator = Validator($data, $limit);
-        if ($validator->fails()){
-            return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
-        } else { 
-            $data = SubArea::where(['id' => $request->input('subarea')])->first();
-            $check = Route::whereRaw("TRIM(UPPER(name)) = '". strtoupper($request->input('name'))."'")
-            ->where(['id_subarea' => $data->id])->count();
-            if ($check < 1) {
-                Route::create([
-                    'name'          => $request->input('name'),
-                    'id_subarea'    => $request->input('subarea'),
-                ]);
-                return redirect()->back()
-                ->with([
-                    'type'   => 'success',
-                    'title'  => 'Sukses!<br/>',
-                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah Route!'
-                ]);
-            } else {
-                return redirect()->back()
-                ->with([
-                    'type'   => 'danger',
-                    'title'  => 'Gagal!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Route sudah ada!'
-                ]);
-            }
-        }
-    }
-    public function update(Request $request, $id) 
-    {
-        $data=$request->all();
-        $limit=[
-            'name'          => 'required',
-            'subarea'      => 'required|numeric',
+            'id'            => 'nullable|numeric',
+            'sub_area'      => 'nullable|string',
+            'area'          => 'nullable|string',
+            'region'        => 'nullable|string',
+            'new_sub_area'  => 'nullable|string',
+            'new_area'      => 'nullable|string',
+            'new_region'    => 'nullable|string',
+            'latitude'      => 'nullable|string',
+            'longitude'     => 'nullable|string',
+            'address'       => 'nullable|string',
+            'type'          => 'nullable|numeric',
+            'update'        => 'nullable|numeric',
         ];
         $validator = Validator($data, $limit);
         if ($validator->fails()){
@@ -82,36 +75,89 @@ class RouteController extends Controller
             ->withErrors($validator)
             ->withInput();
         } else {
-            $data = SubArea::where(['id' => $request->get('subarea')])->first();
-            $check = Route::whereRaw("TRIM(UPPER(name)) = '". strtoupper($request->get('name'))."'")
-            ->where(['id_subarea' => $data->id])->count();
-            if ($check < 1) 
-            { 
-                $subarea = Route::find($id);
-                    $subarea->name      = $request->get('name');
-                    $subarea->id_subarea   = $request->get('subarea');
-                    $subarea->save();
-                    return redirect()->back()
+            $success = 'true';
+
+            if (!$request->has('sub_area')) {
+                if (!empty($request->new_sub_area)) {
+
+                    if (!$request->has('area')) {
+                    
+                        if (!$request->has('region')) {
+                            if (!empty($request->new_region)) {
+                                $region = Region::firstOrCreate([ 'name' => $this->trimAndUpper($request->new_region) ]);
+                            }else{
+                                $success = 'Choose or input the Region.';
+                            }
+                        }else{
+                            $region = Region::where([ 'id' => $this->getFirstExplode($request->region, '`^') ])->first();
+                        }
+
+                        if (!empty($request->new_area)) {
+                            $area = Area::firstOrCreate([ 'name' => $this->trimAndUpper($request->new_area), 'id_region' => $region->id ]);
+                        }else{
+                            $success = 'Choose or input the Area.';
+                        }
+                    }else{
+                        $area = Area::where([ 'id' => $this->getFirstExplode($request->area, '`^') ])->first();
+                    }
+
+                    if (!empty($request->new_sub_area) && $success == 'true') {
+                        $subArea = SubArea::firstOrCreate([ 'name' => $this->trimAndUpper($request->new_sub_area), 'id_area' => $area->id ]);
+                    }else{
+                        $success = 'Choose or input the Sub Area correctly.';
+                    }
+                }else{
+                    $success = 'Choose the Sub Area.';
+                }
+            }else{
+                $subArea = SubArea::where([ 'id' => $this->getFirstExplode($request->sub_area, '`^') ])->first();
+            }
+
+            if ($success == 'true') {
+                $check  = Route::whereRaw("TRIM(UPPER(name)) = '". $this->trimAndUpper($request->name)."'")
+                    ->where(['id_subarea' => $subArea->id])->count();
+
+                if ($request->update == 1) {
+                    Route::whereId($request->id)
+                        ->update([
+                            'name'          => $request->name,
+                            'type'          => $request->type,
+                            'latitude'      => $request->latitude,
+                            'longitude'     => $request->longitude,
+                            'address'       => $request->address,
+                            'id_subarea'    => $subArea->id,
+                        ]);
+                }else{
+                    Route::create([
+                            'name'          => $request->name,
+                            'type'          => $request->type,
+                            'latitude'      => $request->latitude,
+                            'longitude'     => $request->longitude,
+                            'address'       => $request->address,
+                            'id_subarea'    => $subArea->id,
+                        ]);
+                }
+                return redirect()->back()
                     ->with([
-                        'type'    => 'success',
-                        'title'   => 'Sukses!<br/>',
-                        'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah Route!'
+                        'type'   => 'success',
+                        'title'  => 'Sukses!<br/>',
+                        'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil '. ( ($request->update == 1) ? 'mengubah' : 'menambah' ). 'Route!'
                     ]);
             } else {
                 return redirect()->back()
-                ->with([
-                    'type'   => 'danger',
-                    'title'  => 'Gagal!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Route sudah ada!'
-                ]);
+                    ->with([
+                        'type'   => 'danger',
+                        'title'  => 'Gagal!<br/>',
+                        'message'=> '<i class="em em-confounded mr-2"></i>Gagal '. ( ($request->update == 1) ? 'mengubah' : 'menambah' ). ' Route!<br>'.$success
+                    ]);
             }
         }
-    }   
+    }
 
     public function delete($id) 
     {
-        $subarea = Route::find($id); 
-        $subarea->delete();
+        $route = Route::find($id);
+        $route->delete();
         return redirect()->back()
         ->with([
             'type'      => 'success',
@@ -120,108 +166,30 @@ class RouteController extends Controller
         ]);
     }
 
-    // public function importXLS(Request $request)
-    // {
+    public function exportXLS($market = '')
+    {
+        $route = Route::with('subarea.area.region')
+            ->when($market == '1', function($q){
+                return $q->whereType(1);
+            })
+            ->when($market == '2', function($q){
+                return $q->whereType(2);
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
+        $filename = "route_".Carbon::now().".xlsx";
+        (new FastExcel($route))->download($filename, function ($route) {
+            return [
+                'Name'      => $route->name,
+                'Sub Area'  => $route->subarea->name,
+                'Area'      => $route->subarea->area->name,
+                'Region'    => $route->subarea->area->region->name,
+                'Address'   => $route->address,
+                'Latitude'  => $route->latitude,
+                'Longitude' => $route->longitude,
+            ];
+        });
+    }
 
-    //     $this->validate($request, [
-    //         'file' => 'required'
-    //     ]);
-
-    //     $transaction = DB::transaction(function () use ($request) {
-    //         $file = Input::file('file')->getClientOriginalName();
-    //         $filename = pathinfo($file, PATHINFO_FILENAME);
-    //         $extension = pathinfo($file, PATHINFO_EXTENSION);
-
-    //         if ($extension != 'xlsx' && $extension !=  'xls') {
-    //             return response()->json(['error' => 'true', 'error_detail' => "Error File Extention ($extension)"]);
-    //         }
-    //         if($request->hasFile('file')){
-    //             $file = $request->file('file')->getRealPath();
-    //             $ext = '';
-                
-    //             Excel::filter('chunk')->selectSheetsByIndex(0)->load($file)->chunk(250, function($results)
-    //                 {
-    //                     foreach($results as $row)
-    //                     {
-    //                         echo "$row<hr>";
-    //                         // CEK ISSET CUSTOMER
-    //                         $dataArea['area_name']      = $row->area;
-    //                         $dataArea['region_name']    = $row->region;
-    //                         $id_area = $this->findArea($dataArea);
-
-    //                         SubArea::create([
-    //                             'id_area'       => $id_area,
-    //                             'name'          => $row->sub_area,
-    //                         ]);
-    //                     }
-    //                 },false);
-    //         }
-    //         return 'success';
-    //     });
-
-    //     if ($transaction == 'success') {
-    //         return redirect()->back()
-    //             ->with([
-    //                 'type'      => 'success',
-    //                 'title'     => 'Sukses!<br/>',
-    //                 'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil import!'
-    //             ]);
-    //     }else{
-    //         return redirect()->back()
-    //             ->with([
-    //                 'type'    => 'danger',
-    //                 'title'   => 'Gagal!<br/>',
-    //                 'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
-    //             ]);
-    //     }
-    // }
-
-    // public function exportXLS()
-    // {
- 
-    //     $subarea = SubArea::orderBy('created_at', 'DESC')->get();
-    //     $filename = "subareas_".Carbon::now().".xlsx";
-    //     (new FastExcel($subarea))->download($filename, function ($subarea) {
-    //         return [
-    //             'Sub Area'  => $subarea->name,
-    //             'Area'      => $subarea->area->name,
-    //             'Region'    => $subarea->area->region->name
-    //         ];
-    //     });
-    // }
-    
-    // public function findArea($data)
-    // {
-    //     $dataArea = Area::where('name','like','%'.trim($data['area_name']).'%');
-    //     if ($dataArea->count() == 0) {
-            
-    //         $dataRegion['region_name']  = $data['region_name'];
-    //         $id_region = $this->findRegion($dataRegion);
-
-    //         $area = Area::create([
-    //           'name'        => $data['area_name'],
-    //           'id_region'   => $id_region,
-    //         ]);
-    //         $id_area = $area->id;
-    //     }else{
-    //         $id_area = $dataArea->first()->id;
-    //     }
-    //   return $id_area;
-    // }
-
-    // public function findRegion($data)
-    // {
-    //     $dataRegion = Region::where('name','like','%'.trim($data['region_name']).'%');
-    //     if ($dataRegion->count() == 0) {
-            
-    //         $region = Region::create([
-    //           'name'        => $data['region_name'],
-    //         ]);
-    //         $id_region = $region->id;
-    //     }else{
-    //         $id_region = $dataRegion->first()->id;
-    //     }
-    //   return $id_region;
-    // }
 }
 

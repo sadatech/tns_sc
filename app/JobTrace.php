@@ -11,7 +11,7 @@ class JobTrace extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'id_user', 'date', 'title', 'results', 'status', 'explanation', 'log'
+        'id_user', 'date', 'title', 'model', 'directory', 'type', 'file_path', 'file_name', 'results', 'status', 'explanation', 'log'
     ];
 
     /**

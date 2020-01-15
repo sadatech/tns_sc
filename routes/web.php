@@ -58,7 +58,7 @@ Route::prefix('data')->group(function () {
 /**
 *	Store Master Data
 */
-Route::prefix('store')->group(function () {
+Route::group(['middleware' => ['auth'], 'prefix' => 'store'], function () {
 	//Store Pages
 	Route::prefix('summary')->group(function(){
 		Route::get('/', 'StoreController@baca')->name('store')->middleware('auth');
@@ -91,12 +91,12 @@ Route::prefix('store')->group(function () {
 	});
 
 	// Route Pages
-	Route::prefix('root')->group(function(){
-		Route::get('/', 'RouteController@baca')->name('root')->middleware('auth');
-		Route::get('/data', 'RouteController@data')->name('root.data')->middleware('auth');
-		Route::post('/create', 'RouteController@store')->name('root.add')->middleware('auth');
-		Route::put('/update/{id}', 'RouteController@update')->name('root.update')->middleware('auth');
-		Route::get('/delete/{id}', 'RouteController@delete')->name('root.delete')->middleware('auth');
+	Route::prefix('route')->group(function(){
+		Route::get('/data/{market}', 'RouteController@data')->name('route.data');
+		Route::post('/create/{market}', 'RouteController@store')->name('route.add');
+		Route::get('/delete/{id}', 'RouteController@delete')->name('route.delete');
+		Route::get('/export/{market}', 'RouteController@exportXLS')->name('route.export');
+		Route::get('/{market}', 'RouteController@baca')->name('route');
 	});
 
 	//Sub Area Pages
@@ -470,6 +470,21 @@ Route::prefix('product')->group(function () {
 		Route::get('/download-template', function(){
 			return response()->download(public_path('assets/ProductFokusImportGTC.xlsx'));
 		})->name('fokusGTC.download-template')->middleware('auth');
+	});
+
+	Route::prefix('focus')->group(function () {
+		Route::get('/', 'ProductFocusController@baca')->name('focus')->middleware('auth');
+		Route::get('/data', 'ProductFocusController@data')->name('focus.data')->middleware('auth');
+		Route::post('/create', 'ProductFocusController@store')->name('focus.add')->middleware('auth');
+		Route::post('/import', 'ProductFocusController@import')->name('focus.import')->middleware('auth');
+		Route::post('/upload', 'ProductFocusController@upload')->name('focus.upload')->middleware('auth');
+		Route::get('/export', 'ProductFocusController@export')->name('focus.export')->middleware('auth');
+		Route::get('/download', 'ProductFocusController@download')->name('focus.download')->middleware('auth');
+		Route::put('/update/{id}', 'ProductFocusController@update')->name('focus.update')->middleware('auth');
+		Route::get('/delete/{id}', 'ProductFocusController@delete')->name('focus.delete')->middleware('auth');
+		Route::get('/download-template', function(){
+			return response()->download(public_path('assets/ProductFocusImport.xlsx'));
+		})->name('focus.download-template')->middleware('auth');
 	});
 
 	//Fokus Spg Pages
@@ -1140,6 +1155,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/product-select2', 'ProductController@getDataWithFilters')->name('product-select2');
 	Route::post('/sub-category-select2', 'SubCategoryController@getDataWithFilters')->name('sub-category-select2');
 	Route::post('/category-select2', 'CategoryController@getDataWithFilters')->name('category-select2');
+	Route::post('/brand-select2', 'BrandController@getDataWithFilters')->name('brand-select2');
 	Route::post('/employee-is-tl-select2', 'EmployeeController@getDataIsTL')->name('employee-is-tl-select2');
 	Route::get('/product-byCategory-select2/{param}', 'ProductController@getProductByCategory')->name('product-byCategory-select2');
 	Route::get('/sales-tier-select2', 'SalesTiersController@getDataWithFilters')->name('sales-tier-select2');
@@ -1179,3 +1195,8 @@ Route::prefix('data')->group(function () {
 Auth::routes();
 
 Route::get('/tes', 'ReportController@sellInData');
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'job-trace'], function () {
+	Route::get('/data/{model}/{type}', 'JobTraceController@data')->name('job-trace.data');
+	Route::any('/delete/{id}', 'JobTraceController@destroy')->name('job-trace.delete');
+});

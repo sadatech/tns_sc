@@ -4,7 +4,7 @@
 <div class="content">
     <h2 class="content-heading pt-10">Store <small>Manage</small></h2>
     <div class="block block-themed"> 
-        <div class="block-header bg-gd-sun pl-20 pr-20 pt-15 pb-15">
+        <div class="block-header bg-primary pl-20 pr-20 pt-15 pb-15">
             <h3 class="block-title">Datatables</h3>
         </div>
         <div class="block">
@@ -15,7 +15,7 @@
                     </h3>
                     <div class="block-option">
                         <button class="btn btn-info btn-square"  data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-                        <a href="{{route('store.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+                        <a href="{{route('store.exportXLS')}}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Download Data</a>
                     </div>
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered dataTable" id="storetable">
