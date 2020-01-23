@@ -23,13 +23,11 @@
                     <th></th>
                     <th width="200px">NIK</th>
                     <th width="200px">Name</th>
-                    <th>Position</th>
                     <th width="200px">No. KTP</th>
                     <th>Phone</th>
                     <th>Email</th>
                     <th width="200px">Join Date</th>
                     <th>Agency</th>
-                    <th>Gender</th>
                     <th>Education</th>
                     <th width="200px">Birth Date</th>
                 </thead>
@@ -56,7 +54,7 @@
                 {!! csrf_field() !!}
                 <input type="hidden" name="employee" id="employeeID">
                 <div class="block-content">
-                    <label>User Information</label>
+                    <label>Employee Information</label>
                     <table class="table table-bordered">
                         <tr>
                             <td width="100"><b>Name</b></td>
@@ -68,15 +66,11 @@
                         </tr>
                         <tr>
                             <td><b>Position</b></td>
-                            <td id="reasonPosition">Example</td>
-                            <td><b>Status</b></td>
-                            <td id="reasonStatus">Example</td>
+                            <td id="reasonPosition" colspan="4">Example</td>
                         </tr>
                         <tr>
-                            <td><b>Agency</b></td>
-                            <td id="reasonAgency">Example</td>
                             <td><b>Join Date</b></td>
-                            <td id="reasonJoindate">Example</td>
+                            <td id="reasonJoindate" colspan="4">Example</td>
                         </tr>
                     </table>
                     <div class="row">
@@ -206,12 +200,10 @@
             { data: 'action', name: 'action' },
             { data: 'nik', name: 'nik' },
             { data: 'name', name: 'name' },
-            { data: 'position', name: 'position' },
             { data: 'ktp', name: 'ktp' },
             { data: 'phone', name: 'phone' },
             { data: 'email', name: 'email' },
             { data: 'joinAt', name: 'joinAt' },
-            { data: 'agency', name: 'agency' },
             { data: 'gender', name: 'gender' },
             { data: 'education', name: 'education' },
             { data: 'birthdate', name: 'birthdate' },

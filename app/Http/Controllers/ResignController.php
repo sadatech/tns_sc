@@ -23,15 +23,9 @@ class ResignController extends Controller
     {
         $resign = Employee::where([
             'isResign' => 0
-        ])->with(['position', 'agency']);
+        ])->with(['position']);
         
         return Datatables::of($resign)
-        ->addColumn('position', function($resign) {
-            return $resign->position->name;
-        })
-        ->addColumn('agency', function($resign) {
-            return $resign->agency->name;
-        })
         ->addColumn('action', function ($resign) {
             $data = array(
                 'id'        => $resign->id,
@@ -39,7 +33,6 @@ class ResignController extends Controller
                 'nik'       => $resign->nik,
                 'position'  => $resign->position->name,
                 'status'    => $resign->status,
-                'agency'    => $resign->agency->name,
                 'joindate'  => $resign->joinAt
             );
             return "<a href='#resign' onclick='modalResign(".json_encode($data).")' data-toggle='modal' class='btn btn-sm btn-block btn-danger btn-square'><i class='si si-logout mr-2'></i>Resign</a>";

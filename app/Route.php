@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Filters\QueryFilters;
 
 class Route extends Model
 {
@@ -19,4 +20,9 @@ class Route extends Model
     {
     	return $this->hasMany('App\Block', 'id_route');
     }   
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
+    }
 }

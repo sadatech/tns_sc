@@ -59,24 +59,8 @@
                         <a class="nav-submenu" data-toggle="nav-submenu"><i class="fa fa-users"></i><span class="sidebar-mini-hide">Employee(s)</span></a>
                         <ul>
                             <li>
-                                <a class="{{ request()->is('employee/position') ? 'active' : '' }}" href="{{ route('position') }}">Position</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('employee/agency') ? 'active' : '' }}" href="{{ route('agency') }}">Agency</a>
-                            </li>
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminMtc')
-                            <li>
-                                <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">MTC</a>
-                            </li>
-                            @endif
-                            @if(Auth::user()->role->level == 'MasterAdmin' || Auth::user()->role->level == 'Administrator' || Auth::user()->role->level == 'AdminGtc')
-                            <li>
-                                <a class="{{ request()->is('employee/summary/pasar') ? 'active' : '' }}" href="{{ route('employee.pasar') }}">GTC</a>
-                            </li>
-                            <li>
-                                <a class="{{ request()->is('employee/summary/dc') ? 'active' : '' }}" href="{{ route('employee.dc') }}">Demo Cooking</a>
-                            </li>
-                            @endif
+                                <a class="{{ request()->is('employee/summary') ? 'active' : '' }}" href="{{ route('employee') }}">Employee</a>
+                            </li>                            
                             <li>
                                 <a class="{{ request()->is('employee/resign') ? 'active' : '' }}" href="{{ route('resign') }}">Resign</a>
                             </li>

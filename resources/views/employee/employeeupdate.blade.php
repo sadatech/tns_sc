@@ -148,109 +148,77 @@
             </div>
             <div class="block-content">
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>Position</label>
-                        <select class="form-control form-control-lg" name="position" id="position" required>
-                            <option value="" disabled selected>Choose your Position</option>
-                            @foreach($position as $option)
-                            <option value="{{ $option->id }}" {{ (collect(old('position'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>Agency</label>
-                        <select id="agency" class="js-select form-control form-control-lg" style="width: 100%" name="agency" required>
-                            <option value="" disabled selected>Choose your Agency</option>
-                            @foreach($agency as $option)
-                            <option value="{{ $option->id }}" {{ (collect(old('agency'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-6" id="subarea" >
-                        <label>Sub Area / Area</label>
-                        <select class="js-select2 form-control form-control-lg" style="width: 100%" name="subarea[]" id="subareaInput">
-                            <option disabled selected>Choose your Subarea</option>
-                            @foreach($subarea as $option)
-                            <option value="{{ $option->id }}" {{ (collect(old('subarea'))->contains($option->id)) ? 'selected':'' }}>{{ $option->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="custom-control custom-checkbox custom-control-inline mt-20" id="tl">
-                        <input class="custom-control-input" type="checkbox" name="tl" id="example-inline-checkbox2">
-                        <label class="custom-control-label" for="example-inline-checkbox2">TL Demo Cooking</label>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="form-group col-md-6" id="status">
-                        <label>Status</label>
-                        <select class="form-control form-control-lg" id="statusInput" name="status">
-                            <option disabled selected>Choose your Status</option>
-                            <option value="Stay">Stay</option>
-                            <option value="Mobile">Mobile</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-6" id="storeMobile">
-                        <label class="col-md-12" style="padding: 0">Store</label>
+                    <div class="form-group col-md-6" id="routeGroup">
+                        <label class="col-md-12" style="padding: 0">Route</label>
                         <div class="input-group mb-3 col-md-12" style="padding: 0">
                             <div style="width: 82%">
                                 {{
-                                    Form::select2Input('storesMobile', null, route('store-select2'), [
-                                        'key' => 'obj.id + "|" + obj.name1',
-                                        'text' => 'obj.name1',
+                                    Form::select2Input('routeSelect', null, route('route-select2', ['type' => 1]), [
+                                        'key' => 'obj.id + "|" + obj.name',
                                         'useLabel' => false,
                                         'elOptions' => [
-                                            'placeholder' => 'Choose store...',
+                                            'placeholder' => 'Choose Route...',
                                             'style' => 'width: 100%',
-                                            'id' => 'stores',
+                                            'id' => 'route',
                                         ]
                                     ]) 
                                 }}
-                                {{-- <select id="stores" class="js-select2 form-control" style="width: 100%" data-placeholder="Choose store...">
-                                    @foreach($store as $data)
-                                    <option value="{{ $data->id.'|'.$data->name1}}">{{ $data->name1 }}</option>
+                                {{-- <select id="pasar" class="js-select2 form-control" style="width: 100%" data-placeholder="Pilih pasar...">
+                                    @foreach($pasar as $data)
+                                    <option value="{{ $data->id.'|'.$data->name}}">{{ $data->name }}</option>
                                     @endforeach
                                 </select> --}}
                             </div>
                             <div class="input-group-append" style="width: 18%">
-                                <button id="storesAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
+                                <button id="routeAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
                             </div>
                         </div>
                         <!-- Block’s content.. -->
                         <div class="block block-themed block-rounded">
                             <div class="block-header bg-gd-lake" style="padding: 5px">
-                                <h3 class="block-title">Selected Store</h3>
-                                <span id="selectedStoreDefault" style="color: #ffeb5e;padding-top: 5px;">Please Add the Store</span>
+                                <h3 class="block-title">Route Terpilih</h3>
+                                <span id="selectedRouteDefault" style="color: #ffeb5e;padding-top: 5px;">Tolong tambahkan market.</span>
                                 <div class="block-options">
-                                    <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Search for Store..">
+                                    <input type="text" id="myInput3" class="form-control" onkeyup="searchFunctionRoute()" placeholder="Cari Route..">
                                 </div>
                             </div>
                             <div class="block-content" style="padding: 0; width: 100%;">
-                                <table id="selectedStoreTable" class="table table-striped table-vcenter" style="display: none;">
+                                <table id="selectedRouteTable" class="table table-striped table-vcenter" style="display: none;">
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 50px;">#</th>
-                                            <th>Store</th>
+                                            <th>Route</th>
                                             <th class="text-center" style="width: 100px;">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="selectedStoreTableBody">
+                                    <tbody id="selectedRouteTableBody">
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-6" id="pasarMobile">
-                        <label class="col-md-12" style="padding: 0">Pasar</label>
+
+                    <div class="form-group col-md-6" id="pasarGroup">
+                        <label class="col-md-12" style="padding: 0">Market</label>
                         <div class="input-group mb-3 col-md-12" style="padding: 0">
                             <div style="width: 82%">
-                                <select id="pasar" class="js-select2 form-control" style="width: 100%" data-placeholder="Pilih pasar...">
+                                {{
+                                    Form::select2Input('pasarSelect', null, route('route-select2', ['type' => 2]), [
+                                        'key' => 'obj.id + "|" + obj.name',
+                                        'useLabel' => false,
+                                        'elOptions' => [
+                                            'placeholder' => 'Choose Market...',
+                                            'style' => 'width: 100%',
+                                            'id' => 'pasar',
+                                        ]
+                                    ]) 
+                                }}
+                                {{-- <select id="pasar" class="js-select2 form-control" style="width: 100%" data-placeholder="Pilih pasar...">
                                     @foreach($pasar as $data)
                                     <option value="{{ $data->id.'|'.$data->name}}">{{ $data->name }}</option>
                                     @endforeach
-                                </select>
+                                </select> --}}
                             </div>
                             <div class="input-group-append" style="width: 18%">
                                 <button id="pasarAdd" class="btn btn-outline-secondary" type="button" style="width: 100%">Add</button>
@@ -259,10 +227,10 @@
                         <!-- Block’s content.. -->
                         <div class="block block-themed block-rounded">
                             <div class="block-header bg-gd-lake" style="padding: 5px">
-                                <h3 class="block-title">Pasar Terpilih</h3>
-                                <span id="selectedStoreDefault" style="color: #ffeb5e;padding-top: 5px;">Tolong tambahkan pasar.</span>
+                                <h3 class="block-title">Market Terpilih</h3>
+                                <span id="selectedPasarDefault" style="color: #ffeb5e;padding-top: 5px;">Tolong tambahkan market.</span>
                                 <div class="block-options">
-                                    <input type="text" id="myInput" class="form-control" onkeyup="searchFunction()" placeholder="Cari Pasar..">
+                                    <input type="text" id="myInput2" class="form-control" onkeyup="searchFunctionPasar()" placeholder="Cari Market..">
                                 </div>
                             </div>
                             <div class="block-content" style="padding: 0; width: 100%;">
@@ -270,7 +238,7 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 50px;">#</th>
-                                            <th>Pasar</th>
+                                            <th>Market</th>
                                             <th class="text-center" style="width: 100px;">Actions</th>
                                         </tr>
                                     </thead>
@@ -280,14 +248,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-6" id="storeStay">
-                        <label>Store</label>
-                        <select class="js-select form-control" style="width: 100%" data-placeholder="Choose store..." name="store" id="stayInput">
-                            @foreach($store as $data)
-                            <option value="{{ $data->id }}">{{ $data->name1 }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -316,199 +277,18 @@
         this.value = this.checked ? '1' : '0';
       });
     })
-    var url = document.referrer;
-    var positions = url.split("/");
-    var pos = positions[positions.length -1];
-    $("#globalPosition").val(pos);
 
-    if (pos == "summary") {
-        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
-    } else if (pos == "pasar") {
-        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'dc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
-    } else if (pos == "dc") {
-        $("#position option[value={{ App\Position::where(['level' => 'spggtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'motoric'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'spgmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlgtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'mdmtc'])->first()->id }}]").remove();
-        $("#position option[value={{ App\Position::where(['level' => 'tlmtc'])->first()->id }}]").remove();
-
-    }
-    
-    var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
-    var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;
-
-    $('#agency option[value="{{ $emp->agency->id }}"]').attr('selected','selected');
-    $('#position option[value="{{ $emp->position->id }}"]').attr('selected','selected');
-    $('#timezone option[value="{{ $emp->timezone->id }}"]').attr('selected','selected');
-    $('#spv option[value="{{ $emp->id_position }}"]').attr('selected','selected');
-    $('#status option[value="{{ $emp->status }}"]').attr('selected','selected');
-    $('#timezone option[value="{{ $emp->timezone->id }}"]').attr('selected','selected');
-
-    var position = $('#position').find(":selected").val();
-    var status = $('#status').find(":selected").val();
-    if (position == {{ App\Position::where(['level' => 'mdmtc'])->first()->id }}) {
-        $('#status').show();
-        $('#subarea').hide();
-        $('#tl').hide();
-        $('#pasarMobile').hide();
-        $('#subareaInput').val(null);
-        $('#status').val(null);
-        if (status == 'Mobile') {
-            var selected = {!! $store_selected !!};
-            $('#storeStay').hide();
-            $('#pasarMobile').hide();
-            $('#storeMobile').show();
-            $.each(selected, function( index, value ) {
-              addItem(value.stores_item);
-          });
-        } else {
-            var selected = {!! $store_selected !!};
-            var getId = selected[0].stores_item.split("|")[0];
-            $('#stayInput').val(getId).trigger("change");
-            $('#storeMobile').hide();
-            $('#storeStay').show();
-        }
-    } else if (position == {{ App\Position::where(['level' => 'spgmtc'])->first()->id }}) {
-        if (status == 'Mobile') {
-            var selected = {!! $store_selected !!};
-            $('#storeStay').hide();
-            $('#storeMobile').show();
-            $.each(selected, function( index, value ) {
-              addItem(value.stores_item);
-          });
-        } else {
-            var selected = {!! $store_selected !!};
-            var getId = selected[0].stores_item.split("|")[0];
-            $('#stayInput').val(getId).trigger("change");
-            $('#storeMobile').hide();
-            $('#storeStay').show();
-        }
-        $('#status').show();
-        $('#subarea').hide();
-        $('#pasarMobile').hide();
-        $('#tl').hide();
-        $('#subareaInput').val(null);
-        $('#status').val(null);
-    } else if (position == {{ App\Position::where(['level' => 'spggtc'])->first()->id }}) {
-        var selected = {!! $pasar_selected !!};
-        $.each(selected, function( index, value ) {
-          addItemPasar(value.pasars_item);
-      });
-        $('#pasarMobile').show();
-        $('#status').hide();
-        $('#subarea').hide();
-        $('#tl').hide();
-        $('#subareaInput').val(null);
-        $('#status').val(null);
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-    } else if (position == {{ App\Position::where(['level' => 'mdgtc'])->first()->id }}) {
-        var selected = {!! $pasar_selected !!};
-        $.each(selected, function( index, value ) {
-          addItemPasar(value.pasars_item);
-      });
-        $('#pasarMobile').show();
-        $('#status').hide();
-        $('#tl').hide();
-        $('#subarea').hide();
-        $('#subareaInput').val(null);
-        $('#status').val(null);
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-    } else if (position == {{ App\Position::where(['level' => 'dc'])->first()->id }}) {
-        var selectedArea2 = {!! $area_selected !!};
-        var getIdArea2 = selectedArea2[0].subarea_item.split("|")[0];
-        $('#subareaInput').val(getIdArea2).trigger("change");
-        $('#subarea').show();
-        $('#tl').show();
-        $('#status').hide();
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-        $('#pasarMobile').hide();
-        $('#status').val(null);
-        if({!! $isTl !!} == 1) {
-            $('#example-inline-checkbox2').prop("checked", true);
-        }
-    } else if (position == {{ App\Position::where(['level' => 'tlmtc'])->first()->id }}) {
-        var selectedArea = {!! $area_selected !!};
-        var getIdArea = selectedArea[0].subarea_item.split("|")[0];
-        $('#subareaInput').val(getIdArea).trigger("change");
-        $('#subarea').show();
-        $('#status').hide();
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-        $('#pasarMobile').hide();
-        $('#status').val(null);
-        $('#tl').hide();
-    } else if (position == {{ App\Position::where(['level' => 'tlgtc'])->first()->id }}) {
-        var selectedArea = {!! $area_selected !!};
-        var getIdArea = selectedArea[0].subarea_item.split("|")[0];
-        $('#subareaInput').val(getIdArea).trigger("change");
-        $('#subarea').show();
-        $('#status').hide();
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-        $('#pasarMobile').hide();
-        $('#status').val(null);
-        $('#tl').hide();
-    } else if (position == {{ App\Position::where(['level' => 'motoric'])->first()->id }}) {
-        $('#subarea').hide();
-        $('#status').hide();
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-        $('#pasarMobile').hide();
-        $('#status').val(null);
-        $('#subareaInput').val(null);
-        $('#tl').hide();
-    } else {
-        $('#status').hide();
-        $('#storeStay').hide();
-        $('#storeMobile').hide();
-        $('#status').val(null);
-        $('#tl').hide();
-            // $('#pasarMobile').hide();
-            // $('#subarea').hide();
-            // $('#status').hide();
-            // $('#storeStay').hide();
-            // $('#storeMobile').hide();
-        }
-        $(".js-select2").select2({
-            tags: true
+    $(function() {
+        var pasar_selected = {!! $pasar_selected !!};
+        $.each(pasar_selected, function( index, value ) {
+            addItemPasar(value.pasars_item);
         });
-        $(".js-select").select2();
-        $(document).ready(function() {
-            $("#txtboxToFilter").keydown(function (e) {
-                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
-                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) || 
-                    (e.keyCode >= 35 && e.keyCode <= 40)) 
-                {
-                    return;
-                }
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-                    e.preventDefault();
-                }
-            });
 
-        // add Store to Selected Store
-        $('#storesAdd').click(function () {
-            var stores = $('#stores').val();
-            if (stores != null) {
-                $('#stores').val('');
-                $('#select2-stores-container').html('');
-                addItem(stores);
-            }else{                
-                notif('Warning',': Please the select Store first','warning');
-            }
+        var route_selected = {!! $route_selected !!};
+        $.each(route_selected, function( index, value ) {
+            addItemRoute(value.routes_item);
         });
+
         $('#pasarAdd').click(function () {
             var pasar = $('#pasar').val();
             if (pasar != null) {
@@ -516,102 +296,32 @@
                 $('#select2-pasar-container').html('');
                 addItemPasar(pasar);
             }else{                
-                notif('Warning',': Please the select Pasar first','warning');
+                notif('Warning',': Please the select Market first','warning');
             }
         });
-    });
-
-        $('#position').on('change', e => {
-            var select = $('#position').find(":selected").val()
-            var status = $('#status').find(":selected").val()
-            if (select == "{{ App\Position::where(['level' => 'mdmtc'])->first()->id }}") {
-                $('#status').show();
-                $('#subarea').hide();
-                $('#tl').hide();
-                $('#pasarMobile').hide();
-                $('#subareaInput').val(null);
-                $('#status').val(null);
-            } else if (select == "{{ App\Position::where(['level' => 'spgmtc'])->first()->id }}") {
-                $('#status').show();
-                $('#subarea').hide();
-                $('#tl').hide();
-                $('#pasarMobile').hide();
-                $('#subareaInput').val(null);
-                $('#status').val(null);
-            } else if (select == "{{ App\Position::where(['level' => 'spggtc'])->first()->id }}") {
-                $('#pasarMobile').show();
-                $('#status').hide();
-                $('#subarea').hide();
-                $('#tl').hide();
-                $('#subareaInput').val(null);
-                $('#status').val(null);
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-            } else if (select == "{{ App\Position::where(['level' => 'mdgtc'])->first()->id }}") {
-                $('#pasarMobile').show();
-                $('#status').hide();
-                $('#subarea').hide();
-                $('#tl').hide();
-                $('#subareaInput').val(null);
-                $('#status').val(null);
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-            } else if (select == "{{ App\Position::where(['level' => 'dc'])->first()->id }}") {
-                $('#subarea').show();
-                $('#tl').show();
-                $('#status').hide();
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-                $('#pasarMobile').hide();
-                $('#status').val(null);
-            } else if (select == "{{ App\Position::where(['level' => 'tlmtc'])->first()->id }}") {
-                $('#status').hide();
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-                $('#pasarMobile').hide();
-                $('#status').val(null);
-            } else if (select == "{{ App\Position::where(['level' => 'tlgtc'])->first()->id }}") {
-                $('#status').hide();
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-                $('#pasarMobile').hide();
-                $('#status').val(null);
-                $('#subareaInput').val(null);
-                $('#subarea').show();
-            } else if (select == "{{ App\Position::where(['level' => 'motoric'])->first()->id }}") {
-                $('#status').hide();
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-                $('#pasarMobile').hide();
-                $('#status').val(null);
-                $('#subareaInput').val(null);
-                $('#subarea').hide();
-                $('#tl').hide();
-            } else {
-                $('#status').hide();
-                $('#storeStay').hide();
-                $('#storeMobile').hide();
-                $('#status').val(null);
-            // $('#pasarMobile').hide();
-            // $('#subarea').hide();
-            // $('#status').hide();
-            // $('#storeStay').hide();
-            // $('#storeMobile').hide();
-        }
+        $('#routeAdd').click(function () {
+            var route = $('#route').val();
+            if (route != null) {
+                $('#route').val('');
+                $('#select2-route-container').html('');
+                addItemRoute(route);
+            }else{                
+                notif('Warning',': Please the select Route first','warning');
+            }
+        });
     })
-        $('#status').on('change', e => {
-            var select = $('#position').find(":selected").val()
-            var status = $('#status').find(":selected").val()
-            if (status == 'Stay') {
-                clearStores();
-                $('#storeMobile').hide();
-                $('#storeStay').show();
-            } else {
-                clearStores();
-                $('#storeStay').hide();
-                $('#storeMobile').show();
-            } 
-        })
+
+    var url = document.referrer;
+    var positions = url.split("/");
+    var pos = positions[positions.length -1];    
+    $("#globalPosition").val(pos);
+    
+    var selectedStores = [], selectedStoresId = [], selectedStoresName = [], tableIndex = 0;
+    var selectedPasar = [], selectedPasarId = [], selectedPasarName = [], tableIndex = 0;
+    var selectedRoute = [], selectedRouteId = [], selectedRouteName = [], tableIndexRoute = 0;
+
+    $('#timezone option[value="{{ $emp->timezone->id }}"]').attr('selected','selected');
+
         function clearStores() {
             $('#stores').val('');
             $('#select2-stores-container').html('<span class="select2-selection__placeholder">Choose your Store</span>');
@@ -684,6 +394,38 @@
                 notif('Warning',msg,'warning');
             }
         }
+        function addItemRoute(route, get = '') {
+            var routeSplit = route.split("|");
+            var a = selectedRouteId.indexOf(''+routeSplit[0]);
+
+            if (get != 'get') {
+                selectedRoute.push(route);
+                selectedRouteId.push(routeSplit[0]);
+                selectedRouteName.push(routeSplit[1]);
+            }
+
+            if (a < 0 || get == 'get') {
+                tableIndexRoute++;
+                $('#selectedRouteTable').removeAttr('style');
+                $('#selectedRouteDefault').css('display','none');
+                $('#selectedRouteTableBody').append("<tr>"+
+                    "<th class='text-center' scope='row'>"+ tableIndexRoute +"</th>"+
+                    "<td><span>"+ routeSplit[1] +"</span>"+
+                    "<input type='hidden' name='route[]' value='"+ routeSplit[0] +
+                    "'></td>"+
+                    "<td class='text-center'>"+
+                    "<div class='btn-group'>"+
+                    "<button type='button' class='btn btn-sm btn-secondary js-tooltip-enabled' data-toggle='tooltip' title=' data-original-title='Delete' onclick='deleteItemRoute("+ routeSplit[0] +")'>"+
+                    "<i class='fa fa-times'></i>"+
+                    "</button>"+
+                    "</div>"+
+                    "</td>"+
+                    "</tr>");
+            }else{
+                var msg = " : Data Already Exist! data: "+routeSplit[1];
+                notif('Warning',msg,'warning');
+            }
+        }
         function deleteItem(id) {
             var a = selectedStoresId.indexOf(''+id);
             if (a >= 0) {
@@ -714,11 +456,66 @@
                 console.log("Index Item Not Found!");
             }
         }
+        function deleteItemRoute(id) {
+            // console.log(id);
+            var a = selectedRouteId.indexOf(''+id);
+            if (a >= 0) {
+                selectedRoute.splice(a, 1);
+                selectedRouteId.splice(a, 1);
+                selectedRouteName.splice(a, 1);
+                tableIndexRoute = 0;
+                $('#selectedRouteTableBody').html('');
+                $.each(selectedRoute, function( index, value ) {
+                    addItemRoute(value,'get');
+                });
+            }else{
+                console.log("Index Item Not Found!");
+            }
+        }
         function searchFunction() {
             var input, filter, table, tr, a, i;
             input = document.getElementById("myInput");
             filter = input.value.toUpperCase();
             table = document.getElementById("selectedStoreTableBody");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                console.log(a)
+                a = tr[i].getElementsByTagName("span")[0];
+                if(a != null){
+                    a= a.innerHTML;
+                    if (a.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+        function searchFunctionPasar() {
+            var input, filter, table, tr, a, i;
+            input = document.getElementById("myInput2");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("selectedPasarTableBody");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                console.log(a)
+                a = tr[i].getElementsByTagName("span")[0];
+                if(a != null){
+                    a= a.innerHTML;
+                    if (a.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function searchFunctionRoute() {
+            var input, filter, table, tr, a, i;
+            input = document.getElementById("myInput3");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("selectedRouteTableBody");
             tr = table.getElementsByTagName("tr");
             for (i = 0; i < tr.length; i++) {
                 console.log(a)

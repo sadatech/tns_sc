@@ -2,37 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Yajra\Datatables\Datatables;
-use Illuminate\Support\Facades\Input;
-use DB;
-use Auth;
-use File;
-use Excel;
-use App\PlanEmployee;
-use App\TargetGtc;
-use Carbon\Carbon;
-use App\Position;
-use App\Agency;
-use App\SubArea;
-use App\Area;
-use App\Region;
 use App\Account;
+use App\Agency;
+use App\Area;
+use App\Block;
 use App\Channel;
-use App\SalesTiers;
-use App\Store;
-use App\Timezone;
 use App\Employee;
 use App\EmployeePasar;
-use App\EmployeeSubArea;
-use App\Pasar;
-use App\Block;
+use App\EmployeeRoute;
 use App\EmployeeStore;
-use App\Filters\EmployeeFilters;
+use App\EmployeeSubArea;
 use App\Filters\BlockFilters;
-use App\Traits\StringTrait;
+use App\Filters\EmployeeFilters;
+use App\Pasar;
+use App\PlanEmployee;
+use App\Position;
+use App\Region;
+use App\Route;
+use App\SalesTiers;
+use App\Store;
+use App\SubArea;
+use App\TargetGtc;
+use App\Timezone;
 use App\Traits\FirstOrCreateTrait;
+use App\Traits\StringTrait;
+use Auth;
+use Carbon\Carbon;
+use DB;
+use Excel;
+use File;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Str;
+use Yajra\Datatables\Datatables;
 
 class EmployeeController extends Controller
 {
@@ -113,6 +115,10 @@ class EmployeeController extends Controller
 		$data['pasar_selected'] = json_encode(EmployeePasar::where(['employee_pasars.id_employee' => $id, 'active'=>'1'])->join('pasars','pasars.id','employee_pasars.id_pasar')->select(DB::raw("concat(pasars.id,'|',pasars.name) as pasars_item"))->get()->toArray());
 		$data['area_selected'] = json_encode(EmployeeSubArea::where(['employee_sub_areas.id_employee' => $id])->join('sub_areas','sub_areas.id','employee_sub_areas.id_subarea')->select(DB::raw("concat(sub_areas.id,'|',sub_areas.name,'|') as subarea_item"))->get()->toArray());
 		$data['isTl'] = (isset(EmployeeSubArea::where('id_employee', $id)->first()->isTl) ? EmployeeSubArea::where('id_employee', $id)->first()->isTl : 0);
+
+		$data['pasar_selected'] = json_encode(EmployeeRoute::where(['employee_routes.id_employee' => $id, 'type'=>'2'])->join('routes','routes.id','employee_routes.id_route')->select(DB::raw("concat(routes.id,'|',routes.name) as pasars_item"))->get()->toArray());
+		$data['route_selected'] = json_encode(EmployeeRoute::where(['employee_routes.id_employee' => $id, 'type'=>'1'])->join('routes','routes.id','employee_routes.id_route')->select(DB::raw("concat(routes.id,'|',routes.name) as routes_item"))->get()->toArray());
+
 		// dd($data);
 		if ($data['emp']->isResign) {
 			return redirect()->route('employee');
@@ -123,14 +129,16 @@ class EmployeeController extends Controller
 
 	public function store(Request $request)
 	{
+		$request['position'] = 1;
 		$data=$request->all();
+	
 		$limit=[
 			'foto_ktp' 		=> 'max:10000',
 			'foto_tabungan' => 'max:10000|mimes:jpeg,jpg,bmp,png',
 			'name' 			=> 'required',
 			'password' 		=> 'required',
 			'position' 		=> 'required',
-			'agency' 		=> 'required|numeric',
+			'agency' 		=> 'numeric',
 			'email' 		=> 'email|required|unique:employees',
 			'phone' 		=> 'required|numeric|unique:employees',
 			'nik' 			=> 'required|unique:employees',
@@ -195,76 +203,41 @@ class EmployeeController extends Controller
 					'foto_tabungan' => $foto_tabungan,
 					'foto_profile' 	=> $foto_profile,
 					'id_position' 	=> $request->input('position'),
-					'id_timezone' 	=> $request->input('timezone'),
-					'id_agency' 	=> $request->input('agency')
+					'id_timezone' 	=> @$request->input('timezone'),
+					'id_agency' 	=> @$request->input('agency')
 				]);
 				if ($insert->id) {
-					if ($request->input('status') == 'Stay') {
-						EmployeeStore::create([
-							'id_store' 		=> $request->input('store'),
-							'id_employee' 	=> $insert->id,
-						]);
-						return response()->json([
-							'type' 		=> 'success',
-							'title' 	=> 'Sukses!<br/>',
-							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
-						]);
-					} else if($request->input('status') == 'Mobile') {
-						$dataStore = array();
-						foreach ($request->input('stores') as $store) {
-							$dataStore[] = array(
-								'id_employee' 	=> $insert->id,
-								'id_store' 		=> $store,
-							);
-						}
-						DB::table('employee_stores')->insert($dataStore);
-						return response()->json([
-							'type' 		=> 'success',
-							'title' 	=> 'Sukses!<br/>',
-							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
-						]);
-					} else if (!empty($request->input('pasar'))) {
+					if (!empty($request->input('pasar'))) {
 						$dataPasar = array();
 						foreach ($request->input('pasar') as $pasar) {
 							$dataPasar[] = array(
 								'id_employee' 	=> $insert->id,
-								'id_pasar' 		=> $pasar,
+								'id_route' 		=> $pasar,
+								'created_at'	=> Carbon::now(),
+								'updated_at'	=> Carbon::now(),
 							);
 						}
-						DB::table('employee_pasars')->insert($dataPasar);
-						return response()->json([
-							'type' 		=> 'success',
-							'title' 	=> 'Sukses!<br/>',
-							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
-						]);
-					} else if (!empty($request->input('subarea'))) {
-						$dataSubArea = array();
-						foreach ($request->input('subarea') as $subarea) {
-							$dcCheck = Position::where('level', 'dc')->first();
-							if ($request->input('position') == $dcCheck->id)
-							{
-								if ($request->input('tl'))
-								{
-									$isTl = true;
-								} else {
-									$isTl = false;
-								}
-							} else {
-								$isTl = true;
-							}
-							$dataSubArea[] = array(
-								'id_employee' 	=> $insert->id,
-								'isTl'			=> $isTl,
-								'id_subarea' 	=> $subarea
-							);
-						}
-						DB::table('employee_sub_areas')->insert($dataSubArea);
-						return response()->json([
-							'type' 		=> 'success',
-							'title' 	=> 'Sukses!<br/>',
-							'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
-						]);
+						DB::table('employee_routes')->insert($dataPasar);						
 					}
+
+					if (!empty($request->input('route'))) {
+						$dataRoute = array();
+						foreach ($request->input('route') as $route) {
+							$dataRoute[] = array(
+								'id_employee' 	=> $insert->id,
+								'id_route' 		=> $route,
+								'created_at'	=> Carbon::now(),
+								'updated_at'	=> Carbon::now(),
+							);
+						}
+						DB::table('employee_routes')->insert($dataRoute);						
+					}
+
+					return response()->json([
+						'type' 		=> 'success',
+						'title' 	=> 'Sukses!<br/>',
+						'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil menambah employee!'
+					]);
 				}
 			} else {
 				return response()->json([
@@ -279,66 +252,64 @@ class EmployeeController extends Controller
 	public function data()
 	{
 		$employee = Employee::where(['isResign' => 0])
-		->whereIn('id_position', [1,2,6])
-		->with(['agency', 'position', 'employeeStore', 'timezone'])
+		->with(['timezone'])
 		->select('employees.*');
 		return Datatables::of($employee)
-		->addColumn('action', function ($employee) {
-			// return '';
-			if (isset($employee->id)) {
-			$employeeS 		= EmployeeStore::where(['id_employee' => $employee->id])->get();
-				$store 		= array();
-				$address 	= array();
-				$coverage 	= array();
-				$acc		= array();
-				foreach ($employeeS as $key => $data) 
-				{
-					$getOutlet = Store::where(['id' => $data->id_store]);
-					foreach ($getOutlet->get() as $val) {
-						$acc[$data->id][] 		= str_replace("'", "`", $val->account->name);
-						$address[$data->id][] 	= str_replace("'", "`", $val->address);
-						$coverage[$data->id][] 	= $val->coverage;
-					}
-					if ($getOutlet->count() < 1) {
-						$store[] = (isset($data->store->name1) ? "<tr><td>".str_replace("'", "`", $data->store->name1)."</td><td>Kosong</td></tr>" : "");
-					} else {
-						$store[] = (isset($data->store->name1) ? "<tr><td>".str_replace("'", "`", $data->store->name1)."</td><td>".rtrim(implode(', ', $acc[$data->id]), ',')."</td><td>".rtrim(implode(', ', $address[$data->id]), ',')."</td><td>".rtrim(implode(', ', $coverage[$data->id]), ',')."</td></tr>" : "");
-					}
+		->addColumn('coverage', function ($employee) {
+			$employeeS 		= EmployeeRoute::where(['id_employee' => $employee->id])->get();
+			$name 		= array();
+			$type 		= array();
+			$area 		= array();
+			$address	= array();
+			$just_name  = array();
+			foreach ($employeeS as $key => $data)
+			{
+				$getOutlet = Route::where(['id' => $data->id_route])->get();
+				foreach ($getOutlet as $val) {
+					$name[$data->id][] 		= str_replace("'", "`", $val->name);
+					$type[$data->id][] 		= str_replace("'", "`", (($val->type == 1) ? "Route" : "Market"));
+					$area[$data->id][] 		= str_replace("'", "`", $val->subarea->name.", ".$val->subarea->area->name);
+					$address[$data->id][] 	= str_replace("'", "`", $val->address);
+					array_push($just_name, str_replace("'", "`", $val->name));
 				}
+				if ($getOutlet->count() < 1) {
+					$store[] = "<tr><td colspan=4>Kosong</td></tr>";
+				} else {
+					$store[] = "<tr><td>".rtrim(implode(', ', $name[$data->id]), ',')."</td><td>".rtrim(implode(', ', $type[$data->id]), ',')."</td><td>".rtrim(implode(', ', $area[$data->id]), ',')."</td><td>".rtrim(implode(', ', $address[$data->id]), ',')."</td></tr>";
+				}
+			}
 
 			$data = array(
 				'id'        	=> (isset($employee->id) ? $employee->id : ""),
 				'store'    		=> $store
 			);
-			return "<a href=".route('ubah.employee', $employee->id)."/mtc"." class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></a>
-			<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>
-			<button onclick='viewModal(".json_encode($data).")' class='btn btn-sm btn-warning btn-square' title='View Store'><i class='si si-picture mr-2'></i> STORE</button>
-			<a href=".asset('/uploads/ktp')."/".$employee->foto_ktp." class='btn btn-sm btn-success btn-square popup-image' title='Show Photo KTP'><i class='si si-picture mr-2'></i> KTP</a>
-			<a href=".asset('/uploads/tabungan')."/".$employee->foto_tabungan." class='btn btn-sm btn-info btn-square popup-image' title='Show Photo Tabungan'><i class='si si-picture mr-2'></i> TABUNGAN</a>";
-			}
+
+			// $temp_name = implode(', ', array_values($name));
+
+			$naming = implode(', ', $just_name);
+			$naming = (strlen($naming) > 40) ? substr($naming, 0, 40) . ' ...' : $naming;
+
+
+			return " <span class='fake-link' onclick='viewModal(".json_encode($data).")'>".$naming."</span>";
 		})
-		->addColumn('employeeStore', function($employee) {
-			// return '';
-			$store = EmployeeStore::where(['id_employee' => $employee->id])->get();
-			$storeList = array();
-			foreach ($store as $data) {
-				$storeList[] = $data->store->name1;
-			}
-			return rtrim(implode(', ', $storeList), ',');
+		->addColumn('action', function ($employee) {
+
+			// ADD PHOTO PATH
+			$employee['foto_ktp_path'] = ($employee['foto_ktp'] != null) ? asset('uploads/ktp/'.$employee['foto_ktp']) : asset('no-image.jpg');
+			$employee['foto_profile_path'] = ($employee['foto_profil_url'] != null) ? asset('uploads/profile/'.$employee['foto_profil_url']) : asset('no-image.jpg');
+			$employee['foto_tabungan_path'] = ($employee['foto_tabungan'] != null) ? asset('uploads/tabungan/'.$employee['foto_tabungan']) : asset('no-image.jpg');
+			
+			return "<button onclick='viewInfo(".json_encode($employee).")' class='btn btn-sm btn-success btn-square js-tooltip-enabled' data-toggle='tooltip' data-placement='top' title='Employee Detail'><i class='si si-info'></i></button>
+					<a href=".route('ubah.employee', $employee->id)."/mtc"." class='btn btn-sm btn-primary btn-square js-tooltip-enabled' data-toggle='tooltip' data-placement='top' title='Update'><i class='si si-pencil'></i></a>
+					<button data-url=".route('employee.delete', $employee->id)." class='btn btn-sm btn-danger btn-square js-swal-delete js-tooltip-enabled' data-toggle='tooltip' data-placement='top' title='Delete'><i class='si si-trash'></i></button>";
 		})
-		->addColumn('position', function($employee) {
-			return $employee->position->name;
-		})
-		->addColumn('timezone', function($employee) {
-			return $employee->timezone->name;
-		})
-		->addColumn('agency', function($employee) {
-			return $employee->agency->name;
-		})->make(true);
+		->rawColumns(['action', 'coverage'])
+		->make(true);
 	}
 
 	public function update(Request $request, $id) 
 	{
+		$request['position'] = 1;
 		$data=$request->all();
 		$limit=[
 			'name'    				=> 	'required',
@@ -349,7 +320,7 @@ class EmployeeController extends Controller
 			'nik'    				=> 	'required|numeric',
 			'ktp'        			=> 	'required|numeric',
 			'phone'       			=> 	'required|numeric',
-			'agency'				=> 	'required|numeric',
+			'agency'				=> 	'numeric',
 			'position'				=> 	'required',
 		];
 		$validator = Validator($data, $limit);
@@ -396,9 +367,6 @@ class EmployeeController extends Controller
 			if ($request->input('status') == 'Mobile') {
 				$employee->status = $request->input('status');
 			}
-			if ($request->input('position') == Position::where(['level' => 'tlmtc'])->first()->id) {
-				$employee->employeeSubArea->id_subarea = $request->input('subarea');
-			}
 			if ($request->input('password')) {
 				$employee->password = bcrypt($request->input('password'));
 			}
@@ -413,7 +381,6 @@ class EmployeeController extends Controller
 			$employee->education 	= $request->input('education');
 			$employee->birthdate 	= $request->input('birthdate');
 			$employee->id_position 	= $request->input('position');
-			$employee->id_agency 	= $request->input('agency');
 			$employee->save();
 
 			/*
@@ -425,69 +392,35 @@ class EmployeeController extends Controller
 					'message'	=> '<i class="em em-confetti_ball mr-2"></i>Berhasil mengubah employee!'
 				];
 
-			if ($request->input('status') == 'Stay') {
-				EmployeeStore::where('id_employee', $id)->delete();
-				EmployeeStore::create([
-					'id_store' 		=> $request->input('store'),
-					'id_employee' 	=> $id,
-				]);
-				// return redirect()->route('employee')
-				// ->with($statusParam);
-			} else if($request->input('status') == 'Mobile') {
-				EmployeeStore::where('id_employee', $id)->delete();
-				$dataStore = array();
-				foreach ($request->input('stores') as $store) {
-					$dataStore[] = array(
-						'id_employee' 	=> $id,
-						'id_store' 		=> $store,
-					);
-				}
-				DB::table('employee_stores')->insert($dataStore);
-				// return redirect()->route('employee')
-				// ->with($statusParam);
-			} else if (!empty($request->input('pasar'))) {
-				EmployeePasar::where('id_employee', $id)->update(['active'=>'0']);
+			EmployeeRoute::where('id_employee', $id)->delete();
+
+			if (!empty($request->input('pasar'))) {				
+				$dataPasar = array();
 				foreach ($request->input('pasar') as $pasar) {
-					EmployeePasar::updateOrCreate(
-						[
-							'id_employee' 	=> $id,
-							'id_pasar' 		=> $pasar,
-						],
-						[
-							'active'		=> '1',
-						]
-					);
-				}
-				// return redirect()->route('employee.pasar')
-				// ->with($statusParam);
-			} else if (!empty($request->input('subarea'))) {
-				EmployeeSubArea::where('id_employee', $id)->delete();
-				$dataSubArea = array();
-				if ($request->input('tl') == null) {
-					$request['tl'] = '0';
-				}
-				foreach ($request->input('subarea') as $subarea) {
-					$dataSubArea[] = array(
+					$dataPasar[] = array(
 						'id_employee' 	=> $id,
-						'isTl'			=> $request->input('tl'),
-						'id_subarea' 	=> $subarea
+						'id_route' 		=> $pasar,
+						'created_at'	=> Carbon::now(),
+						'updated_at'	=> Carbon::now(),
 					);
 				}
-				DB::table('employee_sub_areas')->insert($dataSubArea);
-				// return redirect()->route('employee.dc')
-				// ->with($statusParam);
+				DB::table('employee_routes')->insert($dataPasar);						
 			}
 
-			if ($data['globalPosition'] == "summary") {
-				return redirect()->route('employee')
-				->with($statusParam);
-		}else if ($data['globalPosition'] == "pasar") {
-				return redirect()->route('employee.pasar')
-				->with($statusParam);
-			}else{
-				return redirect()->route('employee.dc')
-				->with($statusParam);
+			if (!empty($request->input('route'))) {
+				$dataRoute = array();
+				foreach ($request->input('route') as $route) {
+					$dataRoute[] = array(
+						'id_employee' 	=> $id,
+						'id_route' 		=> $route,
+						'created_at'	=> Carbon::now(),
+						'updated_at'	=> Carbon::now(),
+					);
+				}
+				DB::table('employee_routes')->insert($dataRoute);						
 			}
+
+			return redirect()->route('employee')->with($statusParam);			
 		}
 	}
 

@@ -670,8 +670,8 @@ Route::prefix('inventoriDc')->group(function () {
 *	Company Pages
 */
 Route::prefix('company')->group(function () {
-	Route::get('/', 'CompanyController@baca')->name('company')->middleware('auth');
-	Route::put('/update/{id}', 'CompanyController@update')->name('company.update')->middleware('auth');
+	// Route::get('/', 'CompanyController@baca')->name('company')->middleware('auth');
+	// Route::put('/update/{id}', 'CompanyController@update')->name('company.update')->middleware('auth');
 });
 
 
@@ -1167,6 +1167,9 @@ Route::prefix('select2')->group(function () {
 	Route::get('/store-select2', 'StoreController@getDataWithFilters')->name('store-select2');
 	Route::post('/position-select2', 'PositionController@getDataWithFilters')->name('position-select2');
 	Route::post('/brandXSASA-select2', 'BrandController@getDataWithFilters')->name('brandXSASA-select2');
+
+	// NEW
+	Route::get('/route-select2', 'RouteController@getDataWithFilters')->name('route-select2');
 });
 
 Route::prefix('promoactivity')->group(function(){
