@@ -28,22 +28,13 @@
                 </div>
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="employeetable">
                     <thead>
-                        <th class="text-center" width="350px">Action</th>
-                        <th width="200px">NIK</th>
-                        <th width="200px">Name</th>
-                        <th width="200px">No. KTP</th>
-                        <th width="200px">Store</th>
-                        <th width="200px">Phone</th>
-                        <th width="200px">Email</th>
-                        <th width="200px">No. Rekening</th>
-                        <th width="200px">Bank</th>
-                        <th width="60px">Status</th>
-                        <th width="150px">Join Date</th>
-                        <th width="200px">Agency</th>
-                        <th width="120px">Gender</th>
-                        <th width="60px">Education</th>
-                        <th width="200px">Birth Date</th>
-                        <th width="200px">Name Position</th>
+                        <th class="text-center" width="100px">Action</th>                        
+                        <th class="text-center" width="200px">Coverage</th>
+                        <th width="200px">Name</th> 
+                        <th width="100px">NIK</th>  
+                        <th width="100px">Join Date</th>                                      
+                        <th width="100px">Email</th>
+                        <th width="100px">Phone</th>                        
                     </thead>
                 </table>
             </div>
@@ -86,7 +77,6 @@
                                     <td><b>Rekening</b></td>
                                     <td><b>Bank</b></td>    
                                     <td><b>Join Date</b></td>
-                                    <td><b>Agency</b></td>
                                     <td><b>Gender</b></td>
                                     <td><b>Education</b></td>
                                     <td><b>Birth Date</b></td>
@@ -105,7 +95,6 @@
                                     <td>Rekening 1</td>
                                     <td>Bank 1</td>
                                     <td>Join Date 1</td>
-                                    <td>Agency 1</td>
                                     <td>Gender 1</td>
                                     <td>Education 1</td>
                                     <td>Birth Date 1</td>
@@ -122,7 +111,6 @@
                                     <td>Rekening 2</td>
                                     <td>Bank 2</td>
                                     <td>Join Date 2</td>
-                                    <td>Agency 2</td>
                                     <td>Gender 2</td>
                                     <td>Education 2</td>
                                     <td>Birth Date 2</td>
@@ -155,7 +143,7 @@
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-gd-sun p-10">
-                    <h3 class="block-title"><i class="fa fa-edit"></i> Store Information</h3>
+                    <h3 class="block-title"><i class="fa fa-edit"></i> Employee's Coverage</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
                             <i class="si si-close"></i>
@@ -167,10 +155,10 @@
                 <div class="block-content">
                     <table class="table table-bordered">
                         <thead>
-                            <th>Store</th>
-                            <th>Account</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Area</th>
                             <th>Address</th>
-                            <th>Coverage</th>
                         </thead>
                         <tbody id="storeGet">
                         </tbody>
@@ -183,6 +171,82 @@
     </div>
 </div>
 
+<div class="modal fade" id="viewInfo" tabindex="-1" role="dialog" aria-labelledby="addModal" aria-hidden="true" style="z-index:1041">
+    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-gd-sun p-10">
+                    <h3 class="block-title"><i class="fa fa-edit"></i> Employee Information</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>                
+            <div class="block-content">
+                <h6>Profile</h6>
+                <table class="table table-bordered">
+                    <tr>
+                        <td width="20%"><b>NIK</b></td>
+                        <td width="30%" id="infoNik">Example</td>
+                        <td width="20%"><b>Name</b></td>
+                        <td width="30%" id="infoName">Example</td>
+                    </tr>
+                    <tr>
+                        <td><b>No. KTP</b></td>
+                        <td id="infoKtp">Example</td>
+                        <td><b>Phone</b></td>
+                        <td id="infoPhone">Example</td>
+                    </tr>
+                    <tr>
+                        <td><b>Email</b></td>
+                        <td id="infoEmail">Example</td>
+                        <td><b>Gender</b></td>
+                        <td id="infoGender">Example</td>
+                    </tr>
+                    <tr>
+                        <td><b>Education</b></td>
+                        <td id="infoEducation">Example</td>
+                        <td><b>Timezone</b></td>
+                        <td id="infoTimezone">Example</td>
+                    </tr>
+                    <tr>
+                        <td><b>Tanggal Lahir</b></td>
+                        <td id="infoBirth">Example</td>
+                        <td><b>Join Date</b></td>
+                        <td id="infoJoin">Example</td>
+                    </tr>
+                    <tr>
+                        <td><b>Foto KTP</b></td>
+                        <td><a id="infoFotoKtp" href="#" class="btn btn-sm btn-success btn-square popup-image"><i class="si si-picture mr-2"></i> Lihat Foto</a></td>
+                        <td><b>Foto Profile</b></td>
+                        <td><a id="infoFotoProfile" href="#" class="btn btn-sm btn-success btn-square popup-image"><i class="si si-picture mr-2"></i> Lihat Foto</a></td>
+                    </tr>
+                </table>  
+                <br>
+
+                <h6>Bank Account</h6>
+                <table class="table table-bordered">
+                    <tr>
+                        <td width="20%"><b>Nomor Rekening</b></td>
+                        <td width="30%" id="infoNoRekening">Example</td>
+                        <td width="20%"><b>Nama Bank</b></td>
+                        <td width="30%" id="infoNamaBank">Example</td>
+                    </tr>
+                    <tr>
+                        <td><b>Foto Rekening</b></td>
+                        <td colspan="3"><a id="infoFotoTabungan" href="#" class="btn btn-sm btn-success btn-square popup-image"><i class="si si-picture mr-2"></i> Lihat Foto</a></td>
+                    </tr>
+                </table>               
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @endsection
 
@@ -190,6 +254,13 @@
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/magnific-popup/magnific-popup.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
+<style type="text/css">
+.fake-link {
+    color: #2facb2;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
 @endsection
 
 @section('script')
@@ -203,6 +274,26 @@
         $('#viewModal').modal('show');
         $('#employeeID').val(json.id);
         $('#storeGet').html(json.store);
+    }
+
+    function viewInfo(json) {
+        console.log(json);
+        $('#viewInfo').modal('show');
+        $('#infoNik').html(json.nik);
+        $('#infoName').html(json.name);
+        $('#infoKtp').html(json.ktp);
+        $('#infoPhone').html(json.phone);
+        $('#infoEmail').html(json.email);
+        $('#infoGender').html(json.gender);
+        $('#infoEducation').html(json.education);
+        $('#infoTimezone').html(json.timezone.name);
+        $('#infoBirth').html(json.birthdate);
+        $('#infoJoin').html(json.joinAt);
+        $('#infoFotoKtp').attr('href', json.foto_ktp_path);
+        $('#infoFotoProfile').attr('href', json.foto_profile_path);
+        $('#infoFotoTabungan').attr('href', json.foto_tabungan_path);
+        $('#infoNoRekening').html(json.rekening);
+        $('#infoNamaBank').html(json.bank);
     }
 </script>
 <script type="text/javascript">
@@ -230,6 +321,8 @@
             scrollX: true,
             scrollY: "300px",
             drawCallback: function(){
+                $('[data-toggle="popover"]').popover();
+                $('[data-toggle="tooltip"]').tooltip();
                 $('.popup-image').magnificPopup({
                     type: 'image',
                 });
@@ -261,22 +354,13 @@
             },
             ajax: '{!! route('employee.data') !!}',
             columns: [
-            { data: 'action'},
-            { data: 'nik'},
+            { data: 'action'},            
+            { data: 'coverage'},
             { data: 'name'},
-            { data: 'ktp'},
-            { data: 'employeeStore'},
-            { data: 'phone'},
-            { data: 'email'},
-            { data: 'rekening'},
-            { data: 'bank'},
-            { data: 'status'},
-            { data: 'joinAt'},
-            { data: 'agency'},
-            { data: 'gender'},
-            { data: 'education'},
-            { data: 'birthdate'},
-            { data: 'position'}
+            { data: 'nik'},
+            { data: 'joinAt'},            
+            { data: 'email'},            
+            { data: 'phone'},            
             ]
         });
     });

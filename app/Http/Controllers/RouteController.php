@@ -11,10 +11,17 @@ use App\Route;
 use App\Traits\StringTrait;
 use Carbon\Carbon;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Filters\RouteFilters;
 
 class RouteController extends Controller
 {
     use StringTrait;
+
+    public function getDataWithFilters(RouteFilters $filters)
+    {
+        $data = Route::filter($filters)->get();
+        return $data;
+    }
 
     public function baca($market = '')
     {
