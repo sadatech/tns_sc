@@ -39,9 +39,9 @@ class RouteController extends Controller
             ->addColumn('action', function ($routes) use ($market){
                 $data = array(
                     'id'            => $routes->id,
-                    'sub_area'      => $routes->subarea->id,
+                    'sub_area_id'   => $routes->subarea->id,
                     'sub_area_name' => $routes->subarea->name,
-                    'name'          => $routes->name,
+                    'route'         => $routes->name,
                     'latitude'      => $routes->latitude,
                     'longitude'     => $routes->longitude,
                     'address'       => $routes->address,

@@ -50,6 +50,7 @@ $thisId       = str_replace(' ','',$title);
 $modalId      = "inputModal".$thisId;
 $validate     = [];
 $onEdit       = [];
+$onEdit2      = []; //for select2, it have to update at last order to prevent it avoid other function
 $inputCollect = [];
 
 foreach ( $input as $key => $value ) {
@@ -68,11 +69,12 @@ foreach ( $input as $key => $value ) {
             }
         }
         $updateString = !empty($updateString) ? $updateString : "onEdit".$thisId."Input('select2','$value[name]','".$thisId."Input".$id."',{'id':json.$editField[0],'name':json.$editField[1]});";
-        $onEdit[] = $updateString;
+        $onEdit2[] = $updateString;
     } elseif ( $value['type'] == 'select3' ) {
-        $onEdit[] = "onEdit".$thisId."Input('$value[type]','$value[name]','".$thisId."Input".$id."',{'id':json.$editField[0],'name':json.$editField[1]});";
+        $onEdit2[] = "onEdit".$thisId."Input('$value[type]','$value[name]','".$thisId."Input".$id."',{'id':json.$editField[0],'name':json.$editField[1]});";
     } elseif ( $value['type'] == 'location' ) {
-        $onEdit[] = "onEdit".$thisId."Input('$value[type]','$value[name]','".$thisId."Input".$id."',{'latitude':json.$editField[0],'longitude':json.$editField[1]});";
+		$editField = isset($value['edit_field']) ? $editField : ['latitude','longitude'];
+		$onEdit[]  = "onEdit".$thisId."Input('$value[type]','$value[name]','".$thisId."Input".$id."',{'latitude':json.$editField[0],'longitude':json.$editField[1]});";
     } elseif ( $value['type'] == 'password' ) {
         
     } else {
@@ -112,8 +114,9 @@ if ( isset($false_rules) ) {
     }
 }
 
-$onEdit     = implode(" \n ", $onEdit);
-$validate   = implode(" \n ", $validate);
+$onEdit   = implode(" \n ", $onEdit);
+$onEdit2  = implode(" \n ", $onEdit2);
+$validate = implode(" \n ", $validate);
 @endphp
 
 
@@ -178,7 +181,6 @@ $validate   = implode(" \n ", $validate);
                 '{{$value['name']}}' : $('#{{$value['id']}}').val(),
                 @endforeach
             };
-            console.log(formData);
             //var url = $('#{{$thisId}}Form').attr('action');
 //
             //$.ajax({
@@ -202,11 +204,14 @@ $validate   = implode(" \n ", $validate);
 
     function editModal{{$thisId}}(json) {
         $('#{{$modalId}}').modal('toggle');
-        console.log(json)
         $('#idInput{{$thisId}}').val(json.id);
         $('#updateInput{{$thisId}}').val(1);
         clear{{$thisId}}Input();
         {!!$onEdit!!}
+        setTimeout(function() {
+	        {!!$onEdit2!!}
+
+        }, 500);
     }
 
     function addModal{{$thisId}}() {

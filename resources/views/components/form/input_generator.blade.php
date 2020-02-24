@@ -195,6 +195,8 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
         } elseif ( $value['type'] == 'location' ) {
             $includeLoc++;
             echo Form::locationInput($value['name'], null, ['useLabel'=>false,'elOptions'=>['id'=>$currentId]]);
+
+            $currentClear = "initMap$currentId([])";
         } elseif ( $value['type'] == 'text' ) {
             $placeholder = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".strtolower($label)." here";
             echo Form::textInput($value['name'], ( isset($value['value']) ? $value['value'] : null ),
@@ -403,22 +405,29 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
                 setSelect2IfPatch2($("#"+elementId), value['id'], value['name']);
             }
         } else if (type == 'location') {
-          eval( "initMap" + elementId + "(value['latitude'],value['longitude'])" );
+            var fnName = "initMap" + elementId;
+            var params = [ parseFloat(value['latitude']) , parseFloat(value['longitude']) ];
+            console.log(fnName)
+            console.log(params)
+
+            //window[fnName]([]);
+            window[fnName](params);
         } else if (type == 'checkbox') {
             $.each(value, function(i, val){
                $("input[name='" + name + "[]'][value='" + val + "']").prop('checked', true);
             });
         } else if (type == 'radio') {
-           $("input[name='" + name + "[]'][value='" + value + "']").prop('checked', true);
+            $("input[name='" + name + "[]'][value='" + value + "']").prop('checked', true);
         } else if (type == 'select-multi') {
-            eval( "select2val_"+ elementId + "= []" );
+            var varName = "select2val_"+ elementId;
+            window[varName] = [];
             $.each(value, function( i, v ) {
-                eval( "select2val_"+ elementId +".push({id:'"+v['id']+"',name:'"+v['name']+"'})" );
+                window[varName].push({id:"'"+v['id']+"'",name:"'"+v['name']+"'"});
             });
-            eval( "generateTable_"+ elementId +"()" );
+
+            window["generateTable_"+ elementId]();
         } else if (type == 'select3') {
-            console.log('#div'+elementId);
-            setSelect2IfPatch2( $("#"+$('#div'+elementId).find('select')[1].id), value['id'], value['name'] );
+            setSelect2IfPatch2( $("#"+$('#div'+elementId).next().find('select')[1].id), value['id'], value['name'] );
         } else {
             $("#"+elementId).val(value);
         }
@@ -427,6 +436,7 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
     function cek(){
         clear{{$thisId}}();
     }
+
     @if(isset($modal))
     var firstShow{{$thisId}} = 0;
     $('#{{$modal}}').on('shown.bs.modal', function(){

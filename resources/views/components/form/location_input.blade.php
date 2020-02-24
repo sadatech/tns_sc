@@ -114,14 +114,19 @@ $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_
 
 @push('function-js')
 {{-- <script type="text/javascript"> --}}
-	var lat{{$id}}  = {{ !empty($value) ? (isset($value[0]) ? $value[0] : '-6.2241031') : '-6.2241031'}};
-	var long{{$id}} = {{ !empty($value) ? (isset($value[1]) ? $value[1] : '106.92347419999999') : '106.92347419999999'}};
 
-    if( $('#locpic-latitude{{$id}}').val() != '') lat{{$id}} = $('#locpic-latitude{{$id}}').val();
-    if( $('#locpic-longitude{{$id}}').val() != '') long{{$id}} = $('#locpic-longitude{{$id}}').val();
-    initMap{{$id}}(lat{{$id}}, long{{$id}});
+    initMap{{$id}}([]);
 
-    function initMap{{$id}}(latitude, longitude) {
+    function initMap{{$id}}(params=[]) {
+    	if (params.length) {
+			latitude  = params[0];
+			longitude = params[1];
+			console.log('1')
+		}else{
+			latitude  = -6.2241031;
+			longitude = 106.92347419999999;
+			console.log('1')
+		}
         $('#locpic-address{{$id}}').val('');
         $('#locpic-latitude{{$id}}').val(latitude);
 		$('#locpic-longitude{{$id}}').val(longitude);

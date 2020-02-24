@@ -71,13 +71,14 @@
         'width'      => '12',
         'width_tree' => ['9','3'],
         'use_label'  => false,
-        'edit_field' => ['id_sub_area','sub_area_name'],
+        'edit_field' => ['sub_area_id','sub_area_name'],
         'tree'       => ['sub_area','area','brand'],
         'route'      => ['sub-area-select2','area-select2','region-select2'],
       ],
       [
         'name'      => 'location',
         'type'      => 'location',
+        //'edit_field' => ['latitude','longitude'],
         'use_label' => false,
       ],
     ]
