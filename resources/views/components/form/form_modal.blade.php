@@ -174,6 +174,7 @@ $validate = implode(" \n ", $validate);
 
             validate{{$thisId}}();
 
+            {{-- 
             var formData = {
                 'id'      : $('#idInput{{$thisId}}').val(),
                 'update'  : $('#updateInput{{$thisId}}').val(),
@@ -181,22 +182,25 @@ $validate = implode(" \n ", $validate);
                 '{{$value['name']}}' : $('#{{$value['id']}}').val(),
                 @endforeach
             };
-            //var url = $('#{{$thisId}}Form').attr('action');
-//
-            //$.ajax({
-                //url   : url,
-                //type  : 'POST',
-                //data  : formData,
-                //success: function (data) {
-                    //console.log(data)
-                    //swal('data.title', 'data.message', 'success');
-                    //// swal(data.title, data.message, data.type);
-		            //$('#{{$modalId}}').modal('toggle');
-                //},
-                //error: function(xhr, textStatus, errorThrown){
-                    //swal("Gagal melakukan request", "Silahkan hubungi admin", "error");
-                //}
-            //});
+             --}}
+            var formData = $('#{{$thisId}}Form').serialize();
+
+            var url = $('#{{$thisId}}Form').attr('action');
+
+            $.ajax({
+                url   : url,
+                type  : 'POST',
+                data  : formData,
+                success: function (data) {
+                    console.log(data)
+                    swal('data.title', 'data.message', 'success');
+                    // swal(data.title, data.message, data.type);
+		            $('#{{$modalId}}').modal('toggle');
+                },
+                error: function(xhr, textStatus, errorThrown){
+                    swal("Gagal melakukan request", "Silahkan hubungi admin", "error");
+                }
+            });
 
         });
 

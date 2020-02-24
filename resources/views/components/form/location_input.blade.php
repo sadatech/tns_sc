@@ -121,11 +121,9 @@ $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_
     	if (params.length) {
 			latitude  = params[0];
 			longitude = params[1];
-			console.log('1')
 		}else{
 			latitude  = -6.2241031;
 			longitude = 106.92347419999999;
-			console.log('1')
 		}
         $('#locpic-address{{$id}}').val('');
         $('#locpic-latitude{{$id}}').val(latitude);

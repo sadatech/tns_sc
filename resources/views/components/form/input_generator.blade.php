@@ -380,9 +380,11 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
     var inputId = [{!! implode(', ',$inputId) !!}];
     {!! $filter ? "var filterId = [".implode(', ',$inputId)."]" : "" !!}
     {!! implode('',$script) !!}
+    
     function clear{{$thisId}}() {
         {!! implode("\n",$clearInput) !!}
     }
+
     function onEdit{{$thisId}}(type, name, elementId, value, valueIndex = [], check = false, multiple = false) {
         var countingCheck = 0;
 
@@ -397,8 +399,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
                     var atLeastOneIsChecked = $(checkId).length > 0;
                     if (!atLeastOneIsChecked) {
                         $("#"+elementId+"_all").click();
-                    }else{
-
                     }
                 }
             }else{
@@ -407,10 +407,7 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
         } else if (type == 'location') {
             var fnName = "initMap" + elementId;
             var params = [ parseFloat(value['latitude']) , parseFloat(value['longitude']) ];
-            console.log(fnName)
-            console.log(params)
 
-            //window[fnName]([]);
             window[fnName](params);
         } else if (type == 'checkbox') {
             $.each(value, function(i, val){
