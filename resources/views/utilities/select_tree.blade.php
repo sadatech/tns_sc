@@ -44,7 +44,7 @@
 
     $last     = ( count($input) == ($key+1) ? 1 : 0 );
     $script   .= "
-    var select".$selector." = '';
+      var select".$selector." = '';
       $('#".$selector."Select').select2(setOptions('". route($routes.'-select2') ."', 'Select ".$title."', function (params) {
         return filterData('name', params.term);
       }, function (data, params) {
@@ -97,8 +97,8 @@
               <select class='form-control' style='width: 100%' name='".$value."' id='".$selector."Select' ".( ($key == 0) ? 'required' : '' ).">
               </select>
             </div>
-            <div class='input-group-append col-md-". $right ." col-sm-12'>
-              <label class='css-control css-control-primary css-switch'>
+            <div class='input-group-append col-md-". $right ." col-sm-12 padding-r-0'>
+              <label class='css-control css-control-primary css-switch pos-abs-r'>
                   <input type='checkbox' class='css-control-input' id='new".$selector."Checkbox' name='new".$selector."Checkbox'>
                   <span class='css-control-indicator'></span> New
               </label>
@@ -122,9 +122,12 @@
   $content = str_replace(array("\n","\r"), '', $content);
 @endphp
 
+@push('additional-js')
+<script type="text/javascript">
   $('#{{$selectorTree}}').html("{!!$content!!}");
   $('#{{$selectorTree}}').css('padding','15px');
   $('#{{$selectorTree}}').css('padding-top','0');
+  $('#{{$selectorTree}}').css('padding-right','0');
   $('#{{$selectorTree}}').addClass('row');
 
   {!!$script!!}
@@ -150,3 +153,5 @@
   function set{{$treeId}}SelectTree(id, name){
     setSelect2IfPatch2($("#{{$firstSelector}}Select"), id+'`^'+name, name);
   }
+</script>
+@endpush

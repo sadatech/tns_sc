@@ -5,6 +5,7 @@ namespace App;
 use App\Components\traits\ValidationHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Filters\QueryFilters;
 
 class ProductFocus extends Model
 {
@@ -43,5 +44,10 @@ class ProductFocus extends Model
     public function getToAttribute($value)
     {
         return date('m/Y', strtotime($value));
+    }
+
+    public function scopeFilter($query, QueryFilters $filters)
+    {
+        return $filters->apply($query);
     }
 }

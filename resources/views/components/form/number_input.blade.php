@@ -1,6 +1,7 @@
 @php
 if (!is_array($attributes)) $attributes = [];
 $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attributes);
+// $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_replace( array('/[^\w]/','/^\[/','/\]$/'), '', bcrypt($name) );
 @endphp
 
 <div class="form-group {{ !$errors->has($name) ?: 'has-error' }}">

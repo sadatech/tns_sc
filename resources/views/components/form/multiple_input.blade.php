@@ -54,11 +54,11 @@ $isFirst = true;
 	@endif
 </div>
 
-@push('additional-js')
-<script type="text/javascript">
+@push('function-js')
+{{-- <script type="text/javascript"> --}}
 	$('body').on('click', '.multipleInput_removeRowBtn', function(){
-		$(this).closest('div.input-group').remove()
-	})
+		$(this).closest('div.input-group').remove();
+	});
 
 	$('.multipleInput_addRowBtn-{{  $name  }}').click(function(){
 		$(this).closest('.multipleInput_container').append(
@@ -71,7 +71,7 @@ $isFirst = true;
 			'<span class="input-group-addon addon-middle-side">{{$config['addonsConfig']['text']}}</span>' + 
 			@endif
 			'<button type="button" class="btn btn-danger addon-right-side multipleInput_removeRowBtn"><i class="fa fa-times"></i></button>' +
-			'</div>')
-	})
-</script>
+			'</div>');
+	});
+{{-- </script> --}}
 @endpush

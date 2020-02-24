@@ -65,17 +65,16 @@ $isFirst = true;
 	@endif
 </div>
 
-@push('additional-js')
-<script type="text/javascript">
+@push('function-js')
+{{-- <script type="text/javascript"> --}}
 	$('body').on('click', '.multipleInput_removeRowBtn-{{  $name  }}', function(){
-		console.log('remove-clicked');
-		$(this).closest('tr').remove()
-	})
+		$(this).closest('tr').remove();
+	});
 
 	var lastRow_{{ $name }} = 0;
 
 	function getColumn_{{ $name }}(key){
-		var multipleColumn_columns_{{ $name }} = ''
+		var multipleColumn_columns_{{ $name }} = '',
 		lastRow_{{ $name }} = lastRow_{{$name}} == 0 ? key : ++lastRow_{{$name}};
 
 		@foreach ($columns as $column)
@@ -90,7 +89,7 @@ $isFirst = true;
 				'<input type="{{ $column['type'] ?? 'text' }}" value="" name="{{ $name }}[' + lastRow_{{ $name }} + '][{{ $column['name'] }}]" {!! $column['htmlOptions'] !!}>' + 
 			'</td>' 		
 		@endforeach
-		return multipleColumn_columns_{{ $name }}
+		return multipleColumn_columns_{{ $name }};
 	}
 
 	function generateRow_{{ $name }}() {
@@ -101,11 +100,11 @@ $isFirst = true;
 					'<button type="button" class="btn btn-danger multipleInput_removeRowBtn-{{  $name  }}"><span class="fa fa-times"></span></button>' +
 				'</td>' +
 			'</tr>'
-		)
+		);
 	}
 
 	$('body').on('click', '.multipleColumnInput_addRowBtn-{{  $name  }}', function(){
 		generateRow_{{ $name }}();
-	})
-</script>
+	});
+{{-- </script> --}}
 @endpush

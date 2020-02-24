@@ -27,8 +27,8 @@
 
     <!-- Fonts and Codebase framework -->
     <link rel="stylesheet" href="{{ asset('assets/js/plugins/select2/css/select2.min.css') }}">
-    <!-- <link rel="stylesheet" href="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.css') }}"> -->
-    <link href="{{ asset('assets/swal/sweetalert.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.css') }}">
+    <!-- <link href="{{ asset('assets/swal/sweetalert.css') }}" rel="stylesheet" type="text/css" /> -->
     <link rel="stylesheet" href="{{ asset('assets/css/emoji.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/codebase.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/themes/corporate.min.css') }}" id="css-theme" >
@@ -42,6 +42,19 @@
     <style type="text/css">
         .select2-search__field{
             width: 100% !important;
+        }
+        .row-no-margin{
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+        }
+        .padding-r-0{
+            padding-right: 0;
+        }
+        .pos-abs-r{
+            position: absolute;
+            right: 0;
         }
     </style>
 </head>
@@ -134,7 +147,7 @@
         <footer id="page-footer" class="opacity-0">
             <div class="content py-20 font-size-xs clearfix">
                 <div class="float-right">
-                    Created with <i class="fa fa-heart text-pulse"></i> by <a class="font-w600" href="https://www.sada.co.id/" target="_blank">Sada Technology</a>
+                    Created with <i class="fa fa-heart text-pulse"></i> by <a class="font-w600" href="https://www.sada.id/" target="_blank">Sada Technology</a>
                 </div>
             </div>
         </footer>
@@ -142,6 +155,7 @@
     </div>
     <!-- Codebase Core JS -->
     <script src="{{ asset('assets/js/core/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('assets/js/core/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/core/jquery.slimscroll.min.js') }}"></script>
     <script src="{{ asset('assets/js/core/jquery-scrollLock.min.js') }}"></script>
@@ -151,10 +165,13 @@
     <script src="{{ asset('assets/js/codebase.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/select2/js/select2.full.min.js') }}"></script>
-    <script src="{{ asset('assets/swal/sweetalert.min.js') }}"></script>
-    <!-- <script src="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script> -->
+    <!-- <script src="{{ asset('assets/swal/sweetalert.min.js') }}"></script> -->
+    <script src="{{ asset('assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/summernote/summernote-bs4.min.js') }}"></script>
     @yield('script')
     @stack('additional-js')
+    <script type="text/javascript">
+        @stack('function-js')
+    </script>
 </body>
 </html>

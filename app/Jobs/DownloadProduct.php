@@ -18,7 +18,7 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helper\ExcelHelper as ExcelHelper;
 
-class DownloadFocus implements ShouldQueue
+class DownloadProduct implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -55,21 +55,21 @@ class DownloadFocus implements ShouldQueue
         $excel = Excel::create($this->trace->file_name, function($excel) use ($data) {
 
             // Set the title
-            $excel->setTitle('Master - Product Focus');
+            $excel->setTitle('Master - Product');
 
             // Chain the setters
             $excel->setCreator('TNS')
                   ->setCompany('TNS');
 
             // Call them separately
-            $excel->setDescription('Product Focus Data');
+            $excel->setDescription('Product Data');
 
             $excel->getDefaultStyle()
                 ->getAlignment()
                 ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
                 ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
 
-            $excel->sheet('Focus', function ($sheet) use ($data) {
+            $excel->sheet('Product', function ($sheet) use ($data) {
                 $sheet->setAutoFilter('A1:D1');
                 $sheet->setHeight(1, 25);
                 $sheet->fromModel($this->excelHelper->mapForProductFocus($data), null, 'A1', true, true);

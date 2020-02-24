@@ -9,6 +9,20 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('test',function(){
+	$array1=array("Orange" => [100,10], "Apple" => [200,20], "Banana" => [300,30], "Cherry" => [400,40]);
+	$child = [];
+	foreach(array_keys($array1) as $key => $value){
+	    $child = $array1[$value];
+	}
+
+	foreach(array_keys($child) as $key => $value){
+	    foreach(array_keys($array1) as $key2 => $value2){
+	    	echo $array1[$value2][$key].' - ';
+		}
+	    echo '<br>';
+	}
+});
 
 Route::get('/', 'DashboardController@index')->name('dashboard')->middleware('auth');
 
@@ -363,12 +377,14 @@ Route::prefix('product')->group(function () {
 	//Product Summary Pages
 	Route::prefix('summary')->group(function () {
 		Route::get('/', 'ProductController@baca')->name('product')->middleware('auth');
-		Route::get('/data', 'ProductController@data')->name('product.data')->middleware('auth');
-		Route::get('/export', 'ProductController@export')->name('product.export')->middleware('auth');
+		Route::post('/data', 'ProductController@data')->name('product.data')->middleware('auth');
+		Route::post('/export', 'ProductController@export')->name('product.export')->middleware('auth');
 		Route::post('/create', 'ProductController@store')->name('product.add')->middleware('auth');
 		Route::put('/update/{id}', 'ProductController@update')->name('product.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductController@delete')->name('product.delete')->middleware('auth');
 		Route::post('/import', 'ProductController@import')->name('product.import')->middleware('auth');
+		Route::post('/download', 'ProductController@download')->name('product.download')->middleware('auth');
+		Route::post('/upload', 'ProductController@upload')->name('product.upload')->middleware('auth');
 		Route::get('/download-template', function()
 		{
 			return response()->download(public_path('assets/ProductImport.xlsx'));
@@ -474,12 +490,12 @@ Route::prefix('product')->group(function () {
 
 	Route::prefix('focus')->group(function () {
 		Route::get('/', 'ProductFocusController@baca')->name('focus')->middleware('auth');
-		Route::get('/data', 'ProductFocusController@data')->name('focus.data')->middleware('auth');
+		Route::post('/data', 'ProductFocusController@data')->name('focus.data')->middleware('auth');
 		Route::post('/create', 'ProductFocusController@store')->name('focus.add')->middleware('auth');
 		Route::post('/import', 'ProductFocusController@import')->name('focus.import')->middleware('auth');
 		Route::post('/upload', 'ProductFocusController@upload')->name('focus.upload')->middleware('auth');
-		Route::get('/export', 'ProductFocusController@export')->name('focus.export')->middleware('auth');
-		Route::get('/download', 'ProductFocusController@download')->name('focus.download')->middleware('auth');
+		Route::post('/export', 'ProductFocusController@export')->name('focus.export')->middleware('auth');
+		Route::post('/download', 'ProductFocusController@download')->name('focus.download')->middleware('auth');
 		Route::put('/update/{id}', 'ProductFocusController@update')->name('focus.update')->middleware('auth');
 		Route::get('/delete/{id}', 'ProductFocusController@delete')->name('focus.delete')->middleware('auth');
 		Route::get('/download-template', function(){

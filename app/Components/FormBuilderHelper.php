@@ -12,16 +12,16 @@ class FormBuilderHelper
 	{
 		return [
 			// IF THE INPUT JUST NEED FORM INPUT WITHOUT LABEL AND CONTAINER
-			'useLabel' => true,
-			'boldLabel' => true,
+			'useLabel'   => true,
+			'boldLabel'  => true,
 			'labelClass' => '',
-
+			
 			// INFO TEXT UNDER INPUT FIELD
-			'info' => null,
+			'info'       => null,
 
 			// INFO TEXT TEMPLATE UNDER INPUT FIELD
-			'infoTemplate' => '<span class="status-decline"><<field>></span>',
-
+			'infoTemplate'  => '<span class="status-decline"><<field>></span>',
+			
 			// FORM ALIGNMENT
 			'formAlignment' => 'vertical',
 
@@ -29,14 +29,14 @@ class FormBuilderHelper
 			'requiredLabelText' => '<span class="status-decline">*</span>',
 
 			// LABEL CONTAINER CLASS WHEN FORM ALIGNMENT IS VERTICAL
-			'labelContainerClassVertical' => 'col-md-12',
+			'labelContainerClassVertical'   => 'col-md-12',
 			
 			// INPUT CONTAINER CLASS WHEN FORM ALIGNMENT IS VERTICAL
-			'inputContainerClassVertical' => 'col-md-12',
-
+			'inputContainerClassVertical'   => 'col-md-12',
+			
 			// INPUT CONTAINER CLASS WHEN FORM ALIGNMENT IS HORIZONTAL
 			'labelContainerClassHorizontal' => 'col-md-3',
-
+			
 			// INPUT CONTAINER CLASS WHEN FORM ALIGNMENT IS VERTICAL
 			'inputContainerClassHorizontal' => 'col-md-9',
 
@@ -47,8 +47,8 @@ class FormBuilderHelper
 					'position' => '' -> left or right
 				]
 			*/ 
-			'addons' => null,
-
+			'addons'      => null,
+			
 			'htmlOptions' => null,
 
 			// INPUT PROPERTIES
@@ -61,14 +61,14 @@ class FormBuilderHelper
 	public static function setupDefaultConfig($name, $attributes)
 	{
 		$default = self::defaultConfig();
-		$config = array_merge($default, $attributes);
-		$config['elOptions'] = array_merge($default['elOptions'], $attributes['elOptions'] ?? []);
-
+		$config  = array_merge($default, $attributes);
+		$config['elOptions']  = array_merge($default['elOptions'], $attributes['elOptions'] ?? []);
+		
 		// SETUP LABEL
 		$config['textFormat'] = implode(' ', explode('_', $name));
-		$config['labelText'] = $config['labelText'] ?? ucwords($config['textFormat']);
-		$config['labelText'] = isset($config['elOptions']['required']) ? $config['labelText'] . ' ' . $config['requiredLabelText'] : $config['labelText'];
-		$config['labelText'] = $config['boldLabel'] ? '<strong>' . $config['labelText'] . '</strong>' : $config['labelText'];
+		$config['labelText']  = $config['labelText'] ?? ucwords($config['textFormat']);
+		$config['labelText']  = isset($config['elOptions']['required']) ? $config['labelText'] . ' ' . $config['requiredLabelText'] : $config['labelText'];
+		$config['labelText']  = $config['boldLabel'] ? '<strong>' . $config['labelText'] . '</strong>' : $config['labelText'];
 
 		// SETUP INFO
 		if (!empty($config['info'])) {

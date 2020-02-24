@@ -1,7 +1,9 @@
 @php
 if (!is_array($attributes)) $attributes = [];
 $isDataRequestByAjax = is_array($options) ? false : true;
-$url = $options;
+$url    = $isDataRequestByAjax ? ( count($options) == 2 ? $options[0] : $options) : '';
+$url    = !empty($url) ? route($url) : '';
+$method = $isDataRequestByAjax ? ( isset($attributes['elOptions']['route']) ? $attributes['elOptions']['route'] : 'POST') : 'POST';
 
 // SET DEFAULT CLASS
 $attributes['elOptions']['class'] = 'select2 form-control';
@@ -11,7 +13,7 @@ $attributes['elOptions']['id'] = $attributes['elOptions']['id'] ?? 'select2-' . 
 
 // SET DEFAULT FOR FORMATTED SELECT2 DATA FORMAT
 $attributes['text'] = $attributes['text'] ?? 'obj.name';
-$attributes['key'] = $attributes['key'] ?? 'obj.id';
+$attributes['key']  = $attributes['key'] ?? 'obj.id';
 
 // CALLING SETUP DEFAULT CONFIG
 $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attributes, true);
@@ -28,22 +30,22 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 // }
 @endphp
 
-<div class="form-group {{ !$errors->has($name) ?: 'has-error' }}">
+<div class='form-group {{ $config['useLabel'] ? '' : 'width-100' }} {{ !$errors->has($name) ?: 'has-error' }}'>
 	@if ($config['useLabel'])
-	<div class="row">
-		<div class="{{ $config['labelContainerClass'] }}">
-			<label class="{{ $config['labelClass'] }}">
+	<div class='row'>
+		<div class='{{ $config['labelContainerClass'] }}'>
+			<label class='{{ $config['labelClass'] }}'>
 				{!! $config['labelText'] !!}
 			</label>
 		</div>
-		<div class="{{ $config['inputContainerClass'] }}">
+		<div class='{{ $config['inputContainerClass'] }}'>
 	@endif
 
-			<select name="{{ isset($config['pluginOptions']['multiple']) && $config['pluginOptions']['multiple'] ? $name . '[]' : $name }}" <?= $config['htmlOptions'] ?>>
+			<select name='{{ isset($config['pluginOptions']['multiple']) && $config['pluginOptions']['multiple'] ? $name . '[]' : $name }}' <?= $config['htmlOptions'] ?>>
 				@if (!$isDataRequestByAjax)
 					<option></option>
 					@foreach ($options as $key => $option)
-		                <option value="{{ $key }}">{{ $option }}</option>
+		                <option value='{{ $key }}'>{{ $option }}</option>
 					@endforeach
 				@endif
             </select>
@@ -51,7 +53,7 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
             {!! @$config['info'] !!}
 
 			@if($errors->has($name))
-			<span id="helpBlock2" class="help-block">{{ $errors->first($name) }}</span>	
+			<span id='helpBlock2' class='help-block'>{{ $errors->first($name) }}</span>	
 			@endif
 
 	@if ($config['useLabel'])
@@ -60,19 +62,20 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 	@endif
 </div>
 
-@push('additional-js')
-<script type="text/javascript">
+@push('function-js')
+{{-- <script type="text/javascript"> --}}
 	$(document).ready(function() {
 		var select2Options_{{$name}} = Object.assign({
 				placeholder: "{{ $config['elOptions']['placeholder'] }}",
 		    	allowClear: true,//
 			}, {!! json_encode($config['pluginOptions']) !!}),
-			select2val_{{$name}} = {!! !is_array($value) ? json_encode([$value]) : json_encode($value) !!}
+			select2val_{{$name}} = {!! !is_array($value) ? json_encode([$value]) : json_encode($value) !!};
 
 		// IF THE SELECT2 IS REQUEST DATA BY AJAX
 		@if ($isDataRequestByAjax)
 		select2Options_{{$name}}.ajax = {
 			url: "{{ $url }}",
+			method: "{{ $method }}",
 			processResults: function (data) {
 				var result = {},
 					isPaginate = data.hasOwnProperty('data'),
@@ -83,7 +86,7 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 	                })
 
 	                if (isPaginate) {
-	                	result.pagination = {
+	                	result.pagination = {              
 		                	more: isSimplePaginate ? data.next_page_url !== null : data.current_page < data.last_page
 		                }
 	                }
@@ -110,6 +113,6 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 	        $('html, body').scrollTop();
         }, 200);
 	    @endif
-	})
-</script>
+	});
+{{-- </script> --}}
 @endpush

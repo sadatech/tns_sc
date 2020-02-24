@@ -28,13 +28,13 @@
         </div>
         <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="price">
         <thead>
-          <th class="text-center" style="width: 70px;"></th>
-          <th class="text-center">Product</th>
-          <th class="text-center">Category</th>
-          <th class="text-center">Retailer Price</th>
-          <th class="text-center">Consumer Price</th>
-          <th class="text-center">Release Date</th>
-          <th class="text-center" style="width: 15%;"> Action</th>
+          <th></th>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Retailer Price</th>
+          <th>Consumer Price</th>
+          <th>Release Date</th>
+          <th> Action</th>
         </thead>
         </table>
       </div>
@@ -189,7 +189,8 @@
         {"className": "text-center", "targets": 0},
         {"className": "text-right", "targets": 3},
         {"className": "text-right", "targets": 4},
-        {"className": "text-center", "targets": 5}
+        {"className": "text-center", "targets": 5},
+        {"className": "text-center", "targets": 6}
       ],
       columns: [
         { data: 'id', name: 'id' },

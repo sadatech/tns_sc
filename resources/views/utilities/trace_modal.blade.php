@@ -1,19 +1,20 @@
 @php
 //################################
-// trace -> purpose of main view, for example menu name, use underscore, example: product_focus
+// name -> purpose of main view, for example menu name, use underscore, example: product_focus
 // model -> model name, example: App\ProductFocus
+// buttonId -> id of button that click to show the modal, example: upload-status
 //################################
-$route = str_replace('_','-',$trace);
+$route = str_replace('_','-',$name);
 $model = str_replace('\\','bAckSlasH',$model);
-$title = ucwords(str_replace('_',' ',$trace));
+$title = ucwords(str_replace('_',' ',$name));
 @endphp
 
 <div class="modal fade" id="trace-table" role="dialog" aria-labelledby="trace-table" aria-hidden="true" tabindex="false" data-backdrop="static">
-    <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-popout modal-xl" role="document" >
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
                 <div class="block-header bg-primary p-10">
-                    <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Upload Status For {{ @$title }}</h3>
+                    <h3 class="block-title"><i class="si si-cloud-upload mr-2"></i> Job Status For {{ @$title }}</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
                             <i class="si si-close"></i>
@@ -21,7 +22,7 @@ $title = ucwords(str_replace('_',' ',$trace));
                     </div>
                 </div>
             </div>
-            <div class="block-content">
+            <div class="block-content" style="overflow-x: auto;">
                 <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="traceTable" style="white-space: nowrap;width: 100% !important">
                     <thead>
                         <tr>
@@ -29,7 +30,8 @@ $title = ucwords(str_replace('_',' ',$trace));
                             <th>Type</th>
                             <th>Date</th>
                             <th>Status</th>
-                            <th>Error Log</th>
+                            <th>File</th>
+                            <th>Log</th>
                             <th>Request by</th>
                             <th>Options</th>
                         </tr>
@@ -43,15 +45,22 @@ $title = ucwords(str_replace('_',' ',$trace));
     </div>
 </div>
 
-@push('vendor-css')
+@push('additional-css')
 <style type="text/css">
-    
+    @media (min-width: 768px) {
+      .modal-xl {
+        width: 90%;
+       max-width:1200px;
+      }
+    }
 </style>
 @endpush
 
 @push('additional-js')
 <script type="text/javascript">
-    $('#upload-status').on('click',function(){
+    $('#{{$buttonId}}').attr('data-toggle','modal');
+    $('#{{$buttonId}}').attr('href','#trace-table');
+    $('#{{$buttonId}}').on('click',function(){
         $('#traceTable').dataTable().fnDestroy();
         $('#traceTable').dataTable({
             "processing": true,
@@ -62,16 +71,17 @@ $title = ucwords(str_replace('_',' ',$trace));
             },
             "rowId": "id",
             "columns": [
-                { data: 'id', name: 'id', visible: false},
-                { data: 'type', name: 'type'},
-                { data: 'date', name: 'date'},
-                { data: 'status', name: 'status'},
-                { data: 'log', name: 'log'},
+                { data: 'id',       name: 'id', visible: false},
+                { data: 'type',     name: 'type'},
+                { data: 'date',     name: 'date'},
+                { data: 'status',   name: 'status'},
+                { data: 'file',     name: 'file'},
+                { data: 'log',      name: 'log'},
                 { data: 'request_by', name: 'request_by'},
-                {data: 'action', name: 'action', searchable: false, sortable: false},
+                { data: 'action',   name: 'action', searchable: false, sortable: false},
             ],
             "columnDefs": [
-                {"className": "text-center", "targets": [0, 1, 4, 6]}
+                {"className": "text-center", "targets": [0, 1, 3, 5, 6, 7]}
             ],
             "order": [ [0, 'desc'] ],  
             "searching": false,
@@ -112,8 +122,6 @@ $title = ucwords(str_replace('_',' ',$trace));
                         type: "POST",
                         url:  "{{ asset('job-trace/delete') }}/" + id,
                         success: function (data) {
-                            // console.log(data);
-
                             $("#traceTable #"+id).remove();
                         },
                         error: function (data) {

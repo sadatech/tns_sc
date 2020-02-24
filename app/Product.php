@@ -34,7 +34,6 @@ class Product extends Model
             'name'              => 'required|string',
             'code'              => 'required|string',
             'panel'             => 'required|string',
-            'pcs'               => 'integer',
         ];
     }
 
@@ -56,12 +55,12 @@ class Product extends Model
     	return $this->hasMany('App\ProductFokusGtc', 'id_product');
     }
 
-    public function subcategory()
+    public function subCategory()
     {
         return $this->belongsTo('App\SubCategory', 'id_sub_category');
     }
 
-    public function productcategory()
+    public function category()
     {
         return $this->subcategory->category();
     }

@@ -19,16 +19,31 @@
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
-            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#tambahModal" onclick="addModal()"><i class="fa fa-plus mr-2"></i>Add Data</button>
+            <button class="btn btn-primary btn-square" data-toggle="modal" onclick="addModalProduct()"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <button class="btn btn-info btn-square" data-toggle="modal" data-target="#importModal"><i class="si si-cloud-upload mr-2"></i>Import Data</button>
-            <a href="{{ route('product.export') }}" class="btn btn-success btn-square float-right ml-10" title="Unduh Data"><i class="si si-cloud-download mr-2"></i>Unduh Data</a>
+            <a id="direct-download" class="btn btn-success btn-square float-right ml-10" onclick="directDownload('{{ route('product.export') }}', 'direct-download')">
+              <i id="direct-download-icon" class="si si-cloud-download mr-2"></i>
+              Direct Download
+            </a>
+            <a id="download-file" target="_blank" download="Product Focus.xlsx"></a>
+            <button id="import-button" class="btn btn-outline-info btn-square float-right ml-10">
+              <i class="si si-cloud-upload mr-2"></i>
+              Import Data
+            </button>
+            <a id="in-direct-download" class="btn btn-outline-success btn-square float-right ml-10" onclick="inDirectDownload('{{ route('product.download') }}', 'in-direct-download')">
+              <i id="in-direct-download-icon" class="si si-cloud-download mr-2"></i>
+              In-direct Download
+            </a>
+            <a id="upload-status" class="btn btn-outline-warning btn-square float-right ml-10">
+              <i class="fa fa-check-square-o"></i> 
+              View Job Status 
+            </a>
           </div>
         </div>
-        <table class="table table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="product">
+        <table class="table table-responsive table-striped table- table-vcenter js-dataTable-full table-hover table-bordered" id="mainTable">
         <thead>
-          <th></th>
+          <th width="10px"></th>
           <th>Brand</th>
           <th>Category</th>
           <th>Sub Category</th>
@@ -38,7 +53,7 @@
           <th>Carton</th>
           <th>Pack</th>
           <th>PCS</th>
-          <th style="width: 15%;"> Action</th>
+          <th> Action</th>
         </thead>
         </table>
       </div>
@@ -47,7 +62,7 @@
 </div>
 
 {{-- ADD PRODUCT MODAL --}}
-@include('product._form_product', ['action' => route('product.add'), 'id' => 'tambahModal', 'type' => 'product'])
+<!-- include('product._form_product', ['action' => route('product.add'), 'id' => 'tambahModal', 'type' => 'product']) -->
 
 <div class="modal fade" id="importModal" role="dialog" aria-labelledby="importModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-popout modal-lg" role="document">
@@ -124,14 +139,131 @@
   </div>
 </div>
 
+@include('utilities.import_function', ['button_id' => 'import-button','name' => 'product', 'form_url' => route('product.upload'), 'template_url' => route('product.download-template'), 'sample_data' => 
+  [
+      'sub_category' => [
+          'Sambal Terasi 15ml', 'Bumbu Lumur Ayam Spesial'
+      ],
+      'category' => [
+          'ALL', 'Jakarta'
+      ],
+      'code' => [
+          '11/2019', '01/2020'
+      ],
+      'product' => [
+          '11/2020', '01/2021'
+      ]
+  ]
+])
+@include('utilities.filter_modal', ['name' => 'product', 'table_id' => 'mainTable', 'model' => 'App\Product', 'width' => 3, 'adjust_display_timeout' => 0.1, 'filter' => 
+    [
+        [
+            'name'          => 'brand',
+            'type'          => 'select2',
+            'multiple'      => 'true',
+            'route'         => 'brand-select2',
+        ],
+        [
+            'name'          => 'category',
+            'type'          => 'select2',
+            'multiple'      => 'true',
+            'route'         => 'category-select2',
+        ],
+        [
+            'name'          => 'sub_category',
+            'type'          => 'select2',
+            'multiple'      => 'true',
+            'route'         => 'sub-category-select2',
+        ],
+        [
+            'name'          => 'name',
+            'type'          => 'text',
+        ],
+        [
+            'name'          => 'code',
+            'type'          => 'text',
+        ],
+        [
+            'name'          => 'panel',
+            'type'          => 'select',
+            'item'          => [['value'=>'yes', 'text'=>'Yes'],['value'=>'no', 'text'=>'No']],
+        ]
+    ]
+])
+@include('utilities.trace_modal', ['name' => 'product', 'model' => 'App\Product', 'buttonId' => 'upload-status'])
+@include('utilities.explanation_modal')
+@include('utilities.export_function')
+@include('utilities.form_modal', ['name' => 'product', 'url' => route('product.add'), 'width' => '12', 'with_label' => 'true', 'input' => [
+    [
+        'name'          => 'code',
+        'type'          => 'text',
+        'required'      => 'true',
+        'edit_field'    => 'code',
+        'width'         => '6',
+    ],
+    [
+        'name'          => 'name',
+        'type'          => 'text',
+        'required'      => 'true',
+        'edit_field'    => 'name',
+        'width'         => '6',
+    ],
+    [
+        'name'          => 'categorize',
+        'type'          => 'select3',
+        'width'         => '12',
+        'width_tree'    => ['10','2'],
+        'with_label'    => 'false',
+        'edit_field'    => ['id_sub_category','sub_category_name'],
+        'tree'          => ['sub_category','category','brand'],
+    ],
+    [
+        'name'          => 'panel',
+        'type'          => 'select',
+        'item'          => [ ['value'=>'yes','text'=>'Yes'],['value'=>'no','text'=>'No'] ],
+        'width'         => '6',
+        'edit_field'    => 'panel'
+    ],
+    [
+        'name'          => 'pcs',
+        'type'          => 'text',
+        'default'       => '1',
+        'readonly'      => 'true',
+        'required'      => 'true',
+        'edit_field'    => 'pcs'
+    ],
+    [
+        'name'          => 'pack',
+        'type'          => 'text',
+        'placeholder'   => 'Number of Pcs each Pack',
+        'required'      => 'false',
+        'edit_field'    => 'pack'
+    ],
+    [
+        'name'          => 'carton',
+        'type'          => 'text',
+        'placeholder'   => 'Number of Pcs each Carton',
+        'required'      => 'false',
+        'edit_field'    => 'carton'
+    ],
+  ], 'false_rules'  => [ 
+    [
+      'month', 'start_month', '>', 'end_month', 'Start Month tidak boleh lebih dari End Month'
+    ]
+  ]
+])
+
 @endsection
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
 <style type="text/css">
-    [data-notify="container"] {
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
+  [data-notify="container"] {
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  .pac-container {
+      z-index: 99999;
+  }
 </style>
 @endsection
 
@@ -140,8 +272,38 @@
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
-    @if(session('type'))
+      var url   = '{!! route('product.data') !!}';
+      var order = [];
+      var columnDefs = [
+        {"className": "text-center", "targets": 0},
+        {"className": "text-center", "targets": 7},
+        {"className": "text-center", "targets": 8},
+        {"className": "text-center", "targets": 9},
+        {"className": "text-center", "targets": 10}
+      ];
+              
+      var tableColumns = [
+        { data: 'id', name: 'id' },
+        { data: 'brand', name: 'brand' },
+        { data: 'category', name: 'category' },
+        { data: 'sub_category.name', name: 'sub_category.name' },
+        { data: 'code', name: 'code' },
+        { data: 'name', name: 'name' },
+        { data: 'panel', name: 'panel' },
+        { data: 'carton', name: 'carton' },
+        { data: 'pack', name: 'pack' },
+        { data: 'pcs', name: 'pcs' },
+        { data: 'action', name: 'action' },
+      ];
+
     $(document).ready(function() {
+      $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+      });
+
+      @if(session('type'))
         $.notify({
             title: '<strong>{!! session('title') !!}</strong>',
             message: '{!! session('message') !!}'
@@ -156,60 +318,7 @@
                 align: 'center'
             }
         });
-    });
-    @endif
-    $(function() {
-        $('#product').DataTable({
-            processing: true,
-            drawCallback: function(){
-                $('.js-swal-delete').on('click', function(){
-                    var url = $(this).data("url");
-                    swal({
-                        title: 'Are you sure?',
-                        text: 'You will not be able to recover this data!',
-                        type: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d26a5c',
-                        confirmButtonText: 'Yes, delete it!',
-                        html: false,
-                        preConfirm: function() {
-                            return new Promise(function (resolve) {
-                                setTimeout(function () {
-                                    resolve();
-                                }, 50);
-                            });
-                        }
-                    }).then(function(result){
-                        if (result.value) {
-                            window.location = url;
-                        } else if (result.dismiss === 'cancel') {
-                            swal('Cancelled', 'Your data is safe :)', 'error');
-                        }
-                    });
-                });
-            },
-            order: [],
-            ajax: '{!! route('product.data') !!}',
-            columnDefs:[
-              {"className": "text-center", "targets": 0},
-              {"className": "text-center", "targets": 7},
-              {"className": "text-center", "targets": 8},
-              {"className": "text-center", "targets": 9}
-            ],
-            columns: [
-            { data: 'id', name: 'id' },
-            { data: 'brand', name: 'brand' },
-            { data: 'category', name: 'category' },
-            { data: 'subcategory.name', name: 'subcategory.name' },
-            { data: 'code', name: 'code' },
-            { data: 'name', name: 'name' },
-            { data: 'panel', name: 'panel' },
-            { data: 'carton', name: 'carton' },
-            { data: 'pack', name: 'pack' },
-            { data: 'pcs', name: 'pcs' },
-            { data: 'action', name: 'action' },
-            ]
-        });
+      @endif
     });
 </script>
 @endsection

@@ -1,9 +1,10 @@
 @php
 if (!is_array($attributes)) $attributes = [];
 $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attributes);
+$id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_replace( array('/[^\w]/','/^\[/','/\]$/'), '', bcrypt($name) );
 @endphp
 
-<div class="form-group {{ !$errors->has($name) ?: 'has-error' }}">
+<div class="form-group {{ $config['useLabel'] ? '' : 'width-100' }} {{ !$errors->has($name) ?: 'has-error' }}">
 	@if ($config['useLabel'])
 	<div class="row">
 		<div class="{{ $config['labelContainerClass'] }}">
@@ -20,7 +21,17 @@ $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attribute
 				@endif
 			@endif
 
-				{{ Form::date($name, $value, $config['elOptions']) }}
+				{{ 
+					Form::text( $name, $value, 
+						array_merge(
+							[ 
+								'id' => $id
+							],
+							$config['elOptions'], 
+							[ 'class' => ' form-control '. ( isset($config['class']) ? $config['class'] : '' ) ] 
+						)
+					) 
+				}}
 
 			@if (!empty($config['addonsConfig']))
 				@if ($config['addonsConfig']['position'] === 'right')
@@ -38,3 +49,14 @@ $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attribute
 	</div>
 	@endif
 </div>
+
+@push('function-js')
+{{-- <script type="text/javascript"> --}}
+	$("#{{$id}}").datepicker({
+		format: "{{$config['format']}}",
+		viewMode: "{{$config['view']}}", 
+		minViewMode: "{{$config['min_view']}}",
+		autoclose: true
+	});
+{{-- </script> --}}
+@endpush

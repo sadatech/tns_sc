@@ -18,8 +18,8 @@ class RouteController extends Controller
 
     public function baca($market = '')
     {
-        $data['subarea']    = SubArea::get();
-        $data['market']     = $market;
+        $data['subarea'] = SubArea::get();
+        $data['market']  = $market;
         return view('store.route', $data);
     }
 
@@ -39,14 +39,14 @@ class RouteController extends Controller
             ->addColumn('action', function ($routes) use ($market){
                 $data = array(
                     'id'            => $routes->id,
-                    'subarea'       => $routes->subarea->id,
-                    'subarea_name'  => $routes->subarea->name,
+                    'sub_area'      => $routes->subarea->id,
+                    'sub_area_name' => $routes->subarea->name,
                     'name'          => $routes->name,
                     'latitude'      => $routes->latitude,
                     'longitude'     => $routes->longitude,
                     'address'       => $routes->address,
                 );
-                return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' data-target='#formModal' data-toggle='modal'><i class='si si-pencil'></i></button>
+                return "<button onclick='editModalRoute(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' data-target='#formModal' data-toggle='modal'><i class='si si-pencil'></i></button>
                 <button data-url=".route('route.delete',['market'=>$market, 'id'=>$routes->id])." class='btn btn-sm btn-danger btn-square js-swal-delete'><i class='si si-trash'></i></button>";
             })->make(true);
     }

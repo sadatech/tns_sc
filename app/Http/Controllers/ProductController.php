@@ -23,10 +23,18 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\Datatables\Datatables;
+use App\Helper\ExcelHelper as ExcelHelper;
 
 class ProductController extends Controller
 {
     use StringTrait;
+
+    protected $excelHelper;
+
+    public function __construct(ExcelHelper $excelHelper)
+    {
+        $this->excelHelper = $excelHelper;
+    }
 
     public function getDataWithFilters(ProductFilters $filters){
         $data = Product::filter($filters)->limit(10)->get();
@@ -40,10 +48,7 @@ class ProductController extends Controller
                         ->join('categories','sub_categories.id_category', 'categories.id')
                         ->where('categories.id',$param)
                         ->select('products.*')->get();
-
-        // return response()->json($data);
         return $data;
-
     }
 
    public function baca()
@@ -53,11 +58,14 @@ class ProductController extends Controller
 
    public function data()
     {
-        $product = Product::with('subcategory')->with('sku_units')
+        $product = Product::with('subCategory')->with('sku_units')
         ->whereNull('deleted_at')
         ->orderBy('updated_at', 'desc')
         ->select('products.*');
         return Datatables::of($product)
+        ->editColumn('panel', function($product) {
+            return ucfirst($product->panel);
+        })
         ->addColumn('brand', function($product) {
             return $product->brand->name;
         })
@@ -68,18 +76,18 @@ class ProductController extends Controller
             $data = array(
                 'id'            => $product->id,
                 'product'       => $product->id_product,
-                'subcategory'   => $product->subcategory,
                 'name'          => $product->name,
                 'code'          => $product->code,
-                'stock_type_id' => $product->stock_type_id,
                 'deskrispi'     => $product->deskripsi,
                 'panel'         => $product->panel,
                 'carton'        => $product->carton,
                 'pack'          => $product->pack,
                 'pcs'           => $product->pcs,
+                'id_sub_category'   => $product->id_sub_category,
+                'sub_category_name' => $product->subCategory->name,
                
             );
-            return "<button onclick='editModal(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
+            return "<button onclick='editModalProduct(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
             <button data-url=".route('product.delete', $product->id)." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
         })->make(true);
     }
@@ -105,12 +113,14 @@ class ProductController extends Controller
         ];
 
         $validator = Validator($data, $limit);
-
         if ($validator->fails()){
             return redirect()->back()
             ->withErrors($validator)
             ->withInput();
         }
+
+        $actionType = ($request->update == 1 ? 'mengubah' : 'menambah');
+
 
         $data = $request->only(['name', 'code', 'panel', 'pcs', 'pack', 'carton']);
 
@@ -177,20 +187,22 @@ class ProductController extends Controller
         });
 
         if ($action == 'true') {
-            return redirect()->back()
-                ->with([
-                    'type' => 'success',
-                    'title' => 'Sukses!<br/>',
-                    'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil '. ( ($request->update == 1) ? 'mengubah' : 'menambah' ). ' Product!'
-                ]);
-        }else{
-            return redirect()->back()
-                ->with([
-                    'type'   => 'danger',
-                    'title'  => 'Gagal!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Gagal '. ( ($request->update == 1) ? 'mengubah' : 'menambah' ). ' Route!<br>'.$action
-                ]);
+            $result = [
+                'status'  => true,
+                'type'    => 'success',
+                'title'   => 'Sukses!<br/>',
+                'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil '.$actionType.' Product Fokus!'
+            ];
+        } else {
+            $result = [
+                'status' => false,
+                'type'   => 'warning',
+                'title'  => 'Warning!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Product Fokus!'
+            ];
         }
+
+        return response()->json($result, 200);
 
     }
 
@@ -204,49 +216,84 @@ class ProductController extends Controller
 
         if (!$jumlah < 1) 
         {
-            return redirect()->back()
-            ->with([
-                'type'    => 'danger',
-                'title'   => 'Gagal!<br/>',
-                'message' => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di Product Price dan Product Focus!'
-            ]);
+            $result = [
+                'status'    => false,
+                'type'      => 'danger',
+                'title'     => 'Gagal!<br/>',
+                'message'   => '<i class="em em-warning mr-2"></i> Data ini tidak dapat dihapus karena terhubung dengan data lain di Product Price dan Product Focus!'
+            ];
         } else {
             $product->delete();
-            return redirect()->back()
-            ->with([
+
+            $result = [
+                'status'    => true,
                 'type'      => 'success',
                 'title'     => 'Sukses!<br/>',
                 'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil dihapus!'
-           ]);
+           ];
         }
+
+        return response()->json($result, 200);
     }
 
-    public function export()
-    
+    public function export(ProductFilters $filters)
     {
-		$emp = Product::orderBy('updated_at', 'DESC')
-        ->whereNull('deleted_at')
-        ->get();
-		foreach ($emp as $val) {
-			$data[] = array(
-				'Brand'         => (isset($val->subcategory->category->brand->name) ? $val->subcategory->category->brand->name : "-"),
-                'Sub Category'  => $val->subcategory->name,
-                'Category'      => (isset($val->subcategory->category->name) ? $val->subcategory->category->name : "-"),
-                'Code'          => $val->code,
-                'Name'          => $val->name,
-                'Panel'         => $val->panel,
-                'Carton'        => (isset($val->carton) ? $val->carton : "-"),
-                'Pack'          => (isset($val->pack) ? $val->pack : "-"),
-                'PCS'           => (isset($val->pcs) ? $val->pcs : "1")
-			);
-		}
-		$filename = "Product_".Carbon::now().".xlsx";
-		return Excel::create($filename, function($excel) use ($data) {
-			$excel->sheet('Product', function($sheet) use ($data)
-			{
-				$sheet->fromArray($data);
-			});
-		})->download();
+        $product    = Product::filter($filters)->orderBy('id', 'DESC')->get();
+        $filecode   = $this->createFileCode();
+        $fileName   = $this->setFileName("Product_(".$filecode.")");
+        $filePath   = 'export/master/product';
+        $data       = [];
+
+        foreach ($product as $idx => $val) {
+            $data[$idx]['brand']        = @$val->brand->name;
+            $data[$idx]['category']     = @$val->category->name;
+            $data[$idx]['sub_category'] = @$val->subCategory->name;
+            $data[$idx]['code']         = @$val->code;
+            $data[$idx]['name']         = @$val->name;
+            $data[$idx]['panel']        = ucfirst(@$val->panel);
+            $data[$idx]['carton']       = @$val->carton;
+            $data[$idx]['pack']         = @$val->pack;
+            $data[$idx]['pcs']          = @$val->pcs;
+        }
+
+        $excel = Excel::create($fileName, function($excel) use ($data) {
+
+            $excel->setTitle('Master - Product');
+
+            $excel->setCreator('TNS')
+                  ->setCompany('TNS');
+
+            $excel->setDescription('Product Data');
+
+            $excel->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
+                ->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+            $excel->sheet('Product', function ($sheet) use ($data) {
+                $sheet->setAutoFilter('A1:I1');
+                $sheet->setHeight(1, 25);
+                $sheet->fromModel($this->excelHelper->mapForProduct($data), null, 'A1', true, true);
+                $sheet->row(1, function ($row) {
+                    $row->setBackground('#82abde');
+                });
+                $sheet->cells('A1:I1', function ($cells) {
+                    $cells->setFontWeight('bold');
+                });
+                $sheet->setBorder('A1:I1', 'thin');
+            });
+
+        })->store("xlsx", public_path($filePath), true);
+
+        $result = [
+            'status'    => true,
+            'type'      => 'success',
+            'title'     => 'Sukses!',
+            'message'   => 'Berhasil Request Download!',
+            'file'      => '../'.$filePath.'/'.$fileName.'.xlsx'
+        ];
+
+        return response()->json($result, 200);
     }
     
     public function import(Request $request)
@@ -311,6 +358,97 @@ class ProductController extends Controller
                 'type'    => 'danger',
                 'title'   => 'Gagal!<br/>',
                 'message' => '<i class="em em-warning mr-2"></i>Gagal import!'
+            ]);
+        }
+    }
+
+    public function download(Request $request)
+    {
+        $action = DB::transaction(function () use ($request){
+            $directory  = 'export/master/product';
+            $now        = Carbon::now();
+            $filecode   = $this->createFileCode();
+            $filterText = $this->getFilterText($request->all());
+            $title      =  "Export Product" . " (" . $filecode . ")" . $filterText;
+
+            try{
+                $trace = JobTrace::create([
+                        'id_user'   => Auth::user()->id,
+                        'title'     => $title,
+                        'date'      => $now,
+                        'model'     => 'App\Product',
+                        'results'   => asset($directory),
+                        'file_path' => $directory,
+                        'file_name' => $this->setFileName($title),
+                        'type'      => 'D',
+                        'status'    => 'PROCESSING',
+                    ]);
+
+                dispatch(new DownloadProduct($trace, $request->all()));
+                return true;
+            }catch(\Exception $e){
+                DB::rollback();
+                return $e;
+            }
+        });
+
+        $result = [
+            'status'    => true,
+            'type'      => 'success',
+            'title'     => 'Sukses!',
+            'message'   => 'Berhasil Request Download, Silahkan periksa VIEW JOB STATUS!'
+        ];
+
+        return response()->json($result, 200);
+    }
+
+    public function upload(Request $request)
+    {
+        $action = DB::transaction(function () use ($request) {
+
+            $directory  = 'imports/product';
+            $now        = Carbon::now();
+            $path       = public_path($directory);
+            $file       = $request->file('file');
+            $name       = "(@".$now->format('Ymdhis').") " . $file->getClientOriginalName();
+
+            try{
+                // SAVE EXCEL
+                $file->move($path, $name);
+
+                // TRACING AND QUEUE
+                $trace = JobTrace::create([
+                        'id_user'   => Auth::user()->id,
+                        'title'     => "Import Product ".$now,
+                        'date'      => $now,
+                        'model'     => 'App\Product',
+                        'type'      => 'U',
+                        'results'   => asset($directory),
+                        'file_path' => $directory,
+                        'file_name' => $name,
+                        'status'    => 'PROCESSING',
+                    ]);
+
+                dispatch(new UploadProduct($trace));
+                return true;
+            }catch(\Exception $e){
+                DB::rollback();
+                return $e;
+            }
+        });
+
+        if ($action)
+        {
+            return redirect()->back()->with([
+                'type'      => 'success',
+                'title'     => 'Sukses!<br/>',
+                'message'   => '<i class="em em-confetti_ball mr-2"></i>Berhasil Upload File, Silahkan periksa di VIEW JOB STATUS!'
+            ]);
+        } else {
+            return redirect()->back()->with([
+                'type'      => 'danger',
+                'title'     => 'Gagal!<br/>',
+                'message'   => '<i class="em em-confounded mr-2"></i>Gagal Upload File, hubungi admin!'
             ]);
         }
     }

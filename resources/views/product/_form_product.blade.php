@@ -80,6 +80,8 @@ $action = $action ?? '';
     </div>
 </div>
 
+@include('utilities.select_tree', [ 'input' => ['sub_category','category','brand'], 'selectorTree' => 'input-tree', 'treeId' => 'first', 'left' => '10', 'right' => '2' ])
+
 @push('additional-js')
 <script type="text/javascript">
     $.ajaxSetup({
@@ -88,7 +90,6 @@ $action = $action ?? '';
         }
     });
 
-  @include('utilities.select_tree', [ 'input' => ['sub_category','category','brand'], 'selectorTree' => 'input-tree', 'treeId' => 'first', 'left' => '10', 'right' => '2' ])
 
     $("#inlineCheckboxCarton").change(function() {
       var checked = $('#inlineCheckboxCarton:checkbox:checked').length > 0;

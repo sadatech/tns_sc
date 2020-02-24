@@ -24,7 +24,7 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helper\ExcelHelper as ExcelHelper;
 
-class ProductFocusController extends Controller
+class MeasurementController extends Controller
 {
 
     use StringTrait, UploadTrait;
@@ -36,57 +36,16 @@ class ProductFocusController extends Controller
         $this->excelHelper = $excelHelper;
     }
 
-    private $alert = [
-        'type' => 'success',
-        'title' => 'Sukses!<br/>',
-        'message' => 'Berhasil melakukan aski.'
-    ];
-
     public function baca()
     {
-        $data['product']    = Product::get();
-        $data['area']       = Area::get();
-        return view('product.product-focus', $data);
+        return view('product.measurement');
     }
 
-    public function data(ProductFocusFilters $filters)
+    public function data()
     {
-        $focus = ProductFocus::filter($filters)
-        ->with(['product','productFocusArea'])
-        ->orderBy('updated_at','desc')
+        $data = MeasurementUnit::orderBy('updated_at','desc');
         ->select('product_focus.*');
-        return Datatables::of($focus)
-        ->addColumn('row_id', function($focus) {
-            return 'focus'.$focus->id;
-        })
-        ->addColumn('area', function($focus) {
-            if(!$focus->productFocusArea->isEmpty()){
-                $area = "";
-                $areas = [];
-                foreach ($focus->productFocusArea as $key => $value) {
-                    $areas[] = $value->area->name;
-                }
-				$area .= implode(', ', $areas);
-			} else {
-                $area = "ALL";
-			}
-			return $area;
-		})
-        ->addColumn('action', function ($focus) {
-            $data = array(
-                'id'            => $focus->id,
-                'product'     	=> $focus->product()->select('id','name')->first(),
-                'from'          => $focus->from,
-                'to'            => $focus->to,
-                'area'          => $focus->productFocusArea()
-                    ->join('areas','areas.id','product_focus_areas.id_area')
-                    ->select('id_product_focus','id_area','name')
-                    ->get()
-            );
-            return "<button onclick='editModalProductFocus(".json_encode($data).")' class='btn btn-sm btn-primary btn-square' title='Update'><i class='si si-pencil'></i></button>
-            <button data-url=".route('focus.delete', $focus->id)." data-row-id=".'focus'.$focus->id." class='btn btn-sm btn-danger btn-square js-swal-delete' title='Delete'><i class='si si-trash'></i></button>";
-        })
-        ->rawColumns(['area','action'])
+        return Datatables::of($data)
         ->make(true);
     }
 
@@ -94,11 +53,8 @@ class ProductFocusController extends Controller
     {
         $data=$request->all();
         $limit=[
-            'product'   => 'required',
-            'from'      => 'required|string',
-            'to'        => 'required|string',
-            'update'    => 'nullable|numeric',
-            'id'        => 'nullable|numeric',
+            'name' => 'required|string',
+            'size' => 'required|numeric',
         ];
 
         $validator = Validator($data, $limit);

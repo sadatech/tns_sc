@@ -43,13 +43,16 @@ class JobTraceController extends Controller
             ->addColumn('type', function ($item) {
                 return @$item->type == 'U' ? 'Upload' : 'Download';
             })
+            ->addColumn('file', function ($item) {
+                return $this->checkFileExist($item->id) .' '. $item->title;
+            })
             ->editColumn('status', function ($item) {
                 return $this->convertTraceStatus($item->status, $item->id);
             })
             ->addColumn('action', function ($item) {
                 return "<button class='btn btn-danger btn-sm btn-delete deleteButton' data-toggle='confirmation' data-singleton='true' value='".$item->id."'><i class='fa fa-remove'></i></button>";
             })
-            ->rawColumns(['log', 'status', 'action'])
+            ->rawColumns(['log', 'status', 'file', 'action'])
             ->make(true);
     }
 

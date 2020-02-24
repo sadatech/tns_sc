@@ -89,21 +89,23 @@ class UploadFocus implements ShouldQueue
                         'to'            => $dataArray['end_date'],
                     ]);
 
-                    $areaArray = explode(',', $chunked['area_name']);
-                    foreach ($areaArray as $key => $value) {
-                        $areaName = trim($value);
-                    
-                        $area = Area::whereRaw( "upper(name) = '". strtoupper(trim($areaName))  ."'")->first();
-                        if(!$area){
-                            $log_error .= 'Untuk data row ke-'.$i.' tidak bisa menemukan data "'.strtoupper('area').'" dengan Nama "'.$areaName.'". Harap di cek kembali.';
-                            $this->trace->update(['log' => $log_error]);
-                            continue;
-                        }
+                    if (strtoupper($chunked['area_name']) != 'ALL' && !empty($chunked['area_name'])) {
+                        $areaArray = explode(',', $chunked['area_name']);
+                        foreach ($areaArray as $key => $value) {
+                            $areaName = trim($value);
                         
-                        $focusArea = ProductFocusArea::firstOrCreate([
-                            'id_product_focus'  => $focus->id,
-                            'id_area'           => $area->id,
-                        ]);
+                            $area = Area::whereRaw( "upper(name) = '". strtoupper(trim($areaName))  ."'")->first();
+                            if(!$area){
+                                $log_error .= 'Untuk data row ke-'.$i.' tidak bisa menemukan data "'.strtoupper('area').'" dengan Nama "'.$areaName.'". Harap di cek kembali.';
+                                $this->trace->update(['log' => $log_error]);
+                                continue;
+                            }
+                            
+                            $focusArea = ProductFocusArea::firstOrCreate([
+                                'id_product_focus'  => $focus->id,
+                                'id_area'           => $area->id,
+                            ]);
+                        }
                     }
                 }
 

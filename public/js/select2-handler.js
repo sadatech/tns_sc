@@ -7,7 +7,7 @@ function showFilter() {
 }
 
 function triggerResetWithoutWidth (arrayOfData) {
-    console.log('reset')
+    // console.log('reset')
     var data = arrayOfData[0];
     var table = arrayOfData[1];
     var element = arrayOfData[2];
@@ -153,7 +153,6 @@ function filteringReportWithoutWidth(arrayOfData) {
 
 // Reset all filter for search without search box
 function triggerResetWithoutSearch (arrayOfData) {
-    console.log('reset')
     var data = arrayOfData[0];
     var table = arrayOfData[1];
     var element = arrayOfData[2];
@@ -223,8 +222,6 @@ function triggerResetWithoutSearch (arrayOfData) {
 
 // Filtering data without search box
 function filteringReportWithoutSearch(arrayOfData) {
-    // console.log('filter');
-    // console.log(arrayOfData);
     var table = arrayOfData[0];
     var element = arrayOfData[1];
     var newElement = $('#'+arrayOfData[0]);
@@ -236,35 +233,18 @@ function filteringReportWithoutSearch(arrayOfData) {
 
     this.moreParams = [];
     this.moreParamsPost  = {};
-    // console.log('filters:');
-    // console.log(this.filters);
+
     for (filter in this.filters) {
         this.moreParams.push(filter + '=' + this.filters[filter]);
         this.moreParamsPost[filter] = this.filters[filter];
     }
     var self = this;
-    // console.log('moreParamsPost:');
-    // console.log(self.moreParamsPost);
+
     $(document).ready(function () {
-        // console.log(self.moreParamsPost);
-        // console.log(element);
-        // console.log(newElement);
         if($.fn.dataTable.isDataTable('#'+table)){
-            // console.log('testing : isDataTable');
             newElement.DataTable().clear();
             newElement.DataTable().destroy();
         }
-
-        // swal({
-        //   title: "Please Wait!",
-        //   text: "Data in Process, Relax!",
-        //   icon: "success",
-        //   showCancelButton: false,
-        //   showConfirmButton: false
-        // });
-
-        // console.log(tableColumns);
-        // return;
 
         newElement.dataTable({
             "fnCreatedRow": function (nRow, data) {
@@ -300,9 +280,133 @@ function filteringReportWithoutSearch(arrayOfData) {
     })
 }
 
+function adjustTableDisplay(timeout = '') {
+    setTimeout(function(){
+        var width = $('.dataTables_scrollHeadInner').width(), width2 = 0;
+        $('.dataTable').css('width','100%');
+        $('.dataTables_scrollHeadInner').css('width','100%');
+        width2 = $('.dataTables_scrollHeadInner').width();
+        if (width > width2) {
+            $('.dataTables_scrollHeadInner').css('width',width);
+        }
+    }, (timeout != '' ? timeout * 1000 : 1500) );
+}
+
+// Filtering data with action callback
+function filteringReportWithActionCallback(arrayOfData, timeout = '') {
+    var table       = arrayOfData[0];
+    var newElement  = $('#'+table);
+    var element     = arrayOfData[1];
+    var url         = arrayOfData[2];
+    var tableColumns = arrayOfData[3];
+    var columnDefs  = arrayOfData[4];
+    var order       = arrayOfData[5];
+
+    $(document).ready(function () {
+        setupTable(table, newElement, order, columnDefs, tableColumns, url);
+        adjustTableDisplay(timeout);
+    });
+}
+
+function triggerResetWithActionCallback (arrayOfData) {
+    var data = arrayOfData[0];
+    var table = arrayOfData[1];
+    var element = arrayOfData[2];
+    var newElement = $('#'+arrayOfData[1]);
+    var url = arrayOfData[3];
+    var tableColumns = arrayOfData[4];
+    var columnDefs = arrayOfData[5];
+    var order = arrayOfData[6];
+
+    data.map((id) => {
+        $(id).prop('disabled', false);
+        if ( $(id).is(':checkbox') ) {
+            $(id).prop('checked',false);
+        }else{
+            $(id).val('').trigger('change');
+            if($(id).hasClass('default-select')){$(id).prop("selectedIndex", 0).val();}
+        }
+    });
+
+    this.filters = {};
+
+    setupTable(table, newElement, order, columnDefs, tableColumns, url);
+
+}
+
+function setupTable(table, newElement, order, columnDefs, tableColumns, url) {
+    if($.fn.dataTable.isDataTable('#'+table)){
+        newElement.DataTable().clear();
+        newElement.DataTable().destroy();
+    }
+
+    newElement.DataTable({
+        processing:     true,
+        serverSide:     true,
+        scrollX:        true,
+        scrollCollapse: true,
+        bFilter:        false,
+        rowId:          "row_id",
+        ordering:       false,
+        order:          order,
+        columnDefs:     columnDefs,
+        columns:        tableColumns,
+        ajax: {
+            url: url,
+            type: 'POST',
+            data: filters,
+            dataType: 'json',
+            error: function (data) {
+                swal("Error!", "Failed to load Data!", "error");
+            },
+            dataSrc: function(result){
+                this.data = result.data;
+                return result.data;
+            },
+        },
+        drawCallback: function(){
+            $('.js-swal-delete').on('click', function(){
+                var id = $(this).data("id");
+                var deleteUrl = $(this).data("url");
+                swal({
+                    title: 'Are you sure?',
+                    text: 'You will not be able to recover this data!',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d26a5c',
+                    confirmButtonText: 'Yes, delete it!',
+                    html: false,
+                    preConfirm: function() {
+                        return new Promise(function (resolve) {
+                            setTimeout(function () {
+                                resolve();
+                            }, 50);
+                        });
+                    }
+                }).then(function(result){
+                    if (result.value) {
+                        $.ajax({
+                            url: deleteUrl,
+                            type: 'GET',
+                            success: function (data) {
+                                $("#"+id).remove();
+                            },
+                            error: function(xhr, textStatus, errorThrown){
+                                swal("Gagal melakukan request", "Silahkan hubungi admin", "error");
+                            }
+                        });
+                    } else if (result.dismiss === 'cancel') {
+                        swal('Cancelled', 'Your data is safe :)', 'error');
+                    }
+                });
+            });
+        },
+    });
+}
+
 // Reset all filter for search
 function triggerReset (arrayOfData) {
-    console.log('reset')
+    // console.log('reset')
     var data = arrayOfData[0];
     var table = arrayOfData[1];
     var element = arrayOfData[2];
@@ -364,7 +468,6 @@ function triggerReset (arrayOfData) {
 // Set the selected value to key in filter
 function selected (key, val) {
     this.filters[key] = val;
-    console.log(this.filters);
 }
 
 // Filtering data
@@ -524,6 +627,7 @@ function setOptions (url, placeholder, data, processResults, parent = '') {
         // minimumInputLength: 2,     
         width: '100%',
         placeholder: placeholder,
+        allowClear: true,
         // dropdownParent: parent,
     }
 }
@@ -550,7 +654,7 @@ function filterData (search, term) {
         });
 
         // console.log('result-search');
-        console.log(results);
+        // console.log(results);
 
         return results;
     }
@@ -569,7 +673,7 @@ function filterData (search, term) {
     }
 
     // console.log('results');
-    console.log(results);
+    // console.log(results);
 
     return results;
 }

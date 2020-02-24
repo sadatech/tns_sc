@@ -10,46 +10,51 @@ $attributes['elOptions']['id'] = $attributes['elOptions']['id'] ?? 'select2-' . 
 // CALLING SETUP DEFAULT CONFIG
 $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attributes, true);
 $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
+
+$id       = $attributes['elOptions']['id'];
+$value    = is_array($value) ? $value : [];
+$width100 = $config['width100'] ? 'width-100 row-no-margin' : '';
+$label    = ucwords( str_replace('_', ' ', $name) );
 @endphp
 
-<div class="form-group {{ !$errors->has($name) ?: 'has-error' }}">
+<div class='form-group {{$width100.' '.$id}} {{ !$errors->has($name) ?: 'has-error' }}'>
 	@if ($config['useLabel'])
-	<div class="row">
-		<div class="{{ $config['labelContainerClass'] }}">
-			<label class="col-form-label">
+	<div class='row {{$width100}}'>
+		<div class='{{ $config['labelContainerClass'] }}'>
+			<label class='col-form-label'>
 				{!! $config['labelText'] !!}
 			</label>
 		</div>
-		<div class="{{ $config['inputContainerClass'] }}">
+		<div class='{{ $config['inputContainerClass'] }} {{$width100}}'>
 	@endif
 
-			<div class="row">
-				<div class="col-md-12">
-					<div class="input-group" style="margin-bottom: 10px">
-						<div style="width:90%;">
+			<div class='{{empty($width100)?'row':''}} {{$width100}}'>
+				<div class='{{empty($width100)?'col-md-12':''}} {{$width100}}'>
+					<div class='input-group {{$width100}}' style='margin-bottom: 10px'>
+						<div style='width:90%;'>
 							{{ Form::select2Input($name, $value, $options, array_merge($config, ['useLabel' => false])) }}
 						</div>
-						<div style="width:10%">
-							<span class="input-group-append">
-								<button class="btn btn-primary btn-block" type="button" onclick="addSelectedVal_{{$name}}()" style="border-radius: 0 4px 4px 0 !important;">
+						<div style='width:10%'>
+							<span class='input-group-append'>
+								<button class='btn btn-primary btn-block' type='button' onclick='addSelectedVal_{{$id}}()' style='border-radius: 0 4px 4px 0 !important;font-size: 9.5pt;'>
 									Add
 								</button>
 							</span>
 						</div>
 					</div>
 				</div>
-				<div class="col-md-12">
-					<table class="table {{'table-select2-' . $name}}">
+				<div class='{{empty($width100)?'col-md-12':''}} {{$width100}}'>
+					<table class='table {{'table-select2-' . $id}}'>
 						<thead>
 							<tr>
 								<th>#</th>
-								<th>{{$name}} Name</th>
-								<th>Action</th>
+								<th>{{$label}} Name</th>
+								<th style='text-align: right;'>Action</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<td colspan="3">{{$name}} is Empty.</td>
+								<td colspan='3' align='center'>{{$label}} is Empty.</td>
 							</tr>
 						</tbody>
 					</table>
@@ -57,7 +62,7 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 			</div>
 
 			@if($errors->has($name))
-			<span id="helpBlock2" class="help-block">{{ $errors->first($name) }}</span>	
+			<span id='helpBlock2' class='help-block'>{{ $errors->first($name) }}</span>	
 			@endif
 
 	@if ($config['useLabel'])
@@ -74,13 +79,13 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 </style>
 @endpush
 
-@push('additional-js')
-<script type="text/javascript">
-	var select2val_{{$name}} = {!! json_encode($value) !!};
+@push('function-js')
+{{-- <script type="text/javascript"> --}}
+	var select2val_{{$id}} = {!! json_encode($value) !!};
 
-	function addSelectedVal_{{$name}}(){
+	function addSelectedVal_{{$id}}(){
 		$.each($('#{{$config['elOptions']["id"]}}').select2('data'), function(k, v){
-			if (isSelectedDataExist_{{$name}}(v.id)) {
+			if (isSelectedDataExist_{{$id}}(v.id)) {
 				toastr.options = {
 				  "closeButton": true,
 				  "debug": false,
@@ -99,55 +104,55 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 				  "hideMethod": "slideUp"
 				};
 
-				toastr.warning('{{$name}} '+ v.text +' has been selected.', "Warning!");
+				toastr.warning('{{$label}} '+ v.text +' has been selected.', "Warning!");
 			} else {
-				select2val_{{$name}}.push({
+				select2val_{{$id}}.push({
 					id: v.id,
 					name: v.text
-				})
-				generateTable_{{$name}}()
+				});
+				generateTable_{{$id}}();
 			    $('#{{$config['elOptions']["id"]}}').val({}).trigger('change');
 			}
-		})
+		});
 	}
 
-	function generateTable_{{$name}}() {
-		resetTable_{{$name}}()
+	function generateTable_{{$id}}() {
+		resetTable_{{$id}}();
 
-		if (select2val_{{$name}}.length > 0) {
-			$.each(select2val_{{$name}}, function(k, v) {
+		if (select2val_{{$id}}.length > 0) {
+			$.each(select2val_{{$id}}, function(k, v) {
 				var number = k+1;
-	            $(".{{'table-select2-' . $name}} tbody").append(
+	            $(".{{'table-select2-' . $id}} tbody").append(
 	            	'<tr>' +
 	            		'<td>' + number + '</td>' +
 	            		'<td>' + v.name + '</td>' +
-	            		'<td>' + 
-	            		 	'<button class="btn btn-danger btn-sm removeSelectedDataBtn_{{$name}}" type="button" data-id="'+ v.id +'" title="Remove this {{$name}}" data-toggle="tooltip"><i class="fa fa-times"></i></button>' +  
+	            		'<td align="right">' + 
+	            		 	'<button class="btn btn-danger btn-sm removeSelectedDataBtn_{{$id}}" type="button" data-id="'+ v.id +'" title="Remove this {{$label}}" data-toggle="tooltip"><i class="fa fa-times"></i></button>' +  
 	            		 '</td>' +
 	            		 '<td style="display:none">' +
-	            			'<input type="hidden" value="'+ v.id +'" name="{{$name}}[]">' +
+	            			'<input type="hidden" value="'+ v.id +'" name="{{$label}}[]">' +
 	            		 '</td>' +
 	            	'</tr>' 
-	            )
+	            );
 	        });
 		} else {
-			$(".{{'table-select2-' . $name}} tbody").append(
+			$(".{{'table-select2-' . $id}} tbody").append(
 	        	'<tr>' +
-	        		'<td colspan="3">{{$name}} is Empty.</td>' +
+	        		'<td colspan="3" align="center">{{$label}} is Empty.</td>' +
 	        	'</tr>' 
-	        )
+	        );
 		}
 	}
 
 	// Remove Selected Data
-	$(".{{'table-select2-' . $name}} tbody").on('click', '.removeSelectedDataBtn_{{$name}}', function(){
-		getSelectedVal_{{$name}}($(this).attr('data-id'), true)
-		$(this).closest('tr').remove()
-		generateTable_{{$name}}()
-	})
+	$(".{{'table-select2-' . $id}} tbody").on('click', '.removeSelectedDataBtn_{{$id}}', function(){
+		getSelectedVal_{{$id}}($(this).attr('data-id'), true);
+		$(this).closest('tr').remove();
+		generateTable_{{$id}}();
+	});
 
-	function getSelectedVal_{{$name}}(id, update = false) {
-		var foundVal = $.grep(select2val_{{$name}}, function(v) {
+	function getSelectedVal_{{$id}}(id, update = false) {
+		var foundVal = $.grep(select2val_{{$id}}, function(v) {
 			if(update){
 				return v.id !== id
 			}
@@ -155,23 +160,23 @@ $config['pluginOptions'] = $attributes['pluginOptions'] ?? [];
 		});
 
 		if(update) {
-			select2val_{{$name}} = foundVal
+			select2val_{{$id}} = foundVal;
 			return;
 		}
 
 		return foundVal;
 	}
 
-	function isSelectedDataExist_{{$name}}(id) {
-		return getSelectedVal_{{$name}}(id).length > 0;
+	function isSelectedDataExist_{{$id}}(id) {
+		return getSelectedVal_{{$id}}(id).length > 0;
 	}
 
-	function resetTable_{{$name}}() {
-		$(".{{'table-select2-' . $name}} tbody").html('')
+	function resetTable_{{$id}}() {
+		$(".{{'table-select2-' . $id}} tbody").html('')
 	}
 
 	$(document).ready(function(){
-		generateTable_{{$name}}()
-	})
-</script>
+		generateTable_{{$id}}();
+	});
+{{-- </script> --}}
 @endpush

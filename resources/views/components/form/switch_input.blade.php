@@ -69,11 +69,13 @@ foreach ($configAttributes as $attribute => $attributeValue) {
 
 @push('vendor-js')
 <script type="text/javascript" src="{{ asset('assets/vendor/mswitch/js/jquery.mswitch.js') }}"></script>
-<script type="text/javascript">
+@endpush
+@push('function-js')
+{{-- <script type="text/javascript"> --}}
 	@if (isset($configAttributes['id']))
 		$("#{{ $configAttributes['id'] }}").mSwitch();
 	@else
 		$(".m_switch_check:checkbox").mSwitch();
 	@endif
-</script>
+{{-- </script> --}}
 @endpush

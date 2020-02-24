@@ -2,6 +2,7 @@
 if (!is_array($attributes)) $attributes = [];
 $attributes['orientation'] = $attributes['orientation'] ?? 'horizontal'; 
 $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attributes);
+// $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_replace( array('/[^\w]/','/^\[/','/\]$/'), '', bcrypt($name) );
 @endphp
 
 <div class="form-group {{ !$errors->has($name) ?: 'has-error' }}">
@@ -14,28 +15,30 @@ $config = App\Components\FormBuilderHelper::setupDefaultConfig($name, $attribute
 		</div>
 		<div class="{{ $config['inputContainerClass'] }}">
 	@endif
-
+			<div class="col-md-12 {{ strtolower($config['orientation']) == 'horizontal' ? 'row' : '' }}">
 			@if (strtolower($config['orientation']) == 'horizontal')
-			<div class="m-radio-inline">
-					
 				@foreach ($options as $key => $option)
-				<label class="m-radio">
-					{{ Form::radio($name, $key, $key == $value) }} {{ ucwords($option) }}
-					<span></span>
-				</label>
+				<div class="custom-control custom-radio m-radio-inline r-15">
+					@php 
+					$id = str_replace(' ', '', $option)
+					@endphp
+					{{ Form::radio($name, $key, $key == $value, ['class'=>'custom-control-input', 'id'=>$id]) }}
+	              	<label class="custom-control-label" for="{{$id}}">{{ ucwords($option) }}</label>
+	            </div>
 				@endforeach
 
-			</div>
 			@elseif (strtolower($config['orientation']) == 'vertical')
-            <div class="m-radio-list">
 				@foreach ($options as $key => $option)
-                    <label class="m-radio">
-						{{ Form::radio($name, $key, $key == $value) }} {{ ucwords($option) }}
-						<span></span>
-                    </label>
+	            <div class="custom-control custom-radio mb-5 r-15">
+					@php 
+					$id = str_replace(' ', '', $option)
+					@endphp
+					{{ Form::radio($name, $key, $key == $value, ['class'=>'custom-control-input', 'id'=>$id]) }}
+	              	<label class="custom-control-label" for="{{$id}}">{{ ucwords($option) }}</label>
+	            </div>
 				@endforeach
-            </div>
 			@endif
+			</div>
 
             {!! $config['info'] !!}
 
