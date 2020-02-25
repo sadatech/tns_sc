@@ -40,6 +40,7 @@
 //         [
 //         'name'      => 'location_input',
 //         'type'      => 'location',
+
 //         'use_label' => false,
 //         ],
 //         [
@@ -126,7 +127,7 @@ $modal        = isset($options['modal']) ? $options['modal'] : null;
 $use_label    = isset($options['use_label']) ? $options['use_label'] : false;
 $thisTitle    = ucwords(str_replace('_',' ',$name));
 $thisId       = str_replace(' ','',$thisTitle);
-$filter       = isset($options['filter']) ? ($options['filter'] ? true : false) : false;
+$filter       = isset($options['filter']) ? $options['filter'] : false;
 $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
 
     foreach ( $input as $key => $value ) {
@@ -145,10 +146,10 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
         $required           = isset($value['required']) ? ( $value['required'] ? ['required'=>'required'] : [] ) : [];
         $divClass           .= empty($label) ? 'm-top-15' : '';
         $value['elOptions'] = array_merge( $required, (isset($value['elOptions']) ? $value['elOptions'] : [] ) );
-
+        $placeholder        = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".ucwords($label)." here";
 
         echo ($value['type'] != 'hidden') ?
-                    "<div class='col-md-".(is_array($width) ? "12" : $width)." filter-div row-no-margin $divClass'>".
+                    "<div class='col-md-".(is_array($width) ? "12" : $width)." row-no-margin $divClass'>".
                     $defLlabel
                     : "";
         
@@ -188,7 +189,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
 
             $currentClear = "select2val_$currentId = [];generateTable_$currentId();";
         } elseif ( $value['type'] == 'select' ) {
-            $placeholder = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".strtolower($label)." here";
             echo Form::select($value['name'], [null], null, ['class'=> "form-control $inputClass", 'id'=>$currentId, 'placeholder'=>$placeholder]);
 
             $currentClear = "$('#$currentId').prop('selectedIndex', 0).val();";
@@ -198,7 +198,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
 
             $currentClear = "initMap$currentId([])";
         } elseif ( $value['type'] == 'text' ) {
-            $placeholder = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".strtolower($label)." here";
             echo Form::textInput($value['name'], ( isset($value['value']) ? $value['value'] : null ),
                 [
                   'elOptions'  => array_merge( ['class'=>'form-control '.$inputClass, 'id'=>$currentId], ( isset($value['elOptions']) ? $value['elOptions'] : [] ) ),
@@ -224,7 +223,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
               
             echo Form::dateInput($value['name'], ( isset($value['value']) ? $value['value'] : null ), $option );
         } elseif ( $value['type'] == 'number' ) {
-            $placeholder = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".strtolower($label)." here";
             echo Form::number($value['name'], ( isset($value['value']) ? $value['value'] : null ),
                 array_merge( 
                     ['class'=>'form-control m-bot-15 '.$inputClass, 'id'=>$currentId, 'placeholder'=>$placeholder], 
@@ -236,7 +234,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
                 $defaultInput[] = "$('#$currentId').val('$value[default]')";
             }
         } elseif ( $value['type'] == 'email' ) {
-            $placeholder = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".strtolower($label)." here";
             echo Form::email($value['name'], ( isset($value['value']) ? $value['value'] : null ),
                 array_merge( 
                     ['class'=>'form-control m-bot-15 '.$inputClass, 'id'=>$currentId, 'placeholder'=>$placeholder], 
@@ -248,7 +245,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
                 $defaultInput[] = "$('#$currentId').val('$value[default]')";
             }
         } elseif ( $value['type'] == 'password' ) {
-            $placeholder = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".strtolower($label)." here";
             echo Form::password($value['name'],
                 array_merge( 
                     ['class'=>'form-control m-bot-15 '.$inputClass, 'id'=>$currentId, 'placeholder'=>$placeholder], 
@@ -264,7 +260,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
                 $defaultInput[] = "$('#$currentId').val('$value[default]')";
             }
         } elseif ( $value['type'] == 'file' ) {
-            $placeholder = isset($value['placeholder']) ? $value['placeholder'] : "Please enter ".strtolower($label)." here";
             echo Form::fileInput($value['name'],
                 [
                   'elOptions'  => array_merge( ['class'=>$inputClass, 'id'=>$currentId], ( isset($value['elOptions']) ? $value['elOptions'] : [] ) ),
@@ -377,8 +372,7 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
 @prepend('function-js')
 {{-- <script type="text/javascript"> --}}
     
-    var inputId = [{!! implode(', ',$inputId) !!}];
-    {!! $filter ? "var filterId = [".implode(', ',$inputId)."]" : "" !!}
+    {!! $filter ? "var tmpFilter = [];\nvar inputId = [". implode(', ',$inputId) ."];" : "" !!}
     {!! implode('',$script) !!}
     
     function clear{{$thisId}}() {

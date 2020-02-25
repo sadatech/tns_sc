@@ -62,6 +62,7 @@ foreach ( $input as $key => $value ) {
     $inputCollect[$key]['name'] = is_array($editField) ? $value['name'] : $editField;
 
     if ($value['type'] == 'select2') {
+		$editField = isset($value['edit_field']) ? $editField : ['id','name'];
         $multiple   = isset($value['multiple']) ? ($value['multiple'] == 'true' ? 'true' : 'false') : 'false';
         if ( isset($value['check_all']) ) {
             if($value['check_all'] == 'true'){
@@ -71,6 +72,7 @@ foreach ( $input as $key => $value ) {
         $updateString = !empty($updateString) ? $updateString : "onEdit".$thisId."Input('select2','$value[name]','".$thisId."Input".$id."',{'id':json.$editField[0],'name':json.$editField[1]});";
         $onEdit2[] = $updateString;
     } elseif ( $value['type'] == 'select3' ) {
+		$editField = isset($value['edit_field']) ? $editField : ['id','name'];
         $onEdit2[] = "onEdit".$thisId."Input('$value[type]','$value[name]','".$thisId."Input".$id."',{'id':json.$editField[0],'name':json.$editField[1]});";
     } elseif ( $value['type'] == 'location' ) {
 		$editField = isset($value['edit_field']) ? $editField : ['latitude','longitude'];

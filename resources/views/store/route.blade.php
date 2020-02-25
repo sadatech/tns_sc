@@ -85,6 +85,52 @@
   ) 
 }}
 
+{{
+  Form::filterInput( 'route', 'subtable',
+    [
+      [
+        'name'  => 'route',
+        'type'  => 'select2',
+        'route' => 'route-select2',
+      ],
+      [
+        'name'  => 'sub_area',
+        'type'  => 'select2',
+        'route' => 'sub-area-select2',
+      ],
+      [
+        'name'  => 'area',
+        'type'  => 'select2',
+        'route' => 'area-select2',
+      ],
+      [
+        'name'  => 'region',
+        'type'  => 'select2',
+        'route' => 'region-select2',
+      ]
+    ], 
+    [
+      'use_label'  => true,
+      'width'      => '4',
+      'filter'     => true,
+      'url'        => route('route.data',[ 'market' => $market ]),
+      'order'      => "",
+      'columnDefs' => "{'className': 'text-center', 'targets': 0}",
+      'colums'     => "
+        { data: 'id', name: 'routes.id' },
+        { data: 'name', name: 'routes.name' },
+        { data: 'subarea.name', name: 'sub_ares.name' },
+        { data: 'subarea.area.name', name: 'sub_ares.areas.name' },
+        { data: 'subarea.area.region.name', name: 'sub_areas.area.regions.name' },
+        { data: 'address', name: 'address' },
+        { data: 'latitude', name: 'latitude' },
+        { data: 'longitude', name: 'longitude' },
+        { data: 'action', name: 'action' },
+      "
+    ]
+  )
+}}
+
 @endsection
 
 @section('css')
@@ -133,55 +179,5 @@
     });
   });
   @endif
-  $(function() {
-    $('#subtable').dataTable({
-      processing: true,
-      drawCallback: function(){
-        $('.js-swal-delete').on('click', function(){
-          var url = $(this).data("url");
-          swal({
-            title: 'Are you sure?',
-            text: 'You will not be able to recover this data!',
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d26a5c',
-            confirmButtonText: 'Yes, delete it!',
-            html: false,
-            preConfirm: function() {
-                return new Promise(function (resolve) {
-                    setTimeout(function () {
-                        resolve();
-                    }, 50);
-                });
-            }
-          }).then(function(result){
-            if (result.value) {
-                window.location = url;
-            } else if (result.dismiss === 'cancel') {
-                swal('Cancelled', 'Your data is safe :)', 'error');
-            }
-          });
-        });
-      },
-      ajax: '{!! route('route.data',[ 'market' => $market ]) !!}',
-      // scrollY: "300px",
-      order: [],
-      columnDefs:[
-        {"className": "text-center", "targets": 0},
-        {"className": "text-center", "targets": 8}
-      ],
-      columns: [
-      { data: 'id', name: 'routes.id' },
-      { data: 'name', name: 'routes.name' },
-      { data: 'subarea.name', name: 'sub_ares.name' },
-      { data: 'subarea.area.name', name: 'sub_ares.areas.name' },
-      { data: 'subarea.area.region.name', name: 'sub_areas.area.regions.name', "searchable": true },
-      { data: 'address', name: 'address' },
-      { data: 'latitude', name: 'latitude' },
-      { data: 'longitude', name: 'longitude' },
-      { data: 'action', name: 'action' },
-      ]
-    });
-  });
 </script>
 @endsection

@@ -106,7 +106,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'store'], function () {
 
 	// Route Pages
 	Route::prefix('route')->group(function(){
-		Route::get('/data/{market}', 'RouteController@data')->name('route.data');
+		Route::post('/data/{market}', 'RouteController@data')->name('route.data');
 		Route::post('/create/{market}', 'RouteController@store')->name('route.add');
 		Route::get('/delete/{id}', 'RouteController@delete')->name('route.delete');
 		Route::get('/export/{market}', 'RouteController@exportXLS')->name('route.export');
@@ -1185,7 +1185,7 @@ Route::prefix('select2')->group(function () {
 	Route::post('/brandXSASA-select2', 'BrandController@getDataWithFilters')->name('brandXSASA-select2');
 
 	// NEW
-	Route::get('/route-select2', 'RouteController@getDataWithFilters')->name('route-select2');
+	Route::post('/route-select2', 'RouteController@getDataWithFilters')->name('route-select2');
 });
 
 Route::prefix('promoactivity')->group(function(){

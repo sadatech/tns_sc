@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
         FormFacade::component('selectTreeInput', 'components.form.select_tree_input', ['name', 'input', 'route', 'attributes' => []]);        
         FormFacade::component('generateInput', 'components.form.input_generator', ['name', 'input', 'options' => []]);
         FormFacade::component('formModalInput', 'components.form.form_modal', ['name', 'route', 'input', 'options' => []]);
-        FormFacade::component('filterInput', 'components.form.filter_input', ['name', 'input', 'options' => []]);
+        FormFacade::component('filterInput', 'components.form.filter_input', ['name', 'table', 'input', 'options' => []]);
     }
     public function register()
     {
