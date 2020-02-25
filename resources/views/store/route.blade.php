@@ -35,7 +35,7 @@
           <th>Address</th>
           <th>Latitude</th>
           <th>Longitude</th>
-          <th style="width: 15%;"> Action</th>
+          <th> Action</th>
         </thead>
         </table>
       </div>
@@ -151,7 +151,6 @@
 @section('script')
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
     $.ajaxSetup({

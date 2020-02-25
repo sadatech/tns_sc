@@ -360,6 +360,7 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
 <link rel="stylesheet" href="http://localhost/tns_sc/public/assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
 @endprepend
 @prepend('additional-js')
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 @if($includeDate > 0)
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>

@@ -118,12 +118,15 @@ $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_
     initMap{{$id}}([]);
 
     function initMap{{$id}}(params=[]) {
+		latitude  = -6.2241031;
+		longitude = 106.92347419999999;
     	if (params.length) {
-			latitude  = params[0];
-			longitude = params[1];
-		}else{
-			latitude  = -6.2241031;
-			longitude = 106.92347419999999;
+    		if ( (Number(params[0]) === params[0] && params[0] % 1 !== 0) || (params[0] % 1 === 0) ){ // is float or is number
+				latitude  = params[0];
+    		}
+    		if ( (Number(params[1]) === params[1] && params[1] % 1 !== 0) || (params[1] % 1 === 0) ){ // is float or is number
+				longitude = params[1];
+    		}
 		}
         $('#locpic-address{{$id}}').val('');
         $('#locpic-latitude{{$id}}').val(latitude);
@@ -145,5 +148,8 @@ $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_
         });
         $('#locpic{{$id}}').locationpicker('autosize');
     }
+    function isFloat(n){
+    return Number(n) === n && n % 1 !== 0;
+}
 {{-- </script> --}}
 @endpush
