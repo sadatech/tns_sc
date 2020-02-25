@@ -21,4 +21,8 @@ class RouteFilters extends QueryFilters
     public function type($value) {
         return (!$this->requestAllData($value)) ? $this->builder->where('type', $value) : null;
     }
+
+    public function filter_route($value) {
+        return (!$this->requestAllData($value)) ? $this->builder->whereIn('id',$value) : null;
+    }
 }

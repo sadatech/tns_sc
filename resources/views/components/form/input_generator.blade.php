@@ -40,7 +40,6 @@
 //         [
 //         'name'      => 'location_input',
 //         'type'      => 'location',
-
 //         'use_label' => false,
 //         ],
 //         [
@@ -52,6 +51,7 @@
 //         'name'  => 'select2_input',
 //         'type'  => 'select2',
 //         'route' => 'category-select2',
+//         'multiple' => true,
 //         ],
 //         [
 //         'name'        => 'select2_check_input',
@@ -154,7 +154,7 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
                     : "";
         
         if ( $value['type'] == 'select2' ) {
-            $multi        = (isset($value["multiple"]) ? ($value["multiple"] ? "multiple='multiple'" : "") : "" );
+            $multi        = (isset($value["multiple"]) ? ( $value["multiple"] ? ['multiple'=>'multiple'] : [] ) : [] );
             $select2      = "";
             $enableSelect = "";
             $checkAll     = isset($value['check_all']) ? ( $value['check_all'] ? true : false ) : false;
@@ -162,9 +162,9 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
             $select2returnValue = (isset($value['return_id']) ? $value['return_id'] : 'obj.id');
 
             if( $checkAll ) {
-                echo Form::select2CheckboxInput($value['name'], $currentId, $value['route'], ['elOptions'=>['id'=>$currentId], 'useLabel'=>false ]);
+                echo Form::select2CheckboxInput($value['name'], $currentId, $value['route'], ['elOptions'=>array_merge($multi, ['id'=>$currentId]), 'useLabel'=>false ]);
             } else {
-                echo Form::select2Input($value['name'], null, $value['route'], ['elOptions'=>['id'=>$currentId], 'useLabel'=>false ]);
+                echo Form::select2Input($value['name'], null, $value['route'], ['elOptions'=>array_merge($multi, ['id'=>$currentId]), 'useLabel'=>false ]);
             }
 
             $enableSelect = $checkAll ? "enable".$currentId."()\n" : '';
@@ -360,7 +360,6 @@ $thisInputId  = ($filter ? 'finput_' : 'input_') . $thisId;
 <link rel="stylesheet" href="http://localhost/tns_sc/public/assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
 @endprepend
 @prepend('additional-js')
-<script src="{{ asset('js/select2-handler.js') }}"></script>
 @if($includeDate > 0)
 <script src="{{ asset('assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>jQuery(function(){ Codebase.helpers(['datepicker']); });</script>

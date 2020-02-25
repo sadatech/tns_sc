@@ -27,7 +27,7 @@
         </div>
         <table class="table table-responsive table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="subtable">
         <thead>
-          <th class="text-center" style="width: 70px;"></th>
+          <th></th>
           <th>{{ $market == 1 ? "Route" : "Market" }}</th>
           <th>SubArea</th>
           <th>Area</th>
@@ -89,9 +89,10 @@
   Form::filterInput( 'route', 'subtable',
     [
       [
-        'name'  => 'route',
-        'type'  => 'select2',
-        'route' => 'route-select2',
+        'name'     => 'route',
+        'type'     => 'select2',
+        'route'    => 'route-select2',
+        'multiple' => true,
       ],
       [
         'name'  => 'sub_area',
@@ -115,7 +116,7 @@
       'filter'     => true,
       'url'        => route('route.data',[ 'market' => $market ]),
       'order'      => "",
-      'columnDefs' => "{'className': 'text-center', 'targets': 0}",
+      'columnDefs' => "{'className': 'text-center', 'targets': 8}",
       'colums'     => "
         { data: 'id', name: 'routes.id' },
         { data: 'name', name: 'routes.name' },
@@ -151,6 +152,7 @@
 @section('script')
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
     $.ajaxSetup({

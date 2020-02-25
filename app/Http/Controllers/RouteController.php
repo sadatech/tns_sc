@@ -30,9 +30,10 @@ class RouteController extends Controller
         return view('store.route', $data);
     }
 
-    public function data($market = '')
+    public function data(RouteFilters $filters, $market = '')
     {
-        $route = Route::with('subarea.area.region')
+        $route = Route::filter($filters)
+            ->with('subarea.area.region')
             ->when($market == '1', function($q){
                 return $q->whereType(1);
             })
