@@ -137,8 +137,6 @@ $validate = implode(" \n ", $validate);
       </div>
       <form id="{{$thisId}}Form" method="post" action="{{ $route }}">
         {!! csrf_field() !!}
-        <input type="hidden" name="id" id="idInput{{$thisId}}">
-        <input type="hidden" name="update" id="updateInput{{$thisId}}">
         <div id="inputGen" class="block-content row">
         	{{
             	Form::generateInput( $name.'Input', $input, ['use_label'=>true] ) 
@@ -194,9 +192,12 @@ $validate = implode(" \n ", $validate);
                 type  : 'POST',
                 data  : formData,
                 success: function (data) {
+                    if (data.message === undefined) {
+                        console.log('there was something error');
+                        return;
+                    }
                     console.log(data)
-                    swal('data.title', 'data.message', 'success');
-                    // swal(data.title, data.message, data.type);
+                    swal(data.title, data.message, data.type);
 		            $('#{{$modalId}}').modal('toggle');
                 },
                 error: function(xhr, textStatus, errorThrown){
@@ -210,19 +211,17 @@ $validate = implode(" \n ", $validate);
 
     function editModal{{$thisId}}(json) {
         $('#{{$modalId}}').modal('toggle');
-        $('#idInput{{$thisId}}').val(json.id);
-        $('#updateInput{{$thisId}}').val(1);
         clear{{$thisId}}Input();
         {!!$onEdit!!}
+        $('#{{$thisId}}InputUpdate').val('1');
         setTimeout(function() {
 	        {!!$onEdit2!!}
-
         }, 500);
     }
 
     function addModal{{$thisId}}() {
         $('#{{$modalId}}').modal('toggle');
-        $('#update').val('');
+        $('#{{$thisId}}InputUpdate').val('');
         clear{{$thisId}}Input();
     }
 

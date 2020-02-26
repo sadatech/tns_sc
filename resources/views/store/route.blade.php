@@ -152,7 +152,6 @@
 @section('script')
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('js/select2-handler.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
     $.ajaxSetup({
@@ -182,3 +181,7 @@
   @endif
 </script>
 @endsection
+
+@prepend('additional-js')
+<script src="{{ asset('js/select2-handler.js') }}"></script>
+@endprepend

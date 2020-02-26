@@ -107,12 +107,12 @@ $prevSelector  = $treeId.'Parent';
 				          	<div class='input-group mb-3 col-sm-12 col-md-12' style='padding: 0;margin-bottom: 5px !important;'>
 				            	<div class='col-md-". $left ." col-sm-12' style='padding: 0'>
 				            ";
-					            echo Form::select("new_".$prevValue, [null], null,
+					            echo Form::select("s_".$value, [null], null,
 									array_merge([ 
-										'class'       =>'form-control', 
-										'id'          =>$selector.'Select', 
-										'placeholder' =>'Please select '.strtolower($prevTitle).' here',
-										'style'       =>'width: 100%', 
+										'class'       => 'form-control', 
+										'id'          => $selector.'Select', 
+										'placeholder' => 'Please select '.strtolower($prevTitle).' here',
+										'style'       => 'width: 100%', 
 									], $required)
 								);
 				            echo

@@ -47,6 +47,7 @@ class RouteController extends Controller
             ->addColumn('action', function ($routes) use ($market){
                 $data = array(
                     'id'            => $routes->id,
+                    'type'          => $routes->type,
                     'sub_area_id'   => $routes->subarea->id,
                     'sub_area_name' => $routes->subarea->name,
                     'route'         => $routes->name,
@@ -61,9 +62,12 @@ class RouteController extends Controller
 
     public function store(Request $request)
     {
-        $data=$request->all();
-        $limit=[
+        $request['name'] = $request->route;
+
+        return $data  = $request->all();
+        $limit = [
             'name'          => 'required',
+            'type'          => 'required|numeric',
             'id'            => 'nullable|numeric',
             'sub_area'      => 'nullable|string',
             'area'          => 'nullable|string',
@@ -77,27 +81,40 @@ class RouteController extends Controller
             'type'          => 'nullable|numeric',
             'update'        => 'nullable|numeric',
         ];
+
+        $success   = 'true';
+
         $validator = Validator($data, $limit);
         if ($validator->fails()){
-            return redirect()->back()
-            ->withErrors($validator)
-            ->withInput();
-        } else {
-            $success = 'true';
+            $result = [
+                'status' => false,
+                'type'   => 'warning',
+                'title'  => 'Warning!<br/>',
+                'error'  => $validator,
+                'message'=> '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route (validator)!'
+            ];
+            $success   = 'false';
+        }
+        
+        $actionType = ($request->update == 1 ? 'mengubah' : 'menambah');
 
-            if (!$request->has('sub_area')) {
+
+
+        if ($success == 'true') {
+
+            if (!$request->has('s_sub_area')) {
                 if (!empty($request->new_sub_area)) {
 
-                    if (!$request->has('area')) {
+                    if (!$request->has('s_area')) {
                     
-                        if (!$request->has('region')) {
+                        if (!$request->has('s_region')) {
                             if (!empty($request->new_region)) {
                                 $region = Region::firstOrCreate([ 'name' => $this->trimAndUpper($request->new_region) ]);
                             }else{
                                 $success = 'Choose or input the Region.';
                             }
                         }else{
-                            $region = Region::where([ 'id' => $this->getFirstExplode($request->region, '`^') ])->first();
+                            $region = Region::where([ 'id' => $this->getFirstExplode($request->s_region, '`^') ])->first();
                         }
 
                         if (!empty($request->new_area)) {
@@ -106,7 +123,7 @@ class RouteController extends Controller
                             $success = 'Choose or input the Area.';
                         }
                     }else{
-                        $area = Area::where([ 'id' => $this->getFirstExplode($request->area, '`^') ])->first();
+                        $area = Area::where([ 'id' => $this->getFirstExplode($request->s_area, '`^') ])->first();
                     }
 
                     if (!empty($request->new_sub_area) && $success == 'true') {
@@ -114,11 +131,12 @@ class RouteController extends Controller
                     }else{
                         $success = 'Choose or input the Sub Area correctly.';
                     }
+
                 }else{
                     $success = 'Choose the Sub Area.';
                 }
             }else{
-                $subArea = SubArea::where([ 'id' => $this->getFirstExplode($request->sub_area, '`^') ])->first();
+                $subArea = SubArea::where([ 'id' => $this->getFirstExplode($request->s_sub_area, '`^') ])->first();
             }
 
             if ($success == 'true') {
@@ -145,21 +163,36 @@ class RouteController extends Controller
                             'id_subarea'    => $subArea->id,
                         ]);
                 }
-                return redirect()->back()
-                    ->with([
-                        'type'   => 'success',
-                        'title'  => 'Sukses!<br/>',
-                        'message'=> '<i class="em em-confetti_ball mr-2"></i>Berhasil '. ( ($request->update == 1) ? 'mengubah' : 'menambah' ). 'Route!'
-                    ]);
+
+                $result = [
+                    'status'  => true,
+                    'type'    => 'success',
+                    'title'   => 'Sukses!<br/>',
+                    'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil '.$actionType.' Route!'
+                ];
             } else {
-                return redirect()->back()
-                    ->with([
-                        'type'   => 'danger',
-                        'title'  => 'Gagal!<br/>',
-                        'message'=> '<i class="em em-confounded mr-2"></i>Gagal '. ( ($request->update == 1) ? 'mengubah' : 'menambah' ). ' Route!<br>'.$success
-                    ]);
+                $keys = [];
+                foreach ($request->all() as $key => $value) {
+                    $keys[] = $key;
+                }
+                $keys = implode(', ', $keys);
+                $result = [
+                    'status' => false,
+                    'type'   => 'warning',
+                    'title'  => 'Warning!<br/>',
+                    'message'=> '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route (select tree)!\n'.$success.'\n'.$keys
+                ];
             }
+        } else {
+            $result = [
+                'status' => false,
+                'type'   => 'warning',
+                'title'  => 'Warning!<br/>',
+                'message'=> '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route!'
+            ];
         }
+
+        return response()->json($result, 200);
     }
 
     public function delete($id) 
