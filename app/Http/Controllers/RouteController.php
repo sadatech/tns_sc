@@ -64,7 +64,7 @@ class RouteController extends Controller
     {
         $request['name'] = $request->route;
 
-        return $data  = $request->all();
+        $data  = $request->all();
         $limit = [
             'name'          => 'required',
             'type'          => 'required|numeric',
@@ -87,11 +87,11 @@ class RouteController extends Controller
         $validator = Validator($data, $limit);
         if ($validator->fails()){
             $result = [
-                'status' => false,
-                'type'   => 'warning',
-                'title'  => 'Warning!<br/>',
-                'error'  => $validator,
-                'message'=> '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route (validator)!'
+                'status'  => false,
+                'type'    => 'warning',
+                'title'   => 'Warning!<br/>',
+                'error'   => $validator,
+                'message' => '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route (validator)!'
             ];
             $success   = 'false';
         }
@@ -171,24 +171,20 @@ class RouteController extends Controller
                     'message' => '<i class="em em-confetti_ball mr-2"></i>Berhasil '.$actionType.' Route!'
                 ];
             } else {
-                $keys = [];
-                foreach ($request->all() as $key => $value) {
-                    $keys[] = $key;
-                }
-                $keys = implode(', ', $keys);
                 $result = [
-                    'status' => false,
-                    'type'   => 'warning',
-                    'title'  => 'Warning!<br/>',
-                    'message'=> '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route (select tree)!\n'.$success.'\n'.$keys
+                    'status'  => false,
+                    'type'    => 'warning',
+                    'title'   => 'Warning!<br/>',
+                    'message' => '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route (select tree)!
+                    '.$success
                 ];
             }
         } else {
             $result = [
-                'status' => false,
-                'type'   => 'warning',
-                'title'  => 'Warning!<br/>',
-                'message'=> '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route!'
+                'status'  => false,
+                'type'    => 'warning',
+                'title'   => 'Warning!<br/>',
+                'message' => '<i class="em em-confounded mr-2"></i>Gagal '.$actionType.' Route!'
             ];
         }
 

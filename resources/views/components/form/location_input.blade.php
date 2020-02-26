@@ -30,7 +30,7 @@ $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_
 									'id'          => 'locpic-address'.$id,
 									'placeholder' => 'Please enter address here',
 									'class'       => 'form-control',
-								 ]
+								]
 							) 
 						}}
                     </div>
@@ -49,7 +49,7 @@ $id     = isset($config['elOptions']['id']) ? $config['elOptions']['id'] : preg_
 												'class'       => 'form-control',
 												'readonly'    => 'readonly',
 												'required'    => 'required'
-											 ]
+											]
 										) 
 									}}
                                 </div>

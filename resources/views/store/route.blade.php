@@ -15,7 +15,112 @@
     <div class="block-header bg-primary pl-20 pr-20 pt-15 pb-15">
         <h3 class="block-title">Datatables</h3>
     </div>
-    <div class="block">        
+    <div class="block">
+    {{
+       Form::generateInput('form_test12', 
+     [
+         [
+         'name'  => 'text_input',
+         'type'  => 'text',
+         ],
+         [
+         'name'     => 'year_input',
+         'type'     => 'date',
+         'min_view' => 'years',
+         'view'     => 'years',
+         'format'   => 'yyyy'
+         ],
+         [
+         'name'     => 'month_input',
+         'type'     => 'date',
+         'min_view' => 'months',
+         'view'     => 'months',
+         'format'   => 'MM'
+         ],
+         [
+         'name'  => 'date_input',
+         'type'  => 'date',
+         ],
+         [
+         'name'  => 'file_input',
+         'type'  => 'file',
+         ],
+         [
+         'name'      => 'location_input',
+         'type'      => 'location',
+         'use_label' => false,
+         ],
+         [
+         'name'  => 'select_multi_input',
+         'type'  => 'select-multi',
+         'route' => 'product-select2',
+         ],
+         [
+         'name'  => 'select2_input',
+         'type'  => 'select2',
+         'route' => 'category-select2',
+         'multiple' => true,
+         ],
+         [
+         'name'        => 'select2_check_input',
+         'type'        => 'select2',
+         'multiple'    => true,
+         'check_all'   => true,
+         'route'       => 'product-select2',
+         'return_id'   => "obj.id",
+         'return_text' => "obj.code + ' | ' + obj.name",
+         'width'       => ['11','1'],
+         'edit_id'     => 'id',
+         'edit_text'   => 'name',
+         ],
+         [
+         'name'  => 'radio_input',
+         'type'  => 'radio',
+         'value' => ['satu'=>'1','dua'=>'2'],
+         ],
+         [
+         'name'  => 'checkbox_input',
+         'type'  => 'checkbox',
+         'value' => ['satu'=>'1','dua'=>'2'],
+         ],
+         [
+         'name'       => 'select_tree_input',
+         'type'       => 'select3',
+         'width'      => '12',
+         'width_tree' => ['9','3'],
+         'use_label'  => false,
+         'edit_field' => ['id_category','category_name'],
+         'tree'       => ['category','brand'],
+         'route'      => ['category-select2','brand-select2'],
+         ],
+         [
+         'name' => 'id',
+         'type' => 'hidden',
+         ],
+         [
+         'name' => 'update',
+         'type' => 'hidden',
+         ],
+         [
+         'name'    => 'type',
+         'type'    => 'hidden',
+         'default' => $market,
+         ],
+         [
+         'name' => 'email_input',
+         'type' => 'email',
+         ],
+         [
+         'name' => 'number_input',
+         'type' => 'number',
+         ],
+         [
+         'name' => 'password_input',
+         'type' => 'password',
+         ]
+     ], ['filter'=>false,'width'=>'4','use_label'=>true]
+ )
+    }}        
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
