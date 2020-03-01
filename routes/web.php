@@ -111,6 +111,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'store'], function () {
 		Route::get('/delete/{id}', 'RouteController@delete')->name('route.delete');
 		Route::get('/export/{market}', 'RouteController@exportXLS')->name('route.export');
 		Route::get('/{market}', 'RouteController@baca')->name('route');
+		Route::post('/import', 'ProductFocusController@import')->name('route.import')->middleware('auth');
+		Route::get('/download-template', function(){
+			return response()->download(public_path('assets/ProductFocusImport.xlsx'));
+		})->name('route.download-template')->middleware('auth');
 	});
 
 	//Sub Area Pages
@@ -1210,12 +1214,11 @@ Route::prefix('data')->group(function () {
 	Route::post('/product-fokus-gtc-cat1-cat2', 'ReportController@SMDCat1Cat2')->name('product-fokus-gtc-cat1-cat2');
 });
 
-
 Auth::routes();
 
 Route::get('/tes', 'ReportController@sellInData');
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'job-trace'], function () {
-	Route::get('/data/{model}/{type}', 'JobTraceController@data')->name('job-trace.data');
+	Route::post('/data/{model}/{type?}', 'JobTraceController@data')->name('job-trace.data');
 	Route::any('/delete/{id}', 'JobTraceController@destroy')->name('job-trace.delete');
 });

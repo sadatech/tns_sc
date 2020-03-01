@@ -158,6 +158,15 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.css') }}">
+<style type="text/css">
+  [data-notify="container"] 
+  {
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  .pac-container {
+      z-index: 99999;
+  }
+</style>
 @endsection
 
 @section('script')

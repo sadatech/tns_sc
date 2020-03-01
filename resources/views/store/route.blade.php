@@ -15,119 +15,12 @@
     <div class="block-header bg-primary pl-20 pr-20 pt-15 pb-15">
         <h3 class="block-title">Datatables</h3>
     </div>
-    <div class="block">
-    {{
-       Form::generateInput('form_test12', 
-     [
-         [
-         'name'  => 'text_input',
-         'type'  => 'text',
-         ],
-         [
-         'name'     => 'year_input',
-         'type'     => 'date',
-         'min_view' => 'years',
-         'view'     => 'years',
-         'format'   => 'yyyy'
-         ],
-         [
-         'name'     => 'month_input',
-         'type'     => 'date',
-         'min_view' => 'months',
-         'view'     => 'months',
-         'format'   => 'MM'
-         ],
-         [
-         'name'  => 'date_input',
-         'type'  => 'date',
-         ],
-         [
-         'name'  => 'file_input',
-         'type'  => 'file',
-         ],
-         [
-         'name'      => 'location_input',
-         'type'      => 'location',
-         'use_label' => false,
-         ],
-         [
-         'name'  => 'select_multi_input',
-         'type'  => 'select-multi',
-         'route' => 'product-select2',
-         ],
-         [
-         'name'  => 'select2_input',
-         'type'  => 'select2',
-         'route' => 'category-select2',
-         'multiple' => true,
-         ],
-         [
-         'name'        => 'select2_check_input',
-         'type'        => 'select2',
-         'multiple'    => true,
-         'check_all'   => true,
-         'route'       => 'product-select2',
-         'return_id'   => "obj.id",
-         'return_text' => "obj.code + ' | ' + obj.name",
-         'width'       => ['11','1'],
-         'edit_id'     => 'id',
-         'edit_text'   => 'name',
-         ],
-         [
-         'name'  => 'radio_input',
-         'type'  => 'radio',
-         'value' => ['satu'=>'1','dua'=>'2'],
-         ],
-         [
-         'name'  => 'checkbox_input',
-         'type'  => 'checkbox',
-         'value' => ['satu'=>'1','dua'=>'2'],
-         ],
-         [
-         'name'       => 'select_tree_input',
-         'type'       => 'select3',
-         'width'      => '12',
-         'width_tree' => ['9','3'],
-         'use_label'  => false,
-         'edit_field' => ['id_category','category_name'],
-         'tree'       => ['category','brand'],
-         'route'      => ['category-select2','brand-select2'],
-         ],
-         [
-         'name' => 'id',
-         'type' => 'hidden',
-         ],
-         [
-         'name' => 'update',
-         'type' => 'hidden',
-         ],
-         [
-         'name'    => 'type',
-         'type'    => 'hidden',
-         'default' => $market,
-         ],
-         [
-         'name' => 'email_input',
-         'type' => 'email',
-         ],
-         [
-         'name' => 'number_input',
-         'type' => 'number',
-         ],
-         [
-         'name' => 'password_input',
-         'type' => 'password',
-         ]
-     ], ['filter'=>false,'width'=>'4','use_label'=>true]
- )
-    }}        
+    <div class="block">        
       <div class="block-content block-content-full">
         <div class="block-header p-0 mb-20">
           <h3 class="block-title">
-            <button class="btn btn-primary btn-square" data-toggle="modal" data-target="#formModal" onclick="addModalRoute()"><i class="fa fa-plus mr-2"></i>Add Data</button>
           </h3>
           <div class="block-option">
-            <a href="{{ route('route.export',['market'=>$market]) }}" class="btn btn-success btn-square float-right ml-10"><i class="si si-cloud-download mr-2"></i>Download Data</a>
           </div>
         </div>
         <table class="table table-responsive table-striped table-vcenter js-dataTable-full table-hover table-bordered" id="subtable">
@@ -216,13 +109,20 @@
       ]
     ], 
     [
-      'use_label'  => true,
-      'width'      => '4',
-      'filter'     => true,
-      'url'        => route('route.data',[ 'market' => $market ]),
-      'order'      => "",
-      'columnDefs' => "{'className': 'text-center', 'targets': 8}",
-      'colums'     => "
+      'use_label'             => true,
+      'width'                 => '4',
+      'filter'                => true,
+      'add'                   => true,
+      'import'                => true,
+      'import-form-route'     => 'route.import',
+      'import-template-route' => 'route.download-template',
+      'job-status'            => true,
+      'direct-download'       => true,
+      'in-direct-download'    => true,
+      'url'                   => route('route.data',[ 'market' => $market ]),
+      'order'                 => "",
+      'columnDefs'            => "{'className': 'text-center', 'targets': 8}",
+      'colums'                => "
         { data: 'id', name: 'routes.id' },
         { data: 'name', name: 'routes.name' },
         { data: 'subarea.name', name: 'sub_ares.name' },
@@ -257,6 +157,13 @@
 @section('script')
 <script src="{{ asset('assets/js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/pdfmake.min.js') }}"></script>
+<script src="{{ asset('assets/js/vfs_fonts.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('js/select2-handler.js') }}"></script>
+
 <script type="text/javascript">
   $(document).ready(function() {
     $.ajaxSetup({
@@ -286,7 +193,3 @@
   @endif
 </script>
 @endsection
-
-@prepend('additional-js')
-<script src="{{ asset('js/select2-handler.js') }}"></script>
-@endprepend

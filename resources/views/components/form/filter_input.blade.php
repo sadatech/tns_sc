@@ -42,9 +42,9 @@
     //     ]
     // ]
 //################################
-$inputId   = [];
-$title     = ucwords(str_replace('_',' ',$name));
-$thisId    = str_replace(' ','',$title);
+$inputId = [];
+$title   = ucwords(str_replace('_',' ',$name));
+$thisId  = str_replace(' ','',$title);
 
 foreach ( $input as $key => $value ) {
     $label     = ucwords(str_replace('_',' ',$value['name']));
@@ -57,7 +57,93 @@ $inputId = array_map(function($val) { return "'$val'"; }, $inputId);
 
 $timeout = isset($options['timeout']) ? $options['timeout'] : '1.5';
 
+$tableActionLeft  = [];
+$tableActionRight = [];
+$right    = 0;
+$left     = 0;
+$download = [];
+
+if ( isset($options['add']) ) {
+    if ($options['add']) {
+        $left++;
+        $tableActionLeft[] = "
+            <div class='m-bot-10 float-left'>
+                <button id='add-button' class='btn btn-primary btn-square' data-toggle='modal' onclick='addModalProductFocus()'>
+                    <i class='fa fa-plus mr-2'></i>
+                    Add Data
+                </button>
+            </div>
+        ";
+    }
+}
+
+if ( isset($options['direct-download']) ) {
+    if ($options['direct-download']) {
+        $right++;
+        $buttonId = "direct-download";
+        $tableActionRight[] = "
+            <button id='$buttonId' class='btn btn-success btn-square float-right ml-10' onclick=\\\"directDownload('" . route('focus.export') . "', '$buttonId')\\\">
+                <i id='$buttonId-icon' class='si si-cloud-download mr-2'></i>
+                Direct Download
+            </button>
+        ";
+        $download['direct'] = true;
+    }
+}
+
+if ( isset($options['import']) ) {
+    if ($options['import']) {
+        $right++;
+        $buttonId = "import-button";
+        $tableActionRight[] = "
+            <button id='$buttonId' class='btn btn-outline-info btn-square float-right ml-10' onclick=\\\"importModal('$buttonId')\\\">
+                <i class='si si-cloud-upload mr-2'></i>
+                Import Data
+            </button>
+        ";
+        $formRoute     = isset( $options['import-form-route'] ) ? $options['import-form-route'] : $name.'.import';
+        $templateRoute = isset( $options['import-template-route'] ) ? $options['import-template-route'] : $name.'.download-template';
+        echo Form::importModal('route', $formRoute, $templateRoute);
+    }
+}
+
+if ( isset($options['in-direct-download']) ) {
+    if ($options['in-direct-download']) {
+        $right++;
+        $buttonId = "in-direct-download";
+        $tableActionRight[] = "
+            <button id='$buttonId' class='btn btn-outline-success btn-square float-right ml-10' onclick=\\\"inDirectDownload('" . route('focus.download') . "', '$buttonId')\\\">
+                <i id='$buttonId-icon' class='si si-cloud-download mr-2'></i>
+                In-direct Download
+            </button>
+        ";
+        $download['in-direct'] = true;
+    }
+}
+
+echo count($download) > 0 ? Form::exportFunction($download) : "";
+
+if ( isset($options['job-status']) ) {
+    if ($options['job-status']) {
+        $right++;
+        $tableActionRight[] = "
+            <button id='upload-status' class='btn btn-outline-warning btn-square float-right ml-10'>
+                <i class='fa fa-check-square-o'></i>
+                View Job Status
+            </button>
+        ";
+        $model = isset($options['model']) ? $options['model'] : 'App\\'.str_replace(' ', '', ucwords($title) );
+        echo Form::jobStatusModal('route',$model);
+    }
+}
+$tableAction = "";
+$tableAction .= $left > 0 ? implode("", $tableActionLeft) : "";
+$tableAction .= $right > 0 ? "<div class='m-bot-10 float-right'>".implode("", $tableActionRight)."</div>" : "";
+$tableAction = str_replace(array("\n","\r"), "", $tableAction);
+$tableAction = "<div style='width:100%;'>". $tableAction ."</div>";
+
 @endphp
+
 
 <button type="button" data-toggle="modal" data-target="#filter-modal" class="btn btn-warning btn-sm act-btn display-hide"><i class="fa fa-filter"></i> Filter</button>
 
@@ -137,7 +223,120 @@ $timeout = isset($options['timeout']) ? $options['timeout'] : '1.5';
         $('#submitFilterButton').click();
         setTimeout(function() {
             $('#submitFilterButton').click();
-    }, 500);
+        }, 500);
     });
+
+    $('#{{ $table }}').prev().append("{!! $tableAction !!}");
+
+    // Filtering data with action callback
+    function filteringReportWithActionCallback(arrayOfData, timeout = '') {
+        var table        = arrayOfData[0];
+        var newElement   = $('#'+table);
+        var element      = arrayOfData[1];
+        var url          = arrayOfData[2];
+        var tableColumns = arrayOfData[3];
+        var columnDefs   = arrayOfData[4];
+        var order        = arrayOfData[5];
+
+        $(document).ready(function () {
+            setupTable(table, newElement, order, columnDefs, tableColumns, url);
+            adjustTableDisplay(timeout);
+        });
+    }
+
+    function triggerResetWithActionCallback (arrayOfData) {
+        var data         = arrayOfData[0];
+        var table        = arrayOfData[1];
+        var element      = arrayOfData[2];
+        var newElement   = $('#'+arrayOfData[1]);
+        var url          = arrayOfData[3];
+        var tableColumns = arrayOfData[4];
+        var columnDefs   = arrayOfData[5];
+        var order        = arrayOfData[6];
+
+        data.map((id) => {
+            $(id).prop('disabled', false);
+            if ( $(id).is(':checkbox') ) {
+                $(id).prop('checked',false);
+            }else{
+                $(id).val('').trigger('change');
+                if($(id).hasClass('default-select')){$(id).prop("selectedIndex", 0).val();}
+            }
+        });
+
+        this.filters = {};
+
+        setupTable(table, newElement, order, columnDefs, tableColumns, url);
+    }
+
+    function setupTable(table, newElement, order, columnDefs, tableColumns, url) {
+        if($.fn.dataTable.isDataTable('#'+table)){
+            newElement.DataTable().clear();
+            newElement.DataTable().destroy();
+        }
+
+        newElement.DataTable({
+            processing:     true,
+            serverSide:     true,
+            scrollX:        true,
+            scrollCollapse: true,
+            bFilter:        false,
+            rowId:          "row_id",
+            ordering:       false,
+            order:          order,
+            columnDefs:     columnDefs,
+            columns:        tableColumns,
+            ajax: {
+                url: url,
+                type: 'POST',
+                data: filters,
+                dataType: 'json',
+                error: function (data) {
+                    swal("Error!", "Failed to load Data!", "error");
+                },
+                dataSrc: function(result){
+                    this.data = result.data;
+                    return result.data;
+                },
+            },
+            drawCallback: function(){
+                $('.js-swal-delete').on('click', function(){
+                    var id = $(this).data("id");
+                    var deleteUrl = $(this).data("url");
+                    swal({
+                        title: 'Are you sure?',
+                        text: 'You will not be able to recover this data!',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d26a5c',
+                        confirmButtonText: 'Yes, delete it!',
+                        html: false,
+                        preConfirm: function() {
+                            return new Promise(function (resolve) {
+                                setTimeout(function () {
+                                    resolve();
+                                }, 50);
+                            });
+                        }
+                    }).then(function(result){
+                        if (result.value) {
+                            $.ajax({
+                                url: deleteUrl,
+                                type: 'GET',
+                                success: function (data) {
+                                    $("#"+id).remove();
+                                },
+                                error: function(xhr, textStatus, errorThrown){
+                                    swal("Gagal melakukan request", "Silahkan hubungi admin", "error");
+                                }
+                            });
+                        } else if (result.dismiss === 'cancel') {
+                            swal('Cancelled', 'Your data is safe :)', 'error');
+                        }
+                    });
+                });
+            },
+        });
+    }
 {{-- </script> --}}
 @endpush

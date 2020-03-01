@@ -33,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
         FormFacade::component('generateInput', 'components.form.input_generator', ['name', 'input', 'options' => []]);
         FormFacade::component('formModalInput', 'components.form.form_modal', ['name', 'route', 'input', 'options' => []]);
         FormFacade::component('filterInput', 'components.form.filter_input', ['name', 'table', 'input', 'options' => []]);
+        FormFacade::component('jobStatusModal', 'components.job_status_modal', ['name', 'model', 'options' => []]);
+        FormFacade::component('importModal', 'components.import_modal', ['name', 'form_url', 'template_url', 'options' => []]);
+        FormFacade::component('exportFunction', 'components.export_function', [ 'options' => [] ]);
     }
     public function register()
     {

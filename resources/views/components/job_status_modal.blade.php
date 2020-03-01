@@ -2,11 +2,14 @@
 //################################
 // name -> purpose of main view, for example menu name, use underscore, example: product_focus
 // model -> model name, example: App\ProductFocus
-// buttonId -> id of button that click to show the modal, example: upload-status
+// options[buttonId] -> id of button that click to show the modal, example: upload-status
+// options[type] -> upload / download, example: U, D
 //################################
-$route = str_replace('_','-',$name);
-$model = str_replace('\\','bAckSlasH',$model);
-$title = ucwords(str_replace('_',' ',$name));
+$route    = str_replace('_','-',$name);
+$model    = str_replace('\\','bAckSlasH',$model);
+$title    = ucwords(str_replace('_',' ',$name));
+$type     = isset($options['type']) ? $options['type'] : '';
+$buttonId = isset($options['buttonId']) ? $options['buttonId'] : 'upload-status';
 @endphp
 
 <div class="modal fade" id="trace-table" role="dialog" aria-labelledby="trace-table" aria-hidden="true" tabindex="false" data-backdrop="static">
@@ -56,8 +59,8 @@ $title = ucwords(str_replace('_',' ',$name));
 </style>
 @endpush
 
-@push('additional-js')
-<script type="text/javascript">
+@push('function-js')
+{{-- <script type="text/javascript"> --}}
     $('#{{$buttonId}}').attr('data-toggle','modal');
     $('#{{$buttonId}}').attr('href','#trace-table');
     $('#{{$buttonId}}').on('click',function(){
@@ -66,8 +69,8 @@ $title = ucwords(str_replace('_',' ',$name));
             "processing": true,
             "serverSide": true,
             "ajax": {
-                url: "{{ route('job-trace.data', ['model' => $model, 'type' => 2]) }}",
-                type: 'GET',
+                url: "{{ route('job-trace.data', ['model' => $model, 'type' => $type]) }}",
+                type: 'POST',
             },
             "rowId": "id",
             "columns": [
@@ -134,5 +137,5 @@ $title = ucwords(str_replace('_',' ',$name));
                 }
             });
     });
-</script>
+{{-- </script> --}}
 @endpush
